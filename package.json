@@ -10,7 +10,7 @@
     "test": "node --test test/*.test.js",
     "ingest": "node scripts/ingest-lex.js"
   },
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=22.9" },
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "1.4.0",

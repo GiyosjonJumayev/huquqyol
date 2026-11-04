@@ -12,7 +12,7 @@ MVP to‘rtta holatni qamraydi: ish haqi to‘lanmasligi, noqonuniy bo‘shatish
 
 ## Ishga tushirish
 
-Node.js 20 yoki undan yangi versiya kerak.
+Node.js 22.9 yoki undan yangi versiya kerak.
 
 ```bash
 npm install
