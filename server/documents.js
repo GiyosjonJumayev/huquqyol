@@ -13,7 +13,7 @@ const fmtSum = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\
 const P = (v, ph) => (v ? { v: String(v) } : { ph });   // to‘ldirilmagan joy — ph
 
 // Hujjat modeli: bloklar ro‘yxati. Ham ko‘rinish (JSON), ham DOCX/PDF shu modeldan yasaladi.
-export function documentModel({ scenario, recipient, form = {}, triggerDate, today = new Date() }){
+export function documentModel({ scenario, recipient, form = {}, evidence = [], triggerDate, today = new Date() }){
   const s = SCENARIO_BY_ID[scenario];
   if (!s) throw Object.assign(new Error("Noma’lum holat"), { status: 400 });
   if (!s.documents.includes(recipient)) recipient = s.documents[0];
@@ -89,13 +89,18 @@ export function documentModel({ scenario, recipient, form = {}, triggerDate, tod
     }
     B.push({ t:"list", items: asks });
   }
-  const att = recipient === "employer" ? ["Mehnat shartnomasi nusxasi."]
-    : recipient === "inspection" ? ["Ish beruvchiga berilgan talabnoma nusxasi.", "Mehnat shartnomasi nusxasi.", "Dalillar nusxalari."]
-    : ["Da’vo arizasining javobgar uchun nusxasi.", "Mehnat shartnomasi nusxasi.", "Pasport nusxasi.", scenario === "ishdan_boshatish" ? "Bo‘shatish buyrug‘i ko‘chirmasi." : "Bank ko‘chirmasi / ish haqi hisob varaqasi.", "Ish beruvchiga berilgan talabnoma nusxasi."];
+  // Ilovalar: majburiy hujjatlar + foydalanuvchi belgilagan dalillar
+  const base = recipient === "employer" ? ["Mehnat shartnomasi nusxasi"]
+    : recipient === "inspection" ? ["Ish beruvchiga berilgan talabnoma nusxasi", "Mehnat shartnomasi nusxasi"]
+    : ["Da’vo arizasining javobgar uchun nusxasi", "Pasport nusxasi", "Mehnat shartnomasi nusxasi"];
+  const picked = evidence.map(i => s.evidence[i]).filter(Boolean).map(e => e.replace(/\s*\(.*\)$/, ""));
+  const seen = new Set();
+  const att = [...base, ...picked].filter(x => { const k = x.toLowerCase().slice(0, 18); return !seen.has(k) && seen.add(k); }).map(x => /nusxa|guvoh/i.test(x) ? x + "." : x + " (nusxa).");
   B.push({ t:"lbl", text:"Ilovalar:" });
   B.push({ t:"list", items: att.map(x => [{ v:x }]) });
   B.push({ t:"sign", left: uzDate(now), right:[{ v:"Imzo: ____________  " }, P(f.fio, "F.I.Sh.")] });
-  return { scenario, recipient, blocks: B };
+  const missing = [...new Set(B.flatMap(b => [...(b.parts || []), ...(b.lines || []).flat(), ...(b.items || []).flat(), ...(b.right || [])]).filter(p => p.ph).map(p => p.ph))];
+  return { scenario, recipient, blocks: B, missing };
 }
 
 const partText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
