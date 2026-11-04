@@ -1,0 +1,246 @@
+[
+  {
+    "id": "ish_haqi",
+    "title": "Ish haqi to‘lanmayapti",
+    "card": "Maosh kechikyapti yoki umuman berilmayapti",
+    "short": "Ish haqi",
+    "lead": "Ish beruvchi ish haqini oyiga kamida ikki marta to‘lashi shart. Kechiktirilgan har bir kun uchun sizga qo‘shimcha kompensatsiya tegadi.",
+    "keywords": [
+      "maosh",
+      "oylik",
+      "ish haqi",
+      "ish haqqi",
+      "zarplata",
+      "to‘lamay",
+      "bermay",
+      "kechik",
+      "qarz",
+      "avans",
+      "bo‘nak"
+    ],
+    "norms": [
+      "m253",
+      "m333",
+      "m25",
+      "muddat",
+      "m9"
+    ],
+    "deadlineMonths": 6,
+    "compensation": true,
+    "trigger": "Birinchi to‘lanmagan maosh sanasi",
+    "steps": [
+      {
+        "org": "Ish beruvchi",
+        "t": "Yozma talabnoma bering",
+        "when": "Bugun",
+        "body": "2 nusxada; ikkinchisiga qabul belgisi va sana qo‘ydiring."
+      },
+      {
+        "org": "Mehnat inspeksiyasi",
+        "t": "Javob bo‘lmasa, ariza yozing",
+        "when": "1–2 hafta ichida",
+        "body": "Inspektor tekshiradi va ish beruvchiga majburiy ko‘rsatma beradi."
+      },
+      {
+        "org": "Sud",
+        "t": "Qarz va kompensatsiyani undiring",
+        "when": "{deadline} gacha",
+        "hot": true,
+        "body": "Fuqarolik sudiga da’vo. Xodim sud xarajatlaridan ozod."
+      }
+    ],
+    "evidence": [
+      "Mehnat shartnomasi",
+      "Bank ko‘chirmasi (oxirgi tushum)",
+      "Ish haqi hisob varaqasi",
+      "Ish beruvchi bilan yozishmalar",
+      "Talabnoma nusxasi (qabul belgisi bilan)",
+      "Hamkasblar guvohligi"
+    ],
+    "documents": [
+      "employer",
+      "inspection",
+      "court"
+    ]
+  },
+  {
+    "id": "ishdan_boshatish",
+    "title": "Noqonuniy ishdan bo‘shatishdi",
+    "card": "Ogohlantirmasdan yoki asossiz bo‘shatishdi",
+    "short": "Ishdan bo‘shatish",
+    "lead": "Ish beruvchi sizni faqat qonunda sanalgan asos bilan va tartibga rioya qilib bo‘shatishi mumkin. Aks holda sud sizni ishga tiklaydi.",
+    "keywords": [
+      "bo‘shat",
+      "haydash",
+      "haydab",
+      "ishdan chiqar",
+      "uvol",
+      "ozod qil",
+      "qisqart",
+      "shtat",
+      "ishga tikla",
+      "ogohlantir"
+    ],
+    "norms": [
+      "m161",
+      "m165",
+      "sud",
+      "muddat",
+      "m171",
+      "m9"
+    ],
+    "deadlineMonths": 3,
+    "compensation": false,
+    "trigger": "Bo‘shatish buyrug‘i qo‘lingizga tekkan sana",
+    "steps": [
+      {
+        "org": "Ish beruvchi",
+        "t": "Buyruq va daftarchani so‘rang",
+        "when": "Darhol",
+        "body": "Buyruq nusxasini olgan sanani yozib qo‘ying: muddat shu kundan boshlanadi."
+      },
+      {
+        "org": "Sud",
+        "t": "Ishga tiklash da’vosini bering",
+        "when": "{deadline} gacha",
+        "hot": true,
+        "body": "Bevosita sudga. Majburiy progul haqi va ma’naviy zararni ham so‘rang."
+      },
+      {
+        "org": "Mehnat inspeksiyasi",
+        "t": "Parallel ariza yozing",
+        "when": "Sud bilan birga",
+        "body": "Inspeksiya xulosasi sudda dalil bo‘ladi, lekin sud muddatini to‘xtatmaydi."
+      }
+    ],
+    "evidence": [
+      "Bo‘shatish buyrug‘i nusxasi",
+      "Mehnat shartnomasi",
+      "Ogohlantirish xati (yoki uning yo‘qligi)",
+      "Mehnat daftarchasi / elektron ko‘chirma",
+      "Yozishmalar",
+      "Guvohlar"
+    ],
+    "documents": [
+      "court",
+      "inspection"
+    ]
+  },
+  {
+    "id": "tatil",
+    "title": "Ta’tilga chiqarishmayapti",
+    "card": "Yillik ta’til berilmayapti yoki qisqartirildi",
+    "short": "Ta’til",
+    "lead": "Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan ta’tilga haqli. Ish beruvchi uni bermasligi mumkin emas.",
+    "keywords": [
+      "ta’til",
+      "tatil",
+      "otpusk",
+      "dam ol",
+      "ta'til"
+    ],
+    "norms": [
+      "m217",
+      "m218",
+      "m220",
+      "m231",
+      "muddat"
+    ],
+    "deadlineMonths": 6,
+    "compensation": false,
+    "trigger": "Ta’til rad etilgan sana",
+    "steps": [
+      {
+        "org": "Ish beruvchi",
+        "t": "Ta’til so‘rab ariza yozing",
+        "when": "Bugun",
+        "body": "Kunlar soni va sanani ko‘rsating, ta’tillar grafigini so‘rang."
+      },
+      {
+        "org": "Mehnat inspeksiyasi",
+        "t": "Rad etilsa, ariza yozing",
+        "when": "Rad javobidan keyin",
+        "body": "Inspektor ish beruvchiga ta’til berish yuzasidan ko‘rsatma beradi."
+      },
+      {
+        "org": "Sud",
+        "t": "Ta’til yoki kompensatsiyani talab qiling",
+        "when": "{deadline} gacha",
+        "hot": true,
+        "body": "Fuqarolik sudiga da’vo. Sud xarajati to‘lanmaydi."
+      }
+    ],
+    "evidence": [
+      "Mehnat shartnomasi",
+      "Ta’til so‘ralgan ariza nusxasi",
+      "Rad javobi yoki yozishma",
+      "Ta’tillar grafigi",
+      "Ish staji hujjati"
+    ],
+    "documents": [
+      "employer",
+      "inspection"
+    ]
+  },
+  {
+    "id": "hisob_kitob",
+    "title": "Bo‘shatganda hisob-kitob qilinmadi",
+    "card": "Oxirgi pul yoki mehnat daftarcha berilmadi",
+    "short": "Hisob-kitob",
+    "lead": "Ishdan ketgan kuningiz barcha pul va mehnat daftarchasi berilishi shart. Kechiktirilgan har bir kun uchun kompensatsiya tegadi.",
+    "keywords": [
+      "hisob-kitob",
+      "hisob kitob",
+      "raschyot",
+      "rasschet",
+      "daftarcha",
+      "trudovoy",
+      "ketdim",
+      "ishdan ketganman",
+      "kompensatsiya bermay"
+    ],
+    "norms": [
+      "hisob",
+      "m171",
+      "m333",
+      "muddat"
+    ],
+    "deadlineMonths": 6,
+    "compensation": true,
+    "trigger": "Oxirgi ish kuningiz",
+    "steps": [
+      {
+        "org": "Ish beruvchi",
+        "t": "Hisob-kitobni yozma talab qiling",
+        "when": "Bugun",
+        "body": "Qonun bo‘yicha pul talabdan keyin 3 kun ichida to‘lanishi kerak."
+      },
+      {
+        "org": "Mehnat inspeksiyasi",
+        "t": "To‘lanmasa, ariza yozing",
+        "when": "3 kundan keyin",
+        "body": "Daftarcha berilmagani ham alohida qoidabuzarlik sifatida ko‘riladi."
+      },
+      {
+        "org": "Sud",
+        "t": "Summa va kompensatsiyani undiring",
+        "when": "{deadline} gacha",
+        "hot": true,
+        "body": "Fuqarolik sudiga da’vo. Xodim sud xarajatlaridan ozod."
+      }
+    ],
+    "evidence": [
+      "Ishdan bo‘shash arizasi nusxasi",
+      "Bo‘shatish buyrug‘i",
+      "Oxirgi hisob varaqasi",
+      "Bank ko‘chirmasi",
+      "Talabnoma nusxasi",
+      "Yozishmalar"
+    ],
+    "documents": [
+      "employer",
+      "inspection",
+      "court"
+    ]
+  }
+]
