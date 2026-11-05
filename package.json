@@ -1,6 +1,6 @@
 {
   "name": "huquqyol",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "HuquqYo‘l — fuqarolar uchun AI huquqiy yo‘l xaritasi (mehnat, iste’molchi, oila, davlat idoralari, jarimalar, qarz — O‘zbekiston)",
   "type": "module",
   "main": "server/index.js",
