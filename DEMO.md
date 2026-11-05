@@ -16,7 +16,7 @@
    - 3 qadam: ish beruvchi → inspeksiya → sud;
    - normalar va lex.uz havolalari;
    - dalillar ro‘yxati.
-   Belgilangan dalillar ariza ilovalariga tushadi.
+   Belgilangan dalillar ariza ilovalariga tushadi. **Kalendarga eslatma** tugmasi muddatni telefon kalendariga qo‘shadi; **Rejani chop etish** — qog‘ozdagi reja.
 3. **Ariza.** **Namuna bilan to‘ldirish** tugmasini bosing: hujjat ko‘z oldida to‘ladi. Shundan keyin:
    - «Kimga» bo‘limida ish beruvchi / inspeksiya / sud almashadi;
    - **PDF** yoki **Word** yuklab olinadi;
@@ -30,7 +30,7 @@
 - **Muddat qonun bo‘yicha hisoblanadi.** MK 9-modda: oy oxiri, yakshanba kuni keyingi ish kuniga ko‘chiriladi.
 - **Maxfiylik.** Ma’lumot faqat qurilmada saqlanadi, matn logga yozilmaydi.
 - **Sifat.**
-  - 39 unit/API va 5 brauzer testi;
+  - 41 unit/API va 5 brauzer testi;
   - Lighthouse: Accessibility, Best Practices, SEO 100, Performance 99–100;
   - axe: 0 xato (yorug‘ va qorong‘i mavzuda).
 

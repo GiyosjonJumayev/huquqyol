@@ -134,6 +134,19 @@ test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til alma
   assert.equal(await p.innerText("#v2 h1"), "Не выплачивают зарплату");
   assert.match(await p.innerText("#calcValue"), /не менее .* сум/);
   assert.deepEqual(await audit(p), []);
+  const ics = p.waitForEvent("download");
+  await p.click("#calBtn");
+  const icsFile = await (await ics).path();
+  const cal = readFileSync(icsFile, "utf8");
+  const unfolded = cal.replace(/\r\n /g, "");
+  assert.ok(cal.startsWith("BEGIN:VCALENDAR") && unfolded.includes("SUMMARY:Последний день: Не выплачивают зарплату") && cal.includes("BEGIN:VALARM"));
+  assert.ok(cal.split("\r\n").every(l => Buffer.byteLength(l) <= 75), "ICS qatorlari 75 baytdan oshmaydi");
+  await p.emulateMedia({ media:"print" });
+  await p.evaluate(() => document.body.classList.add("print-plan"));
+  assert.equal(await p.isVisible("#v2 h1"), true);                  // chop etishda reja ko‘rinadi
+  assert.equal(await p.isVisible("#v2 .cta"), false);
+  await p.evaluate(() => document.body.classList.remove("print-plan"));
+  await p.emulateMedia({ media:"screen" });
   await p.click(".cta [data-go='3']");
   await p.waitForSelector("#paper .ttl");
   await p.click("#demoFill");

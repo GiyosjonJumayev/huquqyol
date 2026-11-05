@@ -77,3 +77,21 @@ test("Bosh sahifa serverda chiziladi; versiyali fayllar bir yil keshlanadi; gzip
   const js = await (await fetch(base + "/app.js")).text();
   assert.match(js, /from "\/translit\.js\?v=[a-f0-9]+"/);
 });
+
+test("Boshqa saytdan POST rad etiladi; o‘z saytidan va Originsiz — ruxsat", async () => {
+  const body = JSON.stringify({ scenario:"ish_haqi" });
+  const h = origin => ({ method:"POST", headers:{ "Content-Type":"application/json", ...(origin ? { Origin: origin } : {}) }, body });
+  const evil = await fetch(base + "/api/plan", h("https://evil.example"));
+  assert.equal(evil.status, 403);
+  assert.equal((await fetch(base + "/api/plan", h(base))).status, 200);
+  assert.equal((await fetch(base + "/api/plan", h(null))).status, 200);
+  assert.equal((await fetch(base + "/api/plan", h("null"))).status, 403);
+});
+
+test("Noma’lum sahifa — 404 sahifasi; robots.txt; OG teglar", async () => {
+  const r = await fetch(base + "/yoq-sahifa", { headers:{ cookie:"hy_lang=ru" } });
+  assert.equal(r.status, 404);
+  assert.ok((await r.text()).includes("Страница не найдена"));
+  assert.match(await (await fetch(base + "/robots.txt")).text(), /Disallow: \/api\//);
+  assert.match(await (await fetch(base + "/")).text(), /property="og:title" content="HuquqYo‘l/);
+});

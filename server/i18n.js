@@ -41,7 +41,8 @@ const M = {
   badJson:{ uz:"JSON noto‘g‘ri.", ru:"Неверный JSON." },
   notFound:{ uz:"Topilmadi.", ru:"Не найдено." },
   format:{ uz:"Format: docx yoki pdf.", ru:"Формат: docx или pdf." },
-  server:{ uz:"Serverda xatolik yuz berdi.", ru:"На сервере произошла ошибка." }
+  server:{ uz:"Serverda xatolik yuz berdi.", ru:"На сервере произошла ошибка." },
+  origin:{ uz:"So‘rov boshqa saytdan yuborilgan.", ru:"Запрос отправлен с другого сайта." }
 };
 export function msg(lang, key, vars = {}){
   const m = M[key]; if (!m) return key;

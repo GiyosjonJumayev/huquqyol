@@ -10,10 +10,10 @@ LAWS = {
   "ihq":  {"name":"Iste’molchilar huquqlari to‘g‘risidagi qonun", "full":"«Iste’molchilarning huquqlarini himoya qilish to‘g‘risida»gi Qonun (221-I, 26.04.1996)", "url":"https://lex.uz/docs/-4704"},
   "ok":   {"name":"Oila kodeksi", "full":"O‘zbekiston Respublikasining Oila kodeksi (30.04.1998)", "url":"https://lex.uz/docs/104720"},
   "mq":   {"name":"Murojaatlar to‘g‘risidagi qonun", "full":"«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonun (O‘RQ-445 tahririda)", "url":"https://lex.uz/docs/-3336169"},
-  "msk":  {"name":"Ma’muriy sud ishlarini yuritish to‘g‘risidagi kodeks", "full":"Ma’muriy sud ishlarini yuritish to‘g‘risidagi kodeks", "url":"https://lex.uz"},
+  "msk":  {"name":"Ma’muriy sud ishlarini yuritish to‘g‘risidagi kodeks", "full":"O‘zbekiston Respublikasining Ma’muriy sud ishlarini yuritish to‘g‘risidagi kodeksi (25.01.2018)", "url":"https://lex.uz/docs/-3527353"},
   "mjtk": {"name":"Ma’muriy javobgarlik to‘g‘risidagi kodeks", "full":"Ma’muriy javobgarlik to‘g‘risidagi kodeks (MJtK)", "url":"https://lex.uz/acts/-97664"},
   "fk":   {"name":"Fuqarolik kodeksi", "full":"O‘zbekiston Respublikasining Fuqarolik kodeksi", "url":"https://lex.uz/mact/-111189"},
-  "dbq":  {"name":"Davlat boji to‘g‘risidagi qonun", "full":"«Davlat boji to‘g‘risida»gi Qonun", "url":"https://lex.uz"}
+  "dbq":  {"name":"Davlat boji to‘g‘risidagi qonun", "full":"«Davlat boji to‘g‘risida»gi Qonun (O‘RQ-600, 06.01.2020)", "url":"https://lex.uz/docs/4680955"}
 }
 
 DOMAINS = [

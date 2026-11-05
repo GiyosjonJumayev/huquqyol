@@ -99,6 +99,14 @@ const M = {
   selected:{ uz:"Matn belgilandi: Ctrl+C bosing", ru:"Текст выделен: нажмите Ctrl+C" },
   offline:{ uz:"Internet uzildi. Ma’lumotlaringiz saqlanadi, aloqa tiklanganda davom eting.", ru:"Нет интернета. Данные сохранены — продолжите, когда связь восстановится." },
   online:{ uz:"Aloqa tiklandi", ru:"Связь восстановлена" },
+  printPlan:{ uz:"Rejani chop etish", ru:"Распечатать план" },
+  calendar:{ uz:"Kalendarga eslatma", ru:"Напоминание в календарь" },
+  calTitle:{ uz:"Oxirgi kun: {title}", ru:"Последний день: {title}" },
+  calSoon:{ uz:"3 kun qoldi: {title}", ru:"Осталось 3 дня: {title}" },
+  calDone:{ uz:"Eslatma fayli yuklandi — uni kalendaringizda oching", ru:"Файл напоминания загружен — откройте его в календаре" },
+  printedAt:{ uz:"HuquqYo‘l rejasi · {date}", ru:"План HuquqYo‘l · {date}" },
+  notFoundPage:{ uz:"Sahifa topilmadi", ru:"Страница не найдена" },
+  toHome:{ uz:"Bosh sahifaga", ru:"На главную" },
   docLang:{ uz:"Ariza tili: o‘zbekcha", ru:"Язык заявления: русский" },
   docLangNote:{ uz:"", ru:"Обращения можно подавать на государственном или другом языке. В суде делопроизводство ведётся на узбекском языке; при необходимости суд обеспечивает переводчика." }
 };

@@ -137,7 +137,7 @@ function defaultTrigger(m, facts){
   return iso(short ? new Date() : monthsAgo(1));
 }
 async function choose(a){
-  state.analysis = a;
+  state.analysis = { ...a, lang: LANG };
   $("#resume").hidden = true;
   if (a.scenario === "boshqa"){ renderOut(); return; }
   const m = scenarioMeta(a.scenario), facts = a.facts || {};
@@ -179,7 +179,9 @@ function calcInput(f){
   return `<div class="field"><label for="c_${f.k}">${esc(f.label)}</label><input id="c_${f.k}" data-ck="${f.k}" data-type="${f.type}" ${attrs} value="${esc(val)}"></div>`;
 }
 function renderPlan(){
-  const p = state.plan, a = state.analysis || {}, info = p.info, m = scenarioMeta(state.scn);
+  const p = state.plan, info = p.info, m = scenarioMeta(state.scn);
+  // AI xulosasi boshqa tilda yozilgan bo‘lsa (til almashtirilgan), uning o‘rniga holat tavsifi ko‘rsatiladi
+  const a0 = state.analysis || {}, a = a0.lang && a0.lang !== LANG ? { ...a0, summary:"", missing:[] } : a0;
   const focus = new Set(a.normIds || []);
   const law = n => `<div class="law">${badge(n)}<div><b>${esc(n.title)}${focus.has(n.id) ? ` <span class="tag">${t("forYou")}</span>` : ""}</b><p>${esc(n.text)}</p><span class="lawsrc">${esc(n.lawName)}</span></div></div>`;
   const source = t(a.source === "ai" ? "srcAI" : a.source === "rules" ? "srcRules" : "srcChoice");
@@ -216,7 +218,8 @@ function renderPlan(){
     <h2 class="sec">${t("evidenceH")} <span class="small muted evcount" id="evCount"></span></h2>
     <p class="small muted evhint">${t("evidenceHint")}</p>
     <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
-    <div class="cta"><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
+    <div class="cta"><button class="btn ghost" type="button" id="printPlan">${t("printPlan")}</button><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
+  $("#printPlan").addEventListener("click", printPlan);
   renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
   $("#evid").addEventListener("change", e => {
     const i = Number(e.target.dataset.i); if (Number.isNaN(i)) return;
@@ -246,7 +249,9 @@ function renderDeadline(){
     <div class="small muted">${t("lastDay")} <b class="ink">${esc(p.deadlineText)}</b> · ${esc(t("termSuffix", { term: p.deadlineTerm }))}</div>
     <div class="bar ${cls}" role="progressbar" aria-label="${t("progressLabel")}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.progress * 100)}"><i style="width:${Math.round(p.progress * 100)}%"></i></div>
     <div class="small tip">${esc(p.risk.tip)}</div>
-    ${p.deadlineNote ? `<div class="small muted dnote">${esc(p.deadlineNote)}</div>` : ""}${date}`;
+    ${p.deadlineNote ? `<div class="small muted dnote">${esc(p.deadlineNote)}</div>` : ""}${date}
+    ${p.daysLeft >= 0 ? `<button class="btn ghost sm calbtn" id="calBtn" type="button">${t("calendar")}</button>` : ""}`;
+  $("#calBtn")?.addEventListener("click", downloadIcs);
   $("#trigger").addEventListener("change", e => {
     if (!e.target.value) return;
     state.trigger = e.target.value;
@@ -272,6 +277,37 @@ function renderCalc(){
   rows.innerHTML = (c.rows || []).map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("");
 }
 function renderEvCount(){ $("#evCount").textContent = t("evCount", { a: state.evidence.length, b: state.plan.evidence.length }); }
+
+/* ---------- Kalendar eslatmasi (.ics) va rejani chop etish ---------- */
+const icsEsc = s => String(s).replace(/[\\;,]/g, m => "\\" + m).replace(/\r?\n/g, "\\n");
+const icsDate = s => s.replace(/-/g, "");
+// RFC 5545: qatorlar 75 baytdan oshmasligi kerak — uzun qator bo‘linadi
+const fold = line => { const out = []; let cur = "", n = 0; for (const ch of line){ const b = new TextEncoder().encode(ch).length; if (n + b > 73){ out.push(cur); cur = " "; n = 1; } cur += ch; n += b; } out.push(cur); return out.join("\r\n"); };
+function downloadIcs(){
+  const p = state.plan; if (!p?.deadline) return;
+  const next = d => { const x = new Date(d + "T00:00:00"); x.setDate(x.getDate() + 1); return iso(x); };
+  const desc = [p.info.lead, "", ...p.steps.map((s, i) => `${i + 1}. ${s.org}: ${s.t} (${s.when})`), "", location.origin].join("\n");
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  const ev = (uid, day, title, alarm) => ["BEGIN:VEVENT", `UID:${uid}-${p.scenario}-${day}@huquqyol`, `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${icsDate(day)}`, `DTEND;VALUE=DATE:${icsDate(next(day))}`, `SUMMARY:${icsEsc(title)}`, `DESCRIPTION:${icsEsc(desc)}`,
+    ...(alarm ? ["BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsEsc(title)}`, "TRIGGER:-PT15H", "END:VALARM"] : []), "END:VEVENT"];
+  const soon = (() => { const x = new Date(p.deadline + "T00:00:00"); x.setDate(x.getDate() - 3); return iso(x); })();
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//HuquqYo‘l//UZ", "CALSCALE:GREGORIAN",
+    ...(soon >= iso(new Date()) ? ev("soon", soon, t("calSoon", { title: p.info.title }), true) : []),
+    ...ev("last", p.deadline, t("calTitle", { title: p.info.title }), true), "END:VCALENDAR"];
+  const blob = new Blob([lines.map(fold).join("\r\n") + "\r\n"], { type:"text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement("a"), { href:url, download:`HuquqYol-${p.scenario}-${p.deadline}.ics` });
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast(t("calDone"));
+}
+function printPlan(){
+  $("#v2").dataset.printed = t("printedAt", { date: new Date().toLocaleDateString(LANG === "ru" ? "ru-RU" : "uz-UZ") });
+  document.querySelectorAll("#v2 details").forEach(d => d.setAttribute("open", ""));
+  document.body.classList.add("print-plan");
+  window.print();
+}
+window.addEventListener("afterprint", () => document.body.classList.remove("print-plan"));
 
 /* ---------- 3. Ariza ---------- */
 function fieldHTML(f){

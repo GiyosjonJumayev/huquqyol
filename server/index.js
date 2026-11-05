@@ -9,7 +9,7 @@ import { SCENARIOS, NORMS, LEX_URL, kbFor } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, toDocx, toPdf } from "./documents.js";
-import { securityHeaders, requireJson, rateLimit } from "./security.js";
+import { securityHeaders, requireJson, rateLimit, sameOrigin } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
 import { domainCardsHTML, examplesHTML } from "../public/shared.js";
@@ -30,7 +30,7 @@ app.disable("x-powered-by");
 if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY === "true" ? 1 : process.env.TRUST_PROXY);
 app.use(compression());
 app.use(securityHeaders);
-app.use("/api", requireJson, express.json({ limit: "32kb", strict: true }));
+app.use("/api", sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
 app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
@@ -125,6 +125,11 @@ app.use(express.static(PUBLIC, {
     if (path.endsWith(".webmanifest")) res.type("application/manifest+json");
   }
 }));
+
+// Noma’lum sahifa: til bo‘yicha qisqa 404 sahifasi
+const NOT_FOUND = Object.fromEntries(LANGS.map(l => { const t = makeT(l);
+  return [l, `<!doctype html><html lang="${HTML_LANG[l]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${t("notFoundPage")} — HuquqYo‘l</title><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/app.css?v=${VER["app.css"]}"></head><body><main class="wrap nf"><h1>404</h1><p>${t("notFoundPage")}</p><a class="btn primary" href="/">${t("toHome")}</a></main></body></html>`]; }));
+app.use((req, res, next) => req.method === "GET" || req.method === "HEAD" ? res.status(404).type("html").send(NOT_FOUND[req.lang]) : next());
 
 app.use((err, req, res, next) => {
   const lang = req.lang || resolveLang(req);

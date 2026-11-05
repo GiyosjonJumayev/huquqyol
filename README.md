@@ -4,6 +4,8 @@ Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahli
 
 **Uch tilda ishlaydi:** o‘zbek (lotin), o‘zbek (kirill) va rus. Til interfeys, normalar matni, qadamlar, kalkulyatorlar, xato xabarlari va tayyor arizaga birdek tatbiq etiladi. Rus tilidagi ariza ruscha rasmiy uslubda yoziladi («ИСКОВОЕ ЗАЯВЛЕНИЕ», «На основании изложенного прошу:»). Vaziyatni istalgan tilda yozish mumkin, jumladan o‘zbekcha kirillda.
 
+Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
+
 Taqdimot ssenariysi va hakamlar savollariga javoblar — [DEMO.md](DEMO.md).
 
 ## Qamrab olingan sohalar (6 soha, 11 holat)
@@ -25,7 +27,7 @@ Node.js 22.9 yoki undan yangi versiya kerak.
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 39 ta unit/API test (jumladan ruscha va kirillcha)
+npm test                  # 41 ta unit/API test (jumladan ruscha va kirillcha)
 npm run test:e2e          # 5 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
@@ -148,3 +150,9 @@ Shablon sintaksisi:
 | Kirill | O‘zbekcha natijadan avtomatik o‘giriladi (`public/translit.js`); identifikatorlar, URL va sanalar o‘zgarmaydi |
 | Qidiruv | Ruscha kalit so‘zlar bazaga qo‘shilgan; kirillcha o‘zbek matni qidiruv uchun lotinga ham o‘giriladi |
 | AI | Claude `summary` va `missing` ni foydalanuvchi tilida yozadi |
+
+## Xavfsizlik (qisqacha)
+- Qat’iy CSP (inline skript yo‘q), `nosniff`, `X-Frame-Options: DENY`, Permissions-Policy, productionda HSTS.
+- POST so‘rovlar: faqat JSON (415), 32 KB chegara, boshqa saytdan kelgan so‘rov rad etiladi (Origin tekshiruvi, 403), har bir endpoint uchun rate limit.
+- Har bir holat maydonlari spetsifikatsiya bo‘yicha tekshiriladi; boshqaruv belgilari tozalanadi; prototipsiz lug‘atlar.
+- Foydalanuvchi matni logga yozilmaydi; ma’lumotlar faqat brauzerda saqlanadi; Docker konteyner root bo‘lmagan foydalanuvchida ishlaydi.

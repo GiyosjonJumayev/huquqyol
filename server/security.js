@@ -38,6 +38,18 @@ export function requireJson(req, res, next){
   next();
 }
 
+// Boshqa saytdan kelgan POST so‘rovlarni rad etish: brauzer Origin sarlavhasini qo‘yadi, u xostga mos bo‘lishi kerak.
+// Origin bo‘lmasa (curl, server-server) — ruxsat; brauzer esa POSTda uni har doim yuboradi.
+export function sameOrigin(req, res, next){
+  const origin = req.headers.origin;
+  if (req.method !== "POST" || !origin) return next();
+  let host = null;
+  try { host = new URL(origin).host; } catch {}
+  const own = [req.headers.host, req.app.get("trust proxy") ? req.headers["x-forwarded-host"] : null].filter(Boolean);
+  if (host && own.includes(host)) return next();
+  return res.status(403).json({ error: msg(resolveLang(req), "origin") });
+}
+
 // Xotirada ishlaydigan sliding-window rate limit; eskirgan yozuvlar tozalanadi
 export function rateLimit({ windowMs = 60_000, max = 20, name = "api" } = {}){
   const hits = new Map();
