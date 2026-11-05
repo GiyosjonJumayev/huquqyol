@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="HuquqYo‘l — mehnat huquqi buzilganda qonun, qadamlar va tayyor ariza">
 <title>HuquqYo‘l — huquqiy yo‘l xaritasi</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='20' fill='none' stroke='%230E6B5C' stroke-width='3'/%3E%3Ccircle cx='12' cy='31' r='4' fill='%230E6B5C'/%3E%3Ccircle cx='30' cy='13' r='4.5' fill='%23A8322A'/%3E%3C/svg%3E">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/onest/onest-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/fonts.css">
 <meta name="theme-color" content="#0E6B5C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="/app.css">
 <script type="module" src="/app.js"></script>
 </head>
@@ -16,17 +18,23 @@
 <a class="skip" href="#main">Asosiy qismga o‘tish</a>
 <div class="sr" aria-live="polite" id="live"></div>
 <div class="wrap">
-  <div class="top">
-    <button class="brand" id="home" type="button" aria-label="Boshiga qaytish">
+  <header class="top">
+    <button class="brand" id="home" type="button" aria-label="Boshiga qaytish" data-notr>
       <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>
       HuquqYo‘l
     </button>
-    <ol class="stepper" aria-label="Bosqichlar">
+    <div class="topright">
+    <div class="langsw" role="group" aria-label="Yozuv" data-notr>
+      <button type="button" data-lang="lat" aria-pressed="true">Lotin</button>
+      <button type="button" data-lang="cyr" aria-pressed="false" lang="uz-Cyrl">Кирилл</button>
+    </div>
+    <nav aria-label="Bosqichlar"><ol class="stepper">
       <li><button type="button" data-go="1" aria-current="step"><span class="n">1</span><span class="lbl">Vaziyat</span></button></li>
       <li><button type="button" data-go="2" disabled><span class="n">2</span><span class="lbl">Reja</span></button></li>
       <li><button type="button" data-go="3" disabled><span class="n">3</span><span class="lbl">Ariza</span></button></li>
-    </ol>
-  </div>
+    </ol></nav>
+    </div>
+  </header>
 
   <main id="main">
   <div class="resume" id="resume" hidden></div>
@@ -55,7 +63,7 @@
   <!-- 3. Ariza -->
   <section class="view" id="v3" hidden>
     <button class="back" type="button" data-go="2">← Rejaga qaytish</button>
-    <div class="case-head"><h2 tabindex="-1">Arizangiz tayyor</h2><p>Kimga yozishni tanlang va ma’lumotlaringizni kiriting. Hujjat siz yozgan sari yangilanadi.</p></div>
+    <div class="case-head"><h1 tabindex="-1">Arizangiz tayyor</h1><p>Kimga yozishni tanlang va ma’lumotlaringizni kiriting. Hujjat siz yozgan sari yangilanadi.</p></div>
     <div class="seg" role="group" aria-label="Kimga" id="seg"></div>
     <div class="docgrid">
       <div id="docForm"></div>

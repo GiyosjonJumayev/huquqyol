@@ -1,4 +1,5 @@
 // HuquqYo‘l — frontend. Huquqiy mantiq serverda (/api/*); bu fayl ko‘rsatadi, saqlaydi va yo‘naltiradi.
+import { toCyrillic } from "/translit.js";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const fmtSum = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -12,7 +13,7 @@ const store = {
   save(v){ try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} },
   clear(){ try { localStorage.removeItem(KEY); } catch {} }
 };
-function announce(msg){ const l = $("#live"); l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 30); }
+function announce(msg){ msg = typeof T === "function" ? T(msg) : msg; const l = $("#live"); l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 30); }
 function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); announce(msg); setTimeout(() => t.remove(), 2800); }
 
 async function api(path, body){
@@ -44,7 +45,50 @@ const FIELDS = {
 const PH_FIELD = { "F.I.Sh.":"fio", "manzil":"address", "telefon":"phone", "tashkilot nomi":"employer", "lavozim":"position", "rahbar F.I.Sh.":"boss", "tuman/shahar":"district", "tuman":"district", "ish beruvchi manzili":"empAddress", "summa":"amount" };
 const ROUTES = { 1:"vaziyat", 2:"reja", 3:"ariza" };
 
-const state = { meta:null, analysis:null, scn:null, plan:null, trigger:null, recipient:"employer", form:{}, evidence:[], blocks:[], missing:[] };
+/* ---------- Yozuv: lotin / kirill ----------
+   Interfeys matni lotinda yoziladi; kirill rejimida DOM matnlari avtomatik o‘giriladi.
+   Asl matn WeakMap’da saqlanadi, shuning uchun lotinga qaytish yo‘qotishsiz. */
+const LANG_KEY = "huquqyol:lang";
+let lang = (() => { try { return localStorage.getItem(LANG_KEY) === "cyr" ? "cyr" : "lat"; } catch { return "lat"; } })();
+const orig = new WeakMap(), origAttr = new WeakMap();
+const ATTRS = ["placeholder", "aria-label", "title"];
+const skip = el => !el || el.closest("[data-notr], textarea, script, style, #paper");
+function convertTree(root){
+  if (lang !== "cyr") return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = walker.currentNode.nodeType === 3 ? walker.currentNode : walker.nextNode(); n; n = walker.nextNode()){
+    if (skip(n.parentElement) || !/[A-Za-z]/.test(n.data)) continue;
+    if (!orig.has(n)) orig.set(n, n.data);
+    n.data = toCyrillic(orig.get(n));
+  }
+  const els = root.nodeType === 1 ? [root, ...root.querySelectorAll("*")] : [];
+  for (const el of els){
+    if (skip(el) && !el.matches("input, textarea")) continue;
+    for (const a of ATTRS){
+      const v = el.getAttribute(a); if (!v || !/[A-Za-z]/.test(v)) continue;
+      const m = origAttr.get(el) || {}; if (!(a in m)) m[a] = v; origAttr.set(el, m);
+      el.setAttribute(a, toCyrillic(m[a]));
+    }
+  }
+}
+function restoreTree(root){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) if (orig.has(n)){ n.data = orig.get(n); orig.delete(n); }
+  for (const el of root.querySelectorAll("*")){ const m = origAttr.get(el); if (m){ for (const [a, v] of Object.entries(m)) el.setAttribute(a, v); origAttr.delete(el); } }
+}
+const observer = new MutationObserver(muts => { for (const m of muts) for (const n of m.addedNodes) if (n.nodeType === 1 || n.nodeType === 3) convertTree(n.nodeType === 3 ? n.parentNode : n); });
+observer.observe(document.body, { childList:true, subtree:true });
+const T = s => lang === "cyr" ? toCyrillic(s) : s;   // dinamik satrlar uchun (title, toast)
+function setLang(l){
+  lang = l;
+  try { localStorage.setItem(LANG_KEY, l); } catch {}
+  document.documentElement.lang = l === "cyr" ? "uz-Cyrl" : "uz";
+  document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+  if (l === "cyr") convertTree(document.body); else restoreTree(document.body);
+  previewDoc();
+}
+
+const state = { meta:null, analysis:null, scn:null, plan:null, trigger:null, recipient:"employer", form:{}, evidence:[], blocks:[], missing:[], missingKeys:[] };
 const persist = () => store.save({ analysis:state.analysis, scn:state.scn, trigger:state.trigger, recipient:state.recipient, form:state.form, evidence:state.evidence, at:Date.now() });
 const scenarioMeta = id => state.meta.scenarios.find(s => s.id === id);
 
@@ -60,8 +104,8 @@ function go(n, { push = true } = {}){
   });
   if (push && location.hash !== "#" + ROUTES[n]) history.pushState(null, "", "#" + ROUTES[n]);
   window.scrollTo({ top:0 });
-  const h = $(`#v${n} h1, #v${n} h2`); if (h){ h.setAttribute("tabindex", "-1"); h.focus({ preventScroll:true }); }
-  document.title = ["HuquqYo‘l", ["Vaziyat","Reja","Ariza"][n - 1]].join(" — ");
+  const h = $(`#v${n} h1`); if (h){ h.setAttribute("tabindex", "-1"); h.focus({ preventScroll:true }); }
+  document.title = "HuquqYo‘l — " + T(["Vaziyat","Reja","Ariza"][n - 1]);
 }
 window.addEventListener("popstate", () => {
   const n = Number(Object.keys(ROUTES).find(k => "#" + ROUTES[k] === location.hash)) || 1;
@@ -123,10 +167,10 @@ function renderOut(){
   const a = state.analysis;
   state.plan = null;
   $("#v2").innerHTML = `<button class="back" type="button" data-go="1">← Orqaga</button>
-    <div class="case-head"><span class="tag">Doiradan tashqarida</span><h2>Bu holatni hozircha qamramaymiz</h2>
+    <div class="case-head"><span class="tag">Doiradan tashqarida</span><h1>Bu holatni hozircha qamramaymiz</h1>
     <p>HuquqYo‘l hozir mehnat nizolarida yordam beradi: ish haqi, ishdan bo‘shatish, ta’til va hisob-kitob. ${a.summary ? esc(a.summary) : "Vaziyatni ish beruvchi yoki maosh bilan bog‘lab batafsilroq yozing yoki advokatga murojaat qiling."}</p></div>`;
   [1,3].forEach(i => $("#v" + i).hidden = true); $("#v2").hidden = false;
-  history.pushState(null, "", "#reja"); window.scrollTo({ top:0 }); $("#v2 h2").setAttribute("tabindex","-1"); $("#v2 h2").focus();
+  history.pushState(null, "", "#reja"); window.scrollTo({ top:0 }); $("#v2 h1").setAttribute("tabindex","-1"); $("#v2 h1").focus();
 }
 
 /* ---------- 2. Reja ---------- */
@@ -146,7 +190,7 @@ function renderPlan(){
     <button class="back" type="button" data-go="1">← Boshqa vaziyat</button>
     <div class="case-head">
       <span class="tag">${esc(info.short)} · ${esc(source)}</span>
-      <h2>${esc(info.title)}</h2>
+      <h1>${esc(info.title)}</h1>
       <p>${esc(a.summary || info.lead)}</p>
       ${a.missing?.length ? `<p class="small warnline">Arizaga kerak bo‘ladi: ${a.missing.map(esc).join(", ")}</p>` : ""}
     </div>
@@ -165,13 +209,13 @@ function renderPlan(){
         <p class="small muted">${esc(n0.text)}</p>
         <div class="src"><span class="art">MK ${esc(n0.article)}</span></div></div>`}
     </div>
-    <h3 class="sec">Nima qilish kerak</h3>
+    <h2 class="sec">Nima qilish kerak</h2>
     <ol class="steps" id="route"></ol>
-    <h3 class="sec">Qonun nima deydi</h3>
+    <h2 class="sec">Qonun nima deydi</h2>
     <div class="laws">${p.norms.slice(0, 3).map(law).join("")}</div>
     ${p.norms.length > 3 ? `<details class="more"><summary>Yana ${p.norms.length - 3} ta norma</summary><div class="laws">${p.norms.slice(3).map(law).join("")}</div></details>` : ""}
     <div class="src"><a href="${esc(state.meta.lex)}" target="_blank" rel="noopener noreferrer">Mehnat kodeksining to‘liq matni — lex.uz ↗</a></div>
-    <h3 class="sec">Dalillarni to‘plang <span class="small muted evcount" id="evCount"></span></h3>
+    <h2 class="sec">Dalillarni to‘plang <span class="small muted evcount" id="evCount"></span></h2>
     <p class="small muted evhint">Belgilaganlaringiz arizaning «Ilovalar» ro‘yxatiga qo‘shiladi.</p>
     <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
     <div class="cta"><button class="btn primary" type="button" data-go="3">Ariza tayyorlash →</button></div>`;
@@ -249,7 +293,7 @@ function renderDocView(){
 const docRequest = () => {
   const form = { ...state.form };
   for (const k of ["phone","amount"]) if (form[k] && validateField(k, k === "amount" ? fmtSum(form[k]) : form[k])) delete form[k];
-  return { scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form, evidence: state.evidence };
+  return { scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form, evidence: state.evidence, lang };
 };
 
 let previewSeq = 0;
@@ -259,7 +303,7 @@ async function previewDoc(){
   try {
     const m = await getJSON("/api/document/preview", docRequest());
     if (seq !== previewSeq) return;                       // eskirgan javobni tashlab yuborish
-    state.blocks = m.blocks; state.missing = m.missing || [];
+    state.blocks = m.blocks; state.missing = m.missing || []; state.missingKeys = m.missingLatin || m.missing || [];
     $("#paper").innerHTML = m.blocks.map(blockHTML).join("");
     renderMissing();
   } catch (e){ if (seq === previewSeq) toast(e.message); }
@@ -270,7 +314,7 @@ function renderMissing(){
   el.classList.toggle("okay", n === 0);
   el.textContent = n === 0 ? "✓ Barcha joylar to‘ldirilgan" : `${n} ta joy to‘ldirilmagan: ${state.missing.join(", ")} — to‘ldirish`;
   document.querySelectorAll(".field.need").forEach(f => f.classList.remove("need"));
-  state.missing.forEach(ph => { const k = PH_FIELD[ph]; const f = k && document.querySelector(`[data-f="${k}"]`); if (f) f.classList.add("need"); });
+  state.missingKeys.forEach(ph => { const k = PH_FIELD[ph]; const f = k && document.querySelector(`[data-f="${k}"]`); if (f) f.classList.add("need"); });
 }
 const partsHTML = ps => ps.map(p => p.v != null ? esc(p.v) : `<span class="ph">${esc(p.ph)}</span>`).join("");
 const partsText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
@@ -337,6 +381,8 @@ document.addEventListener("click", e => {
   if (c){ choose({ scenario:c.dataset.case, confidence:1, summary:"", facts:{}, source:"choice" }).catch(err => toast(err.message)); return; }
   const ex = e.target.closest("[data-ex]");
   if (ex){ $("#problem").value = EXAMPLES[ex.dataset.ex]; $("#problem").focus(); return; }
+  const lb = e.target.closest("[data-lang]");
+  if (lb){ setLang(lb.dataset.lang); return; }
   const r = e.target.closest("#seg button");
   if (r){
     state.recipient = r.dataset.r; persist();
@@ -355,7 +401,7 @@ $("#docForm").addEventListener("input", e => {
 });
 $("#docForm").addEventListener("focusout", e => { const k = e.target.dataset?.k; if (k === "phone" || k === "amount") formValid(); });
 $("#missing").addEventListener("click", () => {
-  const k = state.missing.map(ph => PH_FIELD[ph]).find(Boolean);
+  const k = state.missingKeys.map(ph => PH_FIELD[ph]).find(Boolean);
   const el = k && $("#f_" + k);
   if (el){ el.scrollIntoView({ block:"center" }); el.focus(); }
 });
@@ -371,7 +417,15 @@ $("#copyTxt").addEventListener("click", async () => {
 });
 $("#wipe").addEventListener("click", () => { store.clear(); state.form = {}; toast("Ma’lumotlaringiz o‘chirildi"); setTimeout(() => { location.href = location.pathname; }, 600); });
 
+/* ---------- Oflayn (PWA) ---------- */
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+window.addEventListener("offline", () => toast("Internet uzildi. Ma’lumotlaringiz saqlanadi, aloqa tiklanganda davom eting."));
+window.addEventListener("online", () => toast("Aloqa tiklandi"));
+
 /* ---------- Boshlash ---------- */
+if (lang === "cyr") setLang("cyr");
 try {
   state.meta = await getJSON("/api/meta");
   renderStart();

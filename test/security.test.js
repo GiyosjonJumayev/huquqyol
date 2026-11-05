@@ -51,3 +51,12 @@ test("Noma’lum API — 404 JSON", async () => {
   assert.equal(r.status, 404);
   assert.ok((await r.json()).error);
 });
+
+test("Kirill yozuvidagi hujjat va fayllar", async () => {
+  const body = { scenario:"ish_haqi", recipient:"court", lang:"cyr", form:{ fio:"Karimov Aziz", amount:"9000000" } };
+  const m = await (await post("/api/document/preview", body)).json();
+  assert.equal(m.blocks.find(b => b.t === "title").text, "ДАЪВО АРИЗАСИ");
+  assert.ok(JSON.stringify(m.blocks).includes("Каримов Азиз"));
+  assert.ok(m.missingLatin.includes("manzil") && m.missing.includes("манзил"));
+  for (const fmt of ["docx", "pdf"]) assert.equal((await post("/api/document/" + fmt, body)).status, 200);
+});

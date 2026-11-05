@@ -60,5 +60,6 @@ export function vDocument(body){
   if (months) form.months = String(months);
   const n = SCENARIO_BY_ID[s].evidence.length;
   const evidence = Array.isArray(body?.evidence) ? [...new Set(body.evidence.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < n))] : [];
-  return { scenario: s, recipient, form, evidence, triggerDate: date(body?.triggerDate) };
+  const lang = body?.lang === "cyr" ? "cyr" : "lat";
+  return { scenario: s, recipient, form, evidence, triggerDate: date(body?.triggerDate), lang };
 }

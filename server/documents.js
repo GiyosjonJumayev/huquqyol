@@ -124,7 +124,7 @@ export async function toDocx(model){
     }
   }
   const doc = new Document({
-    creator:"HuquqYo‘l", title:"Ariza",
+    creator:"HuquqYo‘l", title: model.blocks.find(b => b.t === "title")?.text || "Ariza",
     sections:[{ properties:{ page:{ margin:{ top:1134, right:850, bottom:1134, left:1701 } } }, children }]
   });
   return Packer.toBuffer(doc);

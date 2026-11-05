@@ -8,6 +8,9 @@ import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, toDocx, toPdf, RECIPIENTS } from "./documents.js";
 import { securityHeaders, requireJson, rateLimit } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
+import { cyrillicModel } from "../public/translit.js";
+
+const buildModel = req => { const v = vDocument(req.body); const m = documentModel(v); return v.lang === "cyr" ? cyrillicModel(m) : m; };
 
 const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -34,12 +37,12 @@ app.post("/api/analyze", rateLimit({ max: 15, name:"analyze" }), wrap(async (req
 
 app.post("/api/plan", rateLimit({ max: 120, name:"plan" }), (req, res) => res.json(buildPlan(vPlan(req.body))));
 
-app.post("/api/document/preview", rateLimit({ max: 240, name:"preview" }), (req, res) => res.json(documentModel(vDocument(req.body))));
+app.post("/api/document/preview", rateLimit({ max: 240, name:"preview" }), (req, res) => res.json(buildModel(req)));
 
 app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(async (req, res) => {
   const fmt = req.params.format;
   if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error:"Format: docx yoki pdf." });
-  const model = documentModel(vDocument(req.body));
+  const model = buildModel(req);
   const buf = fmt === "docx" ? await toDocx(model) : await toPdf(model);
   const kind = { employer:"talabnoma", inspection:"inspeksiyaga-ariza", court:"davo-arizasi" }[model.recipient];
   res.set({
@@ -55,7 +58,10 @@ const fontOpts = { maxAge:"30d", immutable:true };
 app.use("/fonts/onest", express.static(fontDir("@fontsource/onest"), fontOpts));
 app.use("/fonts/spectral", express.static(fontDir("@fontsource/spectral"), fontOpts));
 app.use("/fonts/jetbrains-mono", express.static(fontDir("@fontsource/jetbrains-mono"), fontOpts));
-app.use(express.static(join(here, "..", "public"), { extensions:["html"], maxAge: process.env.NODE_ENV === "production" ? "1h" : 0 }));
+app.use(express.static(join(here, "..", "public"), {
+  extensions:["html"], maxAge: process.env.NODE_ENV === "production" ? "1h" : 0,
+  setHeaders(res, path){ if (path.endsWith("sw.js")) res.set({ "Cache-Control":"no-cache", "Service-Worker-Allowed":"/" }); if (path.endsWith(".webmanifest")) res.type("application/manifest+json"); }
+}));
 
 app.use((err, req, res, next) => {
   if (err.type === "entity.too.large") return res.status(413).json({ error:"So‘rov juda katta." });

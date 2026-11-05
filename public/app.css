@@ -3,7 +3,7 @@
 :root{
   --bg:#F3F4EF; --surface:#FFFFFF; --ink:#15203A; --muted:#5D6679; --line:#DDE0D6;
   --accent:#0E6B5C; --accent-ink:#FFFFFF; --accent-soft:#E1F0EB;
-  --stamp:#A8322A; --warn:#A86A12; --ok:#2C7A4B; --chip:#ECEEE7;
+  --stamp:#A8322A; --warn:#8A5507; --on-sem:#FFFFFF; --ok:#2C7A4B; --chip:#ECEEE7;
   --doc-bg:#FFFFFF; --doc-ink:#141414; --doc-line:#D3D3CC;
   --f-display:"Spectral", Georgia, "Times New Roman", serif;
   --f-body:"Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -13,12 +13,12 @@
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#0E1420; --surface:#161F31; --ink:#E7EAF0; --muted:#9BA4B6; --line:#283247;
   --accent:#3DB59D; --accent-ink:#06231D; --accent-soft:#12312C;
-  --stamp:#E36A61; --warn:#E2A847; --ok:#5DBF85; --chip:#1D2639;
+  --stamp:#E36A61; --warn:#E2A847; --on-sem:#10151F; --ok:#5DBF85; --chip:#1D2639;
   --doc-bg:#EEECE5; --doc-ink:#141414; --doc-line:#C9C6BC; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#0E1420; --surface:#161F31; --ink:#E7EAF0; --muted:#9BA4B6; --line:#283247;
   --accent:#3DB59D; --accent-ink:#06231D; --accent-soft:#12312C;
-  --stamp:#E36A61; --warn:#E2A847; --ok:#5DBF85; --chip:#1D2639;
+  --stamp:#E36A61; --warn:#E2A847; --on-sem:#10151F; --ok:#5DBF85; --chip:#1D2639;
   --doc-bg:#EEECE5; --doc-ink:#141414; --doc-line:#C9C6BC; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
 
 *{box-sizing:border-box}
@@ -79,7 +79,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 
 /* screen 2 */
 .case-head{display:grid;gap:8px;margin:8px 0 22px}
-.case-head h2{font-family:var(--f-display);font-size:clamp(26px,4.5vw,36px)}
+.case-head h1,.case-head h2{font-family:var(--f-display);font-size:clamp(26px,4.5vw,36px)}
 .case-head p{margin:0;color:var(--muted);max-width:62ch;font-size:16.5px}
 .tag{justify-self:start;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
 .summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -89,7 +89,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 .big{font-family:var(--f-display);font-size:54px;line-height:1;font-variant-numeric:tabular-nums;margin:10px 0 4px}
 .big small{font-family:var(--f-body);font-size:16px;color:var(--muted);font-weight:500;margin-left:6px}
 .money{font-family:var(--f-display);font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums;margin:10px 0 4px}
-.pill{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:99px;color:#fff}
+.pill{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:99px;color:var(--on-sem)}
 .lv-ok{background:var(--ok)} .lv-warn{background:var(--warn)} .lv-bad{background:var(--stamp)}
 .bar{height:8px;border-radius:99px;background:var(--chip);overflow:hidden;margin:14px 0 6px}
 .bar i{display:block;height:100%;border-radius:99px}
@@ -115,7 +115,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 .steps h3{font-size:17px;font-weight:600;margin-top:2px}
 .steps p{margin:6px 0 0;color:var(--muted)}
 .when{font-size:13px;font-weight:600;white-space:nowrap;padding:4px 10px;border-radius:99px;background:var(--chip);font-variant-numeric:tabular-nums}
-.when.hot{background:var(--stamp);color:#fff}
+.when.hot{background:var(--stamp);color:var(--on-sem)}
 
 .laws{display:grid;gap:10px}
 .law{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
@@ -215,3 +215,9 @@ details.more{margin-top:10px}
 .law .tag{margin-left:6px;vertical-align:middle}
 .field input[aria-invalid="true"]{border-color:var(--stamp)}
 .case{color:var(--ink)}
+
+.topright{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.langsw{display:inline-flex;background:var(--chip);border-radius:9px;padding:3px}
+.langsw button{border:0;background:none;padding:5px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.langsw button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+@media (max-width:560px){.top{gap:10px}.topright{width:100%;justify-content:space-between}}
