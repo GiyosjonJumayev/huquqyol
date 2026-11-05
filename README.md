@@ -4,7 +4,7 @@ Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahli
 
 **Uch tilda ishlaydi:** o‘zbek (lotin), o‘zbek (kirill) va rus. Til interfeys, normalar matni, qadamlar, kalkulyatorlar, xato xabarlari va tayyor arizaga birdek tatbiq etiladi. Rus tilidagi ariza ruscha rasmiy uslubda yoziladi («ИСКОВОЕ ЗАЯВЛЕНИЕ», «На основании изложенного прошу:»). Vaziyatni istalgan tilda yozish mumkin, jumladan o‘zbekcha kirillda.
 
-Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
+Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa, ilova yaqin holatlarni taklif qiladi va bir bosishda almashtiradi. Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
 
 Taqdimot ssenariysi va hakamlar savollariga javoblar — [DEMO.md](DEMO.md).
 
@@ -27,8 +27,8 @@ Node.js 22.9 yoki undan yangi versiya kerak.
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 41 ta unit/API test (jumladan ruscha va kirillcha)
-npm run test:e2e          # 5 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
+npm test                  # 43 ta unit/API test (jumladan ruscha va kirillcha)
+npm run test:e2e          # 6 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.
@@ -153,6 +153,7 @@ Shablon sintaksisi:
 
 ## Xavfsizlik (qisqacha)
 - Qat’iy CSP (inline skript yo‘q), `nosniff`, `X-Frame-Options: DENY`, Permissions-Policy, productionda HSTS.
+- Permissions-Policy: kamera, joylashuv, to‘lov yopiq; mikrofon faqat o‘z saytiga (ovoz bilan kiritish uchun).
 - POST so‘rovlar: faqat JSON (415), 32 KB chegara, boshqa saytdan kelgan so‘rov rad etiladi (Origin tekshiruvi, 403), har bir endpoint uchun rate limit.
 - Har bir holat maydonlari spetsifikatsiya bo‘yicha tekshiriladi; boshqaruv belgilari tozalanadi; prototipsiz lug‘atlar.
 - Foydalanuvchi matni logga yozilmaydi; ma’lumotlar faqat brauzerda saqlanadi; Docker konteyner root bo‘lmagan foydalanuvchida ishlaydi.

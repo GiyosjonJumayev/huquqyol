@@ -130,3 +130,10 @@ test("Formatlash: sana, muddat, ko‘plik, tarjima", () => {
   assert.equal(p.risk.label, "Срок не ограничен");
   assert.match(p.calc.value, /360\s400 сум/);
 });
+
+test("Uzun hujjatda sahifa raqamlari qo‘yiladi", async () => {
+  const { toPdf } = await import("../server/documents.js");
+  const m = documentModel({ scenario:"ish_haqi", recipient:"court", lang:"ru", form:{ fio:"Каримов Азиз", extra:"Длинный текст. ".repeat(250) } });
+  const pdf = (await toPdf(m)).toString("latin1");
+  assert.ok((pdf.match(/\/Type \/Page\b/g) || []).length >= 2);
+});

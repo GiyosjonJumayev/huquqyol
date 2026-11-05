@@ -23,14 +23,15 @@
    - pastda «Qanday topshiriladi» bo‘limi va my.sud.uz havolasi turadi.
 4. **Til.** Tepada **Рус** tugmasini bosing. Ariza shu joyning o‘zida ruscha «ТРЕБОВАНИЕ» bo‘lib qayta yasaladi, kiritilgan ma’lumotlar saqlanadi. **Ўзб** — o‘zbekcha kirill.
 5. **Ruscha matn.** «Бывший муж не платит алименты на двоих детей» deb yozing. Tizim alimentni topadi va bolalar sonini 2 deb ajratadi. Kalkulyator 1/3 ulushni ko‘rsatadi.
-6. **Boshqa sohalar.** Jarima: chegirma sanalari, 10 kunlik shikoyat muddati. Qarz: 3 yillik da’vo muddati.
+6. **Noaniq vaziyat.** «Meni ishdan bo‘shatishdi va oxirgi oylikni bermadi» deb yozing: tizim hisob-kitobni tanlaydi va «Noqonuniy bo‘shatish» variantini ham taklif qiladi — bir bosishda almashtiriladi. Mikrofon tugmasi orqali ovoz bilan ham aytish mumkin.
+7. **Boshqa sohalar.** Jarima: chegirma sanalari, 10 kunlik shikoyat muddati. Qarz: 3 yillik da’vo muddati.
 
 ## 3. Nega bu ishonchli (20 soniya)
 - **Normalar qo‘lda tekshirilgan.** 39 ta norma; AI bazada yo‘q modda raqamini qo‘sha olmaydi, chunki bunday raqamlar javobdan avtomatik olib tashlanadi.
 - **Muddat qonun bo‘yicha hisoblanadi.** MK 9-modda: oy oxiri, yakshanba kuni keyingi ish kuniga ko‘chiriladi.
 - **Maxfiylik.** Ma’lumot faqat qurilmada saqlanadi, matn logga yozilmaydi.
 - **Sifat.**
-  - 41 unit/API va 5 brauzer testi;
+  - 43 unit/API va 6 brauzer testi;
   - Lighthouse: Accessibility, Best Practices, SEO 100, Performance 99–100;
   - axe: 0 xato (yorug‘ va qorong‘i mavzuda).
 

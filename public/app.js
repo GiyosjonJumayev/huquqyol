@@ -195,6 +195,7 @@ function renderPlan(){
       <h1>${esc(info.title)}</h1>
       <p>${esc(a.summary || info.lead)}</p>
       ${a.missing?.length ? `<p class="small warnline">${t("needForDoc")} ${a.missing.map(esc).join(", ")}</p>` : ""}
+      ${altsHTML(a)}
     </div>
     <div class="summary">
       <div class="card" id="deadlineCard"></div>
@@ -236,6 +237,15 @@ function renderPlan(){
     const df = $("#f_" + k); if (df) df.value = e.target.value;
     onCalc();
   });
+}
+
+// Tahlil ishonchi past bo‘lsa yoki boshqa holat ham yaqin chiqsa — bir bosishda almashtirish
+function altsHTML(a){
+  if (!a.source || a.source === "choice") return "";
+  const ranked = a.retrieval?.scenarios || [], top = ranked.find(r => r.id === state.scn)?.score || 0;
+  const alts = ranked.filter(r => r.id !== state.scn && r.score > 0 && r.score >= top * (a.confidence < 0.5 ? 0.4 : 0.5)).slice(0, 2).map(r => scenarioMeta(r.id)).filter(Boolean);
+  if (!alts.length) return "";
+  return `<div class="alts"><span class="small muted">${t("altTitle")}</span>${alts.map(m => `<button class="chipbtn" type="button" data-alt="${m.id}">${esc(m.title)}</button>`).join("")}</div>`;
 }
 
 function renderDeadline(){
@@ -475,6 +485,8 @@ function demoFill(){
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]");
   if (g && !g.disabled){ go(Number(g.dataset.go)); return; }
+  const alt = e.target.closest("[data-alt]");
+  if (alt){ const a = state.analysis || {}; choose({ ...a, scenario: alt.dataset.alt, confidence: 1, summary:"", missing:[], normIds:[], facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
   const c = e.target.closest("[data-case]");
   if (c){ choose({ scenario:c.dataset.case, confidence:1, summary:"", facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
   const dm = e.target.closest("[data-domain]");
@@ -514,6 +526,37 @@ $("#missing").addEventListener("click", () => {
 $("#home").addEventListener("click", () => go(1));
 $("#demoFill").addEventListener("click", demoFill);
 $("#analyzeBtn").addEventListener("click", analyze);
+
+// Belgi hisoblagichi: chegara yaqinlashganda ko‘rsatiladi
+$("#problem").addEventListener("input", e => {
+  const n = e.target.value.length, h = $("#askHint");
+  h.classList.toggle("count", n > 3000); h.classList.toggle("over", n >= 4000);
+  h.textContent = n > 3000 ? t("charCount", { n }) : t("askHint");
+});
+
+// Ovoz bilan kiritish (brauzer qo‘llasa). Matn tahrirlash uchun maydonga yoziladi, avtomatik yuborilmaydi.
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR){
+  const mic = $("#micBtn"); mic.hidden = false;
+  let rec = null;
+  const stop = () => { rec?.stop(); };
+  mic.addEventListener("click", () => {
+    if (rec) return stop();
+    rec = new SR();
+    rec.lang = LANG === "ru" ? "ru-RU" : "uz-UZ";
+    rec.interimResults = true; rec.continuous = true;
+    const box = $("#problem"), before = box.value.trim();
+    rec.onresult = ev => {
+      const said = [...ev.results].map(r => r[0].transcript).join(" ").trim();
+      box.value = (before ? before + " " : "") + said;
+      box.dispatchEvent(new Event("input"));
+    };
+    rec.onerror = ev => { if (ev.error !== "aborted" && ev.error !== "no-speech") toast(t("voiceErr")); };
+    rec.onend = () => { rec = null; mic.setAttribute("aria-pressed", "false"); box.focus(); };
+    try { rec.start(); mic.setAttribute("aria-pressed", "true"); announce(t("voiceOn")); }
+    catch { rec = null; toast(t("voiceErr")); }
+  });
+}
 $("#problem").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) analyze(); });
 $("#dlDocx").addEventListener("click", () => download("docx"));
 $("#dlPdf").addEventListener("click", () => download("pdf"));

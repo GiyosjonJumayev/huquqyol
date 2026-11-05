@@ -296,3 +296,20 @@ details.more{margin-top:10px}
 .nf{text-align:center;padding:18vh 16px}
 .nf h1{font-family:var(--f-head);font-size:64px;margin:0}
 .nf p{color:var(--muted);margin:6px 0 22px}
+
+/* Qanday ishlaydi, ovoz, belgi hisoblagichi, muqobil holatlar */
+.how{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;padding:0;margin:-12px 0 26px;font-size:14.5px;color:var(--ink)}
+.how li{display:flex;align-items:center;gap:8px}
+.how .hn{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:12px;font-weight:700;background:var(--chip);color:var(--accent)}
+.askact{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+.kbd{font-size:12.5px}
+.kbd.count{font-variant-numeric:tabular-nums}
+.kbd.over{color:var(--stamp)}
+.btn.icon{width:44px;height:44px;padding:0;display:inline-grid;place-items:center}
+.btn.icon svg{width:20px;height:20px}
+.btn.icon[aria-pressed="true"]{background:var(--stamp);border-color:var(--stamp);color:#fff;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--stamp) 22%,transparent)}}
+@media (prefers-reduced-motion:reduce){.btn.icon[aria-pressed="true"]{animation:none}}
+.alts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
+.alts .small{margin-right:2px}
+@media (max-width:560px){.kbd:not(.count){display:none}.how{flex-direction:column;gap:8px}}

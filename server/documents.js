@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer, PageNumber } from "docx";
 import PDFDocument from "pdfkit";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -129,7 +129,8 @@ export async function toDocx(model){
   }
   const doc = new Document({
     creator:"HuquqYo‘l", title: model.blocks.find(b => b.t === "title")?.text || "Ariza",
-    sections:[{ properties:{ page:{ margin:{ top:1134, right:850, bottom:1134, left:1701 } } }, children }]
+    sections:[{ properties:{ page:{ margin:{ top:1134, right:850, bottom:1134, left:1701 } } }, children,
+      footers:{ default: new Footer({ children:[new Paragraph({ alignment: AlignmentType.CENTER, children:[new TextRun({ children:[PageNumber.CURRENT], font, size: 20 })] })] }) } }]
   });
   return Packer.toBuffer(doc);
 }
@@ -137,7 +138,7 @@ export async function toDocx(model){
 // ---------- PDF (DejaVu — o‘zbek harflari to‘liq) ----------
 export function toPdf(model){
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size:"A4", margins:{ top:56, bottom:56, left:85, right:42 }, info:{ Title: model.blocks.find(b => b.t === "title")?.text || "Ariza", Creator:"HuquqYo‘l" } });
+    const doc = new PDFDocument({ size:"A4", bufferPages:true, margins:{ top:56, bottom:56, left:85, right:42 }, info:{ Title: model.blocks.find(b => b.t === "title")?.text || "Ariza", Creator:"HuquqYo‘l" } });
     const chunks = []; doc.on("data", c => chunks.push(c)); doc.on("end", () => resolve(Buffer.concat(chunks))); doc.on("error", reject);
     doc.registerFont("R", join(FONT_DIR, "DejaVuSerif.ttf"));
     doc.registerFont("B", join(FONT_DIR, "DejaVuSerif-Bold.ttf"));
@@ -156,6 +157,14 @@ export function toPdf(model){
         doc.font("R").text(b.left, 85, y, { width: W / 2 });
         doc.text(partText(b.right), 85 + W / 2, y, { width: W / 2, align:"right" });
       }
+    }
+    // Bir sahifadan ko‘p bo‘lsa — pastda sahifa raqami
+    const range = doc.bufferedPageRange();
+    if (range.count > 1) for (let i = 0; i < range.count; i++){
+      doc.switchToPage(range.start + i);
+      const bottom = doc.page.margins.bottom; doc.page.margins.bottom = 0;
+      doc.font("R").fontSize(9).text(String(i + 1), 85, doc.page.height - 34, { width: W, align:"center", lineBreak:false });
+      doc.page.margins.bottom = bottom;
     }
     doc.end();
   });

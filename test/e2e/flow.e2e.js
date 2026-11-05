@@ -162,3 +162,24 @@ test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til alma
   assert.equal(await p.inputValue("#f_fio"), "Каримов Азиз Ботирович");
   assert.deepEqual(p.errors, []);
 });
+
+test("Noaniq matnda muqobil holat taklif qilinadi va bir bosishda almashtiriladi", { skip }, async () => {
+  const p = await page();
+  await p.goto(base);
+  await p.waitForSelector(".domain");
+  assert.equal(await p.locator(".how li").count(), 3);
+  await p.fill("#problem", "Meni ishdan bo‘shatishdi va oxirgi oylikni bermadi");
+  await p.press("#problem", "Control+Enter");
+  await p.waitForSelector("[data-alt]");
+  const before = await p.innerText("#v2 h1");
+  await p.locator("[data-alt]").first().click();
+  await p.waitForFunction(b => document.querySelector("#v2 h1")?.textContent !== b, before);
+  assert.equal(await p.locator("[data-alt]").count(), 0);         // tanlangandan keyin taklif yo‘qoladi
+  assert.deepEqual(await audit(p), []);
+  await p.goto(base);
+  await p.fill("#problem", "Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m");
+  await p.click("#analyzeBtn");
+  await p.waitForSelector("#deadlineCard .big");
+  assert.equal(await p.locator("[data-alt]").count(), 0);         // aniq holatda shovqin yo‘q
+  assert.deepEqual(p.errors, []);
+});

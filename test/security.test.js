@@ -95,3 +95,10 @@ test("Noma’lum sahifa — 404 sahifasi; robots.txt; OG teglar", async () => {
   assert.match(await (await fetch(base + "/robots.txt")).text(), /Disallow: \/api\//);
   assert.match(await (await fetch(base + "/")).text(), /property="og:title" content="HuquqYo‘l/);
 });
+
+test("Mikrofon faqat o‘z saytiga ruxsat etilgan (ovoz bilan kiritish), boshqa ruxsatlar yopiq", async () => {
+  const pp = (await fetch(base + "/")).headers.get("permissions-policy");
+  assert.match(pp, /microphone=\(self\)/);
+  assert.match(pp, /camera=\(\)/);
+  assert.match(pp, /geolocation=\(\)/);
+});
