@@ -217,11 +217,18 @@
   "text": "Murojaatlar to‘g‘risidagi qonunchilikni buzgan mansabdor shaxslar qonunda belgilangan javobgarlikka tortiladi."
  },
  {
+  "id": "mq5",
+  "law": "mq",
+  "article": "5-modda",
+  "title": "Murojaat shakllari",
+  "text": "Murojaat og‘zaki, yozma yoki elektron shaklda yuborilishi mumkin; barcha shakllar teng kuchga ega. Elektron murojaat organning rasmiy veb-sayti orqali ham yuboriladi."
+ },
+ {
   "id": "msk6",
   "law": "msk",
   "article": null,
-  "title": "Ma’muriy sudga murojaat muddati",
-  "text": "Davlat organi yoki mansabdor shaxsning qarori, harakati yoki harakatsizligi ustidan huquq buzilganini bilgan kundan 6 oy ichida ma’muriy sudga ariza beriladi, agar qonunda boshqa muddat belgilanmagan bo‘lsa."
+  "title": "Ma’muriy sudga murojaat muddati va boji",
+  "text": "Davlat organi yoki mansabdor shaxsning qarori, harakati yoki harakatsizligi ustidan huquq buzilganini bilgan kunning ertasidan boshlab 6 oy ichida tumanlararo ma’muriy sudga ariza beriladi. Ariza berishda jismoniy shaxslardan davlat boji olinmaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
  },
  {
   "id": "msk_tikla",
@@ -236,6 +243,13 @@
   "article": null,
   "title": "Jarima qaroriga shikoyat qilish",
   "text": "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan 10 kun ichida shikoyat qilinadi (2024-yildan, O‘RQ-884). Muddat uzrli sabab bilan o‘tgan bo‘lsa, tiklashni so‘rash mumkin."
+ },
+ {
+  "id": "yhxx_el",
+  "law": "mjtk",
+  "article": null,
+  "title": "YHXX jarimasi ustidan elektron shikoyat",
+  "text": "Yo‘l harakati xavfsizligi xizmati jarimasi ustidan my.gov.uz portali orqali elektron shikoyat qilish mumkin. Shikoyat bepul, 5–10 ish kunida ko‘riladi. Ko‘rib chiqish davrida chegirma muddati to‘xtamaydi; shikoyat rad etilsa, jarima chegirmasiz to‘lanadi."
  },
  {
   "id": "mjtk332",

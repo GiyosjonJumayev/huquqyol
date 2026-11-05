@@ -66,11 +66,13 @@ norm("mq6","mq","6-modda","Murojaatga qo‘yiladigan talablar","Murojaatda F.I.S
 norm("mq28","mq","28-modda","Murojaatlarni ko‘rib chiqish muddatlari","Murojaat kelib tushgan kundan 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha ko‘rib chiqiladi. Alohida hollarda rahbar muddatni ko‘pi bilan yana 1 oyga uzaytirishi va bu haqda sizga xabar berishi mumkin.")
 norm("mq36","mq","36-modda","Nizolarni hal etish","Murojaat bo‘yicha qaror yoki javob berilmagani ustidan yuqori turuvchi organga yoki sudga shikoyat qilish mumkin.")
 norm("mq38","mq","38-modda","Javobgarlik","Murojaatlar to‘g‘risidagi qonunchilikni buzgan mansabdor shaxslar qonunda belgilangan javobgarlikka tortiladi.")
-norm("msk6","msk",None,"Ma’muriy sudga murojaat muddati","Davlat organi yoki mansabdor shaxsning qarori, harakati yoki harakatsizligi ustidan huquq buzilganini bilgan kundan 6 oy ichida ma’muriy sudga ariza beriladi, agar qonunda boshqa muddat belgilanmagan bo‘lsa.")
+norm("mq5","mq","5-modda","Murojaat shakllari","Murojaat og‘zaki, yozma yoki elektron shaklda yuborilishi mumkin; barcha shakllar teng kuchga ega. Elektron murojaat organning rasmiy veb-sayti orqali ham yuboriladi.")
+norm("msk6","msk",None,"Ma’muriy sudga murojaat muddati va boji","Davlat organi yoki mansabdor shaxsning qarori, harakati yoki harakatsizligi ustidan huquq buzilganini bilgan kunning ertasidan boshlab 6 oy ichida tumanlararo ma’muriy sudga ariza beriladi. Ariza berishda jismoniy shaxslardan davlat boji olinmaydi; ariza rad etilsa, BHMning 70 foizi undiriladi.")
 norm("msk_tikla","msk",None,"Muddatni tiklash va ijroni to‘xtatish","Muddat uzrli sabab bilan o‘tkazib yuborilgan bo‘lsa, sud uni tiklashi mumkin. Arizachi nizolashilayotgan hujjat ijrosini vaqtincha to‘xtatishni ham so‘rashi mumkin.")
 
 # ---- Jarima ----
 norm("mjtk_shik","mjtk",None,"Jarima qaroriga shikoyat qilish","Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan 10 kun ichida shikoyat qilinadi (2024-yildan, O‘RQ-884). Muddat uzrli sabab bilan o‘tgan bo‘lsa, tiklashni so‘rash mumkin.")
+norm("yhxx_el","mjtk",None,"YHXX jarimasi ustidan elektron shikoyat","Yo‘l harakati xavfsizligi xizmati jarimasi ustidan my.gov.uz portali orqali elektron shikoyat qilish mumkin. Shikoyat bepul, 5–10 ish kunida ko‘riladi. Ko‘rib chiqish davrida chegirma muddati to‘xtamaydi; shikoyat rad etilsa, jarima chegirmasiz to‘lanadi.")
 norm("mjtk332","mjtk","332¹-modda","Jarimani ixtiyoriy to‘lashda imtiyoz","Qaror topshirilgan kundan 15 kun ichida jarimaning 50 foizini yoki 30 kun ichida 70 foizini to‘lasangiz, qolgan qismi kechiriladi. Qaror ustidan shikoyat qilingan bo‘lsa, bu imtiyoz qo‘llanmaydi.")
 
 # ---- Qarz ----
@@ -322,12 +324,13 @@ APP_P2 = "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qo
 scen(id="murojaat_javobsiz", domain="davlat", title="Davlat idorasi javob bermayapti", card="Murojaatimga muddatida javob berilmadi", short="Javobsiz murojaat",
   lead="Murojaat 15 kunda, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha ko‘rib chiqilishi shart. Javob bo‘lmasa, yuqori turuvchi organga yoki ma’muriy sudga shikoyat qilasiz.",
   keywords=["murojaat","javob bermay","javob bermadi","javob kelmadi","hokimlik","hokimiyat","idora","ariza berdim","ariza yozgandim","e’tiborsiz","rasmiyatchilik","qabulxona","ko‘rib chiqmay"],
-  norms=["mq28","mq36","mq6","msk6","mq38"],
+  norms=["mq28","mq36","mq6","mq5","msk6","mq38"],
   deadline={"months":6, "offsetDays":15, "label":"Ma’muriy sudga murojaat uchun qoldi", "note":"Javob muddati (15 kun) o‘tgan kundan 6 oy."}, trigger="Murojaat topshirilgan sana",
   calc=None, partyField="agency",
   steps=[{"org":"Idora","t":"Javob muddatini kuting","when":"{t+15} gacha","body":"Kiruvchi raqam bo‘yicha murojaat holatini so‘rang. Rahbar muddatni uzaytirsa, sizga xabar berishi shart."},
          {"org":"Yuqori turuvchi organ","t":"Shikoyat yozing","when":"Muddat o‘tgach","body":"Masalan, tuman hokimligi ustidan viloyat hokimligiga. Birinchi murojaat nusxasini ilova qiling."},
-         {"org":"Ma’muriy sud","t":"Harakatsizlik ustidan sudga","when":"{deadline} gacha","hot":True,"body":"Sud idorani murojaatni ko‘rib chiqishga majburlashi mumkin."}],
+         {"org":"Xalq qabulxonasi","t":"Muqobil yo‘l","when":"Istalgan payt","body":"Prezidentning virtual qabulxonasi, 1000 qisqa raqamiga SMS yoki 0-800-210-00-00 telefoni orqali."},
+         {"org":"Ma’muriy sud","t":"Harakatsizlik ustidan sudga","when":"{deadline} gacha","hot":True,"body":"Sud idorani murojaatni ko‘rib chiqishga majburlashi mumkin. Jismoniy shaxslar ariza berishda davlat boji to‘lamaydi."}],
   evidence=["Murojaat nusxasi (kiruvchi raqam bilan)","Yuborilganini tasdiqlovchi hujjat (pochta kvitansiyasi yoki elektron tasdiq)","Olingan javob (bo‘lsa)","Idora bilan yozishmalar"],
   fields=[
     F("agency","Murojaat qilgan idora","idora nomi", group=GOV, hint="Denov tumani hokimligi"),
@@ -381,12 +384,12 @@ FINE_P3 = "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qar
 scen(id="jarima", domain="jarima", title="Jarimaga rozi emasman", card="YHXB, inspeksiya yoki boshqa organ noto‘g‘ri jarima soldi", short="Jarima",
   lead="Jarima to‘g‘risidagi qaror ustidan qaror nusxasini olgan kundan 10 kun ichida shikoyat qilish mumkin. Diqqat: shikoyat qilsangiz, tez to‘lash chegirmasi (50 yoki 70 foiz) qo‘llanmaydi.",
   keywords=["jarima","shtraf","yhxb","gai","radar","kamera","bayonnoma","protokol","yo‘l harakati","tezlik","to‘xtash","parkovka"],
-  norms=["mjtk_shik","mjtk332"],
+  norms=["mjtk_shik","mjtk332","yhxx_el"],
   deadline={"days":10, "label":"Shikoyat berish uchun qoldi"}, trigger="Jarima qarorini olgan sana",
   calc={"type":"fineDiscount"}, partyField="organ", amountField="fine",
   steps=[{"org":"Organ","t":"Qaror nusxasini oling","when":"Darhol","body":"Shikoyat muddati qaror nusxasi olingan kundan boshlanadi."},
          {"org":"Tanlov","t":"Shikoyat yoki chegirma","when":"Hozir hal qiling","body":"Jarima to‘g‘ri bo‘lsa, 15 kun ichida yarmini to‘lab qutulish mumkin. Shikoyat qilinsa, chegirma qo‘llanmaydi."},
-         {"org":"Yuqori organ yoki sud","t":"Shikoyat bering","when":"{deadline} gacha","hot":True,"body":"Yuqori turuvchi organga yoki jinoyat ishlari bo‘yicha tuman (shahar) sudiga."}],
+         {"org":"Yuqori organ yoki sud","t":"Shikoyat bering","when":"{deadline} gacha","hot":True,"body":"Yuqori turuvchi organga yoki jinoyat ishlari bo‘yicha tuman (shahar) sudiga. YHXX jarimasi bo‘lsa, my.gov.uz orqali elektron shikoyat qilish mumkin."}],
   evidence=["Jarima qarori yoki bayonnoma nusxasi","Foto yoki video (videoregistrator)","Guvohlar","Qoidabuzarlik bo‘lmaganini tasdiqlovchi hujjatlar","Yozishmalar"],
   fields=[
     F("organ","Jarima solgan organ","organ nomi", group=FINE, hint="Toshkent sh. YHXB"),
@@ -438,6 +441,51 @@ scen(id="qarz", domain="fuqarolik", title="Qarzimni qaytarishmayapti", card="Qar
         ["Da’vo arizasining javobgar uchun nusxasi","Pasport nusxasi","Qarzni tasdiqlovchi hujjat nusxasi","Davlat boji to‘langanligi to‘g‘risidagi kvitansiya","Talabnoma nusxasi"],
         sub="qarzni undirish to‘g‘risida", askLabel="Yuqoridagilarga asosan, so‘rayman:")
   ])
+
+
+# ---------- «Qanday topshiriladi» ----------
+L_SUD = {"label":"Sudlarning interaktiv xizmatlari — my.sud.uz", "url":"https://my.sud.uz/"}
+L_PM = {"label":"Prezidentning virtual qabulxonasi — pm.gov.uz", "url":"https://pm.gov.uz/"}
+L_YHXX = {"label":"YHXX jarimasiga elektron shikoyat — my.gov.uz", "url":"https://my.gov.uz/oz/service/1054"}
+HOW = {
+  "private": {"steps":[
+    "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+    "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+    "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+    "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."], "links":[]},
+  "state": {"steps":[
+    "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+    "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+    "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+    "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."], "links":[L_PM]},
+  "court": {"steps":[
+    "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+    "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+    "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali."], "links":[L_SUD]},
+  "fine": {"steps":[
+    "Shikoyatni qaror nusxasi olingan kundan 10 kun ichida topshiring.",
+    "YHXX jarimasi bo‘lsa, my.gov.uz orqali elektron shikoyat qilish mumkin: bepul, 5–10 ish kunida ko‘riladi.",
+    "Shikoyat ko‘rib chiqilayotganda chegirma muddati to‘xtamaydi. Rad etilsa, jarima chegirmasiz to‘lanadi.",
+    "Qog‘ozda topshirsangiz, ikkinchi nusxaga qabul belgisini qo‘ydiring."], "links":[L_YHXX]}
+}
+FEE = {
+  "mehnat": "Mehnat nizolarida xodim sud xarajatlaridan ozod.",
+  "aliment": "Aliment da’vosida davlat boji to‘lanmaydi.",
+  "admin": "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi.",
+  "qarz": "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling."
+}
+for sc in S:
+    for d in sc["docs"]:
+        if sc["id"] == "jarima": kind = "fine"
+        elif d["id"] in ("employer","seller","debtor"): kind = "private"
+        elif d["id"] == "court": kind = "court"
+        else: kind = "state"
+        h = {"steps": list(HOW[kind]["steps"]), "links": list(HOW[kind]["links"])}
+        if kind == "court":
+            fee = FEE["admin"] if sc["domain"] == "davlat" else FEE["mehnat"] if sc["domain"] == "mehnat" else FEE["aliment"] if sc["id"] == "aliment" else FEE["qarz"] if sc["id"] == "qarz" else None
+            if fee: h["steps"].append(fee)
+        if sc["id"] == "jarima" and d["id"] == "court": h["links"] = []
+        d["howto"] = h
 
 APPLICANT = [F("fio","F.I.Sh.","F.I.Sh.", hint="Karimov Aziz Botirovich"), F("address","Yashash manzili","manzil", hint="Toshkent sh., Chilonzor t., …"), F("phone","Telefon","telefon","phone", hint="+998 90 123 45 67")]
 

@@ -60,3 +60,20 @@ test("Kirill yozuvidagi hujjat va fayllar", async () => {
   assert.ok(m.missing.some(x => x.k === "address" && x.label === "манзил"));
   for (const fmt of ["docx", "pdf"]) assert.equal((await post("/api/document/" + fmt, body)).status, 200);
 });
+
+test("Bosh sahifa serverda chiziladi; versiyali fayllar bir yil keshlanadi; gzip", async () => {
+  const r = await fetch(base + "/", { headers:{ "Accept-Encoding":"gzip" } });
+  const html = await r.text();
+  assert.equal(r.headers.get("cache-control"), "no-cache");
+  assert.equal((html.match(/data-domain="/g) || []).length, 6);
+  const meta = JSON.parse(html.match(/<script type="application\/json" id="meta-data">([\s\S]*?)<\/script>/)[1]);
+  assert.equal(meta.scenarios.length, 11);
+  assert.ok(!/<\/script>[\s\S]*<script(?! type="application\/json")[^>]*>[^<]/.test(html.split('id="meta-data"')[1].slice(100)), "inline JS yo‘q");
+  const css = html.match(/\/app\.css\?v=([a-f0-9]+)/);
+  assert.ok(css, "app.css versiyalangan");
+  const a = await fetch(`${base}/app.css?v=${css[1]}`, { headers:{ "Accept-Encoding":"gzip" } });
+  assert.equal(a.headers.get("cache-control"), "public, max-age=31536000, immutable");
+  assert.equal(a.headers.get("content-encoding"), "gzip");
+  const js = await (await fetch(base + "/app.js")).text();
+  assert.match(js, /from "\/translit\.js\?v=[a-f0-9]+"/);
+});

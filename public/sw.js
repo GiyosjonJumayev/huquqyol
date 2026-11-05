@@ -1,6 +1,6 @@
 // HuquqYo‘l service worker: interfeys oflayn ochiladi; API javoblari hech qachon keshlanmaydi.
-const VERSION = "hy-2.0.0";
-const SHELL = ["/", "/app.css", "/fonts.css", "/app.js", "/translit.js", "/manifest.webmanifest", "/icons/icon.svg"];
+const VERSION = "hy-2.1.0";
+const SHELL = ["/", "/manifest.webmanifest", "/icons/icon.svg"];   // versiyali CSS/JS birinchi ochilishda keshga tushadi
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

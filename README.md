@@ -21,7 +21,8 @@ Node.js 22.9 yoki undan yangi versiya kerak.
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 31 ta test
+npm test                  # 32 ta unit/API test
+npm run test:e2e          # 4 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.
@@ -75,6 +76,13 @@ test/              node:test — sana, reja, RAG, API, xavfsizlik, kirill, DOCX/
 - **Docker.** Konteyner root bo‘lmagan `node` foydalanuvchisi nomidan ishlaydi va healthcheck bilan ta’minlangan.
 - Reverse proxy (Render, Nginx) ortida ishlatilsa, `TRUST_PROXY=1` o‘rnating, shunda rate limit haqiqiy IP bo‘yicha ishlaydi.
 
+## Tezlik
+
+Lighthouse (production rejim): **Performance 100, Accessibility 100, Best Practices 100, SEO 100**. Ko‘rsatkichlar: FCP 0,9 s, LCP 1,2 s, CLS 0, TBT 0 ms.
+- Bosh sahifa serverda oldindan chiziladi: soha kartalari va meta-ma’lumot HTML ichida keladi, sahifa ochilganda tarkib siljimaydi.
+- CSS/JS fayllar kontent xeshi bilan versiyalanadi (`?v=…`) va bir yil keshlanadi; HTML har safar tekshiriladi.
+- Barcha matnli javoblar gzip bilan siqiladi; shriftlar alfavit bo‘yicha bo‘lib yuklanadi.
+
 ## Qulaylik
 
 - Uch ekran (Vaziyat → Reja → Ariza) bor va brauzerning «orqaga» tugmasi ishlaydi.
@@ -82,6 +90,7 @@ test/              node:test — sana, reja, RAG, API, xavfsizlik, kirill, DOCX/
 - Belgilangan dalillar arizaning «Ilovalar» ro‘yxatiga avtomatik qo‘shiladi.
 - To‘ldirilmagan joylar hisoblab ko‘rsatiladi. Bossangiz, kerakli maydonga olib boradi.
 - Ariza Word yoki PDF qilib yuklab olinadi, brauzerdan chop etiladi yoki matn sifatida nusxalanadi.
+- **«Qanday topshiriladi» yo‘riqnomasi** har bir qabul qiluvchi uchun alohida: qabul belgisi, buyurtma xat, elektron yo‘llar (sudlar uchun my.sud.uz, davlat idoralari uchun Prezidentning virtual qabulxonasi, YHXX jarimalari uchun my.gov.uz), davlat boji.
 - Klaviatura bilan to‘liq boshqariladi, ekran o‘quvchi uchun e’lonlar (`aria-live`) bor, harakatni kamaytirish sozlamasi hurmat qilinadi.
 - Qorong‘i va yorug‘ mavzu tizim sozlamasiga qarab avtomatik tanlanadi. Mobil qurilmada yuklab olish tugmalari ekran pastida turadi.
 - **Lotin / Kirill.** Interfeys ham, DOCX/PDF arizalar ham o‘zbek kirill yozuvida chiqadi. Transliteratsiya (`public/translit.js`) o‘, g‘, sh, ch, ye, yo va tutuq belgisini to‘g‘ri o‘giradi va rus tilidan o‘zlashgan so‘zlarni ham hisobga oladi (inspeksiya → инспекция, kompensatsiya → компенсация). Lotinda kiritilgan ism ham kirill hujjatda kirillga o‘tadi.
@@ -116,8 +125,11 @@ Shablon sintaksisi:
 - O‘zbekiston Respublikasining Mehnat kodeksi (O‘RQ-798, 28.10.2022, 30.04.2023 dan kuchda): https://lex.uz/acts/-6257288
 - Normalar 2026-yil noyabr holatiga tekshirilgan. Quyidagilar ikkilamchi rasmiy manbalardan (gov.uz/advice, norma.uz, kun.uz) olingan, ularni lex.uz’dagi asl matn bilan tasdiqlash tavsiya etiladi:
   - MK 12-bob (hisob-kitob) va 171-modda;
-  - Oila kodeksi 99-modda ulushlari va aliment eng kam miqdori (360 400 so‘m, 2026-yil 1-sentabrdan, `MIN_ALIMONY` orqali o‘zgartiriladi);
-  - MJtK bo‘yicha jarimaga shikoyat qilishning 10 kunlik muddati (modda raqami ko‘rsatilmagan);
-  - Ma’muriy sudga murojaat qilishning 6 oylik muddati.
+  - MJtK bo‘yicha jarimaga shikoyat qilishning 10 kunlik muddati (O‘RQ-884, 2024-yildan): modda raqami ko‘rsatilmagan.
+- 2026-yil noyabrda qo‘shimcha tasdiqlanganlar:
+  - Oila kodeksi 99-modda sarlavhasi (lex.uz), ulushlar va eng kam miqdor (gov.uz/advice va kun.uz mos keladi; `MIN_ALIMONY` orqali o‘zgartiriladi);
+  - ma’muriy sudga murojaatning 6 oylik muddati va jismoniy shaxslar uchun davlat boji yo‘qligi (uza.uz, gov.uz/advice);
+  - sudga elektron murojaat — my.sud.uz (gov.uz/advice);
+  - YHXX jarimasi ustidan my.gov.uz orqali elektron shikoyat (kursiv.media).
 - 333-modda kompensatsiyasini hisoblash usuli amaliyotda bahsli. Shuning uchun ilova past talqinni asosiy summa sifatida, yuqori talqinni esa oraliq sifatida ko‘rsatadi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
 - **Bu huquqiy maslahat emas.** Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi.

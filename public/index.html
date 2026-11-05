@@ -7,7 +7,7 @@
 <title>HuquqYo‘l — huquqiy yo‘l xaritasi</title>
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/onest/onest-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/fonts.css">
+<link rel="preload" href="/fonts/spectral/spectral-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="theme-color" content="#0E6B5C">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -19,7 +19,7 @@
 <div class="sr" aria-live="polite" id="live"></div>
 <div class="wrap">
   <header class="top">
-    <button class="brand" id="home" type="button" aria-label="Boshiga qaytish" data-notr>
+    <button class="brand" id="home" type="button" aria-label="HuquqYo‘l — boshiga qaytish" data-notr>
       <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>
       HuquqYo‘l
     </button>
@@ -44,18 +44,18 @@
     <p class="lead">Sohani tanlang yoki vaziyatni o‘z so‘zlaringiz bilan yozing. Qaysi qonun himoya qilishini, qayerga murojaat qilishni va tayyor arizani bir daqiqada olasiz.</p>
     <div id="picker">
       <div class="pickhead" id="pickHead" hidden></div>
-      <div class="domains" id="cases"></div>
+      <div class="domains" id="cases"><!--DOMAINS--></div>
     </div>
     <div class="or">yoki o‘z so‘zlaringiz bilan yozing</div>
     <div class="ask">
       <label for="problem" class="sr">Muammo tavsifi</label>
       <textarea id="problem" placeholder="Masalan: do‘kondan olgan muzlatkichim bir haftada buzildi, sotuvchi almashtirmayapti"></textarea>
       <div class="askbar">
-        <span class="ai"><span class="dot" id="aiDot"></span><span id="aiText">AI ulanmoqda…</span></span>
+        <span class="ai"><span class="dot" id="aiDot"></span><span id="aiText"><!--AITEXT--></span></span>
         <button class="btn primary" id="analyzeBtn" type="button">Tahlil qilish</button>
       </div>
     </div>
-    <div class="examples" id="examples" aria-label="Namunalar"></div>
+    <div class="examples" id="examples" aria-label="Namunalar"><!--EXAMPLES--></div>
     <p class="error" id="askErr" role="alert" hidden></p>
     <p class="privacy">Tahlil uchun faqat shu matn serverga yuboriladi va saqlanmaydi. Ariza ma’lumotlari faqat fayl yasash uchun ishlatiladi.</p>
   </section>
@@ -79,7 +79,7 @@
           <button class="btn ghost" id="printBtn" type="button">Chop etish</button>
           <button class="btn ghost" id="copyTxt" type="button">Nusxalash</button>
         </div>
-        <div class="note" id="dlNote">Chop eting, imzolang va 2 nusxada topshiring. Ikkinchi nusxaga qabul belgisini qo‘ydiring.</div>
+        <section class="card howto" id="howto" aria-labelledby="howtoH"><h2 id="howtoH">Qanday topshiriladi</h2><ol id="howtoSteps"></ol><div class="howlinks" id="howtoLinks"></div></section>
       </div>
     </div>
   </section>
@@ -91,5 +91,6 @@
     <div>Kiritgan ma’lumotlaringiz faqat shu qurilmada saqlanadi. <button class="linkbtn" id="wipe" type="button">Ma’lumotlarimni o‘chirish</button></div>
   </footer>
 </div>
+<!--META-->
 </body>
 </html>

@@ -155,7 +155,16 @@
     "attach": [
      "Mehnat shartnomasi nusxasi"
     ],
-    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
+    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    }
    },
    {
     "id": "inspection",
@@ -180,7 +189,21 @@
      "Ish beruvchiga berilgan talabnoma nusxasi",
      "Mehnat shartnomasi nusxasi"
     ],
-    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    },
    {
     "id": "court",
@@ -209,7 +232,21 @@
      "Mehnat shartnomasi nusxasi",
      "Bank ko‘chirmasi yoki ish haqi hisob varaqasi"
     ],
-    "sub": "ish haqi qarzi va kechiktirish kompensatsiyasini undirish to‘g‘risida"
+    "sub": "ish haqi qarzi va kechiktirish kompensatsiyasini undirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Mehnat nizolarida xodim sud xarajatlaridan ozod."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -354,7 +391,21 @@
      "Mehnat shartnomasi nusxasi",
      "Bo‘shatish buyrug‘i ko‘chirmasi"
     ],
-    "sub": "ishga tiklash va majburiy progul vaqti uchun haq undirish to‘g‘risida"
+    "sub": "ishga tiklash va majburiy progul vaqti uchun haq undirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Mehnat nizolarida xodim sud xarajatlaridan ozod."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    },
    {
     "id": "inspection",
@@ -378,7 +429,21 @@
      "Mehnat shartnomasi nusxasi",
      "Bo‘shatish buyrug‘i ko‘chirmasi"
     ],
-    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -510,7 +575,16 @@
     "attach": [
      "Mehnat shartnomasi nusxasi"
     ],
-    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
+    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    }
    },
    {
     "id": "inspection",
@@ -534,7 +608,21 @@
      "Ish beruvchiga berilgan talabnoma nusxasi",
      "Mehnat shartnomasi nusxasi"
     ],
-    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -693,7 +781,16 @@
     "attach": [
      "Mehnat shartnomasi nusxasi"
     ],
-    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
+    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    }
    },
    {
     "id": "inspection",
@@ -717,7 +814,21 @@
      "Ish beruvchiga berilgan talabnoma nusxasi",
      "Mehnat shartnomasi nusxasi"
     ],
-    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    },
    {
     "id": "court",
@@ -745,7 +856,21 @@
      "Mehnat shartnomasi nusxasi",
      "Bank ko‘chirmasi yoki ish haqi hisob varaqasi"
     ],
-    "sub": "bo‘shatishda tegishli to‘lovlar va kompensatsiyani undirish to‘g‘risida"
+    "sub": "bo‘shatishda tegishli to‘lovlar va kompensatsiyani undirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Mehnat nizolarida xodim sud xarajatlaridan ozod."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -943,7 +1068,16 @@
      "Chek (to‘lov hujjati) nusxasi"
     ],
     "sub": "nuqsonli tovar to‘g‘risida",
-    "closing": "Talabim qondirilmagan taqdirda Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasiga va sudga murojaat qilishimni ma’lum qilaman."
+    "closing": "Talabim qondirilmagan taqdirda Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasiga va sudga murojaat qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    }
    },
    {
     "id": "agency",
@@ -968,7 +1102,21 @@
      "Chek nusxasi",
      "Sotuvchiga berilgan talabnoma nusxasi"
     ],
-    "sub": "iste’molchi huquqlari buzilganligi to‘g‘risida"
+    "sub": "iste’molchi huquqlari buzilganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    },
    {
     "id": "court",
@@ -997,7 +1145,20 @@
      "Chek nusxasi",
      "Sotuvchiga berilgan talabnoma nusxasi"
     ],
-    "sub": "iste’molchi huquqlarini himoya qilish to‘g‘risida"
+    "sub": "iste’molchi huquqlarini himoya qilish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -1130,7 +1291,16 @@
      "Chek (to‘lov hujjati) nusxasi"
     ],
     "sub": "maqbul sifatli tovarni almashtirish to‘g‘risida",
-    "closing": "Talabim qondirilmagan taqdirda Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasiga va sudga murojaat qilishimni ma’lum qilaman."
+    "closing": "Talabim qondirilmagan taqdirda Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasiga va sudga murojaat qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    }
    },
    {
     "id": "agency",
@@ -1153,7 +1323,21 @@
     "attach": [
      "Chek nusxasi"
     ],
-    "sub": "iste’molchi huquqlari buzilganligi to‘g‘risida"
+    "sub": "iste’molchi huquqlari buzilganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -1308,7 +1492,21 @@
      "Pasport nusxasi",
      "Bola(lar)ning tug‘ilganlik guvohnomasi nusxasi"
     ],
-    "sub": "voyaga yetmagan bolalar uchun aliment undirish to‘g‘risida"
+    "sub": "voyaga yetmagan bolalar uchun aliment undirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Aliment da’vosida davlat boji to‘lanmaydi."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -1338,6 +1536,7 @@
    "mq28",
    "mq36",
    "mq6",
+   "mq5",
    "msk6",
    "mq38"
   ],
@@ -1364,11 +1563,17 @@
     "body": "Masalan, tuman hokimligi ustidan viloyat hokimligiga. Birinchi murojaat nusxasini ilova qiling."
    },
    {
+    "org": "Xalq qabulxonasi",
+    "t": "Muqobil yo‘l",
+    "when": "Istalgan payt",
+    "body": "Prezidentning virtual qabulxonasi, 1000 qisqa raqamiga SMS yoki 0-800-210-00-00 telefoni orqali."
+   },
+   {
     "org": "Ma’muriy sud",
     "t": "Harakatsizlik ustidan sudga",
     "when": "{deadline} gacha",
     "hot": true,
-    "body": "Sud idorani murojaatni ko‘rib chiqishga majburlashi mumkin."
+    "body": "Sud idorani murojaatni ko‘rib chiqishga majburlashi mumkin. Jismoniy shaxslar ariza berishda davlat boji to‘lamaydi."
    }
   ],
   "evidence": [
@@ -1447,7 +1652,21 @@
      "Murojaat nusxasi",
      "Murojaat yuborilganini tasdiqlovchi hujjat"
     ],
-    "sub": "murojaat ko‘rib chiqilmaganligi to‘g‘risida"
+    "sub": "murojaat ko‘rib chiqilmaganligi to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
    },
    {
     "id": "court",
@@ -1474,7 +1693,21 @@
      "Murojaat nusxasi",
      "Murojaat yuborilganini tasdiqlovchi hujjat"
     ],
-    "sub": "ma’muriy organning harakatsizligini qonunga xilof deb topish to‘g‘risida"
+    "sub": "ma’muriy organning harakatsizligini qonunga xilof deb topish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -1600,7 +1833,21 @@
      "Pasport nusxasi",
      "Nizolashilayotgan qaror nusxasi"
     ],
-    "sub": "ma’muriy hujjatni haqiqiy emas deb topish to‘g‘risida"
+    "sub": "ma’muriy hujjatni haqiqiy emas deb topish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  },
@@ -1627,7 +1874,8 @@
   ],
   "norms": [
    "mjtk_shik",
-   "mjtk332"
+   "mjtk332",
+   "yhxx_el"
   ],
   "deadline": {
    "days": 10,
@@ -1657,7 +1905,7 @@
     "t": "Shikoyat bering",
     "when": "{deadline} gacha",
     "hot": true,
-    "body": "Yuqori turuvchi organga yoki jinoyat ishlari bo‘yicha tuman (shahar) sudiga."
+    "body": "Yuqori turuvchi organga yoki jinoyat ishlari bo‘yicha tuman (shahar) sudiga. YHXX jarimasi bo‘lsa, my.gov.uz orqali elektron shikoyat qilish mumkin."
    }
   ],
   "evidence": [
@@ -1745,7 +1993,21 @@
      "Qaror (bayonnoma) nusxasi",
      "Dalillar (foto, video) nusxasi"
     ],
-    "sub": "ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga"
+    "sub": "ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga",
+    "howto": {
+     "steps": [
+      "Shikoyatni qaror nusxasi olingan kundan 10 kun ichida topshiring.",
+      "YHXX jarimasi bo‘lsa, my.gov.uz orqali elektron shikoyat qilish mumkin: bepul, 5–10 ish kunida ko‘riladi.",
+      "Shikoyat ko‘rib chiqilayotganda chegirma muddati to‘xtamaydi. Rad etilsa, jarima chegirmasiz to‘lanadi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga qabul belgisini qo‘ydiring."
+     ],
+     "links": [
+      {
+       "label": "YHXX jarimasiga elektron shikoyat — my.gov.uz",
+       "url": "https://my.gov.uz/oz/service/1054"
+      }
+     ]
+    }
    },
    {
     "id": "court",
@@ -1770,7 +2032,16 @@
      "Qaror (bayonnoma) nusxasi",
      "Dalillar (foto, video) nusxasi"
     ],
-    "sub": "ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga"
+    "sub": "ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga",
+    "howto": {
+     "steps": [
+      "Shikoyatni qaror nusxasi olingan kundan 10 kun ichida topshiring.",
+      "YHXX jarimasi bo‘lsa, my.gov.uz orqali elektron shikoyat qilish mumkin: bepul, 5–10 ish kunida ko‘riladi.",
+      "Shikoyat ko‘rib chiqilayotganda chegirma muddati to‘xtamaydi. Rad etilsa, jarima chegirmasiz to‘lanadi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga qabul belgisini qo‘ydiring."
+     ],
+     "links": []
+    }
    }
   ]
  },
@@ -1905,7 +2176,16 @@
      "Qarzni tasdiqlovchi hujjat nusxasi"
     ],
     "sub": "qarzni qaytarish to‘g‘risida",
-    "closing": "Qarz qaytarilmagan taqdirda qarz summasi va sud xarajatlarini undirish uchun sudga murojaat qilishimni ma’lum qilaman."
+    "closing": "Qarz qaytarilmagan taqdirda qarz summasi va sud xarajatlarini undirish uchun sudga murojaat qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    }
    },
    {
     "id": "court",
@@ -1934,7 +2214,21 @@
      "Davlat boji to‘langanligi to‘g‘risidagi kvitansiya",
      "Talabnoma nusxasi"
     ],
-    "sub": "qarzni undirish to‘g‘risida"
+    "sub": "qarzni undirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    }
    }
   ]
  }

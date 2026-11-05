@@ -1,4 +1,7 @@
 import express from "express";
+import compression from "compression";
+import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
@@ -9,6 +12,7 @@ import { documentModel, toDocx, toPdf } from "./documents.js";
 import { securityHeaders, requireJson, rateLimit } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
+import { domainCardsHTML, examplesHTML } from "../public/shared.js";
 
 const buildModel = req => { const v = vDocument(req.body); const m = documentModel(v); return v.lang === "cyr" ? cyrillicModel(m) : m; };
 
@@ -19,6 +23,7 @@ const fontDir = pkg => join(dirname(require.resolve(`${pkg}/package.json`)), "fi
 export const app = express();
 app.disable("x-powered-by");
 if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY === "true" ? 1 : process.env.TRUST_PROXY);
+app.use(compression());
 app.use(securityHeaders);
 app.use("/api", requireJson, express.json({ limit: "32kb", strict: true }));
 
@@ -32,7 +37,7 @@ const META = {
   laws: Object.fromEntries(Object.entries(LAWS).map(([k, l]) => [k, { name:l.name, url:l.url }])),
   scenarios: SCENARIOS.map(s => ({
     id:s.id, domain:s.domain, title:s.title, card:s.card, short:s.short, trigger:s.trigger,
-    docs: s.docs.map(d => ({ id:d.id, label:d.label })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline
+    docs: s.docs.map(d => ({ id:d.id, label:d.label, howto:d.howto })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline
   }))
 };
 app.get("/api/meta", (req, res) => res.json({ ai: aiEnabled(), ...META }));
@@ -58,14 +63,44 @@ app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(asyn
 
 app.use("/api", (req, res) => res.status(404).json({ error:"Topilmadi." }));
 
+// ---------- Statik fayllar ----------
+// Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
+const PUBLIC = join(here, "..", "public");
+const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
+const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
+const versioned = (html, list) => list.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`), html);
+
+// Bosh sahifa serverda oldindan chiziladi: soha kartalari, namunalar va meta-ma’lumot HTML ichida keladi
+const jsonForHtml = o => JSON.stringify(o).replace(/</g, "\\u003c").replace(/\u2028|\u2029/g, "");
+function renderIndex(){
+  const meta = { ai: aiEnabled(), ...META };
+  return versioned(readFileSync(join(PUBLIC, "index.html"), "utf8"), ASSETS)
+    .replace("<!--DOMAINS-->", domainCardsHTML(meta))
+    .replace("<!--EXAMPLES-->", examplesHTML())
+    .replace("<!--AITEXT-->", meta.ai ? "AI tahlil: Claude" : "Qidiruv tahlili")
+    .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`);
+}
+const INDEX = renderIndex();
+app.get(["/", "/index.html"], (req, res) => res.set("Cache-Control", "no-cache").type("html").send(INDEX));
+// app.js ichidagi importlar ham versiyalanadi
+const APP_JS = versioned(readFileSync(join(PUBLIC, "app.js"), "utf8"), ["translit.js", "shared.js"]);
+app.get("/app.js", (req, res) => res.set("Cache-Control", req.query.v ? "public, max-age=31536000, immutable" : "no-cache").type("js").send(APP_JS));
+
 // Shriftlar o‘zimizda (tashqi CDN yo‘q — maxfiylik va CSP uchun)
-const fontOpts = { maxAge:"30d", immutable:true };
+const fontOpts = { maxAge:"365d", immutable:true };
 app.use("/fonts/onest", express.static(fontDir("@fontsource/onest"), fontOpts));
 app.use("/fonts/spectral", express.static(fontDir("@fontsource/spectral"), fontOpts));
 app.use("/fonts/jetbrains-mono", express.static(fontDir("@fontsource/jetbrains-mono"), fontOpts));
-app.use(express.static(join(here, "..", "public"), {
-  extensions:["html"], maxAge: process.env.NODE_ENV === "production" ? "1h" : 0,
-  setHeaders(res, path){ if (path.endsWith("sw.js")) res.set({ "Cache-Control":"no-cache", "Service-Worker-Allowed":"/" }); if (path.endsWith(".webmanifest")) res.type("application/manifest+json"); }
+app.use(express.static(PUBLIC, {
+  extensions:["html"], index:false,
+  setHeaders(res, path){
+    const url = res.req.originalUrl;
+    if (path.endsWith("sw.js")) res.set({ "Cache-Control":"no-cache", "Service-Worker-Allowed":"/" });
+    else if (/[?&]v=/.test(url)) res.set("Cache-Control", "public, max-age=31536000, immutable");
+    else res.set("Cache-Control", process.env.NODE_ENV === "production" ? "public, max-age=3600" : "no-cache");
+    if (path.endsWith(".webmanifest")) res.type("application/manifest+json");
+  }
 }));
 
 app.use((err, req, res, next) => {

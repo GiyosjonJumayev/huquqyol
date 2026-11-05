@@ -1,7 +1,7 @@
 // HuquqYo‘l — frontend. Huquqiy mantiq serverda (/api/*); bu fayl ko‘rsatadi, saqlaydi va yo‘naltiradi.
 import { toCyrillic } from "/translit.js";
+import { esc, ICONS, EXAMPLES, domainCardsHTML, examplesHTML } from "/shared.js";
 const $ = s => document.querySelector(s);
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const fmtSum = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 const fmtShort = n => n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(".", ",") + " mln" : fmtSum(n);
 const iso = d => { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
@@ -26,23 +26,7 @@ async function api(path, body){
 }
 const getJSON = async (p, b) => (await api(p, b)).json();
 
-const SVG = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
-const ICONS = {
-  mehnat: SVG('<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>'),
-  istemol: SVG('<path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
-  oila: SVG('<circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><circle cx="12" cy="13" r="2"/><path d="M3.5 20c0-3 2-5 4.5-5M20.5 20c0-3-2-5-4.5-5M9 21c0-2 1.3-3.5 3-3.5s3 1.5 3 3.5"/>'),
-  davlat: SVG('<path d="M3 9l9-5 9 5"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9"/><path d="M3 21h18"/>'),
-  jarima: SVG('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>'),
-  fuqarolik: SVG('<circle cx="9" cy="9" r="5"/><path d="M9 7v4M7.5 9h3"/><path d="M14.5 4.6A5 5 0 1 1 13 19"/><path d="M3 21h8"/>')
-};
-const EXAMPLES = [
-  "Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m",
-  "«Texnomart» do‘konidan olgan televizor 2 haftada buzildi, almashtirmayapti",
-  "Sobiq erim 2 ta bolamga aliment to‘lamayapti",
-  "Hokimlikka murojaat qildim, bir oydan beri javob yo‘q",
-  "YHXB radar bo‘yicha noto‘g‘ri jarima soldi",
-  "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor"
-];
+
 const ROUTES = { 1:"vaziyat", 2:"reja", 3:"ariza" };
 
 /* ---------- Yozuv: lotin / kirill ----------
@@ -124,7 +108,7 @@ window.addEventListener("popstate", () => {
 /* ---------- 1. Vaziyat ---------- */
 function renderStart(){
   renderDomains();
-  $("#examples").innerHTML = EXAMPLES.map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");
+  $("#examples").innerHTML = examplesHTML();
   $("#aiDot").classList.toggle("on", state.meta.ai);
   $("#aiText").textContent = state.meta.ai ? "AI tahlil: Claude" : "Qidiruv tahlili";
 }
@@ -132,10 +116,7 @@ function renderDomains(){
   state.domain = null;
   $("#pickHead").hidden = true;
   $("#cases").className = "domains";
-  $("#cases").innerHTML = state.meta.domains.map(d => {
-    const n = state.meta.scenarios.filter(s => s.domain === d.id).length;
-    return `<button class="case domain" type="button" data-domain="${d.id}"><span class="ic">${ICONS[d.id] || ""}</span><span><b>${esc(d.title)}</b><span>${esc(d.desc)}</span><span class="count">${n} ta holat →</span></span></button>`;
-  }).join("");
+  $("#cases").innerHTML = domainCardsHTML(state.meta);
 }
 function renderDomain(id){
   const d = state.meta.domains.find(x => x.id === id); if (!d) return renderDomains();
@@ -338,7 +319,16 @@ function renderDocView(){
     ${[...groups].map(([g, fs]) => `<fieldset><legend>${esc(g)}</legend>${fs.map(fieldHTML).join("")}</fieldset>`).join("")}
     <details class="more" ${extra ? "open" : ""}><summary>+ Qo‘shimcha holatlar</summary>
       <div class="field"><label for="f_extra">Ariza matniga qo‘shiladi</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
+  renderHowto();
   previewDoc();
+}
+function renderHowto(){
+  const d = scenarioMeta(state.scn).docs.find(x => x.id === state.recipient), h = d?.howto;
+  $("#howto").hidden = !h;
+  if (!h) return;
+  $("#howtoH").textContent = `Qanday topshiriladi: ${d.label.toLowerCase()}`;
+  $("#howtoSteps").innerHTML = h.steps.map(x => `<li>${esc(x)}</li>`).join("");
+  $("#howtoLinks").innerHTML = h.links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)} ↗</a>`).join("");
 }
 function syncVisibility(){
   for (const f of scenarioMeta(state.scn).fields){ const el = document.querySelector(`[data-f="${f.k}"]`); if (el) el.hidden = !!(f.docs && !f.docs.includes(state.recipient)); }
@@ -451,6 +441,7 @@ document.addEventListener("click", e => {
     state.recipient = r.dataset.r; persist();
     document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b === r)));
     syncVisibility();
+    renderHowto();
     previewDoc();
   }
 });
@@ -494,7 +485,8 @@ window.addEventListener("online", () => toast("Aloqa tiklandi"));
 /* ---------- Boshlash ---------- */
 if (lang === "cyr") setLang("cyr");
 try {
-  state.meta = await getJSON("/api/meta");
+  const embedded = document.getElementById("meta-data");
+  state.meta = embedded ? JSON.parse(embedded.textContent) : await getJSON("/api/meta");
   renderStart();
   const saved = store.load();
   if (saved){ state.applicant = saved.applicant || {}; state.formByScn = saved.formByScn || {}; }

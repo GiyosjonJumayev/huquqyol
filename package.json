@@ -1,6 +1,6 @@
 {
   "name": "huquqyol",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "HuquqYo‘l — fuqarolar uchun AI huquqiy yo‘l xaritasi (mehnat, iste’molchi, oila, davlat idoralari, jarimalar, qarz — O‘zbekiston)",
   "type": "module",
   "main": "server/index.js",
@@ -8,6 +8,7 @@
     "start": "node --env-file-if-exists=.env server/index.js",
     "dev": "node --env-file-if-exists=.env --watch server/index.js",
     "test": "node --test test/*.test.js",
+    "test:e2e": "node --test --test-concurrency=1 test/e2e/*.e2e.js",
     "ingest": "node scripts/ingest-lex.js",
     "kb": "python3 scripts/build-kb.py server/kb"
   },
@@ -20,6 +21,7 @@
     "@fontsource/jetbrains-mono": "5.3.0",
     "@fontsource/onest": "5.3.1",
     "@fontsource/spectral": "5.3.0",
+    "compression": "1.8.2",
     "dejavu-fonts-ttf": "2.37.3",
     "docx": "9.15.2",
     "express": "5.3.0",
