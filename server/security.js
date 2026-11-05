@@ -1,3 +1,4 @@
+import { msg, resolveLang } from "./i18n.js";
 // Xavfsizlik qatlami: HTTP headerlar, so‘rov turi, rate limit.
 const PROD = process.env.NODE_ENV === "production";
 
@@ -33,7 +34,7 @@ export function securityHeaders(req, res, next){
 
 // POST so‘rovlar faqat JSON bo‘lishi kerak (CSRF va noto‘g‘ri formatdan himoya)
 export function requireJson(req, res, next){
-  if (req.method === "POST" && !req.is("application/json")) return res.status(415).json({ error:"So‘rov JSON formatida bo‘lishi kerak." });
+  if (req.method === "POST" && !req.is("application/json")) return res.status(415).json({ error: msg(resolveLang(req), "json415") });
   next();
 }
 
@@ -50,7 +51,7 @@ export function rateLimit({ windowMs = 60_000, max = 20, name = "api" } = {}){
     const arr = (hits.get(key) || []).filter(t => now - t < windowMs);
     if (arr.length >= max){
       res.set("Retry-After", String(Math.ceil(windowMs / 1000)));
-      return res.status(429).json({ error:"So‘rovlar juda ko‘p. Bir daqiqadan keyin urinib ko‘ring." });
+      return res.status(429).json({ error: msg(resolveLang(req), "rate") });
     }
     arr.push(now); hits.set(key, arr);
     if (hits.size > 50_000) hits.delete(hits.keys().next().value);   // xotira cheklovi

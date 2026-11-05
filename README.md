@@ -1,6 +1,10 @@
 # HuquqYo‘l — AI huquqiy yo‘l xaritasi
 
-Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahlil qiladi va quyidagilarni beradi: tegishli qonun normalari (lex.uz havolasi bilan), qadamma-qadam reja, muddat va xavf bahosi, kalkulyator, hamda tayyor ariza. Ariza DOCX, PDF yoki chop etish uchun tayyor holatda chiqadi, lotin yoki kirill yozuvida.
+Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahlil qiladi va quyidagilarni beradi: tegishli qonun normalari (lex.uz havolasi bilan), qadamma-qadam reja, muddat va xavf bahosi, kalkulyator, hamda tayyor ariza. Ariza DOCX, PDF yoki chop etish uchun tayyor holatda chiqadi.
+
+**Uch tilda ishlaydi:** o‘zbek (lotin), o‘zbek (kirill) va rus. Til interfeys, normalar matni, qadamlar, kalkulyatorlar, xato xabarlari va tayyor arizaga birdek tatbiq etiladi. Rus tilidagi ariza ruscha rasmiy uslubda yoziladi («ИСКОВОЕ ЗАЯВЛЕНИЕ», «На основании изложенного прошу:»). Vaziyatni istalgan tilda yozish mumkin, jumladan o‘zbekcha kirillda.
+
+Taqdimot ssenariysi va hakamlar savollariga javoblar — [DEMO.md](DEMO.md).
 
 ## Qamrab olingan sohalar (6 soha, 11 holat)
 
@@ -21,8 +25,8 @@ Node.js 22.9 yoki undan yangi versiya kerak.
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 32 ta unit/API test
-npm run test:e2e          # 4 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
+npm test                  # 39 ta unit/API test (jumladan ruscha va kirillcha)
+npm run test:e2e          # 5 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.
@@ -34,7 +38,7 @@ docker build -t huquqyol .
 docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-ant-... huquqyol
 ```
 
-Bepul joylashtirish (Render, Railway): repo ulanadi, start buyrug‘i `npm start`, `ANTHROPIC_API_KEY` environment variable sifatida beriladi.
+Bepul joylashtirish: Render’da repo ulanadi, `render.yaml` hamma narsani o‘zi sozlaydi (faqat `ANTHROPIC_API_KEY` ni kiriting). Railway va boshqa platformalarda start buyrug‘i `npm start`.
 
 ## Arxitektura
 
@@ -133,3 +137,14 @@ Shablon sintaksisi:
   - YHXX jarimasi ustidan my.gov.uz orqali elektron shikoyat (kursiv.media).
 - 333-modda kompensatsiyasini hisoblash usuli amaliyotda bahsli. Shuning uchun ilova past talqinni asosiy summa sifatida, yuqori talqinni esa oraliq sifatida ko‘rsatadi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
 - **Bu huquqiy maslahat emas.** Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi.
+
+## Ko‘p tillilik
+
+| Qatlam | Qanday ishlaydi |
+|---|---|
+| Til tanlash | Ustuvorlik: so‘rovdagi `lang` → `?lang=` → `hy_lang` cookie → brauzer tili (`Accept-Language`) → o‘zbek. `/?lang=ru` havolasi tilni eslab qoladi |
+| Bosh sahifa | Har bir til uchun serverda alohida chiziladi (`{{kalit}}` → `public/i18n.js`), shuning uchun matn «sakramaydi» |
+| Bilim bazasi | `scripts/kb_ru.py` — ruscha matnlar; generator ularni o‘zbekcha baza bilan tuzilma bo‘yicha solishtiradi (maydonlar, shablon kalitlari, hujjatlar soni) va `server/kb/ru.json` yozadi |
+| Kirill | O‘zbekcha natijadan avtomatik o‘giriladi (`public/translit.js`); identifikatorlar, URL va sanalar o‘zgarmaydi |
+| Qidiruv | Ruscha kalit so‘zlar bazaga qo‘shilgan; kirillcha o‘zbek matni qidiruv uchun lotinga ham o‘giriladi |
+| AI | Claude `summary` va `missing` ni foydalanuvchi tilida yozadi |

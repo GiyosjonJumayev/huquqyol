@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="uz">
+<html lang="{{htmlLang}}" data-lang="{{lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="HuquqYo‘l — huquqingiz buzilganda: qonun, qadamlar va tayyor ariza. Mehnat, iste’molchi, aliment, davlat idoralari, jarima, qarz.">
-<title>HuquqYo‘l — huquqiy yo‘l xaritasi</title>
+<meta name="description" content="{{metaDesc}}">
+<title>{{title}}</title>
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/onest/onest-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/spectral/spectral-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -15,23 +15,24 @@
 <script type="module" src="/app.js"></script>
 </head>
 <body>
-<a class="skip" href="#main">Asosiy qismga o‘tish</a>
+<a class="skip" href="#main">{{skip}}</a>
 <div class="sr" aria-live="polite" id="live"></div>
 <div class="wrap">
   <header class="top">
-    <button class="brand" id="home" type="button" aria-label="HuquqYo‘l — boshiga qaytish" data-notr>
+    <button class="brand" id="home" type="button" aria-label="{{homeLabel}}">
       <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>
       HuquqYo‘l
     </button>
     <div class="topright">
-    <div class="langsw" role="group" aria-label="Yozuv" data-notr>
-      <button type="button" data-lang="lat" aria-pressed="true">Lotin</button>
-      <button type="button" data-lang="cyr" aria-pressed="false" lang="uz-Cyrl">Кирилл</button>
+    <div class="langsw" role="group" aria-label="{{langGroup}}">
+      <button type="button" data-lang="uz" aria-pressed="false" lang="uz" title="O‘zbekcha (lotin)">O‘zb</button>
+      <button type="button" data-lang="cyr" aria-pressed="false" lang="uz-Cyrl" title="Ўзбекча (кирилл)">Ўзб</button>
+      <button type="button" data-lang="ru" aria-pressed="false" lang="ru" title="Русский">Рус</button>
     </div>
-    <nav aria-label="Bosqichlar"><ol class="stepper">
-      <li><button type="button" data-go="1" aria-current="step"><span class="n">1</span><span class="lbl">Vaziyat</span></button></li>
-      <li><button type="button" data-go="2" disabled><span class="n">2</span><span class="lbl">Reja</span></button></li>
-      <li><button type="button" data-go="3" disabled><span class="n">3</span><span class="lbl">Ariza</span></button></li>
+    <nav aria-label="{{stepsNav}}"><ol class="stepper">
+      <li><button type="button" data-go="1" aria-current="step"><span class="n">1</span><span class="lbl">{{step1}}</span></button></li>
+      <li><button type="button" data-go="2" disabled><span class="n">2</span><span class="lbl">{{step2}}</span></button></li>
+      <li><button type="button" data-go="3" disabled><span class="n">3</span><span class="lbl">{{step3}}</span></button></li>
     </ol></nav>
     </div>
   </header>
@@ -40,24 +41,24 @@
   <div class="resume" id="resume" hidden></div>
   <!-- 1. Vaziyat -->
   <section class="view" id="v1">
-    <h1 class="hero" tabindex="-1">Huquqingiz buzildimi?</h1>
-    <p class="lead">Sohani tanlang yoki vaziyatni o‘z so‘zlaringiz bilan yozing. Qaysi qonun himoya qilishini, qayerga murojaat qilishni va tayyor arizani bir daqiqada olasiz.</p>
+    <h1 class="hero" tabindex="-1">{{hero}}</h1>
+    <p class="lead">{{lead}}</p>
     <div id="picker">
       <div class="pickhead" id="pickHead" hidden></div>
       <div class="domains" id="cases"><!--DOMAINS--></div>
     </div>
-    <div class="or">yoki o‘z so‘zlaringiz bilan yozing</div>
+    <div class="or">{{or}}</div>
     <div class="ask">
-      <label for="problem" class="sr">Muammo tavsifi</label>
-      <textarea id="problem" placeholder="Masalan: do‘kondan olgan muzlatkichim bir haftada buzildi, sotuvchi almashtirmayapti"></textarea>
+      <label for="problem" class="sr">{{problemLabel}}</label>
+      <textarea id="problem" placeholder="{{problemPh}}"></textarea>
       <div class="askbar">
-        <span class="ai"><span class="dot" id="aiDot"></span><span id="aiText"><!--AITEXT--></span></span>
-        <button class="btn primary" id="analyzeBtn" type="button">Tahlil qilish</button>
+        <span class="ai"><span class="dot" id="aiDot"></span><span id="aiText">{{aiText}}</span></span>
+        <button class="btn primary" id="analyzeBtn" type="button">{{analyze}}</button>
       </div>
     </div>
-    <div class="examples" id="examples" aria-label="Namunalar"><!--EXAMPLES--></div>
+    <div class="examples" id="examples" aria-label="{{examplesLabel}}"><!--EXAMPLES--></div>
     <p class="error" id="askErr" role="alert" hidden></p>
-    <p class="privacy">Tahlil uchun faqat shu matn serverga yuboriladi va saqlanmaydi. Ariza ma’lumotlari faqat fayl yasash uchun ishlatiladi.</p>
+    <p class="privacy">{{privacy}}</p>
   </section>
 
   <!-- 2. Reja -->
@@ -65,30 +66,31 @@
 
   <!-- 3. Ariza -->
   <section class="view" id="v3" hidden>
-    <button class="back" type="button" data-go="2">← Rejaga qaytish</button>
-    <div class="case-head"><h1 tabindex="-1">Arizangiz tayyor</h1><p>Kimga yozishni tanlang va ma’lumotlaringizni kiriting. Hujjat siz yozgan sari yangilanadi.</p></div>
-    <div class="seg" role="group" aria-label="Kimga" id="seg"></div>
+    <button class="back" type="button" data-go="2">{{backToPlan}}</button>
+    <div class="case-head"><h1 tabindex="-1">{{docReady}}</h1><p>{{docLead}}</p></div>
+    <p class="small muted doclang" id="docLang">{{docLangNote}}</p>
+    <div class="seg" role="group" aria-label="{{toWhom}}" id="seg"></div>
     <div class="docgrid">
-      <div id="docForm"></div>
+      <div><button class="btn ghost sm demo" id="demoFill" type="button">✎ {{demoFill}}</button><div id="docForm"></div></div>
       <div class="paperwrap">
         <button class="missing" id="missing" type="button" hidden></button>
-        <div class="paper" id="paper" aria-label="Ariza ko‘rinishi"></div>
+        <div class="paper" id="paper" aria-label="{{paperLabel}}" lang="{{htmlLang}}"></div>
         <div class="dlrow">
           <button class="btn primary" id="dlDocx" type="button">Word (DOCX)</button>
           <button class="btn ghost" id="dlPdf" type="button">PDF</button>
-          <button class="btn ghost" id="printBtn" type="button">Chop etish</button>
-          <button class="btn ghost" id="copyTxt" type="button">Nusxalash</button>
+          <button class="btn ghost" id="printBtn" type="button">{{print}}</button>
+          <button class="btn ghost" id="copyTxt" type="button">{{copy}}</button>
         </div>
-        <section class="card howto" id="howto" aria-labelledby="howtoH"><h2 id="howtoH">Qanday topshiriladi</h2><ol id="howtoSteps"></ol><div class="howlinks" id="howtoLinks"></div></section>
+        <section class="card howto" id="howto" aria-labelledby="howtoH"><h2 id="howtoH">{{howto}}</h2><ol id="howtoSteps"></ol><div class="howlinks" id="howtoLinks"></div></section>
       </div>
     </div>
   </section>
 
 </main>
   <footer>
-    <div><b>Bu huquqiy maslahat emas.</b> Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi; muhim qaror oldidan yurist bilan maslahatlashing.</div>
-    <div>Manbalar: Mehnat, Oila, Fuqarolik va Ma’muriy javobgarlik kodekslari, Iste’molchilar va Murojaatlar to‘g‘risidagi qonunlar — <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz</a>. 2026-yil noyabr holatiga tekshirilgan.</div>
-    <div>Kiritgan ma’lumotlaringiz faqat shu qurilmada saqlanadi. <button class="linkbtn" id="wipe" type="button">Ma’lumotlarimni o‘chirish</button></div>
+    <div><b>{{disclaimerB}}</b> {{disclaimer}}</div>
+    <div>{{sources}} <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz</a>. {{checked}}</div>
+    <div>{{local}} <button class="linkbtn" id="wipe" type="button">{{wipe}}</button></div>
   </footer>
 </div>
 <!--META-->

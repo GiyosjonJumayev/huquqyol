@@ -501,6 +501,12 @@ for s in S:
             k = k[0] or k[1]
             assert k in keys, (s["id"], d["id"], k)
 os.makedirs(OUT, exist_ok=True)
-for name, data in (("laws", LAWS), ("domains", DOMAINS), ("norms", N), ("scenarios", S), ("applicant", APPLICANT)):
+# Ruscha matnlar (kb_ru.py) va ruscha kalit so‘zlar
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kb_ru
+for s_ in S: s_["keywords"] = s_["keywords"] + [k for k in kb_ru.KEYWORDS[s_["id"]] if k not in s_["keywords"]]
+RU = kb_ru.build_ru(S)
+assert set(RU["norms"]) == ids and set(RU["laws"]) == set(LAWS)
+for name, data in (("ru", RU), ("laws", LAWS), ("domains", DOMAINS), ("norms", N), ("scenarios", S), ("applicant", APPLICANT)):
     with open(os.path.join(OUT, name + ".json"), "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=1)
 print(len(N), "norma;", len(S), "holat;", len(DOMAINS), "soha")

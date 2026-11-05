@@ -1,0 +1,16 @@
+# Render.com: repo ulanganda xizmat avtomatik yaratiladi (Blueprint)
+services:
+  - type: web
+    name: huquqyol
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: ANTHROPIC_API_KEY
+        sync: false          # Render panelida kiritiladi; bo‘lmasa ilova qidiruv rejimida ishlaydi

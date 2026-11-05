@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
-import { SCENARIOS, NORMS, DOMAINS, LAWS, APPLICANT_FIELDS, LEX_URL } from "./kb.js";
+import { SCENARIOS, NORMS, LEX_URL, kbFor } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, toDocx, toPdf } from "./documents.js";
@@ -13,8 +13,13 @@ import { securityHeaders, requireJson, rateLimit } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
 import { domainCardsHTML, examplesHTML } from "../public/shared.js";
+import { makeT, LANGS, HTML_LANG } from "../public/i18n.js";
+import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
 
-const buildModel = req => { const v = vDocument(req.body); const m = documentModel(v); return v.lang === "cyr" ? cyrillicModel(m) : m; };
+// Til: uz va ru o‘z bazasidan, cyr — uz natijasining kirill shakli
+const base = lang => lang === "ru" ? "ru" : "uz";
+const out = (lang, x) => lang === "cyr" ? deepCyr(x) : x;
+const buildModel = req => { const v = vDocument(req.body); const m = documentModel({ ...v, lang: base(v.lang) }); return v.lang === "cyr" ? cyrillicModel(m) : m; };
 
 const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -26,33 +31,39 @@ if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY === 
 app.use(compression());
 app.use(securityHeaders);
 app.use("/api", requireJson, express.json({ limit: "32kb", strict: true }));
+app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 
 app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
 // Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
-const META = {
-  cbRate: CB_RATE, lex: LEX_URL, domains: DOMAINS, applicant: APPLICANT_FIELDS,
-  laws: Object.fromEntries(Object.entries(LAWS).map(([k, l]) => [k, { name:l.name, url:l.url }])),
-  scenarios: SCENARIOS.map(s => ({
-    id:s.id, domain:s.domain, title:s.title, card:s.card, short:s.short, trigger:s.trigger,
-    docs: s.docs.map(d => ({ id:d.id, label:d.label, howto:d.howto })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline
-  }))
-};
-app.get("/api/meta", (req, res) => res.json({ ai: aiEnabled(), ...META }));
+function metaOf(lang){
+  const { DOMAINS, LAWS, APPLICANT_FIELDS, SCENARIOS } = kbFor(base(lang));
+  return out(lang, {
+    lang, cbRate: CB_RATE, lex: LEX_URL, domains: DOMAINS, applicant: APPLICANT_FIELDS,
+    laws: Object.fromEntries(Object.entries(LAWS).map(([k, l]) => [k, { name:l.name, url:l.url }])),
+    scenarios: SCENARIOS.map(s => ({
+      id:s.id, domain:s.domain, title:s.title, card:s.card, short:s.short, trigger:s.trigger,
+      docs: s.docs.map(d => ({ id:d.id, label:d.label, howto:d.howto })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline
+    }))
+  });
+}
+const META = Object.fromEntries(LANGS.map(l => [l, metaOf(l)]));
+app.get("/api/meta", (req, res) => res.set("Vary", "Cookie, Accept-Language").json({ ai: aiEnabled(), ...META[req.lang] }));
 
 app.post("/api/analyze", rateLimit({ max: 15, name:"analyze" }), wrap(async (req, res) => {
-  res.json(await analyze(vAnalyze(req.body).text));
+  const v = vAnalyze(req.body);
+  res.json(out(req.lang, await analyze(v.text, base(req.lang))));
 }));
 
-app.post("/api/plan", rateLimit({ max: 120, name:"plan" }), (req, res) => res.json(buildPlan(vPlan(req.body))));
+app.post("/api/plan", rateLimit({ max: 120, name:"plan" }), (req, res) => { const v = vPlan(req.body); res.json(out(req.lang, buildPlan({ ...v, lang: base(v.lang) }))); });
 
 app.post("/api/document/preview", rateLimit({ max: 240, name:"preview" }), (req, res) => res.json(buildModel(req)));
 
 app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(async (req, res) => {
   const fmt = req.params.format;
-  if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error:"Format: docx yoki pdf." });
+  if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error: msg(req.lang, "format") });
   const model = buildModel(req);
   const buf = fmt === "docx" ? await toDocx(model) : await toPdf(model);
   res.set({
@@ -61,31 +72,43 @@ app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(asyn
   }).send(buf);
 }));
 
-app.use("/api", (req, res) => res.status(404).json({ error:"Topilmadi." }));
+app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFound") }));
 
 // ---------- Statik fayllar ----------
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 const versioned = (html, list) => list.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`), html);
 
-// Bosh sahifa serverda oldindan chiziladi: soha kartalari, namunalar va meta-ma’lumot HTML ichida keladi
+// Bosh sahifa serverda oldindan chiziladi (har bir til uchun alohida): matnlar, soha kartalari, namunalar va meta HTML ichida keladi.
+// Shablondagi {{kalit}} — public/i18n.js lug‘atidan.
 const jsonForHtml = o => JSON.stringify(o).replace(/</g, "\\u003c").replace(/\u2028|\u2029/g, "");
-function renderIndex(){
-  const meta = { ai: aiEnabled(), ...META };
-  return versioned(readFileSync(join(PUBLIC, "index.html"), "utf8"), ASSETS)
-    .replace("<!--DOMAINS-->", domainCardsHTML(meta))
-    .replace("<!--EXAMPLES-->", examplesHTML())
-    .replace("<!--AITEXT-->", meta.ai ? "AI tahlil: Claude" : "Qidiruv tahlili")
-    .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`);
+const escAttr = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const TEMPLATE = versioned(readFileSync(join(PUBLIC, "index.html"), "utf8"), ASSETS);
+function renderIndex(lang){
+  const t = makeT(lang), meta = { ai: aiEnabled(), ...META[lang] };
+  return TEMPLATE
+    .replace("<!--DOMAINS-->", domainCardsHTML(meta, t))
+    .replace("<!--EXAMPLES-->", examplesHTML(lang))
+    .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
+    .replace(`data-lang="${lang}" aria-pressed="false"`, `data-lang="${lang}" aria-pressed="true"`)
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff")) : escAttr(t(k)));
 }
-const INDEX = renderIndex();
-app.get(["/", "/index.html"], (req, res) => res.set("Cache-Control", "no-cache").type("html").send(INDEX));
-// app.js ichidagi importlar ham versiyalanadi
-const APP_JS = versioned(readFileSync(join(PUBLIC, "app.js"), "utf8"), ["translit.js", "shared.js"]);
-app.get("/app.js", (req, res) => res.set("Cache-Control", req.query.v ? "public, max-age=31536000, immutable" : "no-cache").type("js").send(APP_JS));
+const INDEX = Object.fromEntries(LANGS.map(l => [l, renderIndex(l)]));
+app.get(["/", "/index.html"], (req, res) => {
+  const forced = parseLang(req.query.lang);
+  if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });   // ?lang=ru havolasi tilni eslab qoladi
+  res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(INDEX[req.lang]);
+});
+// JS modullari ichidagi importlar ham versiyalanadi
+const rewriteImports = src => MODULES.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`).replaceAll(`"./${f}"`, `"/${f}?v=${VER[f]}"`), src);
+for (const f of MODULES){
+  const code = rewriteImports(readFileSync(join(PUBLIC, f), "utf8"));
+  app.get("/" + f, (req, res) => res.set("Cache-Control", req.query.v ? "public, max-age=31536000, immutable" : "no-cache").type("js").send(code));
+}
 
 // Shriftlar o‘zimizda (tashqi CDN yo‘q — maxfiylik va CSP uchun)
 const fontOpts = { maxAge:"365d", immutable:true };
@@ -104,11 +127,12 @@ app.use(express.static(PUBLIC, {
 }));
 
 app.use((err, req, res, next) => {
-  if (err.type === "entity.too.large") return res.status(413).json({ error:"So‘rov juda katta." });
-  if (err.type === "entity.parse.failed") return res.status(400).json({ error:"JSON noto‘g‘ri." });
+  const lang = req.lang || resolveLang(req);
+  if (err.type === "entity.too.large") return res.status(413).json({ error: msg(lang, "tooLarge") });
+  if (err.type === "entity.parse.failed") return res.status(400).json({ error: msg(lang, "badJson") });
   const status = err.status && err.status < 500 ? err.status : 500;
   if (status === 500) console.error("[server]", err.message);
-  res.status(status).json({ error: status === 500 ? "Serverda xatolik yuz berdi." : err.message });
+  res.status(status).json({ error: status === 500 ? msg(lang, "server") : err.key ? msg(lang, err.key, err.vars) : err.message });
 });
 
 if (process.argv[1] === fileURLToPath(import.meta.url)){

@@ -2,9 +2,16 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import PDFDocument from "pdfkit";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { SCENARIO_BY_ID, fieldMap } from "./kb.js";
-import { deadlineFrom, parseISO, startOfDay, uzDate, addMonths, termText } from "./dates.js";
-import { fmtSum, alimonyShare } from "./plan.js";
+import { kbFor } from "./kb.js";
+import { deadlineFrom, parseISO, startOfDay, addMonths } from "./dates.js";
+import { alimonyShare } from "./plan.js";
+import { fmtDate, fmtMoney, termText } from "../public/i18n.js";
+
+// Hujjatdagi doimiy so‘zlar
+const DOC = {
+  uz:{ addr:", yashash manzili: ", tel:", tel.: ", attach:"Ilovalar:", sign:"Imzo: ____________  ", copy:" (nusxa).", isCopy:/nusxa|guvoh|kvitansiya/i, key: x => x.toLowerCase().slice(0, 18) },
+  ru:{ addr:", адрес проживания: ", tel:", тел.: ", attach:"Приложения:", sign:"Подпись: ____________  ", copy:" (копия).", isCopy:/копи|свидетельств|квитанц|выписк/i, key: x => x.toLowerCase().replace(/^копи[яи]\s+/, "").split(/\s+/).slice(0, 3).map(w => w.slice(0, 5)).join(" ") }
+};
 
 const require = createRequire(import.meta.url);
 const FONT_DIR = join(dirname(require.resolve("dejavu-fonts-ttf/package.json")), "ttf");
@@ -15,23 +22,23 @@ const FONT_DIR = join(dirname(require.resolve("dejavu-fonts-ttf/package.json")),
 const COND = /\[([?!])(\w+)\]([\s\S]*?)\[\/\]/g;
 const TOKEN = /\{\{(\w+)\}\}/g;
 
-function makeContext(s, form, trigger, deadline, now){
-  const fm = fieldMap(s), vals = Object.create(null);
+function makeContext(s, form, trigger, deadline, now, kb){
+  const lang = kb.lang, fm = kb.fieldMap(s), vals = Object.create(null);
   for (const [k, f] of Object.entries(fm)){
     const raw = String(form[k] ?? "").trim();
     if (!raw) continue;
-    if (f.type === "money"){ if (Number(raw) > 0) vals[k] = `${fmtSum(Number(raw))} so‘m`; }
-    else if (f.type === "date"){ const d = parseISO(raw); if (d) vals[k] = uzDate(d); }
+    if (f.type === "money"){ if (Number(raw) > 0) vals[k] = fmtMoney(Number(raw), lang); }
+    else if (f.type === "date"){ const d = parseISO(raw); if (d) vals[k] = fmtDate(d, lang); }
     else if (f.type === "select"){ const o = f.options.find(o => o.v === raw); if (o){ vals[k] = o.doc; if (o.court) vals[k + "Court"] = o.court; } }
     else vals[k] = raw;
   }
-  vals.trigger = uzDate(trigger);
-  if (deadline) vals.deadline = uzDate(deadline);
-  vals.deadlineTerm = termText(s.deadline);
-  vals.today = uzDate(now);
+  vals.trigger = fmtDate(trigger, lang);
+  if (deadline) vals.deadline = fmtDate(deadline, lang);
+  vals.deadlineTerm = termText(s.deadline, lang);
+  vals.today = fmtDate(now, lang);
   const sh = alimonyShare(Math.round(Number(form.children) || 0));
-  if (sh) vals.share = sh.text;
-  return { vals, fm };
+  if (sh) vals.share = lang === "ru" ? sh.ru : sh.text;
+  return { vals, fm, W: DOC[lang] };
 }
 
 function render(tpl, ctx){
@@ -42,11 +49,12 @@ function render(tpl, ctx){
   for (const m of str.matchAll(TOKEN)){
     if (m.index > i) push({ v: str.slice(i, m.index) });
     const key = m[1];
-    if (key === "applicant") ["fio", ", yashash manzili: ", "address", ", tel.: ", "phone"].forEach((x, j) => push(j % 2 ? { v:x } : field(x, ctx)));
+    if (key === "applicant") ["fio", ctx.W.addr, "address", ctx.W.tel, "phone"].forEach((x, j) => push(j % 2 ? { v:x } : field(x, ctx)));
     else push(field(key, ctx));
     i = m.index + m[0].length;
   }
   if (i < str.length) push({ v: str.slice(i) });
+  for (const p of parts) if (p.v != null) p.v = p.v.replace(/(г|yil)\.\./g, "$1.");   // «2027 г.» + «.»
   const meaningful = parts.some(p => p.ph || /[\p{L}\p{N}]/u.test(p.v));
   return meaningful ? parts : null;
 }
@@ -60,14 +68,15 @@ const field = (k, ctx) => {
 const P = (v, ph, k) => (v ? { v: String(v) } : { ph, k });
 
 // Hujjat modeli: bloklar ro‘yxati. Ko‘rinish (JSON), DOCX va PDF shu modeldan yasaladi.
-export function documentModel({ scenario, recipient, form = {}, evidence = [], triggerDate, today = new Date() }){
-  const s = SCENARIO_BY_ID[scenario];
+export function documentModel({ scenario, recipient, form = {}, evidence = [], triggerDate, today = new Date(), lang = "uz" }){
+  const kb = kbFor(lang === "ru" ? "ru" : "uz");
+  const s = kb.SCENARIO_BY_ID[scenario];
   if (!s) throw Object.assign(new Error("Noma’lum holat."), { status: 400 });
   const tpl = s.docs.find(d => d.id === recipient) || s.docs[0];
   const now = startOfDay(today);
   const trigger = parseISO(triggerDate) || addMonths(now, -1);
   const deadline = deadlineFrom(trigger, s.deadline);
-  const ctx = makeContext(s, form, trigger, deadline, now);
+  const ctx = makeContext(s, form, trigger, deadline, now, kb), W = ctx.W;
   const R = t => render(t, ctx);
   const B = [];
 
@@ -86,16 +95,16 @@ export function documentModel({ scenario, recipient, form = {}, evidence = [], t
   const picked = evidence.map(i => s.evidence[i]).filter(Boolean).map(e => e.replace(/\s*\(.*\)$/, ""));
   const seen = new Set();
   const att = [...tpl.attach, ...picked]
-    .filter(x => { const key = x.toLowerCase().slice(0, 18); return !seen.has(key) && seen.add(key); })
-    .map(x => /nusxa|guvoh|kvitansiya/i.test(x) ? x.replace(/\.?$/, ".") : x + " (nusxa).");
-  B.push({ t:"lbl", text:"Ilovalar:" });
+    .filter(x => { const key = W.key(x); return !seen.has(key) && seen.add(key); })
+    .map(x => W.isCopy.test(x) ? x.replace(/\.?$/, ".") : x + W.copy);
+  B.push({ t:"lbl", text: W.attach });
   B.push({ t:"list", items: att.map(x => [{ v:x }]) });
-  B.push({ t:"sign", left: uzDate(now), right:[{ v:"Imzo: ____________  " }, P(ctx.vals.fio, ctx.fm.fio.ph, "fio")] });
+  B.push({ t:"sign", left: fmtDate(now, kb.lang), right:[{ v: W.sign }, P(ctx.vals.fio, ctx.fm.fio.ph, "fio")] });
 
   const missing = [], seenK = new Set();
   for (const b of B) for (const p of [...(b.parts || []), ...(b.lines || []).flat(), ...(b.items || []).flat(), ...(b.right || [])])
     if (p.ph && !seenK.has(p.k)){ seenK.add(p.k); missing.push({ k:p.k, label:p.ph }); }
-  return { scenario, recipient: tpl.id, blocks: B, missing };
+  return { scenario, recipient: tpl.id, lang: kb.lang, blocks: B, missing };
 }
 
 const partText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
@@ -128,7 +137,7 @@ export async function toDocx(model){
 // ---------- PDF (DejaVu — o‘zbek harflari to‘liq) ----------
 export function toPdf(model){
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size:"A4", margins:{ top:56, bottom:56, left:85, right:42 }, info:{ Title:"Ariza", Creator:"HuquqYo‘l" } });
+    const doc = new PDFDocument({ size:"A4", margins:{ top:56, bottom:56, left:85, right:42 }, info:{ Title: model.blocks.find(b => b.t === "title")?.text || "Ariza", Creator:"HuquqYo‘l" } });
     const chunks = []; doc.on("data", c => chunks.push(c)); doc.on("end", () => resolve(Buffer.concat(chunks))); doc.on("error", reject);
     doc.registerFont("R", join(FONT_DIR, "DejaVuSerif.ttf"));
     doc.registerFont("B", join(FONT_DIR, "DejaVuSerif-Bold.ttf"));

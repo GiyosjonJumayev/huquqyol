@@ -52,7 +52,7 @@ function word(w){
 const WORD = new RegExp(`[A-Za-z](?:[A-Za-z]|${APOS}(?=[A-Za-z]))*`, "g");
 export function toCyrillic(text){
   return String(text ?? "")
-    .split(/(https?:\/\/\S+)/)              // havolalarni o‘zgartirmaslik
+    .split(/(https?:\/\/\S+|HuquqYo‘l)/)  // havolalar va brend nomi o‘zgarmaydi
     .map((part, i) => i % 2 ? part : part.replace(WORD, word).replace(/«([^»]*)»/g, "«$1»"))
     .join("");
 }

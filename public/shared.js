@@ -1,5 +1,6 @@
 // Brauzer va server uchun umumiy interfeys bo‘laklari: server bosh sahifani shular bilan oldindan chizadi,
 // shuning uchun sahifa ochilganda kontent «sakramaydi».
+import { toCyrillic } from "./translit.js";
 export const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const SVG = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 export const ICONS = {
@@ -10,17 +11,29 @@ export const ICONS = {
   jarima: SVG('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>'),
   fuqarolik: SVG('<circle cx="9" cy="9" r="5"/><path d="M9 7v4M7.5 9h3"/><path d="M14.5 4.6A5 5 0 1 1 13 19"/><path d="M3 21h8"/>')
 };
-export const EXAMPLES = [
-  "Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m",
-  "«Texnomart» do‘konidan olgan televizor 2 haftada buzildi, almashtirmayapti",
-  "Sobiq erim 2 ta bolamga aliment to‘lamayapti",
-  "Hokimlikka murojaat qildim, bir oydan beri javob yo‘q",
-  "YHXB radar bo‘yicha noto‘g‘ri jarima soldi",
-  "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor"
-];
+const EX = {
+  uz: [
+    "Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m",
+    "«Texnomart» do‘konidan olgan televizor 2 haftada buzildi, almashtirmayapti",
+    "Sobiq erim 2 ta bolamga aliment to‘lamayapti",
+    "Hokimlikka murojaat qildim, bir oydan beri javob yo‘q",
+    "YHXB radar bo‘yicha noto‘g‘ri jarima soldi",
+    "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor"
+  ],
+  ru: [
+    "Работодатель 3 месяца не платит зарплату, долг 9 млн сум",
+    "Телевизор из магазина «Texnomart» сломался через 2 недели, не меняют",
+    "Бывший муж не платит алименты на двоих детей",
+    "Обратился в хокимият, уже месяц нет ответа",
+    "СБДД выписали неправильный штраф по радару",
+    "Друг не возвращает долг 20 млн сум, есть расписка"
+  ]
+};
+export const examples = lang => lang === "ru" ? EX.ru : lang === "cyr" ? EX.uz.map(toCyrillic) : EX.uz;
+export const EXAMPLES = EX.uz;
 
-export const domainCardsHTML = meta => meta.domains.map(d => {
+export const domainCardsHTML = (meta, t) => meta.domains.map(d => {
   const n = meta.scenarios.filter(s => s.domain === d.id).length;
-  return `<button class="case domain" type="button" data-domain="${d.id}"><span class="ic">${ICONS[d.id] || ""}</span><span><b>${esc(d.title)}</b><span>${esc(d.desc)}</span><span class="count">${n} ta holat →</span></span></button>`;
+  return `<button class="case domain" type="button" data-domain="${d.id}"><span class="ic">${ICONS[d.id] || ""}</span><span><b>${esc(d.title)}</b><span>${esc(d.desc)}</span><span class="count">${esc(t("casesCount", { n }))}</span></span></button>`;
 }).join("");
-export const examplesHTML = () => EXAMPLES.map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");
+export const examplesHTML = lang => examples(lang).map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");

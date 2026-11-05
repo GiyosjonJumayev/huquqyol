@@ -277,3 +277,8 @@ details.more{margin-top:10px}
 .howlinks{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px;font-size:14px}
 .howlinks:empty{display:none}
 @media print{.howto{display:none!important}}
+/* Til va namuna */
+.doclang{margin:-6px 0 14px;max-width:70ch}
+.doclang:empty{display:none}
+.btn.demo{margin-bottom:12px;width:100%;justify-content:center;border-style:dashed}
+.langsw button{min-width:44px}

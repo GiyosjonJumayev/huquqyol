@@ -110,13 +110,42 @@ test("Kirill yozuvi, telefon ekrani, qorong‘i mavzu", { skip }, async () => {
   await p.goto(base);
   await p.waitForSelector(".domain");
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
-  await p.click("[data-lang='cyr']");
+  await Promise.all([p.waitForNavigation(), p.click("[data-lang='cyr']")]);
+  await p.waitForSelector(".domain");
   assert.equal(await p.innerText("h1.hero"), "Ҳуқуқингиз бузилдими?");
-  await p.click("[data-lang='lat']");
+  assert.deepEqual(await audit(p), []);
   const d = await page({ colorScheme:"dark" });
   await d.goto(base);
   await d.click("[data-domain='davlat']");
   await d.click("[data-case='murojaat_javobsiz']");
   await d.waitForSelector("#deadlineCard .big");
   assert.deepEqual(await audit(d), []);
+});
+
+test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til almashganda holat saqlanadi", { skip }, async () => {
+  const p = await page({ locale:"ru-RU" });
+  await p.goto(base);
+  await p.waitForSelector(".domain");
+  assert.equal(await p.innerText("h1.hero"), "Ваши права нарушены?");      // brauzer tili bo‘yicha
+  assert.deepEqual(await audit(p), []);
+  await p.fill("#problem", "Работодатель 3 месяца не платит зарплату, долг 9 млн сум");
+  await p.click("#analyzeBtn");
+  await p.waitForSelector("#deadlineCard .big");
+  assert.equal(await p.innerText("#v2 h1"), "Не выплачивают зарплату");
+  assert.match(await p.innerText("#calcValue"), /не менее .* сум/);
+  assert.deepEqual(await audit(p), []);
+  await p.click(".cta [data-go='3']");
+  await p.waitForSelector("#paper .ttl");
+  await p.click("#demoFill");
+  await p.waitForFunction(() => document.querySelector("#missing").classList.contains("okay"));
+  assert.equal(await p.innerText("#paper .ttl"), "ТРЕБОВАНИЕ");
+  const dl = p.waitForEvent("download");
+  await p.click("#dlPdf");
+  assert.match((await dl).suggestedFilename(), /\.pdf$/);
+  await Promise.all([p.waitForNavigation(), p.click("[data-lang='uz']")]);
+  await p.waitForSelector("#paper .ttl");
+  assert.equal(await p.innerText("#v3 h1"), "Arizangiz tayyor");
+  assert.equal(await p.innerText("#paper .ttl"), "TALABNOMA");
+  assert.equal(await p.inputValue("#f_fio"), "Каримов Азиз Ботирович");
+  assert.deepEqual(p.errors, []);
 });
