@@ -47,7 +47,9 @@ test("RAG: maosh haqidagi savolga 253 va 333-moddalar topiladi", () => {
 
 test("Faktlar: summa, oy, ish beruvchi", () => {
   assert.deepEqual(extractFacts("«Bog‘bon Agro» MChJ 3 oydan beri, qarzi 9 million so‘m"),
-    { amount:9_000_000, months:3, employer:"«Bog‘bon Agro» MChJ" });
+    { amount:9_000_000, months:3, party:"«Bog‘bon Agro» MChJ" });
+  assert.equal(extractFacts("2 ta bolam bor").children, 2);
+  assert.equal(extractFacts("uch nafar farzandim bor").children, 3);
   assert.equal(extractFacts("qarz 4 500 000 so‘m").amount, 4_500_000);
 });
 

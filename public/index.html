@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="HuquqYo‘l — mehnat huquqi buzilganda qonun, qadamlar va tayyor ariza">
+<meta name="description" content="HuquqYo‘l — huquqingiz buzilganda: qonun, qadamlar va tayyor ariza. Mehnat, iste’molchi, aliment, davlat idoralari, jarima, qarz.">
 <title>HuquqYo‘l — huquqiy yo‘l xaritasi</title>
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/onest/onest-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -40,13 +40,16 @@
   <div class="resume" id="resume" hidden></div>
   <!-- 1. Vaziyat -->
   <section class="view" id="v1">
-    <h1 class="hero" tabindex="-1">Ish joyida huquqingiz buzildimi?</h1>
-    <p class="lead">Vaziyatni tanlang. Qaysi qonun himoya qilishini, qayerga murojaat qilishni va tayyor arizani bir daqiqada olasiz.</p>
-    <div class="cases" id="cases"></div>
+    <h1 class="hero" tabindex="-1">Huquqingiz buzildimi?</h1>
+    <p class="lead">Sohani tanlang yoki vaziyatni o‘z so‘zlaringiz bilan yozing. Qaysi qonun himoya qilishini, qayerga murojaat qilishni va tayyor arizani bir daqiqada olasiz.</p>
+    <div id="picker">
+      <div class="pickhead" id="pickHead" hidden></div>
+      <div class="domains" id="cases"></div>
+    </div>
     <div class="or">yoki o‘z so‘zlaringiz bilan yozing</div>
     <div class="ask">
       <label for="problem" class="sr">Muammo tavsifi</label>
-      <textarea id="problem" placeholder="Masalan: ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m"></textarea>
+      <textarea id="problem" placeholder="Masalan: do‘kondan olgan muzlatkichim bir haftada buzildi, sotuvchi almashtirmayapti"></textarea>
       <div class="askbar">
         <span class="ai"><span class="dot" id="aiDot"></span><span id="aiText">AI ulanmoqda…</span></span>
         <button class="btn primary" id="analyzeBtn" type="button">Tahlil qilish</button>
@@ -84,7 +87,7 @@
 </main>
   <footer>
     <div><b>Bu huquqiy maslahat emas.</b> Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi; muhim qaror oldidan yurist bilan maslahatlashing.</div>
-    <div>Manba: Mehnat kodeksi (O‘RQ-798), <a href="https://lex.uz/acts/-6257288" target="_blank" rel="noopener">lex.uz</a>, 2026-yil noyabr holatiga.</div>
+    <div>Manbalar: Mehnat, Oila, Fuqarolik va Ma’muriy javobgarlik kodekslari, Iste’molchilar va Murojaatlar to‘g‘risidagi qonunlar — <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz</a>. 2026-yil noyabr holatiga tekshirilgan.</div>
     <div>Kiritgan ma’lumotlaringiz faqat shu qurilmada saqlanadi. <button class="linkbtn" id="wipe" type="button">Ma’lumotlarimni o‘chirish</button></div>
   </footer>
 </div>

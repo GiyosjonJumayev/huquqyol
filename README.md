@@ -1,14 +1,17 @@
 # HuquqYo‘l — AI huquqiy yo‘l xaritasi
 
-Fuqaro mehnat huquqi buzilganda muammosini oddiy tilda yozadi, tizim esa quyidagilarni beradi:
+Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahlil qiladi va quyidagilarni beradi: tegishli qonun normalari (lex.uz havolasi bilan), qadamma-qadam reja, muddat va xavf bahosi, kalkulyator, hamda tayyor ariza. Ariza DOCX, PDF yoki chop etish uchun tayyor holatda chiqadi, lotin yoki kirill yozuvida.
 
-1. **Vaziyat tahlili.** Muammo qaysi holatga tegishli ekanini aniqlaydi.
-2. **Tegishli normalar.** Mehnat kodeksi moddalarini oddiy tilda tushuntiradi va lex.uz manbasiga havola beradi.
-3. **Qadamma-qadam reja.** Ish beruvchi → mehnat inspeksiyasi → sud, har biri muddati bilan.
-4. **Xavf bahosi.** Sudga murojaat muddatigacha qolgan kunlarni, 333-modda bo‘yicha kompensatsiyani va kerakli dalillar ro‘yxatini ko‘rsatadi.
-5. **Tayyor ariza.** Ish beruvchiga talabnoma, inspeksiyaga ariza yoki sudga da’vo arizasi. DOCX yoki PDF formatida yuklab olinadi.
+## Qamrab olingan sohalar (6 soha, 11 holat)
 
-MVP to‘rtta holatni qamraydi: ish haqi to‘lanmasligi, noqonuniy bo‘shatish, ta’til berilmasligi, bo‘shatishda hisob-kitob qilinmasligi.
+| Soha | Holatlar | Asosiy manba | Muddat | Kalkulyator | Arizalar |
+|---|---|---|---|---|---|
+| Mehnat | Ish haqi to‘lanmasligi; noqonuniy bo‘shatish; ta’til berilmasligi; bo‘shatishda hisob-kitob | Mehnat kodeksi (O‘RQ-798) | 3 yoki 6 oy | MK 333-modda kompensatsiyasi | Ish beruvchi, mehnat inspeksiyasi, sud |
+| Iste’molchi | Sifatsiz tovar; sifatli tovarni qaytarish | Iste’molchilar huquqlari to‘g‘risidagi qonun (221-I), 13–18, 22, 29-moddalar | Kafolat muddati / 6 oy; 10 kun | Penya: narxning 1%i × kechikkan kun | Sotuvchi, Raqobat va iste’molchilar qo‘mitasi, sud |
+| Oila | Aliment undirish | Oila kodeksi, 96, 99, 136-moddalar | Muddatsiz (OK 12-modda) | 1/4 · 1/3 · 1/2 ulush, eng kam miqdor | Sud |
+| Davlat idoralari | Javobsiz murojaat; noqonuniy qaror | Murojaatlar to‘g‘risidagi qonun (6, 28, 36-moddalar); ma’muriy sud | 15 kun + 6 oy; 6 oy | — | Yuqori organ, ma’muriy sud |
+| Jarimalar | Ma’muriy jarimaga shikoyat | MJtK (10 kunlik shikoyat muddati, 332¹-modda chegirmasi) | 10 kun | 50% / 70% chegirma sanalari bilan | Yuqori organ, sud |
+| Qarz | Qarzni undirish | Fuqarolik kodeksi, 150, 732-moddalar | 3 yil | — | Qarzdor, sud |
 
 ## Ishga tushirish
 
@@ -18,7 +21,7 @@ Node.js 22.9 yoki undan yangi versiya kerak.
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 23 ta test
+npm test                  # 31 ta test
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.
@@ -40,10 +43,11 @@ server/
   index.js         Express API, rate limit, statik fayllar
   analyze.js       Tahlil: RAG konteksti → Claude (JSON) → validatsiya; xato bo‘lsa qoidalar
   rag.js           BM25 indeks: normalar + holatlar + (ixtiyoriy) lex.uz moddalari, sinonimlar
-  plan.js          Muddat (MK 9-modda), xavf darajasi, 333-modda kompensatsiyasi
-  documents.js     Hujjat modeli → ko‘rinish (JSON), DOCX (docx), PDF (pdfkit + DejaVu)
-  kb/norms.json    Tekshirilgan normalar (oddiy tilda)
-  kb/scenarios.json Holatlar: qadamlar, dalillar, muddatlar, hujjat turlari
+  plan.js          Muddatlar (kun/oy/yil, offset, muddatsiz), xavf darajasi, 4 xil kalkulyator
+  documents.js     Shablon dvigateli → hujjat modeli → ko‘rinish (JSON), DOCX (docx), PDF (pdfkit + DejaVu)
+scripts/build-kb.py    Bilim bazasining manbasi: yangi soha va holatlar shu yerda qo‘shiladi
+  kb/*.json        Bilim bazasi: laws, domains, norms, scenarios (shablonli hujjatlar), applicant
+  validate.js      Har bir holat maydonlarining spetsifikatsiyasi bo‘yicha tekshiruv
 scripts/ingest-lex.js  lex.uz sahifasini moddalarga bo‘lib, qidiruvga qo‘shadi
 public/translit.js Lotin → kirill (brauzer va server uchun umumiy)
 public/sw.js       Service worker: oflayn interfeys, API keshlanmaydi
@@ -90,11 +94,30 @@ test/              node:test — sana, reja, RAG, API, xavfsizlik, kirill, DOCX/
 2. `npm run ingest -- mehnat-kodeksi.html` buyrug‘ini ishga tushiring. Natijada `server/kb/lex-articles.json` (barcha moddalar) yaratiladi.
 3. Serverni qayta ishga tushiring. Endi qidiruv moddalarning asl matnidan ham parcha topib, Claude’ga beradi.
 
-Yangi holat qo‘shish uchun `kb/scenarios.json` ga yozuv, `kb/norms.json` ga kerakli normalar, `server/documents.js` ga esa ariza matni qo‘shiladi.
+### Yangi soha yoki holat qo‘shish
+
+Kod yozish shart emas. `scripts/build-kb.py` faylida quyidagilar qo‘shiladi:
+
+1. `norm(...)` — qonun normasi: qaysi qonun, modda, sarlavha va oddiy tildagi izoh.
+2. `scen(...)` — holat: kalit so‘zlar, normalar, muddat (`days`, `months`, `years`, `offsetDays` yoki `none`), qadamlar, dalillar, maydonlar va ariza shablonlari.
+3. `python3 scripts/build-kb.py server/kb` buyrug‘i bilan bilim bazasi qayta yaratiladi, keyin `npm test`.
+
+Generator va testlar har bir shablondagi `{{kalit}}` maydonlarda mavjudligini avtomatik tekshiradi.
+
+Shablon sintaksisi:
+- `{{fio}}` — maydon qiymati. Bo‘sh bo‘lsa, hujjatda «to‘ldirilmagan joy» bo‘lib chiqadi.
+- `{{applicant}}` — F.I.Sh., manzil va telefon birga.
+- `[?price] ... [/]` — maydon to‘ldirilgan bo‘lsagina chiqadi; `[!price] ... [/]` — to‘ldirilmagan bo‘lsagina chiqadi.
+- Hisoblanadigan qiymatlar: `{{trigger}}`, `{{deadline}}`, `{{deadlineTerm}}`, `{{share}}` (aliment ulushi), `{{demandCourt}}` (tanlovning sud uchun iborasi).
+
 
 ## Manbalar va cheklovlar
 
 - O‘zbekiston Respublikasining Mehnat kodeksi (O‘RQ-798, 28.10.2022, 30.04.2023 dan kuchda): https://lex.uz/acts/-6257288
-- Normalar 2026-yil noyabr holatiga tekshirilgan. 12-bob (hisob-kitob) va 171-modda bo‘yicha ma’lumotlar ikkilamchi manbalardan olingan, ularni lex.uz’da tasdiqlash tavsiya etiladi.
+- Normalar 2026-yil noyabr holatiga tekshirilgan. Quyidagilar ikkilamchi rasmiy manbalardan (gov.uz/advice, norma.uz, kun.uz) olingan, ularni lex.uz’dagi asl matn bilan tasdiqlash tavsiya etiladi:
+  - MK 12-bob (hisob-kitob) va 171-modda;
+  - Oila kodeksi 99-modda ulushlari va aliment eng kam miqdori (360 400 so‘m, 2026-yil 1-sentabrdan, `MIN_ALIMONY` orqali o‘zgartiriladi);
+  - MJtK bo‘yicha jarimaga shikoyat qilishning 10 kunlik muddati (modda raqami ko‘rsatilmagan);
+  - Ma’muriy sudga murojaat qilishning 6 oylik muddati.
 - 333-modda kompensatsiyasini hisoblash usuli amaliyotda bahsli. Shuning uchun ilova past talqinni asosiy summa sifatida, yuqori talqinni esa oraliq sifatida ko‘rsatadi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
 - **Bu huquqiy maslahat emas.** Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi.

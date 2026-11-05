@@ -25,7 +25,7 @@ function buildIndex(docs){
   };
 }
 
-const normDocs = NORMS.map(n => ({ id:n.id, kind:"norm", text:`${n.title} ${n.text}` }));
+const normDocs = NORMS.map(n => ({ id:n.id, kind:"norm", text:`${n.lawName} ${n.title} ${n.text}` }));
 const scenDocs = SCENARIOS.map(s => ({ id:s.id, kind:"scenario", text:`${s.title} ${s.card} ${s.lead} ${s.keywords.join(" ")} ${s.keywords.join(" ")}` }));
 const searchNorms = buildIndex(normDocs);
 
@@ -53,7 +53,13 @@ const SYNONYMS = [
   [/haydash|haydab|uvol|chiqarib yubor/, "mehnat shartnomasini bekor qilish ish beruvchi tashabbusi"],
   [/otpusk|dam olish/, "mehnat ta’tili"],
   [/trudovoy|daftarcha/, "mehnat daftarchasi"],
-  [/raschyot|rasschet|oxirgi pul/, "hisob-kitob"]
+  [/raschyot|rasschet|oxirgi pul/, "hisob-kitob"],
+  [/shtraf|gai|radar/, "jarima ma’muriy huquqbuzarlik qaror shikoyat"],
+  [/raspiska|tilxat|qarzga/, "qarz shartnomasi qaytarish"],
+  [/garantiya|brak|buzuq|buzilib/, "nuqsonli tovar kafolat"],
+  [/razmer|o‘lcham|mos kelmadi/, "sifatli tovarni almashtirish"],
+  [/alement|aliment|bolamga|bolalarimga/, "aliment ota-ona ta’minot bola"],
+  [/hokimlik|idora|javob bermay/, "murojaat ko‘rib chiqish muddati"]
 ];
 export const expandQuery = text => {
   const t = normalize(text);

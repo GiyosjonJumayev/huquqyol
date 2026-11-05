@@ -7,14 +7,14 @@ const fmtShort = n => n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace("."
 const iso = d => { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
 const monthsAgo = n => { const d = new Date(); d.setHours(0,0,0,0); d.setMonth(d.getMonth() - n); return d; };
 const debounce = (fn, ms = 250) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
-const KEY = "huquqyol:v1";
+const KEY = "huquqyol:v2";
 const store = {
   load(){ try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } },
   save(v){ try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} },
   clear(){ try { localStorage.removeItem(KEY); } catch {} }
 };
 function announce(msg){ msg = typeof T === "function" ? T(msg) : msg; const l = $("#live"); l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 30); }
-function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.append(t); announce(msg); setTimeout(() => t.remove(), 2800); }
+function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; ($("#main") || document.body).append(t); announce(msg); setTimeout(() => t.remove(), 2800); }
 
 async function api(path, body){
   let res;
@@ -26,23 +26,23 @@ async function api(path, body){
 }
 const getJSON = async (p, b) => (await api(p, b)).json();
 
+const SVG = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const ICONS = {
-  ish_haqi:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.4"/><path d="M7 3.5h10"/></svg>',
-  ishdan_boshatish:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M9 16l-4-4 4-4"/><path d="M5 12h10"/></svg>',
-  tatil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="4"/><path d="M12 2v1.5M12 16.5V18M4 10H2.5M21.5 10H20M6.3 4.3l1 1M16.7 14.7l1 1M6.3 15.7l1-1M16.7 5.3l1-1"/><path d="M3 21c3-1.5 6-1.5 9 0s6 1.5 9 0"/></svg>',
-  hisob_kitob:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h6M9 16h4"/></svg>'
+  mehnat: SVG('<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>'),
+  istemol: SVG('<path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
+  oila: SVG('<circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><circle cx="12" cy="13" r="2"/><path d="M3.5 20c0-3 2-5 4.5-5M20.5 20c0-3-2-5-4.5-5M9 21c0-2 1.3-3.5 3-3.5s3 1.5 3 3.5"/>'),
+  davlat: SVG('<path d="M3 9l9-5 9 5"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9"/><path d="M3 21h18"/>'),
+  jarima: SVG('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>'),
+  fuqarolik: SVG('<circle cx="9" cy="9" r="5"/><path d="M9 7v4M7.5 9h3"/><path d="M14.5 4.6A5 5 0 1 1 13 19"/><path d="M3 21h8"/>')
 };
 const EXAMPLES = [
   "Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m",
-  "Meni ogohlantirmasdan ishdan bo‘shatishdi, buyruqni ham bermadi",
-  "Ishdan ketdim, lekin hisob-kitob va mehnat daftarchamni berishmayapti"
+  "«Texnomart» do‘konidan olgan televizor 2 haftada buzildi, almashtirmayapti",
+  "Sobiq erim 2 ta bolamga aliment to‘lamayapti",
+  "Hokimlikka murojaat qildim, bir oydan beri javob yo‘q",
+  "YHXB radar bo‘yicha noto‘g‘ri jarima soldi",
+  "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor"
 ];
-const FIELDS = {
-  you:[["fio","F.I.Sh.","Karimov Aziz Botirovich","name"],["address","Yashash manzili","Toshkent sh., Chilonzor t., …","street-address"],["phone","Telefon","+998 90 123 45 67","tel"]],
-  work:[["employer","Ish beruvchi","«…» MChJ","organization"],["position","Lavozimingiz","omborchi","organization-title"],["amount","Qarz summasi, so‘m","9 000 000","off"],["boss","Rahbar F.I.Sh.","direktor","off"],["district","Tuman yoki shahar","Chilonzor tumani","address-level2"],["empAddress","Ish beruvchi manzili","","off"]]
-};
-// Hujjatdagi bo‘sh joy → qaysi maydonga olib boradi
-const PH_FIELD = { "F.I.Sh.":"fio", "manzil":"address", "telefon":"phone", "tashkilot nomi":"employer", "lavozim":"position", "rahbar F.I.Sh.":"boss", "tuman/shahar":"district", "tuman":"district", "ish beruvchi manzili":"empAddress", "summa":"amount" };
 const ROUTES = { 1:"vaziyat", 2:"reja", 3:"ariza" };
 
 /* ---------- Yozuv: lotin / kirill ----------
@@ -88,9 +88,18 @@ function setLang(l){
   previewDoc();
 }
 
-const state = { meta:null, analysis:null, scn:null, plan:null, trigger:null, recipient:"employer", form:{}, evidence:[], blocks:[], missing:[], missingKeys:[] };
-const persist = () => store.save({ analysis:state.analysis, scn:state.scn, trigger:state.trigger, recipient:state.recipient, form:state.form, evidence:state.evidence, at:Date.now() });
+// Ariza beruvchi ma’lumotlari (F.I.Sh., manzil, telefon) umumiy; qolgan maydonlar har bir holat uchun alohida saqlanadi,
+// shunda bir holatdagi «summa» boshqasiga o‘tib ketmaydi.
+const state = { meta:null, analysis:null, scn:null, plan:null, trigger:null, recipient:null, applicant:{}, formByScn:{}, evidence:[], blocks:[], missing:[], domain:null };
+const persist = () => store.save({ analysis:state.analysis, scn:state.scn, trigger:state.trigger, recipient:state.recipient, applicant:state.applicant, formByScn:state.formByScn, evidence:state.evidence, at:Date.now() });
 const scenarioMeta = id => state.meta.scenarios.find(s => s.id === id);
+const isApplicant = k => state.meta.applicant.some(f => f.k === k);
+const form = () => ({ ...state.applicant, ...(state.formByScn[state.scn] || {}) });
+function setField(k, v){
+  if (isApplicant(k)) state.applicant[k] = v;
+  else (state.formByScn[state.scn] ||= {})[k] = v;
+}
+const fieldSpec = k => [...state.meta.applicant, ...(scenarioMeta(state.scn)?.fields || []), { k:"extra", type:"textarea" }].find(f => f.k === k);
 
 /* ---------- Navigatsiya (brauzer "orqaga" tugmasi ishlaydi) ---------- */
 function go(n, { push = true } = {}){
@@ -114,11 +123,29 @@ window.addEventListener("popstate", () => {
 
 /* ---------- 1. Vaziyat ---------- */
 function renderStart(){
-  $("#cases").innerHTML = state.meta.scenarios.map(s => `
-    <button class="case" type="button" data-case="${s.id}"><span class="ic">${ICONS[s.id] || ""}</span><span><b>${esc(s.title)}</b><span>${esc(s.card)}</span></span></button>`).join("");
+  renderDomains();
   $("#examples").innerHTML = EXAMPLES.map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");
   $("#aiDot").classList.toggle("on", state.meta.ai);
   $("#aiText").textContent = state.meta.ai ? "AI tahlil: Claude" : "Qidiruv tahlili";
+}
+function renderDomains(){
+  state.domain = null;
+  $("#pickHead").hidden = true;
+  $("#cases").className = "domains";
+  $("#cases").innerHTML = state.meta.domains.map(d => {
+    const n = state.meta.scenarios.filter(s => s.domain === d.id).length;
+    return `<button class="case domain" type="button" data-domain="${d.id}"><span class="ic">${ICONS[d.id] || ""}</span><span><b>${esc(d.title)}</b><span>${esc(d.desc)}</span><span class="count">${n} ta holat →</span></span></button>`;
+  }).join("");
+}
+function renderDomain(id){
+  const d = state.meta.domains.find(x => x.id === id); if (!d) return renderDomains();
+  state.domain = id;
+  $("#pickHead").hidden = false;
+  $("#pickHead").innerHTML = `<button class="back" type="button" id="allDomains">← Barcha sohalar</button><h2>${esc(d.title)}</h2>`;
+  $("#cases").className = "domains list";
+  $("#cases").innerHTML = state.meta.scenarios.filter(s => s.domain === id).map(s => `
+    <button class="case" type="button" data-case="${s.id}"><span class="ic">${ICONS[s.domain] || ""}</span><span><b>${esc(s.title)}</b><span>${esc(s.card)}</span></span></button>`).join("");
+  $("#cases .case")?.focus();
 }
 
 function renderResume(saved){
@@ -129,7 +156,7 @@ function renderResume(saved){
     <span class="acts"><button class="btn primary sm" type="button" id="resumeGo">Davom etish</button><button class="btn ghost sm" type="button" id="resumeNew">Yangidan boshlash</button></span>`;
   el.hidden = false;
   $("#resumeGo").onclick = async () => { el.hidden = true; Object.assign(state, saved); await refreshPlan(true); renderDocView(); go(2); };
-  $("#resumeNew").onclick = () => { el.hidden = true; store.clear(); state.form = {}; };
+  $("#resumeNew").onclick = () => { el.hidden = true; store.clear(); state.formByScn = {}; };
 }
 
 async function analyze(){
@@ -143,19 +170,23 @@ async function analyze(){
   finally { btn.disabled = false; btn.textContent = "Tahlil qilish"; }
 }
 
+function defaultTrigger(m, facts){
+  if (facts.eventDate) return facts.eventDate;
+  if (m.id === "ish_haqi" && Number(facts.form?.months) > 0) return iso(monthsAgo(Number(facts.form.months)));
+  const short = m.deadline?.days || m.deadline?.none;          // qisqa muddatli holatlarda bugungi sana
+  return iso(short ? new Date() : monthsAgo(1));
+}
 async function choose(a){
   state.analysis = a;
   $("#resume").hidden = true;
   if (a.scenario === "boshqa"){ renderOut(); return; }
-  const f = a.facts || {};
+  const m = scenarioMeta(a.scenario), facts = a.facts || {};
   state.scn = a.scenario;
-  state.trigger = f.eventDate || iso(f.months && a.scenario === "ish_haqi" ? monthsAgo(f.months) : monthsAgo(1));
-  for (const k of ["employer","position"]) if (f[k]) state.form[k] = f[k];
-  if (f.amount) state.form.amount = String(f.amount);
-  if (f.months) state.form.months = String(f.months);
+  state.trigger = defaultTrigger(m, facts);
+  const own = state.formByScn[state.scn] ||= {};
+  for (const [k, v] of Object.entries(facts.form || {})) if (!own[k] && v) own[k] = v;   // foydalanuvchi yozganini ustidan yozmaymiz
   state.evidence = [];
-  const docs = scenarioMeta(a.scenario).documents;
-  if (!docs.includes(state.recipient)) state.recipient = docs[0];
+  if (!m.docs.some(d => d.id === state.recipient)) state.recipient = m.docs[0].id;
   $("#v2").innerHTML = `<div class="skeleton" aria-hidden="true"></div>`;
   await refreshPlan(true);
   renderDocView();
@@ -168,82 +199,94 @@ function renderOut(){
   state.plan = null;
   $("#v2").innerHTML = `<button class="back" type="button" data-go="1">← Orqaga</button>
     <div class="case-head"><span class="tag">Doiradan tashqarida</span><h1>Bu holatni hozircha qamramaymiz</h1>
-    <p>HuquqYo‘l hozir mehnat nizolarida yordam beradi: ish haqi, ishdan bo‘shatish, ta’til va hisob-kitob. ${a.summary ? esc(a.summary) : "Vaziyatni ish beruvchi yoki maosh bilan bog‘lab batafsilroq yozing yoki advokatga murojaat qiling."}</p></div>`;
+    <p>HuquqYo‘l hozir ${state.meta.domains.length} ta sohada yordam beradi: ${esc(state.meta.domains.map(d => d.title.toLowerCase()).join(", "))}. ${a.summary ? esc(a.summary) + " " : ""}Ro‘yxatdan sohani tanlab ko‘ring yoki bepul yuridik yordam markazi va advokatga murojaat qiling.</p></div>`;
   [1,3].forEach(i => $("#v" + i).hidden = true); $("#v2").hidden = false;
   history.pushState(null, "", "#reja"); window.scrollTo({ top:0 }); $("#v2 h1").setAttribute("tabindex","-1"); $("#v2 h1").focus();
 }
 
 /* ---------- 2. Reja ---------- */
 async function refreshPlan(full){
-  state.plan = await getJSON("/api/plan", { scenario: state.scn, triggerDate: state.trigger, amount: Number(state.form.amount) || 0, months: Number(state.form.months) || 1 });
-  if (full) renderPlan(); else { renderDeadline(); renderRoute(); renderComp(); }
+  state.plan = await getJSON("/api/plan", { scenario: state.scn, triggerDate: state.trigger, form: cleanForm() });
+  if (full) renderPlan(); else { renderDeadline(); renderRoute(); renderCalc(); }
   persist();
 }
 
+const badge = n => n.article ? `<span class="art">${esc(n.article)}</span>` : `<span class="art law-only">Qonun</span>`;
+function calcInput(f){
+  const v = form()[f.k] || "";
+  const attrs = f.type === "date" ? `type="date" max="${iso(new Date())}"` : `inputmode="numeric" autocomplete="off"`;
+  const val = f.type === "money" && v ? fmtSum(v) : v;
+  return `<div class="field"><label for="c_${f.k}">${esc(f.label)}</label><input id="c_${f.k}" data-ck="${f.k}" data-type="${f.type}" ${attrs} value="${esc(val)}"></div>`;
+}
 function renderPlan(){
-  const p = state.plan, a = state.analysis || {}, info = p.info;
+  const p = state.plan, a = state.analysis || {}, info = p.info, m = scenarioMeta(state.scn);
   const focus = new Set(a.normIds || []);
-  const law = n => `<div class="law"><span class="art">MK ${esc(n.article)}</span><div><b>${esc(n.title)}${focus.has(n.id) ? ' <span class="tag">siz uchun</span>' : ""}</b><p>${esc(n.text)}</p></div></div>`;
+  const law = n => `<div class="law">${badge(n)}<div><b>${esc(n.title)}${focus.has(n.id) ? ' <span class="tag">siz uchun</span>' : ""}</b><p>${esc(n.text)}</p><span class="lawsrc">${esc(n.lawName)}</span></div></div>`;
   const source = a.source === "ai" ? "Claude tahlili" : a.source === "rules" ? "Avtomatik tahlil" : "Siz tanladingiz";
   const n0 = p.norms[0];
+  const laws = [...new Map(p.norms.map(n => [n.law, { name:n.lawName, url:n.lawUrl }])).values()];
+  const calcFields = m.fields.filter(f => f.calc);
   $("#v2").innerHTML = `
     <button class="back" type="button" data-go="1">← Boshqa vaziyat</button>
     <div class="case-head">
-      <span class="tag">${esc(info.short)} · ${esc(source)}</span>
+      <span class="tag">${esc(state.meta.domains.find(d => d.id === info.domain)?.title || "")} · ${esc(info.short)} · ${esc(source)}</span>
       <h1>${esc(info.title)}</h1>
       <p>${esc(a.summary || info.lead)}</p>
       ${a.missing?.length ? `<p class="small warnline">Arizaga kerak bo‘ladi: ${a.missing.map(esc).join(", ")}</p>` : ""}
     </div>
     <div class="summary">
       <div class="card" id="deadlineCard"></div>
-      ${info.compensation ? `<div class="card">
-        <div class="kicker">Sizga qo‘shimcha to‘lanishi kerak</div>
-        <div class="money" id="compBig">—</div>
-        <div class="small muted" id="compSub"></div>
-        <div class="inline">
-          <div class="field"><label for="cAmount">Qarz, so‘m</label><input id="cAmount" inputmode="numeric" autocomplete="off" placeholder="9 000 000" value="${esc(state.form.amount ? fmtSum(state.form.amount) : "")}"></div>
-          <div class="field months"><label for="cMonths">Necha oy</label><input id="cMonths" inputmode="numeric" autocomplete="off" value="${esc(state.form.months || "1")}"></div>
-        </div></div>`
+      ${p.calc ? `<div class="card" id="calcCard">
+        <div class="kicker" id="calcTitle"></div>
+        <div class="money" id="calcValue">—</div>
+        <div class="small muted" id="calcNote"></div>
+        <div class="calcrows" id="calcRows" hidden></div>
+        <div class="inline">${calcFields.map(calcInput).join("")}</div></div>`
       : `<div class="card"><div class="kicker">Sizning asosiy huquqingiz</div>
         <div class="money right">${esc(n0.title)}</div>
         <p class="small muted">${esc(n0.text)}</p>
-        <div class="src"><span class="art">MK ${esc(n0.article)}</span></div></div>`}
+        <div class="src">${badge(n0)} <span class="lawsrc">${esc(n0.lawName)}</span></div></div>`}
     </div>
     <h2 class="sec">Nima qilish kerak</h2>
     <ol class="steps" id="route"></ol>
     <h2 class="sec">Qonun nima deydi</h2>
     <div class="laws">${p.norms.slice(0, 3).map(law).join("")}</div>
     ${p.norms.length > 3 ? `<details class="more"><summary>Yana ${p.norms.length - 3} ta norma</summary><div class="laws">${p.norms.slice(3).map(law).join("")}</div></details>` : ""}
-    <div class="src"><a href="${esc(state.meta.lex)}" target="_blank" rel="noopener noreferrer">Mehnat kodeksining to‘liq matni — lex.uz ↗</a></div>
+    <div class="sources">${laws.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)} — lex.uz ↗</a>`).join("")}</div>
     <h2 class="sec">Dalillarni to‘plang <span class="small muted evcount" id="evCount"></span></h2>
     <p class="small muted evhint">Belgilaganlaringiz arizaning «Ilovalar» ro‘yxatiga qo‘shiladi.</p>
     <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
     <div class="cta"><button class="btn primary" type="button" data-go="3">Ariza tayyorlash →</button></div>`;
-  renderDeadline(); renderRoute(); renderComp(); renderEvCount();
+  renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
   $("#evid").addEventListener("change", e => {
     const i = Number(e.target.dataset.i); if (Number.isNaN(i)) return;
     state.evidence = e.target.checked ? [...new Set([...state.evidence, i])] : state.evidence.filter(x => x !== i);
     renderEvCount(); persist(); previewDoc();
   });
-  const onMoney = debounce(() => {
-    state.form.amount = String(Number(String($("#cAmount").value).replace(/\D/g, "")) || "");
-    state.form.months = String(Math.min(60, Math.max(1, Number($("#cMonths").value) || 1)));
-    const af = $("#f_amount"); if (af) af.value = state.form.amount ? fmtSum(state.form.amount) : "";
-    refreshPlan(false).then(previewDoc).catch(e => toast(e.message));
-  }, 300);
-  $("#cAmount")?.addEventListener("input", onMoney);
-  $("#cMonths")?.addEventListener("input", onMoney);
+  const onCalc = debounce(() => { refreshPlan(false).then(previewDoc).catch(e => toast(e.message)); }, 300);
+  $("#calcCard")?.addEventListener("input", e => {
+    const k = e.target.dataset.ck; if (!k) return;
+    let v = e.target.value;
+    if (e.target.dataset.type === "money"){ v = v.replace(/\D/g, "").slice(0, 13); e.target.value = v ? fmtSum(v) : ""; }
+    if (e.target.dataset.type === "int") v = v.replace(/\D/g, "").slice(0, 2);
+    setField(k, v); persist();
+    const df = $("#f_" + k); if (df) df.value = e.target.value;
+    onCalc();
+  });
 }
 
 function renderDeadline(){
-  const p = state.plan, cls = { low:"lv-ok", medium:"lv-warn", high:"lv-bad", expired:"lv-bad" }[p.risk.level];
-  $("#deadlineCard").innerHTML = `
-    <div class="cardhead"><div class="kicker">Sudga murojaat uchun qoldi</div><span class="pill ${cls}">${esc(p.risk.label)}</span></div>
+  const p = state.plan, cls = { low:"lv-ok", medium:"lv-warn", high:"lv-bad", expired:"lv-bad", info:"lv-ok" }[p.risk.level];
+  const head = `<div class="cardhead"><div class="kicker">${esc(p.deadlineLabel)}</div><span class="pill ${cls}">${esc(p.risk.label)}</span></div>`;
+  const date = `<div class="inline"><div class="field"><label for="trigger">${esc(p.info.trigger)}</label><input type="date" id="trigger" value="${esc(p.trigger)}" max="${iso(new Date())}"></div></div>`;
+  $("#deadlineCard").innerHTML = p.deadline == null ? `${head}
+    <div class="big word">Muddatsiz</div>
+    <div class="small tip">${esc(p.deadlineNote)}</div>${date}` : `${head}
     <div class="big">${Math.abs(p.daysLeft)}<small>${p.daysLeft < 0 ? "kun kechikdi" : "kun"}</small></div>
-    <div class="small muted">Oxirgi kun: <b class="ink">${esc(p.deadlineText)}</b> · ${p.deadlineMonths} oylik muddat</div>
+    <div class="small muted">Oxirgi kun: <b class="ink">${esc(p.deadlineText)}</b> · ${esc(p.deadlineTerm)} muddat</div>
     <div class="bar ${cls}" role="progressbar" aria-label="O‘tgan muddat" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.progress * 100)}"><i style="width:${Math.round(p.progress * 100)}%"></i></div>
     <div class="small tip">${esc(p.risk.tip)}</div>
-    <div class="inline"><div class="field"><label for="trigger">${esc(p.info.trigger)}</label><input type="date" id="trigger" value="${esc(p.trigger)}" max="${iso(new Date())}"></div></div>`;
+    ${p.deadlineNote ? `<div class="small muted dnote">${esc(p.deadlineNote)}</div>` : ""}${date}`;
   $("#trigger").addEventListener("change", e => {
     if (!e.target.value) return;
     state.trigger = e.target.value;
@@ -259,42 +302,55 @@ function renderRoute(){
       <p>${esc(st.body)}</p></div></li>`).join("");
 }
 
-function renderComp(){
-  if (!$("#compBig")) return;
-  const c = state.plan.compensation;
-  $("#compBig").textContent = c ? `kamida ${fmtShort(c.low)} so‘m` : "Qarzni kiriting";
-  $("#compSub").textContent = c
-    ? `Qarz ustiga, MK 333-modda bo‘yicha (MB stavkasi ${c.rate}%). Ayrim mutaxassislar talqinida ${fmtShort(c.high)} so‘mgacha.`
-    : "Kechiktirilgan har bir kun uchun kompensatsiya (MK 333-modda)";
+function renderCalc(){
+  const c = state.plan.calc; if (!c || !$("#calcValue")) return;
+  $("#calcTitle").textContent = c.title;
+  $("#calcValue").textContent = c.value;
+  $("#calcNote").textContent = c.note || "";
+  const rows = $("#calcRows");
+  rows.hidden = !c.rows;
+  rows.innerHTML = (c.rows || []).map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("");
 }
 function renderEvCount(){ $("#evCount").textContent = `· ${state.evidence.length} / ${state.plan.evidence.length} bor`; }
 
 /* ---------- 3. Ariza ---------- */
+function fieldHTML(f){
+  const v = form()[f.k] || "", hidden = f.docs && !f.docs.includes(state.recipient);
+  const ph = esc(f.hint || "");
+  let input;
+  if (f.type === "textarea") input = `<textarea id="f_${f.k}" data-k="${f.k}" placeholder="${ph}" maxlength="1500">${esc(v)}</textarea>`;
+  else if (f.type === "select") input = `<select id="f_${f.k}" data-k="${f.k}"><option value="">— tanlang —</option>${f.options.map(o => `<option value="${esc(o.v)}" ${o.v === v ? "selected" : ""}>${esc(o.text)}</option>`).join("")}</select>`;
+  else {
+    const t = { phone:'type="tel" inputmode="tel" autocomplete="tel"', money:'inputmode="numeric" autocomplete="off"', int:'inputmode="numeric" autocomplete="off"', date:`type="date" max="${iso(new Date())}"` }[f.type]
+      || ({ fio:'autocomplete="name"', address:'autocomplete="street-address"' }[f.k] || 'autocomplete="off"');
+    input = `<input id="f_${f.k}" data-k="${f.k}" data-type="${f.type}" placeholder="${ph}" value="${esc(f.type === "money" && v ? fmtSum(v) : v)}" ${t} maxlength="200">`;
+  }
+  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}<span class="err" id="e_${f.k}" hidden></span></div>`;
+}
 function renderDocView(){
-  const docs = state.plan.info.documents, comp = state.plan.info.compensation;
-  $("#seg").innerHTML = docs.map(r => `<button type="button" data-r="${r}" aria-pressed="${r === state.recipient}">${esc(state.meta.recipients[r])}</button>`).join("");
-  const fm = state.form;
-  const input = ([k, l, ph, ac]) => {
-    const hidden = (k === "empAddress" && state.recipient !== "court") || (k === "amount" && !comp);
-    const val = k === "amount" && fm[k] ? fmtSum(fm[k]) : fm[k] || "";
-    return `<div class="field" data-f="${k}" ${hidden ? "hidden" : ""}><label for="f_${k}">${l}</label>
-      <input id="f_${k}" data-k="${k}" placeholder="${esc(ph)}" value="${esc(val)}" autocomplete="${ac}" ${k === "phone" ? 'type="tel" inputmode="tel"' : ""} ${k === "amount" ? 'inputmode="numeric"' : ""} maxlength="${k === "address" || k === "empAddress" ? 200 : 120}">
-      <span class="err" id="e_${k}" hidden></span></div>`;
-  };
+  const m = scenarioMeta(state.scn);
+  $("#seg").innerHTML = m.docs.map(d => `<button type="button" data-r="${d.id}" aria-pressed="${d.id === state.recipient}">${esc(d.label)}</button>`).join("");
+  const groups = new Map();
+  for (const f of m.fields) if (!(f.docs && f.docs.length === 0)) { const g = f.group || "Ma’lumotlar"; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(f); }
+  const extra = form().extra || "";
   $("#docForm").innerHTML = `
-    <fieldset><legend>Siz haqingizda</legend>${FIELDS.you.map(input).join("")}</fieldset>
-    <fieldset><legend>Ish joyi</legend>${FIELDS.work.map(input).join("")}</fieldset>
-    <details class="more" ${fm.extra ? "open" : ""}><summary>+ Qo‘shimcha holatlar</summary>
-      <div class="field"><label for="f_extra">Ariza matniga qo‘shiladi</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(fm.extra || "")}</textarea></div></details>`;
+    <fieldset><legend>Siz haqingizda</legend>${state.meta.applicant.map(fieldHTML).join("")}</fieldset>
+    ${[...groups].map(([g, fs]) => `<fieldset><legend>${esc(g)}</legend>${fs.map(fieldHTML).join("")}</fieldset>`).join("")}
+    <details class="more" ${extra ? "open" : ""}><summary>+ Qo‘shimcha holatlar</summary>
+      <div class="field"><label for="f_extra">Ariza matniga qo‘shiladi</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
   previewDoc();
+}
+function syncVisibility(){
+  for (const f of scenarioMeta(state.scn).fields){ const el = document.querySelector(`[data-f="${f.k}"]`); if (el) el.hidden = !!(f.docs && !f.docs.includes(state.recipient)); }
 }
 
 // Noto‘g‘ri kiritilgan maydon serverga yuborilmaydi (xato faqat maydon ostida ko‘rsatiladi)
-const docRequest = () => {
-  const form = { ...state.form };
-  for (const k of ["phone","amount"]) if (form[k] && validateField(k, k === "amount" ? fmtSum(form[k]) : form[k])) delete form[k];
-  return { scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form, evidence: state.evidence, lang };
-};
+function cleanForm(){
+  const out = {};
+  for (const [k, v] of Object.entries(form())){ const f = fieldSpec(k); if (f && v !== "" && v != null && !validateField(f, String(v))) out[k] = v; }
+  return out;
+}
+const docRequest = () => ({ scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form: cleanForm(), evidence: state.evidence, lang });
 
 let previewSeq = 0;
 async function previewDoc(){
@@ -303,7 +359,7 @@ async function previewDoc(){
   try {
     const m = await getJSON("/api/document/preview", docRequest());
     if (seq !== previewSeq) return;                       // eskirgan javobni tashlab yuborish
-    state.blocks = m.blocks; state.missing = m.missing || []; state.missingKeys = m.missingLatin || m.missing || [];
+    state.blocks = m.blocks; state.missing = m.missing || [];
     $("#paper").innerHTML = m.blocks.map(blockHTML).join("");
     renderMissing();
   } catch (e){ if (seq === previewSeq) toast(e.message); }
@@ -312,9 +368,9 @@ function renderMissing(){
   const el = $("#missing"), n = state.missing.length;
   el.hidden = false;
   el.classList.toggle("okay", n === 0);
-  el.textContent = n === 0 ? "✓ Barcha joylar to‘ldirilgan" : `${n} ta joy to‘ldirilmagan: ${state.missing.join(", ")} — to‘ldirish`;
+  el.textContent = n === 0 ? "✓ Barcha joylar to‘ldirilgan" : `${n} ta joy to‘ldirilmagan: ${state.missing.map(x => x.label).join(", ")} — to‘ldirish`;
   document.querySelectorAll(".field.need").forEach(f => f.classList.remove("need"));
-  state.missingKeys.forEach(ph => { const k = PH_FIELD[ph]; const f = k && document.querySelector(`[data-f="${k}"]`); if (f) f.classList.add("need"); });
+  state.missing.forEach(x => document.querySelector(`[data-f="${x.k}"]`)?.classList.add("need"));
 }
 const partsHTML = ps => ps.map(p => p.v != null ? esc(p.v) : `<span class="ph">${esc(p.ph)}</span>`).join("");
 const partsText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
@@ -342,17 +398,21 @@ function docText(){
   }).join("\n");
 }
 
-function validateField(k, v){
-  if (k === "phone" && v && !/^[+\d\s()-]{7,40}$/.test(v)) return "Faqat raqam, +, bo‘sh joy va qavs. Masalan: +998 90 123 45 67";
-  if (k === "amount" && v && !/^[\d\s]+$/.test(v)) return "Faqat raqam kiriting.";
+function validateField(f, v){
+  if (!v) return "";
+  if (f.type === "phone" && !/^[+\d\s()-]{7,40}$/.test(v)) return "Faqat raqam, +, bo‘sh joy va qavs. Masalan: +998 90 123 45 67";
+  if ((f.type === "money" || f.type === "int") && !/^[\d\s\u00A0]+$/.test(v)) return "Faqat raqam kiriting.";
+  if (f.type === "int" && (Number(v) < (f.min ?? 0) || Number(v) > (f.max ?? 1000))) return `${f.min ?? 0} dan ${f.max ?? 1000} gacha son kiriting.`;
+  if (f.type === "date" && v > iso(new Date())) return "Sana kelajakda bo‘lishi mumkin emas.";
   return "";
 }
 function formValid(){
   let ok = true;
-  for (const k of ["phone","amount"]){
-    const el = $("#f_" + k); if (!el) continue;
-    const msg = validateField(k, el.value.trim()), e = $("#e_" + k);
-    e.textContent = msg; e.hidden = !msg; el.setAttribute("aria-invalid", String(!!msg));
+  for (const el of document.querySelectorAll("#docForm [data-k]")){
+    const f = fieldSpec(el.dataset.k); if (!f) continue;
+    const msg = validateField(f, el.value.trim()), e = $("#e_" + f.k);
+    if (e){ e.textContent = msg; e.hidden = !msg; }
+    el.setAttribute("aria-invalid", String(!!msg));
     if (msg) ok = false;
   }
   return ok;
@@ -378,7 +438,10 @@ document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]");
   if (g && !g.disabled){ go(Number(g.dataset.go)); return; }
   const c = e.target.closest("[data-case]");
-  if (c){ choose({ scenario:c.dataset.case, confidence:1, summary:"", facts:{}, source:"choice" }).catch(err => toast(err.message)); return; }
+  if (c){ choose({ scenario:c.dataset.case, confidence:1, summary:"", facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
+  const dm = e.target.closest("[data-domain]");
+  if (dm){ renderDomain(dm.dataset.domain); return; }
+  if (e.target.closest("#allDomains")){ renderDomains(); $("#cases .case")?.focus(); return; }
   const ex = e.target.closest("[data-ex]");
   if (ex){ $("#problem").value = EXAMPLES[ex.dataset.ex]; $("#problem").focus(); return; }
   const lb = e.target.closest("[data-lang]");
@@ -387,23 +450,27 @@ document.addEventListener("click", e => {
   if (r){
     state.recipient = r.dataset.r; persist();
     document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b === r)));
-    const ea = document.querySelector('[data-f="empAddress"]'); if (ea) ea.hidden = state.recipient !== "court";
+    syncVisibility();
     previewDoc();
   }
 });
 const onForm = debounce(previewDoc, 220);
-$("#docForm").addEventListener("input", e => {
+const onDocCalc = debounce(() => refreshPlan(false).catch(() => {}), 300);
+function onDocInput(e){
   const k = e.target.dataset.k; if (!k) return;
+  const f = fieldSpec(k);
   let v = e.target.value;
-  if (k === "amount"){ const n = v.replace(/\D/g, "").slice(0, 13); v = n; e.target.value = n ? fmtSum(n) : ""; const ca = $("#cAmount"); if (ca) ca.value = e.target.value; }
-  state.form[k] = v; persist(); onForm();
-  if (k === "amount") refreshPlan(false).catch(() => {});
-});
-$("#docForm").addEventListener("focusout", e => { const k = e.target.dataset?.k; if (k === "phone" || k === "amount") formValid(); });
+  if (f?.type === "money"){ v = v.replace(/\D/g, "").slice(0, 13); e.target.value = v ? fmtSum(v) : ""; }
+  setField(k, v); persist(); onForm();
+  const c = $("#c_" + k); if (c) c.value = e.target.value;
+  if (f?.calc) onDocCalc();
+}
+$("#docForm").addEventListener("input", onDocInput);
+$("#docForm").addEventListener("change", e => { if (e.target.tagName === "SELECT" || e.target.type === "date") onDocInput(e); });
+$("#docForm").addEventListener("focusout", e => { const f = fieldSpec(e.target.dataset?.k); if (f && ["phone","money","int","date"].includes(f.type)) formValid(); });
 $("#missing").addEventListener("click", () => {
-  const k = state.missingKeys.map(ph => PH_FIELD[ph]).find(Boolean);
-  const el = k && $("#f_" + k);
-  if (el){ el.scrollIntoView({ block:"center" }); el.focus(); }
+  const el = state.missing.map(x => $("#f_" + x.k)).find(el => el && !el.closest("[hidden]"));
+  if (el){ el.closest("details")?.setAttribute("open", ""); el.scrollIntoView({ block:"center" }); el.focus(); }
 });
 $("#home").addEventListener("click", () => go(1));
 $("#analyzeBtn").addEventListener("click", analyze);
@@ -415,7 +482,7 @@ $("#copyTxt").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(docText()); toast("Matn nusxalandi"); }
   catch { const rg = document.createRange(); rg.selectNodeContents($("#paper")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); toast("Matn belgilandi: Ctrl+C bosing"); }
 });
-$("#wipe").addEventListener("click", () => { store.clear(); state.form = {}; toast("Ma’lumotlaringiz o‘chirildi"); setTimeout(() => { location.href = location.pathname; }, 600); });
+$("#wipe").addEventListener("click", () => { store.clear(); try { localStorage.removeItem("huquqyol:v1"); } catch {} state.applicant = {}; state.formByScn = {}; toast("Ma’lumotlaringiz o‘chirildi"); setTimeout(() => { location.href = location.pathname; }, 600); });
 
 /* ---------- Oflayn (PWA) ---------- */
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
@@ -430,7 +497,7 @@ try {
   state.meta = await getJSON("/api/meta");
   renderStart();
   const saved = store.load();
-  if (saved?.form) state.form = saved.form;
+  if (saved){ state.applicant = saved.applicant || {}; state.formByScn = saved.formByScn || {}; }
   const want = location.hash.slice(1);
   if (saved?.scn && scenarioMeta(saved.scn) && (want === "reja" || want === "ariza")){
     Object.assign(state, saved);

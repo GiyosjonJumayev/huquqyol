@@ -59,7 +59,7 @@ export function toCyrillic(text){
 
 // Hujjat modelidagi barcha matnlarni o‘girish
 export function cyrillicModel(model){
-  const tp = p => p.v != null ? { v: toCyrillic(p.v) } : { ph: toCyrillic(p.ph) };
+  const tp = p => p.v != null ? { v: toCyrillic(p.v) } : { ...p, ph: toCyrillic(p.ph) };
   return {
     ...model,
     blocks: model.blocks.map(b => ({
@@ -71,7 +71,6 @@ export function cyrillicModel(model){
       ...(b.items ? { items: b.items.map(l => l.map(tp)) } : {}),
       ...(b.right ? { right: b.right.map(tp) } : {})
     })),
-    missing: (model.missing || []).map(toCyrillic),
-    missingLatin: model.missing || []
+    missing: (model.missing || []).map(m => typeof m === "string" ? toCyrillic(m) : { ...m, label: toCyrillic(m.label) })
   };
 }

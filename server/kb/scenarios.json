@@ -1,246 +1,1941 @@
 [
-  {
-    "id": "ish_haqi",
-    "title": "Ish haqi to‘lanmayapti",
-    "card": "Maosh kechikyapti yoki umuman berilmayapti",
-    "short": "Ish haqi",
-    "lead": "Ish beruvchi ish haqini oyiga kamida ikki marta to‘lashi shart. Kechiktirilgan har bir kun uchun sizga qo‘shimcha kompensatsiya tegadi.",
-    "keywords": [
-      "maosh",
-      "oylik",
-      "ish haqi",
-      "ish haqqi",
-      "zarplata",
-      "to‘lamay",
-      "bermay",
-      "kechik",
-      "qarz",
-      "avans",
-      "bo‘nak"
-    ],
-    "norms": [
-      "m253",
-      "m333",
-      "m25",
-      "muddat",
-      "m9"
-    ],
-    "deadlineMonths": 6,
-    "compensation": true,
-    "trigger": "Birinchi to‘lanmagan maosh sanasi",
-    "steps": [
-      {
-        "org": "Ish beruvchi",
-        "t": "Yozma talabnoma bering",
-        "when": "Bugun",
-        "body": "2 nusxada; ikkinchisiga qabul belgisi va sana qo‘ydiring."
-      },
-      {
-        "org": "Mehnat inspeksiyasi",
-        "t": "Javob bo‘lmasa, ariza yozing",
-        "when": "1–2 hafta ichida",
-        "body": "Inspektor tekshiradi va ish beruvchiga majburiy ko‘rsatma beradi."
-      },
-      {
-        "org": "Sud",
-        "t": "Qarz va kompensatsiyani undiring",
-        "when": "{deadline} gacha",
-        "hot": true,
-        "body": "Fuqarolik sudiga da’vo. Xodim sud xarajatlaridan ozod."
-      }
-    ],
-    "evidence": [
-      "Mehnat shartnomasi",
-      "Bank ko‘chirmasi (oxirgi tushum)",
-      "Ish haqi hisob varaqasi",
-      "Ish beruvchi bilan yozishmalar",
-      "Talabnoma nusxasi (qabul belgisi bilan)",
-      "Hamkasblar guvohligi"
-    ],
-    "documents": [
-      "employer",
-      "inspection",
-      "court"
-    ]
+ {
+  "id": "ish_haqi",
+  "domain": "mehnat",
+  "title": "Ish haqi to‘lanmayapti",
+  "card": "Maosh kechikyapti yoki umuman berilmayapti",
+  "short": "Ish haqi",
+  "lead": "Ish beruvchi ish haqini oyiga kamida ikki marta to‘lashi shart. Kechiktirilgan har bir kun uchun sizga qo‘shimcha kompensatsiya tegadi.",
+  "keywords": [
+   "maosh",
+   "oylik",
+   "ish haqi",
+   "ish haqqi",
+   "zarplata",
+   "avans",
+   "bo‘nak",
+   "ish beruvchi"
+  ],
+  "norms": [
+   "m253",
+   "m333",
+   "m25",
+   "muddat",
+   "m9"
+  ],
+  "deadline": {
+   "months": 6,
+   "label": "Sudga murojaat uchun qoldi"
   },
-  {
-    "id": "ishdan_boshatish",
-    "title": "Noqonuniy ishdan bo‘shatishdi",
-    "card": "Ogohlantirmasdan yoki asossiz bo‘shatishdi",
-    "short": "Ishdan bo‘shatish",
-    "lead": "Ish beruvchi sizni faqat qonunda sanalgan asos bilan va tartibga rioya qilib bo‘shatishi mumkin. Aks holda sud sizni ishga tiklaydi.",
-    "keywords": [
-      "bo‘shat",
-      "haydash",
-      "haydab",
-      "ishdan chiqar",
-      "uvol",
-      "ozod qil",
-      "qisqart",
-      "shtat",
-      "ishga tikla",
-      "ogohlantir"
-    ],
-    "norms": [
-      "m161",
-      "m165",
-      "sud",
-      "muddat",
-      "m171",
-      "m9"
-    ],
-    "deadlineMonths": 3,
-    "compensation": false,
-    "trigger": "Bo‘shatish buyrug‘i qo‘lingizga tekkan sana",
-    "steps": [
-      {
-        "org": "Ish beruvchi",
-        "t": "Buyruq va daftarchani so‘rang",
-        "when": "Darhol",
-        "body": "Buyruq nusxasini olgan sanani yozib qo‘ying: muddat shu kundan boshlanadi."
-      },
-      {
-        "org": "Sud",
-        "t": "Ishga tiklash da’vosini bering",
-        "when": "{deadline} gacha",
-        "hot": true,
-        "body": "Bevosita sudga. Majburiy progul haqi va ma’naviy zararni ham so‘rang."
-      },
-      {
-        "org": "Mehnat inspeksiyasi",
-        "t": "Parallel ariza yozing",
-        "when": "Sud bilan birga",
-        "body": "Inspeksiya xulosasi sudda dalil bo‘ladi, lekin sud muddatini to‘xtatmaydi."
-      }
-    ],
-    "evidence": [
-      "Bo‘shatish buyrug‘i nusxasi",
-      "Mehnat shartnomasi",
-      "Ogohlantirish xati (yoki uning yo‘qligi)",
-      "Mehnat daftarchasi / elektron ko‘chirma",
-      "Yozishmalar",
-      "Guvohlar"
-    ],
-    "documents": [
-      "court",
-      "inspection"
-    ]
+  "trigger": "Birinchi to‘lanmagan maosh sanasi",
+  "calc": {
+   "type": "labor333"
   },
-  {
-    "id": "tatil",
-    "title": "Ta’tilga chiqarishmayapti",
-    "card": "Yillik ta’til berilmayapti yoki qisqartirildi",
-    "short": "Ta’til",
-    "lead": "Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan ta’tilga haqli. Ish beruvchi uni bermasligi mumkin emas.",
-    "keywords": [
-      "ta’til",
-      "tatil",
-      "otpusk",
-      "dam ol",
-      "ta'til"
+  "partyField": "employer",
+  "amountField": "amount",
+  "steps": [
+   {
+    "org": "Ish beruvchi",
+    "t": "Yozma talabnoma bering",
+    "when": "Bugun",
+    "body": "2 nusxada; ikkinchisiga qabul belgisi va sana qo‘ydiring."
+   },
+   {
+    "org": "Mehnat inspeksiyasi",
+    "t": "Javob bo‘lmasa, ariza yozing",
+    "when": "1–2 hafta ichida",
+    "body": "Inspektor tekshiradi va ish beruvchiga majburiy ko‘rsatma beradi."
+   },
+   {
+    "org": "Sud",
+    "t": "Qarz va kompensatsiyani undiring",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Fuqarolik sudiga da’vo. Xodim sud xarajatlaridan ozod."
+   }
+  ],
+  "evidence": [
+   "Mehnat shartnomasi",
+   "Bank ko‘chirmasi (oxirgi tushum)",
+   "Ish haqi hisob varaqasi",
+   "Ish beruvchi bilan yozishmalar",
+   "Talabnoma nusxasi (qabul belgisi bilan)",
+   "Hamkasblar guvohligi"
+  ],
+  "fields": [
+   {
+    "k": "employer",
+    "label": "Ish beruvchi",
+    "ph": "tashkilot nomi",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "«…» MChJ"
+   },
+   {
+    "k": "position",
+    "label": "Lavozimingiz",
+    "ph": "lavozim",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "omborchi"
+   },
+   {
+    "k": "amount",
+    "label": "Qarz summasi, so‘m",
+    "ph": "summa",
+    "type": "money",
+    "group": "Ish joyi",
+    "calc": true
+   },
+   {
+    "k": "months",
+    "label": "Necha oylik qarz",
+    "ph": "oylar soni",
+    "type": "int",
+    "group": "Ish joyi",
+    "max": 60,
+    "min": 1,
+    "calc": true
+   },
+   {
+    "k": "boss",
+    "label": "Rahbar F.I.Sh.",
+    "ph": "rahbar F.I.Sh.",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "employer"
     ],
-    "norms": [
-      "m217",
-      "m218",
-      "m220",
-      "m231",
-      "muddat"
+    "hint": "direktor"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "inspection",
+     "court"
     ],
-    "deadlineMonths": 6,
-    "compensation": false,
-    "trigger": "Ta’til rad etilgan sana",
-    "steps": [
-      {
-        "org": "Ish beruvchi",
-        "t": "Ta’til so‘rab ariza yozing",
-        "when": "Bugun",
-        "body": "Kunlar soni va sanani ko‘rsating, ta’tillar grafigini so‘rang."
-      },
-      {
-        "org": "Mehnat inspeksiyasi",
-        "t": "Rad etilsa, ariza yozing",
-        "when": "Rad javobidan keyin",
-        "body": "Inspektor ish beruvchiga ta’til berish yuzasidan ko‘rsatma beradi."
-      },
-      {
-        "org": "Sud",
-        "t": "Ta’til yoki kompensatsiyani talab qiling",
-        "when": "{deadline} gacha",
-        "hot": true,
-        "body": "Fuqarolik sudiga da’vo. Sud xarajati to‘lanmaydi."
-      }
-    ],
-    "evidence": [
-      "Mehnat shartnomasi",
-      "Ta’til so‘ralgan ariza nusxasi",
-      "Rad javobi yoki yozishma",
-      "Ta’tillar grafigi",
-      "Ish staji hujjati"
-    ],
-    "documents": [
-      "employer",
-      "inspection"
+    "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "empAddress",
+    "label": "Ish beruvchi manzili",
+    "ph": "ish beruvchi manzili",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
     ]
+   }
+  ],
+  "docs": [
+   {
+    "id": "employer",
+    "label": "Ish beruvchiga",
+    "to": [
+     "{{employer}} rahbari",
+     "{{boss}}ga",
+     "xodim {{applicant}} dan"
+    ],
+    "title": "TALABNOMA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
+     "{{trigger}}dan boshlab [?months]{{months}} oy davomida [/]menga ish haqi to‘lanmagan. Ish haqi bo‘yicha qarz miqdori {{amount}}ni tashkil etadi.",
+     "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga ko‘ra ish beruvchi ish haqini har yarim oyda kamida bir marta, belgilangan muddatlarda to‘liq hajmda to‘lashi shart. Kodeksning 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun ish beruvchi, aybi bor-yo‘qligidan qat’i nazar, pulli kompensatsiya to‘laydi."
+    ],
+    "askLabel": "Talab qilaman:",
+    "asks": [
+     "ish haqi bo‘yicha {{amount}} qarzni to‘lashni;",
+     "MK 333-moddasi bo‘yicha kechiktirish kompensatsiyasini hisoblab to‘lashni;",
+     "ish haqi hisob varaqasini yozma ravishda taqdim etishni."
+    ],
+    "attach": [
+     "Mehnat shartnomasi nusxasi"
+    ],
+    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
+   },
+   {
+    "id": "inspection",
+    "label": "Mehnat inspeksiyasiga",
+    "to": [
+     "Davlat mehnat inspeksiyasining {{district}} bo‘yicha hududiy bo‘limiga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
+     "{{trigger}}dan boshlab [?months]{{months}} oy davomida [/]menga ish haqi to‘lanmagan. Ish haqi bo‘yicha qarz miqdori {{amount}}ni tashkil etadi.",
+     "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga ko‘ra ish beruvchi ish haqini har yarim oyda kamida bir marta, belgilangan muddatlarda to‘liq hajmda to‘lashi shart. Kodeksning 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun ish beruvchi, aybi bor-yo‘qligidan qat’i nazar, pulli kompensatsiya to‘laydi."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "ish beruvchi {{employer}} faoliyatida mehnat qonunchiligiga rioya etilishini tekshirishni;",
+     "ish haqi qarzini kompensatsiya bilan to‘lash yuzasidan majburiy ko‘rsatma berishni;",
+     "aybdor mansabdor shaxslarni qonunda belgilangan javobgarlikka tortish masalasini ko‘rib chiqishni."
+    ],
+    "attach": [
+     "Ish beruvchiga berilgan talabnoma nusxasi",
+     "Mehnat shartnomasi nusxasi"
+    ],
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+   },
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{employer}}, manzil: {{empAddress}}",
+     "[?amount]Da’vo summasi: {{amount}} va kechiktirish kompensatsiyasi[/]"
+    ],
+    "title": "DA’VO ARIZASI",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
+     "{{trigger}}dan boshlab [?months]{{months}} oy davomida [/]menga ish haqi to‘lanmagan. Ish haqi bo‘yicha qarz miqdori {{amount}}ni tashkil etadi.",
+     "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga ko‘ra ish beruvchi ish haqini har yarim oyda kamida bir marta, belgilangan muddatlarda to‘liq hajmda to‘lashi shart. Kodeksning 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun ish beruvchi, aybi bor-yo‘qligidan qat’i nazar, pulli kompensatsiya to‘laydi.",
+     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "javobgardan mening foydamga {{amount}} miqdoridagi qarzni undirishni;",
+     "javobgardan MK 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun pulli kompensatsiyani undirishni;"
+    ],
+    "attach": [
+     "Da’vo arizasining javobgar uchun nusxasi",
+     "Pasport nusxasi",
+     "Mehnat shartnomasi nusxasi",
+     "Bank ko‘chirmasi yoki ish haqi hisob varaqasi"
+    ],
+    "sub": "ish haqi qarzi va kechiktirish kompensatsiyasini undirish to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "ishdan_boshatish",
+  "domain": "mehnat",
+  "title": "Noqonuniy ishdan bo‘shatishdi",
+  "card": "Ogohlantirmasdan yoki asossiz bo‘shatishdi",
+  "short": "Ishdan bo‘shatish",
+  "lead": "Ish beruvchi sizni faqat qonunda sanalgan asos bilan va tartibga rioya qilib bo‘shatishi mumkin. Aks holda sud sizni ishga tiklaydi.",
+  "keywords": [
+   "bo‘shat",
+   "haydash",
+   "haydab",
+   "ishdan chiqar",
+   "uvol",
+   "ozod qil",
+   "qisqart",
+   "shtat",
+   "ishga tikla",
+   "ogohlantir"
+  ],
+  "norms": [
+   "m161",
+   "m165",
+   "sud",
+   "muddat",
+   "m171",
+   "m9"
+  ],
+  "deadline": {
+   "months": 3,
+   "label": "Sudga murojaat uchun qoldi"
   },
-  {
-    "id": "hisob_kitob",
-    "title": "Bo‘shatganda hisob-kitob qilinmadi",
-    "card": "Oxirgi pul yoki mehnat daftarcha berilmadi",
-    "short": "Hisob-kitob",
-    "lead": "Ishdan ketgan kuningiz barcha pul va mehnat daftarchasi berilishi shart. Kechiktirilgan har bir kun uchun kompensatsiya tegadi.",
-    "keywords": [
-      "hisob-kitob",
-      "hisob kitob",
-      "raschyot",
-      "rasschet",
-      "daftarcha",
-      "trudovoy",
-      "ketdim",
-      "ishdan ketganman",
-      "kompensatsiya bermay"
+  "trigger": "Bo‘shatish buyrug‘i qo‘lingizga tekkan sana",
+  "calc": null,
+  "partyField": "employer",
+  "steps": [
+   {
+    "org": "Ish beruvchi",
+    "t": "Buyruq va daftarchani so‘rang",
+    "when": "Darhol",
+    "body": "Buyruq nusxasini olgan sanani yozib qo‘ying: muddat shu kundan boshlanadi."
+   },
+   {
+    "org": "Sud",
+    "t": "Ishga tiklash da’vosini bering",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Bevosita sudga. Majburiy progul haqi va ma’naviy zararni ham so‘rang."
+   },
+   {
+    "org": "Mehnat inspeksiyasi",
+    "t": "Parallel ariza yozing",
+    "when": "Sud bilan birga",
+    "body": "Inspeksiya xulosasi sudda dalil bo‘ladi, lekin sud muddatini to‘xtatmaydi."
+   }
+  ],
+  "evidence": [
+   "Bo‘shatish buyrug‘i nusxasi",
+   "Mehnat shartnomasi",
+   "Ogohlantirish xati (yoki uning yo‘qligi)",
+   "Mehnat daftarchasi / elektron ko‘chirma",
+   "Yozishmalar",
+   "Guvohlar"
+  ],
+  "fields": [
+   {
+    "k": "employer",
+    "label": "Ish beruvchi",
+    "ph": "tashkilot nomi",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "«…» MChJ"
+   },
+   {
+    "k": "position",
+    "label": "Lavozimingiz",
+    "ph": "lavozim",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "omborchi"
+   },
+   {
+    "k": "boss",
+    "label": "Rahbar F.I.Sh.",
+    "ph": "rahbar F.I.Sh.",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "employer"
     ],
-    "norms": [
-      "hisob",
-      "m171",
-      "m333",
-      "muddat"
+    "hint": "direktor"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "inspection",
+     "court"
     ],
-    "deadlineMonths": 6,
-    "compensation": true,
-    "trigger": "Oxirgi ish kuningiz",
-    "steps": [
-      {
-        "org": "Ish beruvchi",
-        "t": "Hisob-kitobni yozma talab qiling",
-        "when": "Bugun",
-        "body": "Qonun bo‘yicha pul talabdan keyin 3 kun ichida to‘lanishi kerak."
-      },
-      {
-        "org": "Mehnat inspeksiyasi",
-        "t": "To‘lanmasa, ariza yozing",
-        "when": "3 kundan keyin",
-        "body": "Daftarcha berilmagani ham alohida qoidabuzarlik sifatida ko‘riladi."
-      },
-      {
-        "org": "Sud",
-        "t": "Summa va kompensatsiyani undiring",
-        "when": "{deadline} gacha",
-        "hot": true,
-        "body": "Fuqarolik sudiga da’vo. Xodim sud xarajatlaridan ozod."
-      }
-    ],
-    "evidence": [
-      "Ishdan bo‘shash arizasi nusxasi",
-      "Bo‘shatish buyrug‘i",
-      "Oxirgi hisob varaqasi",
-      "Bank ko‘chirmasi",
-      "Talabnoma nusxasi",
-      "Yozishmalar"
-    ],
-    "documents": [
-      "employer",
-      "inspection",
-      "court"
+    "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "empAddress",
+    "label": "Ish beruvchi manzili",
+    "ph": "ish beruvchi manzili",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
     ]
-  }
+   }
+  ],
+  "docs": [
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{employer}}, manzil: {{empAddress}}"
+    ],
+    "title": "DA’VO ARIZASI",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
+     "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat shartnomasi bekor qilindi. Bo‘shatish qonuniy asossiz va belgilangan tartib buzilgan holda amalga oshirildi: Mehnat kodeksining 161-moddasiga ko‘ra ish beruvchi tashabbusi bilan bekor qilish asoslangan bo‘lishi, 165-moddaga ko‘ra esa xodim oldindan yozma ogohlantirilishi shart.",
+     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "meni avvalgi ishimga — {{position}} lavozimiga tiklashni;",
+     "javobgardan majburiy progul vaqti uchun o‘rtacha ish haqini undirishni;",
+     "javobgardan ma’naviy zarar kompensatsiyasini undirishni."
+    ],
+    "attach": [
+     "Da’vo arizasining javobgar uchun nusxasi",
+     "Pasport nusxasi",
+     "Mehnat shartnomasi nusxasi",
+     "Bo‘shatish buyrug‘i ko‘chirmasi"
+    ],
+    "sub": "ishga tiklash va majburiy progul vaqti uchun haq undirish to‘g‘risida"
+   },
+   {
+    "id": "inspection",
+    "label": "Mehnat inspeksiyasiga",
+    "to": [
+     "Davlat mehnat inspeksiyasining {{district}} bo‘yicha hududiy bo‘limiga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
+     "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat shartnomasi bekor qilindi. Bo‘shatish qonuniy asossiz va belgilangan tartib buzilgan holda amalga oshirildi: Mehnat kodeksining 161-moddasiga ko‘ra ish beruvchi tashabbusi bilan bekor qilish asoslangan bo‘lishi, 165-moddaga ko‘ra esa xodim oldindan yozma ogohlantirilishi shart."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "ish beruvchi {{employer}} faoliyatida mehnat qonunchiligiga rioya etilishini tekshirishni;",
+     "bo‘shatish tartibi buzilganligi yuzasidan xulosa berishni;",
+     "aybdor mansabdor shaxslarni qonunda belgilangan javobgarlikka tortish masalasini ko‘rib chiqishni."
+    ],
+    "attach": [
+     "Mehnat shartnomasi nusxasi",
+     "Bo‘shatish buyrug‘i ko‘chirmasi"
+    ],
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "tatil",
+  "domain": "mehnat",
+  "title": "Ta’tilga chiqarishmayapti",
+  "card": "Yillik ta’til berilmayapti yoki qisqartirildi",
+  "short": "Ta’til",
+  "lead": "Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan ta’tilga haqli. Ish beruvchi uni bermasligi mumkin emas.",
+  "keywords": [
+   "ta’til",
+   "tatil",
+   "otpusk",
+   "dam ol"
+  ],
+  "norms": [
+   "m217",
+   "m218",
+   "m220",
+   "m231",
+   "muddat"
+  ],
+  "deadline": {
+   "months": 6,
+   "label": "Sudga murojaat uchun qoldi"
+  },
+  "trigger": "Ta’til rad etilgan sana",
+  "calc": null,
+  "partyField": "employer",
+  "steps": [
+   {
+    "org": "Ish beruvchi",
+    "t": "Ta’til so‘rab ariza yozing",
+    "when": "Bugun",
+    "body": "Kunlar soni va sanani ko‘rsating, ta’tillar grafigini so‘rang."
+   },
+   {
+    "org": "Mehnat inspeksiyasi",
+    "t": "Rad etilsa, ariza yozing",
+    "when": "Rad javobidan keyin",
+    "body": "Inspektor ish beruvchiga ta’til berish yuzasidan ko‘rsatma beradi."
+   },
+   {
+    "org": "Sud",
+    "t": "Ta’til yoki kompensatsiyani talab qiling",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Fuqarolik sudiga da’vo. Sud xarajati to‘lanmaydi."
+   }
+  ],
+  "evidence": [
+   "Mehnat shartnomasi",
+   "Ta’til so‘ralgan ariza nusxasi",
+   "Rad javobi yoki yozishma",
+   "Ta’tillar grafigi",
+   "Ish staji hujjati"
+  ],
+  "fields": [
+   {
+    "k": "employer",
+    "label": "Ish beruvchi",
+    "ph": "tashkilot nomi",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "«…» MChJ"
+   },
+   {
+    "k": "position",
+    "label": "Lavozimingiz",
+    "ph": "lavozim",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "omborchi"
+   },
+   {
+    "k": "boss",
+    "label": "Rahbar F.I.Sh.",
+    "ph": "rahbar F.I.Sh.",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "employer"
+    ],
+    "hint": "direktor"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "inspection",
+     "court"
+    ],
+    "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "empAddress",
+    "label": "Ish beruvchi manzili",
+    "ph": "ish beruvchi manzili",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
+    ]
+   }
+  ],
+  "docs": [
+   {
+    "id": "employer",
+    "label": "Ish beruvchiga",
+    "to": [
+     "{{employer}} rahbari",
+     "{{boss}}ga",
+     "xodim {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
+     "Mehnat kodeksining 217-moddasiga ko‘ra har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan asosiy ta’tilga haqli. Menga ta’til hozirgacha berilmagan."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "menga yillik asosiy mehnat ta’tilini ____ kalendar kun muddatga ____ sanadan boshlab berishni;",
+     "ta’tillar grafigi nusxasini taqdim etishni."
+    ],
+    "attach": [
+     "Mehnat shartnomasi nusxasi"
+    ],
+    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
+   },
+   {
+    "id": "inspection",
+    "label": "Mehnat inspeksiyasiga",
+    "to": [
+     "Davlat mehnat inspeksiyasining {{district}} bo‘yicha hududiy bo‘limiga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
+     "Mehnat kodeksining 217-moddasiga ko‘ra har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan asosiy ta’tilga haqli. Men ta’til so‘rab ariza berganman, biroq ish beruvchi {{trigger}} holatiga ko‘ra ta’til bermagan."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "ish beruvchi {{employer}} faoliyatida mehnat qonunchiligiga rioya etilishini tekshirishni;",
+     "menga qonuniy ta’til berish yuzasidan ko‘rsatma berishni;",
+     "aybdor mansabdor shaxslarni qonunda belgilangan javobgarlikka tortish masalasini ko‘rib chiqishni."
+    ],
+    "attach": [
+     "Ish beruvchiga berilgan talabnoma nusxasi",
+     "Mehnat shartnomasi nusxasi"
+    ],
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "hisob_kitob",
+  "domain": "mehnat",
+  "title": "Bo‘shatganda hisob-kitob qilinmadi",
+  "card": "Oxirgi pul yoki mehnat daftarcha berilmadi",
+  "short": "Hisob-kitob",
+  "lead": "Ishdan ketgan kuningiz barcha pul va mehnat daftarchasi berilishi shart. Kechiktirilgan har bir kun uchun kompensatsiya tegadi.",
+  "keywords": [
+   "hisob-kitob",
+   "hisob kitob",
+   "raschyot",
+   "rasschet",
+   "daftarcha",
+   "trudovoy",
+   "ishdan ketdim",
+   "ishdan ketganman",
+   "bo‘shab ketdim"
+  ],
+  "norms": [
+   "hisob",
+   "m171",
+   "m333",
+   "muddat"
+  ],
+  "deadline": {
+   "months": 6,
+   "label": "Sudga murojaat uchun qoldi"
+  },
+  "trigger": "Oxirgi ish kuningiz",
+  "calc": {
+   "type": "labor333"
+  },
+  "partyField": "employer",
+  "amountField": "amount",
+  "steps": [
+   {
+    "org": "Ish beruvchi",
+    "t": "Hisob-kitobni yozma talab qiling",
+    "when": "Bugun",
+    "body": "Qonun bo‘yicha pul talabdan keyin 3 kun ichida to‘lanishi kerak."
+   },
+   {
+    "org": "Mehnat inspeksiyasi",
+    "t": "To‘lanmasa, ariza yozing",
+    "when": "3 kundan keyin",
+    "body": "Daftarcha berilmagani ham alohida qoidabuzarlik sifatida ko‘riladi."
+   },
+   {
+    "org": "Sud",
+    "t": "Summa va kompensatsiyani undiring",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Fuqarolik sudiga da’vo. Xodim sud xarajatlaridan ozod."
+   }
+  ],
+  "evidence": [
+   "Ishdan bo‘shash arizasi nusxasi",
+   "Bo‘shatish buyrug‘i",
+   "Oxirgi hisob varaqasi",
+   "Bank ko‘chirmasi",
+   "Talabnoma nusxasi",
+   "Yozishmalar"
+  ],
+  "fields": [
+   {
+    "k": "employer",
+    "label": "Ish beruvchi",
+    "ph": "tashkilot nomi",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "«…» MChJ"
+   },
+   {
+    "k": "position",
+    "label": "Lavozimingiz",
+    "ph": "lavozim",
+    "type": "text",
+    "group": "Ish joyi",
+    "hint": "omborchi"
+   },
+   {
+    "k": "amount",
+    "label": "Qarz summasi, so‘m",
+    "ph": "summa",
+    "type": "money",
+    "group": "Ish joyi",
+    "calc": true
+   },
+   {
+    "k": "months",
+    "label": "Necha oylik qarz",
+    "ph": "oylar soni",
+    "type": "int",
+    "group": "Ish joyi",
+    "max": 60,
+    "min": 1,
+    "calc": true
+   },
+   {
+    "k": "boss",
+    "label": "Rahbar F.I.Sh.",
+    "ph": "rahbar F.I.Sh.",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "employer"
+    ],
+    "hint": "direktor"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "inspection",
+     "court"
+    ],
+    "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "empAddress",
+    "label": "Ish beruvchi manzili",
+    "ph": "ish beruvchi manzili",
+    "type": "text",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
+    ]
+   }
+  ],
+  "docs": [
+   {
+    "id": "employer",
+    "label": "Ish beruvchiga",
+    "to": [
+     "{{employer}} rahbari",
+     "{{boss}}ga",
+     "xodim {{applicant}} dan"
+    ],
+    "title": "TALABNOMA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
+     "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish beruvchi hozirgacha men bilan to‘liq hisob-kitob qilmagan[?amount] (qarz: {{amount}})[/] va mehnat daftarchasini (elektron ko‘chirmasini) bermagan. Mehnat kodeksiga ko‘ra barcha summalar shartnoma bekor qilingan kuni, xodim ishlamagan bo‘lsa, talabdan keyin 3 kun ichida to‘lanishi, 171-moddaga ko‘ra esa daftarcha va buyruq ko‘chirmasi o‘sha kuni berilishi shart."
+    ],
+    "askLabel": "Talab qilaman:",
+    "asks": [
+     "men bilan 3 kun ichida to‘liq hisob-kitob qilishni[?amount] ({{amount}})[/];",
+     "mehnat daftarchasini (elektron ko‘chirmani) va bo‘shatish buyrug‘i ko‘chirmasini berishni;",
+     "MK 333-moddasi bo‘yicha kechiktirish kompensatsiyasini to‘lashni."
+    ],
+    "attach": [
+     "Mehnat shartnomasi nusxasi"
+    ],
+    "closing": "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
+   },
+   {
+    "id": "inspection",
+    "label": "Mehnat inspeksiyasiga",
+    "to": [
+     "Davlat mehnat inspeksiyasining {{district}} bo‘yicha hududiy bo‘limiga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
+     "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish beruvchi hozirgacha men bilan to‘liq hisob-kitob qilmagan[?amount] (qarz: {{amount}})[/] va mehnat daftarchasini (elektron ko‘chirmasini) bermagan. Mehnat kodeksiga ko‘ra barcha summalar shartnoma bekor qilingan kuni, xodim ishlamagan bo‘lsa, talabdan keyin 3 kun ichida to‘lanishi, 171-moddaga ko‘ra esa daftarcha va buyruq ko‘chirmasi o‘sha kuni berilishi shart."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "ish beruvchi {{employer}} faoliyatida mehnat qonunchiligiga rioya etilishini tekshirishni;",
+     "hisob-kitob va mehnat daftarchasini berish yuzasidan majburiy ko‘rsatma berishni;",
+     "aybdor mansabdor shaxslarni qonunda belgilangan javobgarlikka tortish masalasini ko‘rib chiqishni."
+    ],
+    "attach": [
+     "Ish beruvchiga berilgan talabnoma nusxasi",
+     "Mehnat shartnomasi nusxasi"
+    ],
+    "sub": "ish beruvchi tomonidan mehnat qonunchiligi buzilganligi to‘g‘risida"
+   },
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{employer}}, manzil: {{empAddress}}"
+    ],
+    "title": "DA’VO ARIZASI",
+    "body": [
+     "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
+     "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish beruvchi hozirgacha men bilan to‘liq hisob-kitob qilmagan[?amount] (qarz: {{amount}})[/] va mehnat daftarchasini (elektron ko‘chirmasini) bermagan. Mehnat kodeksiga ko‘ra barcha summalar shartnoma bekor qilingan kuni, xodim ishlamagan bo‘lsa, talabdan keyin 3 kun ichida to‘lanishi, 171-moddaga ko‘ra esa daftarcha va buyruq ko‘chirmasi o‘sha kuni berilishi shart.",
+     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "javobgardan mening foydamga {{amount}} miqdoridagi qarzni undirishni;",
+     "javobgardan MK 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun pulli kompensatsiyani undirishni;",
+     "javobgarni mehnat daftarchasini berishga majburlashni."
+    ],
+    "attach": [
+     "Da’vo arizasining javobgar uchun nusxasi",
+     "Pasport nusxasi",
+     "Mehnat shartnomasi nusxasi",
+     "Bank ko‘chirmasi yoki ish haqi hisob varaqasi"
+    ],
+    "sub": "bo‘shatishda tegishli to‘lovlar va kompensatsiyani undirish to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "nuqsonli_tovar",
+  "domain": "istemol",
+  "title": "Sifatsiz tovar sotishdi",
+  "card": "Tovar buzuq chiqdi, sotuvchi almashtirmayapti yoki pulni qaytarmayapti",
+  "short": "Sifatsiz tovar",
+  "lead": "Nuqsonli tovar uchun almashtirish, bepul ta’mirlash, narxni kamaytirish yoki pulni qaytarishni o‘zingiz tanlaysiz. Almashtirish talabi 7 kunda bajarilishi shart, kechikkan har kun uchun narxning 1 foizi penya to‘lanadi.",
+  "keywords": [
+   "sifatsiz",
+   "nuqson",
+   "buzuq",
+   "buzilib",
+   "ishlamay",
+   "brak",
+   "kafolat",
+   "garantiya",
+   "ta’mir",
+   "remont",
+   "servis",
+   "do‘kon",
+   "sotuvchi",
+   "sotib oldim",
+   "xarid"
+  ],
+  "norms": [
+   "ihq13",
+   "ihq14",
+   "ihq15",
+   "ihq16",
+   "ihq22",
+   "ihq23",
+   "ihq29"
+  ],
+  "deadline": {
+   "months": 6,
+   "label": "Talab qo‘yish uchun qoldi",
+   "note": "Kafolat muddati bo‘lsa, kafolat davomida; bo‘lmasa xariddan 6 oy."
+  },
+  "trigger": "Xarid sanasi",
+  "calc": {
+   "type": "consumerPenalty"
+  },
+  "partyField": "seller",
+  "amountField": "price",
+  "steps": [
+   {
+    "org": "Sotuvchi",
+    "t": "Yozma talabnoma bering",
+    "when": "Bugun",
+    "body": "Chek yoki boshqa xarid dalilini ilova qiling, nima talab qilishingizni aniq yozing. Chek yo‘qligi rad etish uchun asos emas."
+   },
+   {
+    "org": "Iste’molchilar qo‘mitasi",
+    "t": "Bajarilmasa, shikoyat qiling",
+    "when": "7 kundan keyin",
+    "body": "Raqobat va iste’molchilar qo‘mitasining hududiy boshqarmasiga ariza. Tekshiruv bepul."
+   },
+   {
+    "org": "Sud",
+    "t": "Pul, penya va zararni undiring",
+    "when": "Kerak bo‘lsa",
+    "body": "Fuqarolik sudiga da’vo; ma’naviy zararni ham so‘rash mumkin (22-modda)."
+   }
+  ],
+  "evidence": [
+   "Chek yoki to‘lov kvitansiyasi",
+   "Kafolat taloni yoki texnik pasport",
+   "Nuqson fotosurati yoki videosi",
+   "Sotuvchiga berilgan talabnoma nusxasi",
+   "Servis markazi xulosasi",
+   "Sotuvchi bilan yozishmalar"
+  ],
+  "fields": [
+   {
+    "k": "seller",
+    "label": "Sotuvchi (do‘kon, MChJ yoki YaTT)",
+    "ph": "sotuvchi nomi",
+    "type": "text",
+    "group": "Sotuvchi va tovar",
+    "hint": "«Texnomart» MChJ"
+   },
+   {
+    "k": "sellerAddress",
+    "label": "Sotuvchi manzili",
+    "ph": "sotuvchi manzili",
+    "type": "text",
+    "group": "Sotuvchi va tovar"
+   },
+   {
+    "k": "product",
+    "label": "Tovar (nomi, modeli)",
+    "ph": "tovar nomi",
+    "type": "text",
+    "group": "Sotuvchi va tovar",
+    "hint": "Samsung muzlatkich RB-34"
+   },
+   {
+    "k": "price",
+    "label": "Tovar narxi, so‘m",
+    "ph": "narxi",
+    "type": "money",
+    "group": "Sotuvchi va tovar",
+    "calc": true
+   },
+   {
+    "k": "defect",
+    "label": "Nuqson nimada",
+    "ph": "nuqson tavsifi",
+    "type": "textarea",
+    "group": "Sotuvchi va tovar",
+    "hint": "2 haftadan keyin sovutmay qoldi"
+   },
+   {
+    "k": "demand",
+    "label": "Nima talab qilasiz",
+    "ph": "talab",
+    "type": "select",
+    "group": "Sotuvchi va tovar",
+    "options": [
+     {
+      "v": "replace",
+      "text": "Almashtirib berish",
+      "doc": "tovarni ayni shunday tovarga almashtirib berishni",
+      "court": "javobgarni tovarni ayni shunday tovarga almashtirib berishga majburlashni"
+     },
+     {
+      "v": "repair",
+      "text": "Bepul ta’mirlash",
+      "doc": "tovardagi nuqsonni bepul bartaraf etishni",
+      "court": "javobgarni tovardagi nuqsonni bepul bartaraf etishga majburlashni"
+     },
+     {
+      "v": "discount",
+      "text": "Narxni kamaytirish",
+      "doc": "tovar narxini mutanosib ravishda kamaytirishni",
+      "court": "tovar narxini mutanosib kamaytirib, ortiqcha to‘langan summani javobgardan undirishni"
+     },
+     {
+      "v": "refund",
+      "text": "Pulni qaytarish",
+      "doc": "shartnomani bekor qilib, to‘langan pulni qaytarishni",
+      "court": "shartnomani bekor qilib, javobgardan to‘langan pulni undirishni"
+     }
+    ]
+   },
+   {
+    "k": "demandDate",
+    "label": "Sotuvchiga talab qo‘ygan sanangiz",
+    "ph": "talab sanasi",
+    "type": "date",
+    "group": "Sotuvchi va tovar",
+    "docs": [
+     "agency",
+     "court"
+    ],
+    "hint": "Hali talab qo‘ymagan bo‘lsangiz, bo‘sh qoldiring",
+    "calc": true
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Sotuvchi va tovar",
+    "docs": [
+     "agency",
+     "court"
+    ],
+    "hint": "Yunusobod tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "seller",
+    "label": "Sotuvchiga",
+    "to": [
+     "{{seller}} rahbariga",
+     "manzil: {{sellerAddress}}",
+     "xaridor {{applicant}} dan"
+    ],
+    "title": "TALABNOMA",
+    "body": [
+     "{{trigger}}da {{seller}}dan {{product}}ni[?price] {{price}}ga[/] sotib oldim. Tovarda quyidagi nuqson aniqlandi: {{defect}}.",
+     "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 13-moddasiga ko‘ra nuqsonli tovar sotilganda iste’molchi o‘z xohishiga qarab tovarni almashtirib berishni, nuqsonni bepul bartaraf etishni, narxni mutanosib kamaytirishni yoki shartnomani bekor qilib, to‘langan pulni qaytarishni talab qilishga haqli. Qonunning 14 va 15-moddalariga ko‘ra talab bajarilishi kechiktirilgan har bir kun uchun tovar narxining 1 foizi miqdorida penya to‘lanadi."
+    ],
+    "askLabel": "Talab qilaman:",
+    "asks": [
+     "{{demand}};",
+     "talabim muddatida bajarilmasa, kechiktirilgan har bir kun uchun tovar narxining 1 foizi miqdorida penya to‘lashni."
+    ],
+    "attach": [
+     "Chek (to‘lov hujjati) nusxasi"
+    ],
+    "sub": "nuqsonli tovar to‘g‘risida",
+    "closing": "Talabim qondirilmagan taqdirda Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasiga va sudga murojaat qilishimni ma’lum qilaman."
+   },
+   {
+    "id": "agency",
+    "label": "Iste’molchilar qo‘mitasiga",
+    "to": [
+     "Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasining {{district}} bo‘yicha hududiy boshqarmasiga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "{{trigger}}da {{seller}}dan {{product}}ni[?price] {{price}}ga[/] sotib oldim. Tovarda quyidagi nuqson aniqlandi: {{defect}}.",
+     "[?demandDate]{{demandDate}}da sotuvchiga yozma talab qo‘ydim, biroq talabim qonunda belgilangan muddatda bajarilmadi.[/]",
+     "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 13-moddasiga ko‘ra nuqsonli tovar sotilganda iste’molchi o‘z xohishiga qarab tovarni almashtirib berishni, nuqsonni bepul bartaraf etishni, narxni mutanosib kamaytirishni yoki shartnomani bekor qilib, to‘langan pulni qaytarishni talab qilishga haqli. Qonunning 14 va 15-moddalariga ko‘ra talab bajarilishi kechiktirilgan har bir kun uchun tovar narxining 1 foizi miqdorida penya to‘lanadi."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "sotuvchi {{seller}} faoliyatida iste’molchilar huquqlari to‘g‘risidagi qonunchilikka rioya etilishini tekshirishni;",
+     "sotuvchiga mening qonuniy talabimni bajarish yuzasidan ko‘rsatma berishni;",
+     "qonunbuzarlik uchun belgilangan choralarni ko‘rishni."
+    ],
+    "attach": [
+     "Chek nusxasi",
+     "Sotuvchiga berilgan talabnoma nusxasi"
+    ],
+    "sub": "iste’molchi huquqlari buzilganligi to‘g‘risida"
+   },
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{seller}}, manzil: {{sellerAddress}}"
+    ],
+    "title": "DA’VO ARIZASI",
+    "body": [
+     "{{trigger}}da {{seller}}dan {{product}}ni[?price] {{price}}ga[/] sotib oldim. Tovarda quyidagi nuqson aniqlandi: {{defect}}.",
+     "[?demandDate]{{demandDate}}da sotuvchiga yozma talab qo‘ydim, biroq talabim qonunda belgilangan muddatda bajarilmadi.[/]",
+     "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 13-moddasiga ko‘ra nuqsonli tovar sotilganda iste’molchi o‘z xohishiga qarab tovarni almashtirib berishni, nuqsonni bepul bartaraf etishni, narxni mutanosib kamaytirishni yoki shartnomani bekor qilib, to‘langan pulni qaytarishni talab qilishga haqli. Qonunning 14 va 15-moddalariga ko‘ra talab bajarilishi kechiktirilgan har bir kun uchun tovar narxining 1 foizi miqdorida penya to‘lanadi.",
+     "Qonunning 22-moddasiga ko‘ra iste’molchiga yetkazilgan ma’naviy zarar uchun haq to‘lanadi, uning miqdorini sud belgilaydi."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "{{demandCourt}};",
+     "javobgardan talab bajarilmagan har bir kun uchun tovar narxining 1 foizi miqdorida penya undirishni;",
+     "javobgardan ma’naviy zarar kompensatsiyasini undirishni."
+    ],
+    "attach": [
+     "Da’vo arizasining javobgar uchun nusxasi",
+     "Pasport nusxasi",
+     "Chek nusxasi",
+     "Sotuvchiga berilgan talabnoma nusxasi"
+    ],
+    "sub": "iste’molchi huquqlarini himoya qilish to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "tovar_qaytarish",
+  "domain": "istemol",
+  "title": "Tovarni qaytarib olishmayapti",
+  "card": "Mos kelmadi (o‘lchami, rangi), lekin do‘kon almashtirmayapti",
+  "short": "Tovarni qaytarish",
+  "lead": "Sifatli, lekin sizga mos kelmagan nooziq-ovqat tovarini xariddan 10 kun ichida almashtirish mumkin. Bir xil tovar bo‘lmasa, pul qaytariladi. «Qaytarilmaydi» yozuvi bu huquqni bekor qilmaydi.",
+  "keywords": [
+   "qaytarib olmay",
+   "qaytarib olishmay",
+   "almashtirmay",
+   "almashtirib bermay",
+   "o‘lcham",
+   "razmer",
+   "rangi",
+   "mos kelmadi",
+   "to‘g‘ri kelmadi",
+   "qaytarilmaydi",
+   "kiyim",
+   "poyabzal",
+   "oyoq kiyim"
+  ],
+  "norms": [
+   "ihq18",
+   "ihq23",
+   "ihq29"
+  ],
+  "deadline": {
+   "days": 10,
+   "label": "Almashtirish uchun qoldi"
+  },
+  "trigger": "Xarid sanasi",
+  "calc": null,
+  "partyField": "seller",
+  "amountField": "price",
+  "steps": [
+   {
+    "org": "Sotuvchi",
+    "t": "Tovarni chek bilan olib boring",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Tovar ishlatilmagan, yorlig‘i va qadog‘i saqlangan bo‘lsin. Rad etishsa, yozma talabnoma bering."
+   },
+   {
+    "org": "Iste’molchilar qo‘mitasi",
+    "t": "Rad etilsa, shikoyat qiling",
+    "when": "Rad javobidan keyin",
+    "body": "Raqobat va iste’molchilar qo‘mitasining hududiy boshqarmasiga ariza."
+   },
+   {
+    "org": "Sud",
+    "t": "Pulni undiring",
+    "when": "Kerak bo‘lsa",
+    "body": "Fuqarolik sudiga da’vo."
+   }
+  ],
+  "evidence": [
+   "Chek",
+   "Tovar yorlig‘i va qadog‘i",
+   "Rad javobi (yozma yoki video)",
+   "Sotuvchi bilan yozishmalar"
+  ],
+  "fields": [
+   {
+    "k": "seller",
+    "label": "Sotuvchi (do‘kon, MChJ yoki YaTT)",
+    "ph": "sotuvchi nomi",
+    "type": "text",
+    "group": "Sotuvchi va tovar",
+    "hint": "«Texnomart» MChJ"
+   },
+   {
+    "k": "sellerAddress",
+    "label": "Sotuvchi manzili",
+    "ph": "sotuvchi manzili",
+    "type": "text",
+    "group": "Sotuvchi va tovar"
+   },
+   {
+    "k": "product",
+    "label": "Tovar (nomi, modeli)",
+    "ph": "tovar nomi",
+    "type": "text",
+    "group": "Sotuvchi va tovar",
+    "hint": "Samsung muzlatkich RB-34"
+   },
+   {
+    "k": "price",
+    "label": "Tovar narxi, so‘m",
+    "ph": "narxi",
+    "type": "money",
+    "group": "Sotuvchi va tovar",
+    "calc": true
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Sotuvchi va tovar",
+    "docs": [
+     "agency",
+     "court"
+    ],
+    "hint": "Yunusobod tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "seller",
+    "label": "Sotuvchiga",
+    "to": [
+     "{{seller}} rahbariga",
+     "manzil: {{sellerAddress}}",
+     "xaridor {{applicant}} dan"
+    ],
+    "title": "TALABNOMA",
+    "body": [
+     "{{trigger}}da {{seller}}dan {{product}}ni[?price] {{price}}ga[/] sotib oldim. Tovar menga o‘lchami, shakli, rangi yoki boshqa xususiyati bo‘yicha mos kelmadi. Tovar ishlatilmagan, tashqi ko‘rinishi, yorliqlari va qadog‘i saqlangan.",
+     "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 18-moddasiga ko‘ra iste’molchi maqbul sifatli nooziq-ovqat tovarini xarid qilgan kunidan e’tiboran o‘n kun ichida ayni shunday tovarga almashtirishga, bunday tovar bo‘lmaganda esa to‘langan pulni qaytarib olishga haqli. «Almashtirilmaydi» yozuvi bu huquqni cheklamaydi."
+    ],
+    "askLabel": "Talab qilaman:",
+    "asks": [
+     "tovarni ayni shunday tovarga almashtirib berishni yoki, bunday tovar bo‘lmasa, to‘langan [?price]{{price}}ni[/][!price]pulni[/] qaytarishni."
+    ],
+    "attach": [
+     "Chek (to‘lov hujjati) nusxasi"
+    ],
+    "sub": "maqbul sifatli tovarni almashtirish to‘g‘risida",
+    "closing": "Talabim qondirilmagan taqdirda Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasiga va sudga murojaat qilishimni ma’lum qilaman."
+   },
+   {
+    "id": "agency",
+    "label": "Iste’molchilar qo‘mitasiga",
+    "to": [
+     "Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasining {{district}} bo‘yicha hududiy boshqarmasiga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "{{trigger}}da {{seller}}dan {{product}}ni[?price] {{price}}ga[/] sotib oldim. Tovar menga o‘lchami, shakli, rangi yoki boshqa xususiyati bo‘yicha mos kelmadi. Tovar ishlatilmagan, tashqi ko‘rinishi, yorliqlari va qadog‘i saqlangan.",
+     "Sotuvchi tovarni almashtirishni yoki pulni qaytarishni rad etdi.",
+     "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 18-moddasiga ko‘ra iste’molchi maqbul sifatli nooziq-ovqat tovarini xarid qilgan kunidan e’tiboran o‘n kun ichida ayni shunday tovarga almashtirishga, bunday tovar bo‘lmaganda esa to‘langan pulni qaytarib olishga haqli. «Almashtirilmaydi» yozuvi bu huquqni cheklamaydi."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "sotuvchi {{seller}} faoliyatida iste’molchilar huquqlari to‘g‘risidagi qonunchilikka rioya etilishini tekshirishni;",
+     "sotuvchiga tovarni almashtirish yoki pulni qaytarish yuzasidan ko‘rsatma berishni."
+    ],
+    "attach": [
+     "Chek nusxasi"
+    ],
+    "sub": "iste’molchi huquqlari buzilganligi to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "aliment",
+  "domain": "oila",
+  "title": "Aliment undirish kerak",
+  "card": "Ikkinchi ota-ona bolaga ta’minot bermayapti",
+  "short": "Aliment",
+  "lead": "Ota-ona voyaga yetmagan bolasini ta’minlashi shart. Sud daromadning bir bola uchun 1/4, ikki bola uchun 1/3, uch va undan ortiq bola uchun 1/2 qismini undiradi. Ariza uchun davlat boji to‘lanmaydi.",
+  "keywords": [
+   "aliment",
+   "alement",
+   "bolaga pul",
+   "bolalarimga",
+   "bolamga",
+   "ta’minot",
+   "ajrashdik",
+   "ajrashgan",
+   "sobiq erim",
+   "sobiq turmush",
+   "otasi pul bermay",
+   "farzandim"
+  ],
+  "norms": [
+   "ok96",
+   "ok99",
+   "ok136",
+   "ok12",
+   "dbq8"
+  ],
+  "deadline": {
+   "none": true,
+   "label": "Murojaat muddati",
+   "note": "Aliment uchun da’vo muddati yo‘q, lekin aliment odatda sudga murojaat qilingan kundan undiriladi. Har kechikkan oy — yo‘qotilgan pul."
+  },
+  "trigger": "Ta’minot to‘xtagan sana",
+  "calc": {
+   "type": "alimony"
+  },
+  "partyField": "respondent",
+  "amountField": "income",
+  "steps": [
+   {
+    "org": "Ixtiyoriy",
+    "t": "Kelishuvga urinib ko‘ring",
+    "when": "Ixtiyoriy",
+    "body": "Notarial tasdiqlangan aliment kelishuvi ijro hujjati kuchiga ega."
+   },
+   {
+    "org": "Sud",
+    "t": "Sudga ariza bering",
+    "when": "Imkon qadar tez",
+    "hot": true,
+    "body": "Javobgar yoki o‘zingiz yashaydigan joydagi fuqarolik ishlari sudiga. Davlat boji to‘lanmaydi; elektron topshirish ham mumkin."
+   },
+   {
+    "org": "Majburiy ijro byurosi",
+    "t": "To‘lanmasa, ijroga bering",
+    "when": "Sud qaroridan keyin",
+    "body": "Aliment javobgarning ish haqidan ushlab qolinadi."
+   }
+  ],
+  "evidence": [
+   "Bolaning tug‘ilganlik guvohnomasi",
+   "Nikoh yoki ajrim guvohnomasi",
+   "Pasport nusxasi",
+   "Javobgarning ish joyi yoki daromadi haqida ma’lumot",
+   "Bola siz bilan yashashini tasdiqlovchi ma’lumotnoma"
+  ],
+  "fields": [
+   {
+    "k": "respondent",
+    "label": "Ikkinchi ota-ona (javobgar) F.I.Sh.",
+    "ph": "javobgar F.I.Sh.",
+    "type": "text",
+    "group": "Ikkinchi ota-ona va bolalar"
+   },
+   {
+    "k": "respAddress",
+    "label": "Javobgar manzili",
+    "ph": "javobgar manzili",
+    "type": "text",
+    "group": "Ikkinchi ota-ona va bolalar"
+   },
+   {
+    "k": "respWork",
+    "label": "Javobgarning ish joyi (bilsangiz)",
+    "ph": "ish joyi",
+    "type": "text",
+    "group": "Ikkinchi ota-ona va bolalar"
+   },
+   {
+    "k": "children",
+    "label": "Bolalar soni",
+    "ph": "bolalar soni",
+    "type": "int",
+    "group": "Ikkinchi ota-ona va bolalar",
+    "max": 15,
+    "min": 1,
+    "calc": true
+   },
+   {
+    "k": "childrenNames",
+    "label": "Bolalarning ismi va tug‘ilgan sanasi",
+    "ph": "bolalar ismi va tug‘ilgan sanasi",
+    "type": "textarea",
+    "group": "Ikkinchi ota-ona va bolalar",
+    "hint": "Aziza, 12.03.2019; Bobur, 05.07.2021"
+   },
+   {
+    "k": "income",
+    "label": "Javobgarning oylik daromadi (taxminan), so‘m",
+    "ph": "daromad",
+    "type": "money",
+    "group": "Ikkinchi ota-ona va bolalar",
+    "docs": [],
+    "calc": true
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Ikkinchi ota-ona va bolalar",
+    "hint": "Denov tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{respondent}}, manzil: {{respAddress}}[?respWork], ish joyi: {{respWork}}[/]"
+    ],
+    "title": "DA’VO ARIZASI",
+    "body": [
+     "Men va javobgar {{respondent}} voyaga yetmagan farzand(lar)ning ota-onasimiz: {{childrenNames}}. Farzand(lar) men bilan birga yashaydi va mening qaramog‘imda.",
+     "{{trigger}}dan boshlab javobgar farzand(lar)ni moddiy ta’minlashda ishtirok etmayapti, aliment to‘lash to‘g‘risida kelishuv tuzilmagan.",
+     "Oila kodeksining 96-moddasiga ko‘ra ota-ona voyaga yetmagan bolalariga ta’minot berishi shart. Kodeksning 99-moddasiga muvofiq aliment ota-onaning ish haqi va boshqa daromadidan bir bola uchun to‘rtdan bir, ikki bola uchun uchdan bir, uch va undan ortiq bola uchun yarmi miqdorida undiriladi.",
+     "Aliment undirish to‘g‘risidagi da’volar bo‘yicha da’vogar davlat bojidan ozod qilinadi."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "javobgar {{respondent}}dan {{children}} nafar voyaga yetmagan farzand uchun ish haqi va boshqa daromadining {{share}} miqdorida, farzandlar voyaga yetgunga qadar har oy aliment undirishni;",
+     "alimentni da’vo arizasi berilgan kundan boshlab undirishni."
+    ],
+    "attach": [
+     "Da’vo arizasining javobgar uchun nusxasi",
+     "Pasport nusxasi",
+     "Bola(lar)ning tug‘ilganlik guvohnomasi nusxasi"
+    ],
+    "sub": "voyaga yetmagan bolalar uchun aliment undirish to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "murojaat_javobsiz",
+  "domain": "davlat",
+  "title": "Davlat idorasi javob bermayapti",
+  "card": "Murojaatimga muddatida javob berilmadi",
+  "short": "Javobsiz murojaat",
+  "lead": "Murojaat 15 kunda, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha ko‘rib chiqilishi shart. Javob bo‘lmasa, yuqori turuvchi organga yoki ma’muriy sudga shikoyat qilasiz.",
+  "keywords": [
+   "murojaat",
+   "javob bermay",
+   "javob bermadi",
+   "javob kelmadi",
+   "hokimlik",
+   "hokimiyat",
+   "idora",
+   "ariza berdim",
+   "ariza yozgandim",
+   "e’tiborsiz",
+   "rasmiyatchilik",
+   "qabulxona",
+   "ko‘rib chiqmay"
+  ],
+  "norms": [
+   "mq28",
+   "mq36",
+   "mq6",
+   "msk6",
+   "mq38"
+  ],
+  "deadline": {
+   "months": 6,
+   "offsetDays": 15,
+   "label": "Ma’muriy sudga murojaat uchun qoldi",
+   "note": "Javob muddati (15 kun) o‘tgan kundan 6 oy."
+  },
+  "trigger": "Murojaat topshirilgan sana",
+  "calc": null,
+  "partyField": "agency",
+  "steps": [
+   {
+    "org": "Idora",
+    "t": "Javob muddatini kuting",
+    "when": "{t+15} gacha",
+    "body": "Kiruvchi raqam bo‘yicha murojaat holatini so‘rang. Rahbar muddatni uzaytirsa, sizga xabar berishi shart."
+   },
+   {
+    "org": "Yuqori turuvchi organ",
+    "t": "Shikoyat yozing",
+    "when": "Muddat o‘tgach",
+    "body": "Masalan, tuman hokimligi ustidan viloyat hokimligiga. Birinchi murojaat nusxasini ilova qiling."
+   },
+   {
+    "org": "Ma’muriy sud",
+    "t": "Harakatsizlik ustidan sudga",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Sud idorani murojaatni ko‘rib chiqishga majburlashi mumkin."
+   }
+  ],
+  "evidence": [
+   "Murojaat nusxasi (kiruvchi raqam bilan)",
+   "Yuborilganini tasdiqlovchi hujjat (pochta kvitansiyasi yoki elektron tasdiq)",
+   "Olingan javob (bo‘lsa)",
+   "Idora bilan yozishmalar"
+  ],
+  "fields": [
+   {
+    "k": "agency",
+    "label": "Murojaat qilgan idora",
+    "ph": "idora nomi",
+    "type": "text",
+    "group": "Murojaat",
+    "hint": "Denov tumani hokimligi"
+   },
+   {
+    "k": "regNumber",
+    "label": "Kiruvchi raqam (bo‘lsa)",
+    "ph": "kiruvchi raqam",
+    "type": "text",
+    "group": "Murojaat"
+   },
+   {
+    "k": "appealSubject",
+    "label": "Murojaatingiz nima haqida edi",
+    "ph": "murojaat mazmuni",
+    "type": "textarea",
+    "group": "Murojaat",
+    "hint": "Mahallamizdagi yo‘lni ta’mirlash"
+   },
+   {
+    "k": "higherAgency",
+    "label": "Yuqori turuvchi organ",
+    "ph": "yuqori organ",
+    "type": "text",
+    "group": "Murojaat",
+    "docs": [
+     "higher"
+    ],
+    "hint": "Surxondaryo viloyati hokimligi"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Murojaat",
+    "docs": [
+     "court"
+    ],
+    "hint": "Denov tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "higher",
+    "label": "Yuqori organga",
+    "to": [
+     "{{higherAgency}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "SHIKOYAT",
+    "body": [
+     "Men {{trigger}}da {{agency}}ga[?regNumber] (kiruvchi raqam: {{regNumber}})[/] quyidagi masala bo‘yicha murojaat qildim: {{appealSubject}}.",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaatlar kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak. Biroq hozirgacha murojaatim mazmunan ko‘rib chiqilmagan va menga javob berilmagan."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "murojaatim ko‘rib chiqilmaganligi holatini o‘rganishni;",
+     "{{agency}}ga murojaatimni qonunda belgilangan muddatda mazmunan ko‘rib chiqish yuzasidan ko‘rsatma berishni;",
+     "aybdor mansabdor shaxslarga nisbatan qonunda belgilangan choralarni ko‘rishni."
+    ],
+    "attach": [
+     "Murojaat nusxasi",
+     "Murojaat yuborilganini tasdiqlovchi hujjat"
+    ],
+    "sub": "murojaat ko‘rib chiqilmaganligi to‘g‘risida"
+   },
+   {
+    "id": "court",
+    "label": "Ma’muriy sudga",
+    "to": [
+     "{{district}} tumanlararo ma’muriy sudiga",
+     "Arizachi: {{applicant}}",
+     "Javobgar: {{agency}}"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Men {{trigger}}da {{agency}}ga[?regNumber] (kiruvchi raqam: {{regNumber}})[/] quyidagi masala bo‘yicha murojaat qildim: {{appealSubject}}.",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaatlar kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak. Biroq hozirgacha murojaatim mazmunan ko‘rib chiqilmagan va menga javob berilmagan.",
+     "Ma’muriy organning harakatsizligi ustidan huquq buzilganligi ma’lum bo‘lgan kundan e’tiboran olti oy ichida ma’muriy sudga murojaat qilish mumkin; bu muddat o‘tkazib yuborilmagan."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "{{agency}}ning murojaatimni ko‘rib chiqmaslik bilan bog‘liq harakatsizligini qonunga xilof deb topishni;",
+     "javobgarni murojaatimni mazmunan ko‘rib chiqib, yozma javob berishga majburlashni."
+    ],
+    "attach": [
+     "Ariza nusxasi (javobgar uchun)",
+     "Pasport nusxasi",
+     "Murojaat nusxasi",
+     "Murojaat yuborilganini tasdiqlovchi hujjat"
+    ],
+    "sub": "ma’muriy organning harakatsizligini qonunga xilof deb topish to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "organ_qarori",
+  "domain": "davlat",
+  "title": "Davlat organining qarori huquqimni buzdi",
+  "card": "Hokimlik yoki boshqa organ noqonuniy qaror chiqardi yoki rad etdi",
+  "short": "Noqonuniy qaror",
+  "lead": "Davlat organi yoki mansabdor shaxsning qarori, harakati yoki harakatsizligi ustidan huquq buzilganini bilgan kundan 6 oy ichida ma’muriy sudga murojaat qilish mumkin. Uzrli sabab bo‘lsa, sud muddatni tiklashi mumkin.",
+  "keywords": [
+   "qaror chiqar",
+   "noqonuniy qaror",
+   "hokim qarori",
+   "rad etdi",
+   "rad javobi",
+   "ruxsat bermay",
+   "ruxsatnoma",
+   "litsenziya",
+   "bekor qildi",
+   "ma’muriy sud",
+   "buzib tashla",
+   "buzish",
+   "snos",
+   "yer ajrat",
+   "kadastr"
+  ],
+  "norms": [
+   "msk6",
+   "msk_tikla",
+   "mq36"
+  ],
+  "deadline": {
+   "months": 6,
+   "label": "Ma’muriy sudga murojaat uchun qoldi"
+  },
+  "trigger": "Qaror haqida bilgan sanangiz",
+  "calc": null,
+  "partyField": "agency",
+  "steps": [
+   {
+    "org": "Organ",
+    "t": "Qaror nusxasini yozma so‘rang",
+    "when": "Darhol",
+    "body": "Qaror nusxasi sudga ilova qilinadi. Uni olgan sanani yozib qo‘ying."
+   },
+   {
+    "org": "Yuqori organ",
+    "t": "Shikoyat (ixtiyoriy)",
+    "when": "Parallel",
+    "body": "Javobni kutib, sud muddatini o‘tkazib yubormang."
+   },
+   {
+    "org": "Ma’muriy sud",
+    "t": "Qarorni haqiqiy emas deb topishni so‘rang",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Zarur bo‘lsa, qaror ijrosini vaqtincha to‘xtatishni ham so‘rang."
+   }
+  ],
+  "evidence": [
+   "Nizolashilayotgan qaror nusxasi",
+   "Qaror sizga qachon ma’lum bo‘lganini tasdiqlovchi hujjat",
+   "Huquqingizni tasdiqlovchi hujjatlar (kadastr, shartnoma va h.k.)",
+   "Organ bilan yozishmalar"
+  ],
+  "fields": [
+   {
+    "k": "agency",
+    "label": "Qaror chiqargan organ",
+    "ph": "organ nomi",
+    "type": "text",
+    "group": "Qaror",
+    "hint": "Denov tumani hokimligi"
+   },
+   {
+    "k": "decisionTitle",
+    "label": "Qaror (nomi, raqami, sanasi)",
+    "ph": "qaror nomi va raqami",
+    "type": "text",
+    "group": "Qaror",
+    "hint": "2026-yil 10-oktabrdagi 245-son qaror"
+   },
+   {
+    "k": "violation",
+    "label": "Qaror qanday huquqingizni buzdi",
+    "ph": "buzilgan huquq",
+    "type": "textarea",
+    "group": "Qaror"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Qaror",
+    "hint": "Denov tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "court",
+    "label": "Ma’muriy sudga",
+    "to": [
+     "{{district}} tumanlararo ma’muriy sudiga",
+     "Arizachi: {{applicant}}",
+     "Javobgar: {{agency}}"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "{{agency}} tomonidan {{decisionTitle}} qabul qilingan. Men bu haqda {{trigger}}da xabar topdim.",
+     "Mazkur qaror mening quyidagi huquq va qonuniy manfaatlarimni buzadi: {{violation}}.",
+     "Ma’muriy organning qarori ustidan huquq buzilganligi ma’lum bo‘lgan kundan e’tiboran olti oy ichida ma’muriy sudga murojaat qilish mumkin. Mazkur muddat {{deadline}}da tugaydi."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "{{decisionTitle}}ni haqiqiy emas (qonunga xilof) deb topishni;",
+     "buzilgan huquqlarimni tiklashni;",
+     "zarur bo‘lsa, ish bo‘yicha qaror chiqarilguniga qadar nizolashilayotgan hujjat ijrosini to‘xtatib turishni."
+    ],
+    "attach": [
+     "Ariza nusxasi (javobgar uchun)",
+     "Pasport nusxasi",
+     "Nizolashilayotgan qaror nusxasi"
+    ],
+    "sub": "ma’muriy hujjatni haqiqiy emas deb topish to‘g‘risida"
+   }
+  ]
+ },
+ {
+  "id": "jarima",
+  "domain": "jarima",
+  "title": "Jarimaga rozi emasman",
+  "card": "YHXB, inspeksiya yoki boshqa organ noto‘g‘ri jarima soldi",
+  "short": "Jarima",
+  "lead": "Jarima to‘g‘risidagi qaror ustidan qaror nusxasini olgan kundan 10 kun ichida shikoyat qilish mumkin. Diqqat: shikoyat qilsangiz, tez to‘lash chegirmasi (50 yoki 70 foiz) qo‘llanmaydi.",
+  "keywords": [
+   "jarima",
+   "shtraf",
+   "yhxb",
+   "gai",
+   "radar",
+   "kamera",
+   "bayonnoma",
+   "protokol",
+   "yo‘l harakati",
+   "tezlik",
+   "to‘xtash",
+   "parkovka"
+  ],
+  "norms": [
+   "mjtk_shik",
+   "mjtk332"
+  ],
+  "deadline": {
+   "days": 10,
+   "label": "Shikoyat berish uchun qoldi"
+  },
+  "trigger": "Jarima qarorini olgan sana",
+  "calc": {
+   "type": "fineDiscount"
+  },
+  "partyField": "organ",
+  "amountField": "fine",
+  "steps": [
+   {
+    "org": "Organ",
+    "t": "Qaror nusxasini oling",
+    "when": "Darhol",
+    "body": "Shikoyat muddati qaror nusxasi olingan kundan boshlanadi."
+   },
+   {
+    "org": "Tanlov",
+    "t": "Shikoyat yoki chegirma",
+    "when": "Hozir hal qiling",
+    "body": "Jarima to‘g‘ri bo‘lsa, 15 kun ichida yarmini to‘lab qutulish mumkin. Shikoyat qilinsa, chegirma qo‘llanmaydi."
+   },
+   {
+    "org": "Yuqori organ yoki sud",
+    "t": "Shikoyat bering",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Yuqori turuvchi organga yoki jinoyat ishlari bo‘yicha tuman (shahar) sudiga."
+   }
+  ],
+  "evidence": [
+   "Jarima qarori yoki bayonnoma nusxasi",
+   "Foto yoki video (videoregistrator)",
+   "Guvohlar",
+   "Qoidabuzarlik bo‘lmaganini tasdiqlovchi hujjatlar",
+   "Yozishmalar"
+  ],
+  "fields": [
+   {
+    "k": "organ",
+    "label": "Jarima solgan organ",
+    "ph": "organ nomi",
+    "type": "text",
+    "group": "Jarima",
+    "hint": "Toshkent sh. YHXB"
+   },
+   {
+    "k": "decisionNumber",
+    "label": "Qaror yoki bayonnoma raqami",
+    "ph": "qaror raqami",
+    "type": "text",
+    "group": "Jarima"
+   },
+   {
+    "k": "fine",
+    "label": "Jarima summasi, so‘m",
+    "ph": "jarima summasi",
+    "type": "money",
+    "group": "Jarima",
+    "calc": true
+   },
+   {
+    "k": "reason",
+    "label": "Nega jarima noto‘g‘ri",
+    "ph": "shikoyat asosi",
+    "type": "textarea",
+    "group": "Jarima",
+    "hint": "Belgi ko‘rinmas edi, videoda ko‘rinadi"
+   },
+   {
+    "k": "higherOrgan",
+    "label": "Yuqori turuvchi organ",
+    "ph": "yuqori organ",
+    "type": "text",
+    "group": "Jarima",
+    "docs": [
+     "higher"
+    ],
+    "hint": "IIV YHXB bosh boshqarmasi"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Jarima",
+    "docs": [
+     "court"
+    ],
+    "hint": "Mirobod tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "higher",
+    "label": "Yuqori organga",
+    "to": [
+     "{{higherOrgan}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "SHIKOYAT",
+    "body": [
+     "{{organ}} tomonidan[?decisionNumber] {{decisionNumber}}-son[/] qaror bilan menga nisbatan[?fine] {{fine}} miqdorida[/] ma’muriy jarima qo‘llanilgan. Qaror nusxasini {{trigger}}da oldim.",
+     "Men ushbu qarorga quyidagi asoslarga ko‘ra rozi emasman: {{reason}}.",
+     "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan e’tiboran o‘n kun ichida shikoyat qilinishi mumkin. Shikoyat muddati o‘tkazib yuborilmagan."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "{{organ}}ning qarorini bekor qilishni va ish yuritishni tugatishni;",
+     "ishni to‘liq va xolis qayta o‘rganishni."
+    ],
+    "attach": [
+     "Qaror (bayonnoma) nusxasi",
+     "Dalillar (foto, video) nusxasi"
+    ],
+    "sub": "ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga"
+   },
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} jinoyat ishlari bo‘yicha sudiga",
+     "Shikoyatchi: {{applicant}}",
+     "Qaror chiqargan organ: {{organ}}"
+    ],
+    "title": "SHIKOYAT",
+    "body": [
+     "{{organ}} tomonidan[?decisionNumber] {{decisionNumber}}-son[/] qaror bilan menga nisbatan[?fine] {{fine}} miqdorida[/] ma’muriy jarima qo‘llanilgan. Qaror nusxasini {{trigger}}da oldim.",
+     "Men ushbu qarorga quyidagi asoslarga ko‘ra rozi emasman: {{reason}}.",
+     "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan e’tiboran o‘n kun ichida shikoyat qilinishi mumkin. Shikoyat muddati o‘tkazib yuborilmagan."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "{{organ}}ning qarorini bekor qilishni va ma’muriy huquqbuzarlik to‘g‘risidagi ish yuritishni tugatishni."
+    ],
+    "attach": [
+     "Shikoyat nusxasi",
+     "Qaror (bayonnoma) nusxasi",
+     "Dalillar (foto, video) nusxasi"
+    ],
+    "sub": "ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga"
+   }
+  ]
+ },
+ {
+  "id": "qarz",
+  "domain": "fuqarolik",
+  "title": "Qarzimni qaytarishmayapti",
+  "card": "Qarzga bergan pulimni qaytarishmayapti",
+  "short": "Qarz",
+  "lead": "Qarz muddati kelib qaytarilmasa, avval yozma talab qilasiz, keyin sudga murojaat qilasiz. Umumiy da’vo muddati 3 yil.",
+  "keywords": [
+   "qarzga ber",
+   "qarzimni",
+   "qarzni qaytar",
+   "qarzdor",
+   "tilxat",
+   "raspiska",
+   "pulimni qaytar",
+   "qarz olgan",
+   "qarz bergan",
+   "qaytarmayapti",
+   "qaytarmay"
+  ],
+  "norms": [
+   "fk732",
+   "fk150"
+  ],
+  "deadline": {
+   "years": 3,
+   "label": "Da’vo muddati tugashiga qoldi"
+  },
+  "trigger": "Qarz qaytarilishi kerak bo‘lgan sana",
+  "calc": null,
+  "partyField": "debtor",
+  "amountField": "amount",
+  "steps": [
+   {
+    "org": "Qarzdor",
+    "t": "Yozma talabnoma yuboring",
+    "when": "Bugun",
+    "body": "Pochta orqali xabarnoma bilan. Muddat belgilanmagan bo‘lsa, talab qilingan sana muhim."
+   },
+   {
+    "org": "Sud",
+    "t": "Qarzni sud orqali undiring",
+    "when": "{deadline} gacha",
+    "hot": true,
+    "body": "Fuqarolik sudiga da’vo. Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq."
+   },
+   {
+    "org": "Majburiy ijro byurosi",
+    "t": "Qaror ijrosi",
+    "when": "Sud qaroridan keyin",
+    "body": "To‘lanmasa, sud hujjati majburiy ijroga yuboriladi."
+   }
+  ],
+  "evidence": [
+   "Tilxat (raspiska)",
+   "Bank o‘tkazmasi ko‘chirmasi",
+   "Yozishmalar va ovozli xabarlar",
+   "Talabnoma va pochta kvitansiyasi",
+   "Guvohlar"
+  ],
+  "fields": [
+   {
+    "k": "debtor",
+    "label": "Qarzdor F.I.Sh.",
+    "ph": "qarzdor F.I.Sh.",
+    "type": "text",
+    "group": "Qarz"
+   },
+   {
+    "k": "debtorAddress",
+    "label": "Qarzdor manzili",
+    "ph": "qarzdor manzili",
+    "type": "text",
+    "group": "Qarz"
+   },
+   {
+    "k": "amount",
+    "label": "Qarz summasi, so‘m",
+    "ph": "qarz summasi",
+    "type": "money",
+    "group": "Qarz"
+   },
+   {
+    "k": "loanDate",
+    "label": "Qarz bergan sanangiz",
+    "ph": "qarz berilgan sana",
+    "type": "date",
+    "group": "Qarz"
+   },
+   {
+    "k": "proof",
+    "label": "Qarzni nima tasdiqlaydi",
+    "ph": "dalil",
+    "type": "text",
+    "group": "Qarz",
+    "hint": "tilxat, bank o‘tkazmasi, yozishmalar"
+   },
+   {
+    "k": "district",
+    "label": "Tuman yoki shahar",
+    "ph": "tuman/shahar",
+    "type": "text",
+    "group": "Qarz",
+    "docs": [
+     "court"
+    ],
+    "hint": "Denov tumani"
+   }
+  ],
+  "docs": [
+   {
+    "id": "debtor",
+    "label": "Qarzdorga",
+    "to": [
+     "{{debtor}}ga",
+     "manzil: {{debtorAddress}}",
+     "{{applicant}} dan"
+    ],
+    "title": "TALABNOMA",
+    "body": [
+     "{{loanDate}}da men {{debtor}}ga {{amount}} miqdorida qarz berganman. Buni {{proof}} tasdiqlaydi. Qarzni qaytarish muddati {{trigger}}da kelgan, biroq qarz hozirgacha qaytarilmagan.",
+     "Fuqarolik kodeksining 732-moddasiga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytarilishi kerak."
+    ],
+    "askLabel": "Talab qilaman:",
+    "asks": [
+     "{{amount}} miqdoridagi qarzni ushbu talabnoma olingan kundan e’tiboran 10 kun ichida qaytarishni."
+    ],
+    "attach": [
+     "Qarzni tasdiqlovchi hujjat nusxasi"
+    ],
+    "sub": "qarzni qaytarish to‘g‘risida",
+    "closing": "Qarz qaytarilmagan taqdirda qarz summasi va sud xarajatlarini undirish uchun sudga murojaat qilishimni ma’lum qilaman."
+   },
+   {
+    "id": "court",
+    "label": "Sudga",
+    "to": [
+     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{debtor}}, manzil: {{debtorAddress}}",
+     "Da’vo summasi: {{amount}}"
+    ],
+    "title": "DA’VO ARIZASI",
+    "body": [
+     "{{loanDate}}da men {{debtor}}ga {{amount}} miqdorida qarz berganman. Buni {{proof}} tasdiqlaydi. Qarzni qaytarish muddati {{trigger}}da kelgan, biroq qarz hozirgacha qaytarilmagan.",
+     "Fuqarolik kodeksining 732-moddasiga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytarilishi kerak.",
+     "Fuqarolik kodeksining 150-moddasiga ko‘ra umumiy da’vo muddati uch yil bo‘lib, u o‘tkazib yuborilmagan."
+    ],
+    "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
+    "asks": [
+     "javobgardan mening foydamga {{amount}} miqdoridagi qarzni undirishni;",
+     "javobgardan sud xarajatlarini undirishni."
+    ],
+    "attach": [
+     "Da’vo arizasining javobgar uchun nusxasi",
+     "Pasport nusxasi",
+     "Qarzni tasdiqlovchi hujjat nusxasi",
+     "Davlat boji to‘langanligi to‘g‘risidagi kvitansiya",
+     "Talabnoma nusxasi"
+    ],
+    "sub": "qarzni undirish to‘g‘risida"
+   }
+  ]
+ }
 ]

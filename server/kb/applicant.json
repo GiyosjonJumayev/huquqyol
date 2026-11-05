@@ -1,0 +1,23 @@
+[
+ {
+  "k": "fio",
+  "label": "F.I.Sh.",
+  "ph": "F.I.Sh.",
+  "type": "text",
+  "hint": "Karimov Aziz Botirovich"
+ },
+ {
+  "k": "address",
+  "label": "Yashash manzili",
+  "ph": "manzil",
+  "type": "text",
+  "hint": "Toshkent sh., Chilonzor t., …"
+ },
+ {
+  "k": "phone",
+  "label": "Telefon",
+  "ph": "telefon",
+  "type": "phone",
+  "hint": "+998 90 123 45 67"
+ }
+]

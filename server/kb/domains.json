@@ -1,0 +1,32 @@
+[
+ {
+  "id": "mehnat",
+  "title": "Mehnat",
+  "desc": "Ish haqi, ishdan bo‘shatish, ta’til"
+ },
+ {
+  "id": "istemol",
+  "title": "Iste’molchi",
+  "desc": "Sifatsiz tovar, tovarni qaytarish"
+ },
+ {
+  "id": "oila",
+  "title": "Oila",
+  "desc": "Bolalar uchun aliment"
+ },
+ {
+  "id": "davlat",
+  "title": "Davlat idoralari",
+  "desc": "Javobsiz murojaat, noqonuniy qaror"
+ },
+ {
+  "id": "jarima",
+  "title": "Jarimalar",
+  "desc": "Ma’muriy jarimaga shikoyat"
+ },
+ {
+  "id": "fuqarolik",
+  "title": "Qarz",
+  "desc": "Qarzga bergan pulni undirish"
+ }
+]

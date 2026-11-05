@@ -43,7 +43,7 @@ test("Belgilangan dalillar ilovalarga qo‘shiladi; to‘ldirilmagan joylar qayt
   const m = await (await post("/api/document/preview", { scenario:"ish_haqi", recipient:"inspection", evidence:[1, 99, "x"] })).json();
   const items = m.blocks.filter(b => b.t === "list").at(-1).items.map(i => i[0].v);
   assert.ok(items.some(i => i.startsWith("Bank ko‘chirmasi")));
-  assert.ok(m.missing.includes("F.I.Sh."));
+  assert.ok(m.missing.some(x => x.k === "fio" && x.label === "F.I.Sh."));
 });
 
 test("Noma’lum API — 404 JSON", async () => {
@@ -57,6 +57,6 @@ test("Kirill yozuvidagi hujjat va fayllar", async () => {
   const m = await (await post("/api/document/preview", body)).json();
   assert.equal(m.blocks.find(b => b.t === "title").text, "ДАЪВО АРИЗАСИ");
   assert.ok(JSON.stringify(m.blocks).includes("Каримов Азиз"));
-  assert.ok(m.missingLatin.includes("manzil") && m.missing.includes("манзил"));
+  assert.ok(m.missing.some(x => x.k === "address" && x.label === "манзил"));
   for (const fmt of ["docx", "pdf"]) assert.equal((await post("/api/document/" + fmt, body)).status, 200);
 });

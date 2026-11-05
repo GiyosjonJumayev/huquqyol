@@ -1,100 +1,261 @@
 [
-  {
-    "id": "m25",
-    "article": "25-modda",
-    "title": "Ish beruvchining majburiyatlari",
-    "text": "Ish beruvchi ish haqini Kodeks, jamoa shartnomasi va mehnat shartnomasida belgilangan muddatlarda to‘liq hajmda to‘lashi shart.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m253",
-    "article": "253-modda",
-    "title": "Ish haqini to‘lash muddatlari",
-    "text": "Ish haqi har yarim oyda kamida bir marta to‘lanadi, to‘lovlar orasidagi tanaffus 16 kundan oshmasligi kerak. To‘lov kuni dam olish yoki bayram kuniga to‘g‘ri kelsa, undan oldingi kunda to‘lanadi.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m333",
-    "article": "333-modda",
-    "title": "Ish haqini kechiktirganlik uchun javobgarlik",
-    "text": "Ish haqi, ta’til puli yoki bo‘shatishdagi to‘lovlar kechiktirilsa, ish beruvchi har bir kechikkan kun uchun pulli kompensatsiya to‘laydi (Markaziy bank qayta moliyalash stavkasining 10 foizi miqdorida). Ish beruvchining aybi bor-yo‘qligi ahamiyatsiz.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m161",
-    "article": "161-modda",
-    "title": "Ish beruvchi tashabbusi bilan bekor qilish",
-    "text": "Ish beruvchi mehnat shartnomasini faqat Kodeksda sanab o‘tilgan asoslar bo‘lganda va belgilangan tartibga rioya qilib bekor qila oladi. Bekor qilish asoslangan bo‘lishi kerak.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m165",
-    "article": "165-modda",
-    "title": "Ogohlantirish muddati",
-    "text": "Alohida asoslarda ish beruvchi xodimni oldindan yozma ogohlantirishi shart. Masalan, shtat qisqarganda kamida 2 oy oldin. Ayrim hollarda ogohlantirish pulli kompensatsiya bilan almashtiriladi.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m171",
-    "article": "171-modda",
-    "title": "Bo‘shatish kuni beriladigan hujjatlar",
-    "text": "Shartnoma bekor qilingan kuni ish beruvchi mehnat daftarchasini (yoki elektron daftarchadan ko‘chirmani) va bo‘shatish buyrug‘ining ko‘chirma nusxasini berishi shart.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "hisob",
-    "article": "12-bob",
-    "title": "Bo‘shatishda hisob-kitob",
-    "text": "Barcha tegishli summalar shartnoma bekor qilingan kuni to‘lanadi. Xodim o‘sha kuni ishlamagan bo‘lsa, hisob-kitob talab qilingandan keyin 3 kundan kechiktirmay. Summa bo‘yicha nizo bo‘lsa ham, shubhasiz tegishli qism shu muddatda to‘lanadi.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m217",
-    "article": "217-modda",
-    "title": "Har yilgi asosiy ta’til",
-    "text": "Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan asosiy mehnat ta’tili olish huquqiga ega.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m218",
-    "article": "218-modda",
-    "title": "Uzaytirilgan asosiy ta’til",
-    "text": "18 yoshgacha bo‘lganlar va I–II guruh nogironligi bo‘lgan xodimlarga 30 kalendar kun, davlat hokimiyati va boshqaruvi organlari xodimlariga 27 kalendar kun.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m220",
-    "article": "220-modda",
-    "title": "Ish staji uchun qo‘shimcha ta’til",
-    "text": "Bitta tashkilot yoki tarmoqda ishlangan har 5 yil uchun 2 kalendar kun, jami 8 kundan oshmaydigan qo‘shimcha ta’til beriladi.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m231",
-    "article": "231-modda",
-    "title": "Ta’tilni qismlarga bo‘lish",
-    "text": "Ta’tilni qismlarga bo‘lish mumkin, lekin qismlardan biri kamida 14 kalendar kun bo‘lishi kerak.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "muddat",
-    "article": "34-bob",
-    "title": "Sudga murojaat qilish muddatlari",
-    "text": "Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi. Xodimlar sud xarajatlaridan ozod.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "sud",
-    "article": "34-bob",
-    "title": "Bevosita sudda ko‘riladigan nizolar",
-    "text": "Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi.",
-    "source": "https://lex.uz/acts/-6257288"
-  },
-  {
-    "id": "m9",
-    "article": "9-modda",
-    "title": "Muddatlarni hisoblash",
-    "text": "Muddat boshlanish sanasidan keyingi kundan hisoblanadi. Oylar bilan hisoblanadigan muddat oxirgi oyning tegishli sanasida tugaydi. Oxirgi kun ishlanmaydigan kunga to‘g‘ri kelsa, keyingi birinchi ish kuni muddat tugaydi.",
-    "source": "https://lex.uz/acts/-6257288"
-  }
+ {
+  "id": "m25",
+  "law": "mk",
+  "article": "25-modda",
+  "title": "Ish beruvchining majburiyatlari",
+  "text": "Ish beruvchi ish haqini Kodeks, jamoa shartnomasi va mehnat shartnomasida belgilangan muddatlarda to‘liq hajmda to‘lashi shart."
+ },
+ {
+  "id": "m253",
+  "law": "mk",
+  "article": "253-modda",
+  "title": "Ish haqini to‘lash muddatlari",
+  "text": "Ish haqi har yarim oyda kamida bir marta to‘lanadi, to‘lovlar orasidagi tanaffus 16 kundan oshmasligi kerak. To‘lov kuni dam olish yoki bayram kuniga to‘g‘ri kelsa, undan oldingi kunda to‘lanadi."
+ },
+ {
+  "id": "m333",
+  "law": "mk",
+  "article": "333-modda",
+  "title": "Ish haqini kechiktirganlik uchun javobgarlik",
+  "text": "Ish haqi, ta’til puli yoki bo‘shatishdagi to‘lovlar kechiktirilsa, ish beruvchi har bir kechikkan kun uchun pulli kompensatsiya to‘laydi (Markaziy bank qayta moliyalash stavkasining 10 foizi miqdorida). Ish beruvchining aybi bor-yo‘qligi ahamiyatsiz."
+ },
+ {
+  "id": "m161",
+  "law": "mk",
+  "article": "161-modda",
+  "title": "Ish beruvchi tashabbusi bilan bekor qilish",
+  "text": "Ish beruvchi mehnat shartnomasini faqat Kodeksda sanab o‘tilgan asoslar bo‘lganda va belgilangan tartibga rioya qilib bekor qila oladi. Bekor qilish asoslangan bo‘lishi kerak."
+ },
+ {
+  "id": "m165",
+  "law": "mk",
+  "article": "165-modda",
+  "title": "Ogohlantirish muddati",
+  "text": "Alohida asoslarda ish beruvchi xodimni oldindan yozma ogohlantirishi shart. Masalan, shtat qisqarganda kamida 2 oy oldin. Ayrim hollarda ogohlantirish pulli kompensatsiya bilan almashtiriladi."
+ },
+ {
+  "id": "m171",
+  "law": "mk",
+  "article": "171-modda",
+  "title": "Bo‘shatish kuni beriladigan hujjatlar",
+  "text": "Shartnoma bekor qilingan kuni ish beruvchi mehnat daftarchasini (yoki elektron daftarchadan ko‘chirmani) va bo‘shatish buyrug‘ining ko‘chirma nusxasini berishi shart."
+ },
+ {
+  "id": "hisob",
+  "law": "mk",
+  "article": "12-bob",
+  "title": "Bo‘shatishda hisob-kitob",
+  "text": "Barcha tegishli summalar shartnoma bekor qilingan kuni to‘lanadi. Xodim o‘sha kuni ishlamagan bo‘lsa, hisob-kitob talab qilingandan keyin 3 kundan kechiktirmay. Summa bo‘yicha nizo bo‘lsa ham, shubhasiz tegishli qism shu muddatda to‘lanadi."
+ },
+ {
+  "id": "m217",
+  "law": "mk",
+  "article": "217-modda",
+  "title": "Har yilgi asosiy ta’til",
+  "text": "Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan asosiy mehnat ta’tili olish huquqiga ega."
+ },
+ {
+  "id": "m218",
+  "law": "mk",
+  "article": "218-modda",
+  "title": "Uzaytirilgan asosiy ta’til",
+  "text": "18 yoshgacha bo‘lganlar va I–II guruh nogironligi bo‘lgan xodimlarga 30 kalendar kun, davlat hokimiyati va boshqaruvi organlari xodimlariga 27 kalendar kun."
+ },
+ {
+  "id": "m220",
+  "law": "mk",
+  "article": "220-modda",
+  "title": "Ish staji uchun qo‘shimcha ta’til",
+  "text": "Bitta tashkilot yoki tarmoqda ishlangan har 5 yil uchun 2 kalendar kun, jami 8 kundan oshmaydigan qo‘shimcha ta’til beriladi."
+ },
+ {
+  "id": "m231",
+  "law": "mk",
+  "article": "231-modda",
+  "title": "Ta’tilni qismlarga bo‘lish",
+  "text": "Ta’tilni qismlarga bo‘lish mumkin, lekin qismlardan biri kamida 14 kalendar kun bo‘lishi kerak."
+ },
+ {
+  "id": "muddat",
+  "law": "mk",
+  "article": "34-bob",
+  "title": "Sudga murojaat qilish muddatlari",
+  "text": "Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi. Xodimlar sud xarajatlaridan ozod."
+ },
+ {
+  "id": "sud",
+  "law": "mk",
+  "article": "34-bob",
+  "title": "Bevosita sudda ko‘riladigan nizolar",
+  "text": "Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi."
+ },
+ {
+  "id": "m9",
+  "law": "mk",
+  "article": "9-modda",
+  "title": "Muddatlarni hisoblash",
+  "text": "Muddat boshlanish sanasidan keyingi kundan hisoblanadi. Oylar bilan hisoblanadigan muddat oxirgi oyning tegishli sanasida tugaydi. Oxirgi kun ishlanmaydigan kunga to‘g‘ri kelsa, keyingi birinchi ish kuni muddat tugaydi."
+ },
+ {
+  "id": "ihq13",
+  "law": "ihq",
+  "article": "13-modda",
+  "title": "Nuqsonli tovar sotilganda iste’molchining huquqlari",
+  "text": "Siz o‘zingiz tanlaysiz: tovarni almashtirish, nuqsonni bepul tuzatish, narxni kamaytirish yoki pulni qaytarib, zararni qoplash. Talabni kafolat muddati ichida, kafolat bo‘lmasa xariddan 6 oy ichida qo‘yish mumkin (ko‘chmas mulk uchun 2 yil)."
+ },
+ {
+  "id": "ihq14",
+  "law": "ihq",
+  "article": "14-modda",
+  "title": "Nuqsonli tovarni almashtirib berish",
+  "text": "Sotuvchi tovarni 7 kun ichida, qo‘shimcha tekshiruv kerak bo‘lsa 20 kun ichida almashtiradi. Bir xil tovar bo‘lmasa, 1 oy ichida. Kechiktirilgan har bir kun uchun tovar narxining 1 foizi miqdorida penya to‘lanadi."
+ },
+ {
+  "id": "ihq15",
+  "law": "ihq",
+  "article": "15-modda",
+  "title": "Nuqsonni bepul bartaraf etish",
+  "text": "Kafolatli tovardagi nuqsonni sotuvchi 20 kun, ishlab chiqaruvchi 10 kun ichida bepul tuzatadi. Uzoq foydalaniladigan tovar ta’mirda bo‘lsa, 3 kun ichida vaqtinchalik o‘xshash tovar beriladi. Kechikkan har kun uchun narxning 1 foizi penya."
+ },
+ {
+  "id": "ihq16",
+  "law": "ihq",
+  "article": "16-modda",
+  "title": "Narxni kamaytirish yoki shartnomani bekor qilish",
+  "text": "Sotuvchi tovarni almashtirmasa yoki tuzatmasa, narxni kamaytirishni yoki shartnomani bekor qilib, pulni qaytarishni talab qilishingiz mumkin."
+ },
+ {
+  "id": "ihq18",
+  "law": "ihq",
+  "article": "18-modda",
+  "title": "Sifatli tovarni almashtirish",
+  "text": "O‘lchami, shakli yoki rangi mos kelmagan nooziq-ovqat tovarini xariddan 10 kun ichida almashtirish mumkin; bir xil tovar bo‘lmasa, pul qaytariladi. Tovar ishlatilmagan, yorliq va qadoqlari saqlangan bo‘lishi kerak. Faqat hukumat ro‘yxatidagi tovarlar almashtirilmaydi, kiyim bu ro‘yxatda yo‘q."
+ },
+ {
+  "id": "ihq22",
+  "law": "ihq",
+  "article": "22-modda",
+  "title": "Ma’naviy zarar",
+  "text": "Iste’molchiga yetkazilgan ma’naviy zarar uchun haq to‘lanadi, uning miqdorini sud belgilaydi."
+ },
+ {
+  "id": "ihq23",
+  "law": "ihq",
+  "article": "23-modda",
+  "title": "Davlat himoyasi",
+  "text": "Iste’molchilar huquqlarini Raqobatni rivojlantirish va iste’molchilar huquqlarini himoya qilish qo‘mitasi va uning hududiy boshqarmalari himoya qiladi."
+ },
+ {
+  "id": "ihq29",
+  "law": "ihq",
+  "article": "29-modda",
+  "title": "Sud orqali himoya",
+  "text": "Iste’molchining huquqlari buzilsa, u sudga murojaat qilishga haqli."
+ },
+ {
+  "id": "ok96",
+  "law": "ok",
+  "article": "96-modda",
+  "title": "Ota-onaning ta’minot berish majburiyati",
+  "text": "Ota-ona voyaga yetmagan bolalarini ta’minlashi shart. Bu majburiyat ota-onaning ikkalasiga ham tegishli, ular ajrashgan bo‘lsa ham."
+ },
+ {
+  "id": "ok99",
+  "law": "ok",
+  "article": "99-modda",
+  "title": "Aliment miqdori",
+  "text": "Kelishuv bo‘lmasa, sud ota-onaning daromadidan bir bola uchun to‘rtdan bir, ikki bola uchun uchdan bir, uch va undan ortiq bola uchun yarmi miqdorida aliment undiradi. Sud bu ulushni tomonlarning ahvoliga qarab o‘zgartirishi mumkin. Bir bola uchun eng kam miqdor 2026-yil 1-sentabrdan oyiga 360 400 so‘m."
+ },
+ {
+  "id": "ok136",
+  "law": "ok",
+  "article": "136-modda",
+  "title": "Alimentni sud tartibida undirish",
+  "text": "Aliment olishga haqli shaxs sudga istalgan vaqtda murojaat qilishi mumkin. Aliment odatda sudga murojaat qilingan kundan boshlab undiriladi, shuning uchun kechiktirmang."
+ },
+ {
+  "id": "ok12",
+  "law": "ok",
+  "article": "12-modda",
+  "title": "Da’vo muddati qo‘llanilmaydi",
+  "text": "Oilaviy munosabatlardan kelib chiqadigan talablarga, Kodeksda nazarda tutilgan hollardan tashqari, da’vo muddati qo‘llanilmaydi."
+ },
+ {
+  "id": "dbq8",
+  "law": "dbq",
+  "article": "8-modda",
+  "title": "Davlat bojidan ozod qilish",
+  "text": "Aliment undirish to‘g‘risidagi da’volar bo‘yicha da’vogar davlat bojini to‘lamaydi."
+ },
+ {
+  "id": "mq6",
+  "law": "mq",
+  "article": "6-modda",
+  "title": "Murojaatga qo‘yiladigan talablar",
+  "text": "Murojaatda F.I.Sh., yashash joyi, qaysi idoraga yuborilayotgani va masalaning mohiyati ko‘rsatiladi. Yozma murojaat imzolanadi."
+ },
+ {
+  "id": "mq28",
+  "law": "mq",
+  "article": "28-modda",
+  "title": "Murojaatlarni ko‘rib chiqish muddatlari",
+  "text": "Murojaat kelib tushgan kundan 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha ko‘rib chiqiladi. Alohida hollarda rahbar muddatni ko‘pi bilan yana 1 oyga uzaytirishi va bu haqda sizga xabar berishi mumkin."
+ },
+ {
+  "id": "mq36",
+  "law": "mq",
+  "article": "36-modda",
+  "title": "Nizolarni hal etish",
+  "text": "Murojaat bo‘yicha qaror yoki javob berilmagani ustidan yuqori turuvchi organga yoki sudga shikoyat qilish mumkin."
+ },
+ {
+  "id": "mq38",
+  "law": "mq",
+  "article": "38-modda",
+  "title": "Javobgarlik",
+  "text": "Murojaatlar to‘g‘risidagi qonunchilikni buzgan mansabdor shaxslar qonunda belgilangan javobgarlikka tortiladi."
+ },
+ {
+  "id": "msk6",
+  "law": "msk",
+  "article": null,
+  "title": "Ma’muriy sudga murojaat muddati",
+  "text": "Davlat organi yoki mansabdor shaxsning qarori, harakati yoki harakatsizligi ustidan huquq buzilganini bilgan kundan 6 oy ichida ma’muriy sudga ariza beriladi, agar qonunda boshqa muddat belgilanmagan bo‘lsa."
+ },
+ {
+  "id": "msk_tikla",
+  "law": "msk",
+  "article": null,
+  "title": "Muddatni tiklash va ijroni to‘xtatish",
+  "text": "Muddat uzrli sabab bilan o‘tkazib yuborilgan bo‘lsa, sud uni tiklashi mumkin. Arizachi nizolashilayotgan hujjat ijrosini vaqtincha to‘xtatishni ham so‘rashi mumkin."
+ },
+ {
+  "id": "mjtk_shik",
+  "law": "mjtk",
+  "article": null,
+  "title": "Jarima qaroriga shikoyat qilish",
+  "text": "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan 10 kun ichida shikoyat qilinadi (2024-yildan, O‘RQ-884). Muddat uzrli sabab bilan o‘tgan bo‘lsa, tiklashni so‘rash mumkin."
+ },
+ {
+  "id": "mjtk332",
+  "law": "mjtk",
+  "article": "332¹-modda",
+  "title": "Jarimani ixtiyoriy to‘lashda imtiyoz",
+  "text": "Qaror topshirilgan kundan 15 kun ichida jarimaning 50 foizini yoki 30 kun ichida 70 foizini to‘lasangiz, qolgan qismi kechiriladi. Qaror ustidan shikoyat qilingan bo‘lsa, bu imtiyoz qo‘llanmaydi."
+ },
+ {
+  "id": "fk732",
+  "law": "fk",
+  "article": "732-modda",
+  "title": "Qarz shartnomasi",
+  "text": "Qarz oluvchi olgan pul summasini qaytarishi shart. Qaytarish muddati shartnomada ko‘rsatilmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytariladi."
+ },
+ {
+  "id": "fk150",
+  "law": "fk",
+  "article": "150-modda",
+  "title": "Umumiy da’vo muddati",
+  "text": "Umumiy da’vo muddati 3 yil. U huquq buzilganini bilgan yoki bilishi kerak bo‘lgan kundan boshlanadi. Muddat o‘tgan bo‘lsa ham sud arizani qabul qiladi, lekin javobgar so‘rasa, da’vo rad etilishi mumkin."
+ }
 ]

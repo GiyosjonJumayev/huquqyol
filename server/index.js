@@ -2,10 +2,10 @@ import express from "express";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
-import { SCENARIOS, NORMS, LEX_URL } from "./kb.js";
+import { SCENARIOS, NORMS, DOMAINS, LAWS, APPLICANT_FIELDS, LEX_URL } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
-import { documentModel, toDocx, toPdf, RECIPIENTS } from "./documents.js";
+import { documentModel, toDocx, toPdf } from "./documents.js";
 import { securityHeaders, requireJson, rateLimit } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
@@ -26,10 +26,16 @@ const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next)
 
 app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
-app.get("/api/meta", (req, res) => res.json({
-  ai: aiEnabled(), cbRate: CB_RATE, lex: LEX_URL, recipients: RECIPIENTS,
-  scenarios: SCENARIOS.map(({ id, title, card, short, documents, compensation, trigger }) => ({ id, title, card, short, documents, compensation, trigger }))
-}));
+// Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
+const META = {
+  cbRate: CB_RATE, lex: LEX_URL, domains: DOMAINS, applicant: APPLICANT_FIELDS,
+  laws: Object.fromEntries(Object.entries(LAWS).map(([k, l]) => [k, { name:l.name, url:l.url }])),
+  scenarios: SCENARIOS.map(s => ({
+    id:s.id, domain:s.domain, title:s.title, card:s.card, short:s.short, trigger:s.trigger,
+    docs: s.docs.map(d => ({ id:d.id, label:d.label })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline
+  }))
+};
+app.get("/api/meta", (req, res) => res.json({ ai: aiEnabled(), ...META }));
 
 app.post("/api/analyze", rateLimit({ max: 15, name:"analyze" }), wrap(async (req, res) => {
   res.json(await analyze(vAnalyze(req.body).text));
@@ -44,10 +50,9 @@ app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(asyn
   if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error:"Format: docx yoki pdf." });
   const model = buildModel(req);
   const buf = fmt === "docx" ? await toDocx(model) : await toPdf(model);
-  const kind = { employer:"talabnoma", inspection:"inspeksiyaga-ariza", court:"davo-arizasi" }[model.recipient];
   res.set({
     "Content-Type": fmt === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf",
-    "Content-Disposition": `attachment; filename="HuquqYol-${kind}.${fmt}"`
+    "Content-Disposition": `attachment; filename="HuquqYol-${model.scenario}-${model.recipient}.${fmt}"`
   }).send(buf);
 }));
 

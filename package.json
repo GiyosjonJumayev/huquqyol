@@ -1,14 +1,15 @@
 {
   "name": "huquqyol",
-  "version": "1.2.0",
-  "description": "HuquqYo‘l — fuqarolar uchun AI huquqiy yo‘l xaritasi (mehnat nizolari, O‘zbekiston)",
+  "version": "2.0.0",
+  "description": "HuquqYo‘l — fuqarolar uchun AI huquqiy yo‘l xaritasi (mehnat, iste’molchi, oila, davlat idoralari, jarimalar, qarz — O‘zbekiston)",
   "type": "module",
   "main": "server/index.js",
   "scripts": {
     "start": "node --env-file-if-exists=.env server/index.js",
     "dev": "node --env-file-if-exists=.env --watch server/index.js",
     "test": "node --test test/*.test.js",
-    "ingest": "node scripts/ingest-lex.js"
+    "ingest": "node scripts/ingest-lex.js",
+    "kb": "python3 scripts/build-kb.py server/kb"
   },
   "engines": {
     "node": ">=22.9"
