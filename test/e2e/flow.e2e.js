@@ -98,8 +98,7 @@ test("Orqaga tugmasi, qayta yuklash, holatlar orasida ma’lumot ajratilishi", {
   await p.waitForSelector("#c_amount");
   assert.equal(await p.inputValue("#c_amount"), "9 000 000");
   await p.goto(base);
-  await p.click("[data-domain='fuqarolik']");
-  await p.click("[data-case='qarz']");
+  await p.click("[data-domain='fuqarolik']");                       // bitta holatli soha to‘g‘ridan-to‘g‘ri rejani ochadi
   await p.click(".cta [data-go='3']");
   assert.equal(await p.inputValue("#f_amount"), "");                 // ish haqi summasi qarzga o‘tmaydi
   assert.equal(await p.inputValue("#f_fio"), "Karimov Aziz");        // ariza beruvchi ma’lumoti umumiy
@@ -157,7 +156,7 @@ test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til alma
   assert.match((await dl).suggestedFilename(), /\.pdf$/);
   await Promise.all([p.waitForNavigation(), p.click("[data-lang='uz']")]);
   await p.waitForSelector("#paper .ttl");
-  assert.equal(await p.innerText("#v3 h1"), "Arizangiz tayyor");
+  assert.equal(await p.innerText("#v3 h1"), "Arizani to‘ldiring");
   assert.equal(await p.innerText("#paper .ttl"), "TALABNOMA");
   assert.equal(await p.inputValue("#f_fio"), "Каримов Азиз Ботирович");
   assert.deepEqual(p.errors, []);

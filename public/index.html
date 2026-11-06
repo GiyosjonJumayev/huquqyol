@@ -28,17 +28,15 @@
       <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>
       HuquqYo‘l
     </button>
-    <div class="topright">
-    <div class="langsw" role="group" aria-label="{{langGroup}}">
-      <button type="button" data-lang="uz" aria-pressed="false" lang="uz" title="O‘zbekcha (lotin)">O‘zb</button>
-      <button type="button" data-lang="cyr" aria-pressed="false" lang="uz-Cyrl" title="Ўзбекча (кирилл)">Ўзб</button>
-      <button type="button" data-lang="ru" aria-pressed="false" lang="ru" title="Русский">Рус</button>
-    </div>
-    <nav aria-label="{{stepsNav}}"><ol class="stepper">
+    <nav id="stepsNav" aria-label="{{stepsNav}}" hidden><ol class="stepper">
       <li><button type="button" data-go="1" aria-current="step"><span class="n">1</span><span class="lbl">{{step1}}</span></button></li>
       <li><button type="button" data-go="2" disabled><span class="n">2</span><span class="lbl">{{step2}}</span></button></li>
       <li><button type="button" data-go="3" disabled><span class="n">3</span><span class="lbl">{{step3}}</span></button></li>
     </ol></nav>
+    <div class="langsw" role="group" aria-label="{{langGroup}}">
+      <button type="button" data-lang="uz" aria-pressed="false" lang="uz" title="O‘zbekcha (lotin)">O‘zb</button>
+      <button type="button" data-lang="cyr" aria-pressed="false" lang="uz-Cyrl" title="Ўзбекча (кирилл)">Ўзб</button>
+      <button type="button" data-lang="ru" aria-pressed="false" lang="ru" title="Русский">Рус</button>
     </div>
   </header>
 
@@ -46,14 +44,10 @@
   <div class="resume" id="resume" hidden></div>
   <!-- 1. Vaziyat -->
   <section class="view" id="v1">
+    <div class="herobox">
+    <svg class="heroroute" viewBox="0 0 240 200" fill="none" aria-hidden="true"><path d="M14 186C70 120 150 170 226 22" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 11"/><circle cx="14" cy="186" r="7" fill="currentColor"/><circle cx="226" cy="22" r="9" stroke="currentColor" stroke-width="3"/></svg>
     <h1 class="hero" tabindex="-1">{{hero}}</h1>
     <p class="lead">{{lead}}</p>
-    <ol class="how" aria-label="{{howLabel}}"><li><span class="hn">1</span>{{how1}}</li><li><span class="hn">2</span>{{how2}}</li><li><span class="hn">3</span>{{how3}}</li></ol>
-    <div id="picker">
-      <div class="pickhead" id="pickHead" hidden></div>
-      <div class="domains" id="cases"><!--DOMAINS--></div>
-    </div>
-    <div class="or">{{or}}</div>
     <div class="ask">
       <label for="problem" class="sr">{{problemLabel}}</label>
       <textarea id="problem" placeholder="{{problemPh}}" maxlength="4000" aria-describedby="askHint"></textarea>
@@ -66,9 +60,19 @@
         </span>
       </div>
     </div>
-    <div class="examples" id="examples" aria-label="{{examplesLabel}}"><!--EXAMPLES--></div>
     <p class="error" id="askErr" role="alert" hidden></p>
-    <p class="privacy">{{privacy}}</p>
+    <div class="exrow">
+      <div class="examples" id="examples" role="group" aria-label="{{examplesLabel}}"><!--EXAMPLES--></div>
+      <button class="morex" id="moreEx" type="button">{{moreEx}}</button>
+    </div>
+    <p class="privacy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>{{privacy}}</span></p>
+    </div>
+    <div id="picker">
+      <h2 class="sec" id="pickTitle">{{or}}</h2>
+      <div class="pickhead" id="pickHead" hidden></div>
+      <div class="domains" id="cases"><!--DOMAINS--></div>
+    </div>
+    <ol class="how" aria-label="{{howLabel}}"><li><span class="hn">1</span>{{how1}}</li><li><span class="hn">2</span>{{how2}}</li><li><span class="hn">3</span>{{how3}}</li></ol>
   </section>
 
   <!-- 2. Reja -->
@@ -79,11 +83,12 @@
     <button class="back" type="button" data-go="2">{{backToPlan}}</button>
     <div class="case-head"><h1 tabindex="-1">{{docReady}}</h1><p>{{docLead}}</p></div>
     <p class="small muted doclang" id="docLang">{{docLangNote}}</p>
+    <div class="kicker seglabel" aria-hidden="true">{{toWhom}}</div>
     <div class="seg" role="group" aria-label="{{toWhom}}" id="seg"></div>
+    <button class="missing" id="missing" type="button" hidden></button>
     <div class="docgrid">
-      <div><button class="btn ghost sm demo" id="demoFill" type="button">✎ {{demoFill}}</button><div id="docForm"></div></div>
+      <div><div id="docForm"></div><button class="btn ghost sm demo" id="demoFill" type="button">✎ {{demoFill}}</button></div>
       <div class="paperwrap">
-        <button class="missing" id="missing" type="button" hidden></button>
         <div class="paper" id="paper" aria-label="{{paperLabel}}" lang="{{htmlLang}}"></div>
         <div class="dlrow">
           <button class="btn primary" id="dlDocx" type="button">Word (DOCX)</button>

@@ -68,6 +68,7 @@ const fieldSpec = k => [...state.meta.applicant, ...(scenarioMeta(state.scn)?.fi
 function go(n, { push = true } = {}){
   if (n > 1 && !state.plan) n = 1;
   [1,2,3].forEach(i => { $("#v" + i).hidden = i !== n; });
+  $("#stepsNav").hidden = n === 1;                         // bosh sahifada qadamlar pastdagi «Qanday ishlaydi» qatorida
   document.querySelectorAll(".stepper button").forEach(b => {
     const i = Number(b.dataset.go);
     b.disabled = i > 1 && !state.plan;
@@ -94,16 +95,21 @@ function renderStart(){
 function renderDomains(){
   state.domain = null;
   $("#pickHead").hidden = true;
+  $("#pickTitle").hidden = false;
   $("#cases").className = "domains";
   $("#cases").innerHTML = domainCardsHTML(state.meta, t);
 }
 function renderDomain(id){
   const d = state.meta.domains.find(x => x.id === id); if (!d) return renderDomains();
+  // Sohada bitta holat bo‘lsa, ortiqcha bosish so‘ralmaydi
+  const list = state.meta.scenarios.filter(s => s.domain === id);
+  if (list.length === 1) return pickCase(list[0].id);
   state.domain = id;
+  $("#pickTitle").hidden = true;
   $("#pickHead").hidden = false;
   $("#pickHead").innerHTML = `<button class="back" type="button" id="allDomains">${t("allDomains")}</button><h2>${esc(d.title)}</h2>`;
   $("#cases").className = "domains list";
-  $("#cases").innerHTML = state.meta.scenarios.filter(s => s.domain === id).map(s => `
+  $("#cases").innerHTML = list.map(s => `
     <button class="case" type="button" data-case="${s.id}"><span class="ic">${ICONS[s.domain] || ""}</span><span><b>${esc(s.title)}</b><span>${esc(s.card)}</span></span></button>`).join("");
   $("#cases .case")?.focus();
 }
@@ -136,7 +142,12 @@ function defaultTrigger(m, facts){
   const short = m.deadline?.days || m.deadline?.none;          // qisqa muddatli holatlarda bugungi sana
   return iso(short ? new Date() : monthsAgo(1));
 }
+const pickCase = id => choose({ scenario:id, confidence:1, summary:"", facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message));
 async function choose(a){
+  document.body.classList.add("busy");
+  try { await openCase(a); } finally { document.body.classList.remove("busy"); }
+}
+async function openCase(a){
   state.analysis = { ...a, lang: LANG };
   $("#resume").hidden = true;
   if (a.scenario === "boshqa"){ renderOut(); return; }
@@ -191,7 +202,7 @@ function renderPlan(){
   $("#v2").innerHTML = `
     <button class="back" type="button" data-go="1">${t("otherSituation")}</button>
     <div class="case-head">
-      <span class="tag">${esc(state.meta.domains.find(d => d.id === info.domain)?.title || "")} · ${esc(info.short)} · ${esc(source)}</span>
+      <div class="headmeta"><span class="tag">${esc(state.meta.domains.find(d => d.id === info.domain)?.title || "")} · ${esc(info.short)}</span><span class="small muted">${esc(source)}</span></div>
       <h1>${esc(info.title)}</h1>
       <p>${esc(a.summary || info.lead)}</p>
       ${a.missing?.length ? `<p class="small warnline">${t("needForDoc")} ${a.missing.map(esc).join(", ")}</p>` : ""}
@@ -212,14 +223,15 @@ function renderPlan(){
     </div>
     <h2 class="sec">${t("whatToDo")}</h2>
     <ol class="steps" id="route"></ol>
+    <h2 class="sec">${t("evidenceH")} <span class="small muted evcount" id="evCount"></span></h2>
+    <p class="small muted evhint">${t("evidenceHint")}</p>
+    <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
     <h2 class="sec">${t("lawSays")}</h2>
     <div class="laws">${p.norms.slice(0, 3).map(law).join("")}</div>
     ${p.norms.length > 3 ? `<details class="more"><summary>${t("moreNorms", { n: p.norms.length - 3 })}</summary><div class="laws">${p.norms.slice(3).map(law).join("")}</div></details>` : ""}
     <div class="sources">${laws.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)} — lex.uz ↗</a>`).join("")}</div>
-    <h2 class="sec">${t("evidenceH")} <span class="small muted evcount" id="evCount"></span></h2>
-    <p class="small muted evhint">${t("evidenceHint")}</p>
-    <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
-    <div class="cta"><button class="btn ghost" type="button" id="printPlan">${t("printPlan")}</button><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
+    <div class="planextra"><button class="linkbtn" type="button" id="printPlan">${t("printPlan")}</button></div>
+    <div class="cta"><span class="small muted ctahint">${t("nextHint")}</span><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
   $("#printPlan").addEventListener("click", printPlan);
   renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
   $("#evid").addEventListener("change", e => {
@@ -251,7 +263,7 @@ function altsHTML(a){
 function renderDeadline(){
   const p = state.plan, cls = { low:"lv-ok", medium:"lv-warn", high:"lv-bad", expired:"lv-bad", info:"lv-ok" }[p.risk.level];
   const head = `<div class="cardhead"><div class="kicker">${esc(p.deadlineLabel)}</div><span class="pill ${cls}">${esc(p.risk.label)}</span></div>`;
-  const date = `<div class="inline"><div class="field"><label for="trigger">${esc(p.info.trigger)}</label><input type="date" id="trigger" value="${esc(p.trigger)}" max="${iso(new Date())}"></div></div>`;
+  const date = `<div class="inline"><div class="field"><label for="trigger">${esc(p.info.trigger)}</label><input type="date" id="trigger" value="${esc(p.trigger)}" max="${iso(new Date())}"><span class="hint">${t("dateHint")}</span></div></div>`;
   $("#deadlineCard").innerHTML = p.deadline == null ? `${head}
     <div class="big word">${t("unlimited")}</div>
     <div class="small tip">${esc(p.deadlineNote)}</div>${date}` : `${head}
@@ -322,7 +334,9 @@ window.addEventListener("afterprint", () => document.body.classList.remove("prin
 /* ---------- 3. Ariza ---------- */
 function fieldHTML(f){
   const v = form()[f.k] || "", hidden = f.docs && !f.docs.includes(state.recipient);
-  const ph = esc(f.hint || "");
+  // Namuna to‘ldirilgan qiymatga o‘xshamasligi uchun «Masalan:» bilan; sana maydoni placeholder ko‘rsatmaydi, unga oddiy izoh
+  const ph = f.hint && f.type !== "date" ? esc(`${t("eg")} ${f.hint}`) : "";
+  const note = f.hint && f.type === "date" ? `<span class="hint">${esc(f.hint)}</span>` : "";
   let input;
   if (f.type === "textarea") input = `<textarea id="f_${f.k}" data-k="${f.k}" placeholder="${ph}" maxlength="1500">${esc(v)}</textarea>`;
   else if (f.type === "select") input = `<select id="f_${f.k}" data-k="${f.k}"><option value="">${t("choose")}</option>${f.options.map(o => `<option value="${esc(o.v)}" ${o.v === v ? "selected" : ""}>${esc(o.text)}</option>`).join("")}</select>`;
@@ -331,7 +345,7 @@ function fieldHTML(f){
       || ({ fio:'autocomplete="name"', address:'autocomplete="street-address"' }[f.k] || 'autocomplete="off"');
     input = `<input id="f_${f.k}" data-k="${f.k}" data-type="${f.type}" placeholder="${ph}" value="${esc(f.type === "money" && v ? fmtSum(v) : v)}" ${t} maxlength="200">`;
   }
-  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}<span class="err" id="e_${f.k}" hidden></span></div>`;
+  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}${note}<span class="err" id="e_${f.k}" hidden></span></div>`;
 }
 function renderDocView(){
   const m = scenarioMeta(state.scn);
@@ -383,7 +397,10 @@ function renderMissing(){
   const el = $("#missing"), n = state.missing.length;
   el.hidden = false;
   el.classList.toggle("okay", n === 0);
-  el.textContent = n === 0 ? t("allFilled") : t("missingN", { n, list: state.missing.map(x => x.label).join(", ") });
+  // To‘ldirilgan ulush: ko‘rinib turgan maydonlardagi qiymatlar va hali yetishmayotgan joylar bo‘yicha
+  const filled = [...document.querySelectorAll("#docForm .field:not([hidden]) [data-k]")].filter(x => x.dataset.k !== "extra" && x.value.trim()).length;
+  const pct = n === 0 ? 100 : Math.round(filled / (filled + n) * 100);
+  el.innerHTML = `<span>${esc(n === 0 ? t("allFilled") : t("missingN", { n, list: state.missing.map(x => x.label).join(", ") }))}</span><span class="mbar" aria-hidden="true"><i style="width:${pct}%"></i></span>`;
   document.querySelectorAll(".field.need").forEach(f => f.classList.remove("need"));
   state.missing.forEach(x => document.querySelector(`[data-f="${x.k}"]`)?.classList.add("need"));
 }
@@ -488,7 +505,7 @@ document.addEventListener("click", e => {
   const alt = e.target.closest("[data-alt]");
   if (alt){ const a = state.analysis || {}; choose({ ...a, scenario: alt.dataset.alt, confidence: 1, summary:"", missing:[], normIds:[], facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
   const c = e.target.closest("[data-case]");
-  if (c){ choose({ scenario:c.dataset.case, confidence:1, summary:"", facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
+  if (c){ pickCase(c.dataset.case); return; }
   const dm = e.target.closest("[data-domain]");
   if (dm){ renderDomain(dm.dataset.domain); return; }
   if (e.target.closest("#allDomains")){ renderDomains(); $("#cases .case")?.focus(); return; }
@@ -524,6 +541,10 @@ $("#missing").addEventListener("click", () => {
   if (el){ el.closest("details")?.setAttribute("open", ""); el.scrollIntoView({ block:"center" }); el.focus(); }
 });
 $("#home").addEventListener("click", () => go(1));
+$("#moreEx").addEventListener("click", e => {
+  $("#examples").classList.add("all"); e.currentTarget.hidden = true;
+  $("#examples .chipbtn:nth-child(4)")?.focus();
+});
 $("#demoFill").addEventListener("click", demoFill);
 $("#analyzeBtn").addEventListener("click", analyze);
 

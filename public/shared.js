@@ -34,6 +34,6 @@ export const EXAMPLES = EX.uz;
 
 export const domainCardsHTML = (meta, t) => meta.domains.map(d => {
   const n = meta.scenarios.filter(s => s.domain === d.id).length;
-  return `<button class="case domain" type="button" data-domain="${d.id}"><span class="ic">${ICONS[d.id] || ""}</span><span><b>${esc(d.title)}</b><span>${esc(d.desc)}</span><span class="count">${esc(t("casesCount", { n }))}</span></span></button>`;
+  return `<button class="case domain" type="button" data-domain="${d.id}"><span class="ic">${ICONS[d.id] || ""}</span><span><b>${esc(d.title)}</b><span>${esc(d.desc)}</span><span class="count">${esc(n === 1 ? t("startCase") : t("casesCount", { n }))}</span></span></button>`;
 }).join("");
 export const examplesHTML = lang => examples(lang).map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");
