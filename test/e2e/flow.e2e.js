@@ -32,7 +32,7 @@ async function page(opts = {}){
 async function audit(p){
   if (!axe) return [];
   await p.addScriptTag({ content: axe });
-  return p.evaluate(() => window.axe.run(document, { runOnly:["wcag2a","wcag2aa","wcag21aa","best-practice"] }).then(r => r.violations.map(v => v.id)));
+  return p.evaluate(() => window.axe.run(document, { runOnly:["wcag2a","wcag2aa","wcag21aa","wcag22aa","best-practice"] }).then(r => r.violations.map(v => v.id)));
 }
 
 test("Soha → holat → reja → ariza → DOCX va PDF", { skip }, async () => {
@@ -180,5 +180,53 @@ test("Noaniq matnda muqobil holat taklif qilinadi va bir bosishda almashtiriladi
   await p.click("#analyzeBtn");
   await p.waitForSelector("#deadlineCard .big");
   assert.equal(await p.locator("[data-alt]").count(), 0);         // aniq holatda shovqin yo‘q
+  assert.deepEqual(p.errors, []);
+});
+
+test("UX standartlari: 320px, teginish maydoni, xato bog‘lanishi, tasdiqlash, boshi berk ko‘cha yo‘q", { skip }, async () => {
+  const p = await page({ viewport:{ width:320, height:640 } });
+  const small = sel => p.evaluate(s => [...document.querySelectorAll(s)].filter(e => e.offsetParent && e.getBoundingClientRect().height < 44).map(e => e.id || e.className), sel);
+  await p.goto(base);
+  await p.waitForSelector(".domain");
+  assert.equal(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  assert.deepEqual(await small(".langsw button, .morex, .chipbtn, .case"), []);
+  // Xato maydonga bog‘langan va matn yozilganda yo‘qoladi
+  await p.click("#analyzeBtn");
+  assert.equal(await p.getAttribute("#problem", "aria-invalid"), "true");
+  assert.ok((await p.getAttribute("#problem", "aria-describedby")).includes("askErr"));
+  await p.fill("#problem", "a");
+  assert.equal(await p.isVisible("#askErr"), false);
+  // Doiradan tashqari ekranida keyingi qadam bor
+  await p.fill("#problem", "Qo‘shnim mashinamni urib ketdi, nima qilay");
+  await p.click("#analyzeBtn");
+  await p.waitForSelector("#v2 [data-to]");
+  await p.click("#v2 [data-to]");
+  assert.equal(await p.isVisible("[data-domain='oila']"), true);
+  // Reja va ariza: 320px da siljish yo‘q, xato matni maydonga bog‘langan
+  await p.click("[data-domain='fuqarolik']");
+  await p.click(".cta [data-go='3']");
+  await p.waitForSelector("#paper .ttl");
+  assert.equal(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  assert.equal(await p.getAttribute("#f_fio", "aria-required"), "true");
+  assert.equal(await p.isVisible("#dlNote"), true);
+  await p.fill("#f_phone", "abc");
+  await p.locator("#f_phone").blur();
+  assert.equal(await p.getAttribute("#f_phone", "aria-describedby"), "e_phone");
+  assert.equal(await p.isVisible("#e_phone"), true);
+  await p.click("#dlPdf");                                          // noto‘g‘ri maydon: yuklanmaydi, fokus xatoga o‘tadi
+  assert.equal(await p.evaluate(() => document.activeElement.id), "f_phone");
+  await p.fill("#f_phone", "+998 90 123 45 67");
+  await p.fill("#f_fio", "Karimov Aziz");
+  // O‘chirish tasdiq so‘raydi: bekor qilinsa ma’lumot joyida, Esc ham bekor qiladi
+  await p.click("#wipe");
+  assert.equal(await p.evaluate(() => document.querySelector("#dlg").open), true);
+  assert.equal(await p.evaluate(() => document.activeElement.id), "dlgNo");
+  assert.deepEqual(await audit(p), []);
+  await p.keyboard.press("Escape");
+  assert.equal(await p.inputValue("#f_fio"), "Karimov Aziz");
+  await p.click("#wipe");
+  await Promise.all([p.waitForNavigation(), p.click("#dlgOk")]);
+  await p.waitForSelector(".domain");
+  assert.equal(await p.evaluate(() => localStorage.getItem("huquqyol:v2")), null);
   assert.deepEqual(p.errors, []);
 });
