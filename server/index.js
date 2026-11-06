@@ -9,7 +9,7 @@ import { SCENARIOS, NORMS, LEX_URL, kbFor } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, toDocx, toPdf } from "./documents.js";
-import { securityHeaders, requireJson, rateLimit, sameOrigin } from "./security.js";
+import { securityHeaders, requireJson, rateLimit, sameOrigin, httpsRedirect } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
 import { domainCardsHTML, examplesHTML } from "../public/shared.js";
@@ -27,8 +27,11 @@ const fontDir = pkg => join(dirname(require.resolve(`${pkg}/package.json`)), "fi
 
 export const app = express();
 app.disable("x-powered-by");
-if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY === "true" ? 1 : process.env.TRUST_PROXY);
+// Proxy (Nginx, Apache/Passenger, Render) ortida: TRUST_PROXY=1 — haqiqiy IP va HTTPS ni X-Forwarded-* dan olish
+{ const tp = (process.env.TRUST_PROXY || "").trim();
+  if (tp) app.set("trust proxy", tp === "true" ? 1 : /^\d+$/.test(tp) ? Number(tp) : tp); }
 app.use(compression());
+app.use(httpsRedirect);
 app.use(securityHeaders);
 app.use("/api", sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
 app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
@@ -140,10 +143,16 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: status === 500 ? msg(lang, "server") : err.key ? msg(lang, err.key, err.vars) : err.message });
 });
 
-if (process.argv[1] === fileURLToPath(import.meta.url)){
-  const port = Number(process.env.PORT || 3000);
-  const server = app.listen(port, () => console.log(`HuquqYo‘l: http://localhost:${port}  (AI: ${aiEnabled() ? "Claude" : "o‘chiq — qidiruv rejimi"})`));
-  server.requestTimeout = 30_000; server.headersTimeout = 15_000;
-  const stop = () => server.close(() => process.exit(0));
-  process.on("SIGTERM", stop); process.on("SIGINT", stop);
+// Serverni ishga tushirish. Hosting (Passenger/cPanel) PORT ni o‘zi beradi; VPS’da HOST=127.0.0.1 bilan
+// faqat Nginx orqali ochiladi. Passenger’da port raqam emas, soket yo‘li bo‘lishi mumkin.
+export function start({ port = process.env.PORT || 3000, host = process.env.HOST } = {}){
+  const p = /^\d+$/.test(String(port)) ? Number(port) : port;
+  const onListen = () => console.log(`HuquqYo‘l ishga tushdi: ${typeof p === "number" ? `http://${host || "localhost"}:${p}` : p}  (AI: ${aiEnabled() ? "Claude" : "o‘chiq — qidiruv rejimi"})`);
+  const server = host && typeof p === "number" ? app.listen(p, host, onListen) : app.listen(p, onListen);
+  server.requestTimeout = 30_000; server.headersTimeout = 15_000; server.keepAliveTimeout = 65_000;
+  const stop = () => { server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 8000).unref(); };
+  process.once("SIGTERM", stop); process.once("SIGINT", stop);
+  return server;
 }
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) start();

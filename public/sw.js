@@ -1,5 +1,5 @@
 // HuquqYo‘l service worker: interfeys oflayn ochiladi; API javoblari hech qachon keshlanmaydi.
-const VERSION = "hy-3.2.0";
+const VERSION = "hy-3.3.0";
 const SHELL = ["/", "/manifest.webmanifest", "/icons/icon.svg"];   // versiyali CSS/JS birinchi ochilishda keshga tushadi
 
 self.addEventListener("install", e => {

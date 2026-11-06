@@ -1,6 +1,8 @@
 import { msg, resolveLang } from "./i18n.js";
 // Xavfsizlik qatlami: HTTP headerlar, so‘rov turi, rate limit.
-const PROD = process.env.NODE_ENV === "production";
+// HTTPS ga bog‘liq headerlar (HSTS, upgrade-insecure-requests) faqat so‘rov haqiqatan HTTPS orqali kelganda qo‘yiladi:
+// shunda SSL hali ulanmagan hostingda sayt buzilmaydi. Proxy ortida TRUST_PROXY=1 kerak (X-Forwarded-Proto).
+const FORCE_HTTPS = /^(1|true)$/i.test(process.env.FORCE_HTTPS || "");
 
 const CSP = [
   "default-src 'self'",
@@ -13,20 +15,27 @@ const CSP = [
   "object-src 'none'",
   "base-uri 'none'",
   "form-action 'none'",
-  "frame-ancestors 'none'",
-  ...(PROD ? ["upgrade-insecure-requests"] : [])
+  "frame-ancestors 'none'"
 ].join("; ");
+const CSP_HTTPS = CSP + "; upgrade-insecure-requests";
+
+// FORCE_HTTPS=1 — http so‘rovlarni https ga yo‘naltirish (health check bundan mustasno)
+export function httpsRedirect(req, res, next){
+  if (!FORCE_HTTPS || req.secure || req.path === "/api/health") return next();
+  if (req.method !== "GET" && req.method !== "HEAD") return res.status(403).json({ error:"HTTPS required" });
+  res.redirect(308, `https://${req.headers.host}${req.originalUrl}`);
+}
 
 export function securityHeaders(req, res, next){
   res.set({
-    "Content-Security-Policy": CSP,
+    "Content-Security-Policy": req.secure ? CSP_HTTPS : CSP,
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "no-referrer",
     "Permissions-Policy": "camera=(), microphone=(self), geolocation=(), payment=(), usb=()",
     "Cross-Origin-Opener-Policy": "same-origin",
     "Cross-Origin-Resource-Policy": "same-origin",
-    ...(PROD ? { "Strict-Transport-Security": "max-age=31536000; includeSubDomains" } : {})
+    ...(req.secure ? { "Strict-Transport-Security": "max-age=31536000; includeSubDomains" } : {})
   });
   if (req.path.startsWith("/api/")) res.set("Cache-Control", "no-store");
   next();

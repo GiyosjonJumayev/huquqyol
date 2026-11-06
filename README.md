@@ -6,7 +6,7 @@ Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahli
 
 Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa, ilova yaqin holatlarni taklif qiladi va bir bosishda almashtiradi. Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
 
-Taqdimot ssenariysi va hakamlar savollariga javoblar — [DEMO.md](DEMO.md).
+Taqdimot ssenariysi va hakamlar savollariga javoblar — [DEMO.md](DEMO.md). Hostingga joylashtirish (cPanel, VPS, Docker, Render) — [DEPLOY.md](DEPLOY.md).
 
 ## Qamrab olingan sohalar (6 soha, 11 holat)
 
@@ -21,13 +21,13 @@ Taqdimot ssenariysi va hakamlar savollariga javoblar — [DEMO.md](DEMO.md).
 
 ## Ishga tushirish
 
-Node.js 22.9 yoki undan yangi versiya kerak.
+Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 
 ```bash
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 43 ta unit/API test (jumladan ruscha va kirillcha)
+npm test                  # 45 ta unit/API test (jumladan ruscha va kirillcha)
 npm run test:e2e          # 6 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 

@@ -1,0 +1,26 @@
+# /etc/systemd/system/huquqyol.service  (VPS, PM2 o‘rniga)
+#   sudo systemctl daemon-reload && sudo systemctl enable --now huquqyol
+[Unit]
+Description=HuquqYo‘l — huquqiy yo‘l xaritasi
+After=network.target
+
+[Service]
+Type=simple
+User=huquqyol
+WorkingDirectory=/var/www/huquqyol
+ExecStart=/usr/bin/node app.cjs
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+Environment=TRUST_PROXY=1
+# Maxfiy kalit .env faylida (chmod 600) — app.cjs uni o‘zi o‘qiydi
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/var/www/huquqyol
+
+[Install]
+WantedBy=multi-user.target
