@@ -9,7 +9,7 @@
 «Fuqaroning huquqi buzilganda u uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga borish kerak, muddat qachon tugaydi. Yurist xizmati qimmat, ariza yozish esa qo‘rqinchli.»
 
 ## 2. Jonli namoyish (90 soniya)
-1. **O‘z so‘zi bilan yozadi.** Namuna tugmasini bosing: «Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m» → **Tahlil qilish**.
+1. **O‘z so‘zi bilan yozadi.** Namuna tugmasini bosing: «Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m» → **Reja tuzish**.
 2. **Reja.** Quyidagilarni ko‘rsating:
    - muddat kartasi: necha kun qolgan, oxirgi kun, xavf darajasi;
    - kalkulyator: MK 333-modda bo‘yicha kompensatsiya;

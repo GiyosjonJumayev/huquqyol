@@ -74,9 +74,9 @@ test/              node:test — sana, reja, RAG, API, xavfsizlik, kirill, DOCX/
 
 ## Xavfsizlik
 
-- **HTTP headerlar.** Qat’iy CSP o‘rnatilgan: faqat o‘z domenidan skript va stil yuklanadi, tashqi CDN yo‘q, shriftlar ham o‘zimizda. Bundan tashqari `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy: no-referrer` va `Permissions-Policy` yoqilgan. Production rejimida HSTS ham ishlaydi.
+- **HTTP headerlar.** Qat’iy CSP o‘rnatilgan: faqat o‘z domenidan skript va stil yuklanadi, tashqi CDN yo‘q, shriftlar ham o‘zimizda. Bundan tashqari `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy: no-referrer` va `Permissions-Policy` yoqilgan. Production rejimida HSTS ham ishlaydi. Permissions-Policy: kamera, joylashuv va to‘lov yopiq; mikrofon faqat o‘z saytiga (ovoz bilan kiritish uchun).
 - **Validatsiya.** Har bir maydonning turi, uzunligi va sanalari tekshiriladi. Noma’lum maydonlar tashlab yuboriladi. Boshqaruv va yo‘nalish belgilari (masalan, RLO) tozalanadi. `__proto__` kabi kalitlar ishlamaydi, chunki lug‘atlar prototipsiz (null-prototype).
-- **So‘rovlar.** POST so‘rovlar faqat JSON formatida qabul qilinadi (aks holda 415). Tana hajmi 32 KB bilan cheklangan. Har bir endpoint uchun IP bo‘yicha rate limit qo‘yilgan.
+- **So‘rovlar.** POST so‘rovlar faqat JSON formatida qabul qilinadi (aks holda 415). Tana hajmi 32 KB bilan cheklangan. Boshqa saytdan kelgan so‘rov rad etiladi (Origin tekshiruvi, 403). Har bir endpoint uchun IP bo‘yicha rate limit qo‘yilgan.
 - **AI himoyasi.** Fuqaro matni AI’ga alohida teg ichida beriladi va prompt injection’ga qarshi ko‘rsatma qo‘shilgan. AI javobi JSON sifatida tekshiriladi, bazada yo‘q modda raqamlari olib tashlanadi. AI so‘rovi 20 soniyadan oshsa to‘xtatiladi, xato bo‘lsa ilova qoidalar rejimiga o‘tadi.
 - **Maxfiylik.** Foydalanuvchi matni va shaxsiy ma’lumotlari serverda saqlanmaydi va logga yozilmaydi. Brauzerda faqat `localStorage` da turadi va «Ma’lumotlarimni o‘chirish» tugmasi bilan o‘chiriladi.
 - **Docker.** Konteyner root bo‘lmagan `node` foydalanuvchisi nomidan ishlaydi va healthcheck bilan ta’minlangan.
@@ -94,14 +94,17 @@ Lighthouse (production rejim): **Performance 100, Accessibility 100, Best Practi
 - Uch ekran (Vaziyat → Reja → Ariza) bor va brauzerning «orqaga» tugmasi ishlaydi.
 - Sahifa yangilansa ham ish yo‘qolmaydi. Bosh sahifada «Davom etish» taklif qilinadi.
 - Belgilangan dalillar arizaning «Ilovalar» ro‘yxatiga avtomatik qo‘shiladi.
-- To‘ldirilmagan joylar hisoblab ko‘rsatiladi. Bossangiz, kerakli maydonga olib boradi.
+- Bosh sahifada asosiy amal birinchi turadi: vaziyatni yozish, undan keyin soha tanlash. Bitta holatli soha to‘g‘ridan-to‘g‘ri rejani ochadi.
+- Rejada «Ariza tayyorlash» tugmasi doim ko‘rinib turadi. Muddat hisoblanadigan sana yonida uni tekshirish eslatmasi bor.
+- To‘ldirilmagan joylar hisoblab ko‘rsatiladi, to‘ldirish chizig‘i bilan. Bossangiz, kerakli maydonga olib boradi. Majburiy maydonlar `*` bilan belgilanadi.
 - Ariza Word yoki PDF qilib yuklab olinadi, brauzerdan chop etiladi yoki matn sifatida nusxalanadi.
 - **«Qanday topshiriladi» yo‘riqnomasi** har bir qabul qiluvchi uchun alohida: qabul belgisi, buyurtma xat, elektron yo‘llar (sudlar uchun my.sud.uz, davlat idoralari uchun Prezidentning virtual qabulxonasi, YHXX jarimalari uchun my.gov.uz), davlat boji.
 - Klaviatura bilan to‘liq boshqariladi, ekran o‘quvchi uchun e’lonlar (`aria-live`) bor, harakatni kamaytirish sozlamasi hurmat qilinadi.
 - Qorong‘i va yorug‘ mavzu tizim sozlamasiga qarab avtomatik tanlanadi. Mobil qurilmada yuklab olish tugmalari ekran pastida turadi.
 - **Lotin / Kirill.** Interfeys ham, DOCX/PDF arizalar ham o‘zbek kirill yozuvida chiqadi. Transliteratsiya (`public/translit.js`) o‘, g‘, sh, ch, ye, yo va tutuq belgisini to‘g‘ri o‘giradi va rus tilidan o‘zlashgan so‘zlarni ham hisobga oladi (inspeksiya → инспекция, kompensatsiya → компенсация). Lotinda kiritilgan ism ham kirill hujjatda kirillga o‘tadi.
 - **O‘rnatiladigan ilova (PWA).** Telefonda «Bosh ekranga qo‘shish» mumkin. Internet uzilsa ham ilova ochiladi va saqlangan ish ko‘rinadi. Tahlil va hujjat yasash uchun aloqa kerak.
-- **Accessibility.** axe-core tekshiruvida (WCAG 2.1 AA va best-practice qoidalari) uchala ekranda yorug‘ va qorong‘i mavzuda 0 ta xato.
+- **Accessibility.** axe-core tekshiruvida (WCAG 2.2 AA va best-practice qoidalari) uchala ekranda yorug‘ va qorong‘i mavzuda 0 ta xato. Xato matnlari maydonlarga `aria-describedby` bilan bog‘langan, teginish maydonlari kamida 44px, sahifa 320px kenglikda gorizontal siljimaydi, yuqori kontrast rejimi hisobga olingan. Bu avtomatik tekshiruv; ekran o‘quvchi bilan qo‘lda sinov o‘tkazilmagan.
+- **Xatoning oldini olish.** Ma’lumotni o‘chirish tasdiq so‘raydi (Esc yoki «Bekor qilish» bilan qaytish mumkin). Bo‘sh joylar bor ariza yuklab olinishidan oldin ogohlantirish ko‘rsatiladi.
 
 ## Qonun bazasini kengaytirish
 
@@ -150,10 +153,3 @@ Shablon sintaksisi:
 | Kirill | O‘zbekcha natijadan avtomatik o‘giriladi (`public/translit.js`); identifikatorlar, URL va sanalar o‘zgarmaydi |
 | Qidiruv | Ruscha kalit so‘zlar bazaga qo‘shilgan; kirillcha o‘zbek matni qidiruv uchun lotinga ham o‘giriladi |
 | AI | Claude `summary` va `missing` ni foydalanuvchi tilida yozadi |
-
-## Xavfsizlik (qisqacha)
-- Qat’iy CSP (inline skript yo‘q), `nosniff`, `X-Frame-Options: DENY`, Permissions-Policy, productionda HSTS.
-- Permissions-Policy: kamera, joylashuv, to‘lov yopiq; mikrofon faqat o‘z saytiga (ovoz bilan kiritish uchun).
-- POST so‘rovlar: faqat JSON (415), 32 KB chegara, boshqa saytdan kelgan so‘rov rad etiladi (Origin tekshiruvi, 403), har bir endpoint uchun rate limit.
-- Har bir holat maydonlari spetsifikatsiya bo‘yicha tekshiriladi; boshqaruv belgilari tozalanadi; prototipsiz lug‘atlar.
-- Foydalanuvchi matni logga yozilmaydi; ma’lumotlar faqat brauzerda saqlanadi; Docker konteyner root bo‘lmagan foydalanuvchida ishlaydi.

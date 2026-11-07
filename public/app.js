@@ -14,7 +14,16 @@ const store = {
   clear(){ try { localStorage.removeItem(KEY); } catch {} }
 };
 function announce(msg){ const l = $("#live"); l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 30); }
-function toast(msg){ document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; ($("#main") || document.body).append(t); announce(msg); setTimeout(() => t.remove(), 2800); }
+function toast(msg){ document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; ($("#main") || document.body).append(t); announce(msg); setTimeout(() => t.remove(), Math.max(2800, msg.length * 70)); }
+
+// Qaytarib bo‘lmaydigan amaldan oldin tasdiq: xavfsiz javob (bekor qilish) oldindan tanlangan, Esc ham bekor qiladi
+function confirmAction({ title, text, ok }){
+  const d = $("#dlg");
+  $("#dlgT").textContent = title; $("#dlgP").textContent = text; $("#dlgOk").textContent = ok;
+  d.returnValue = "";
+  d.showModal();
+  return new Promise(res => d.addEventListener("close", () => res(d.returnValue === "ok"), { once:true }));
+}
 
 async function api(path, body){
   let res;
@@ -68,6 +77,7 @@ const fieldSpec = k => [...state.meta.applicant, ...(scenarioMeta(state.scn)?.fi
 function go(n, { push = true } = {}){
   if (n > 1 && !state.plan) n = 1;
   [1,2,3].forEach(i => { $("#v" + i).hidden = i !== n; });
+  $("#stepsNav").hidden = n === 1;                         // bosh sahifada qadamlar pastdagi «Qanday ishlaydi» qatorida
   document.querySelectorAll(".stepper button").forEach(b => {
     const i = Number(b.dataset.go);
     b.disabled = i > 1 && !state.plan;
@@ -94,16 +104,21 @@ function renderStart(){
 function renderDomains(){
   state.domain = null;
   $("#pickHead").hidden = true;
+  $("#pickTitle").hidden = false;
   $("#cases").className = "domains";
   $("#cases").innerHTML = domainCardsHTML(state.meta, t);
 }
 function renderDomain(id){
   const d = state.meta.domains.find(x => x.id === id); if (!d) return renderDomains();
+  // Sohada bitta holat bo‘lsa, ortiqcha bosish so‘ralmaydi
+  const list = state.meta.scenarios.filter(s => s.domain === id);
+  if (list.length === 1) return pickCase(list[0].id);
   state.domain = id;
+  $("#pickTitle").hidden = true;
   $("#pickHead").hidden = false;
   $("#pickHead").innerHTML = `<button class="back" type="button" id="allDomains">${t("allDomains")}</button><h2>${esc(d.title)}</h2>`;
   $("#cases").className = "domains list";
-  $("#cases").innerHTML = state.meta.scenarios.filter(s => s.domain === id).map(s => `
+  $("#cases").innerHTML = list.map(s => `
     <button class="case" type="button" data-case="${s.id}"><span class="ic">${ICONS[s.domain] || ""}</span><span><b>${esc(s.title)}</b><span>${esc(s.card)}</span></span></button>`).join("");
   $("#cases .case")?.focus();
 }
@@ -116,17 +131,25 @@ function renderResume(saved){
     <span class="acts"><button class="btn primary sm" type="button" id="resumeGo">${t("resumeGo")}</button><button class="btn ghost sm" type="button" id="resumeNew">${t("resumeNew")}</button></span>`;
   el.hidden = false;
   $("#resumeGo").onclick = async () => { el.hidden = true; Object.assign(state, saved); await refreshPlan(true); renderDocView(); go(2); };
-  $("#resumeNew").onclick = () => { el.hidden = true; store.clear(); state.formByScn = {}; };
+  $("#resumeNew").onclick = async () => {
+    if (!await confirmAction({ title:t("newT"), text:t("newP"), ok:t("del") })) return;
+    el.hidden = true; store.clear(); state.formByScn = {}; $("#problem").focus();
+  };
 }
 
+function setAskErr(msg){
+  const err = $("#askErr");
+  err.textContent = msg; err.hidden = !msg;
+  $("#problem").setAttribute("aria-invalid", String(!!msg));
+}
 async function analyze(){
   const text = $("#problem").value.trim(), btn = $("#analyzeBtn"), err = $("#askErr");
-  err.hidden = true;
-  if (text.length < 8){ err.textContent = t("tooShort"); err.hidden = false; $("#problem").focus(); return; }
+  setAskErr("");
+  if (text.length < 8){ setAskErr(t("tooShort")); $("#problem").focus(); err.scrollIntoView({ block:"nearest" }); return; }
   btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span> ${t("analyzing")}`;
   announce(t("analyzing"));
   try { await choose(await getJSON("/api/analyze", { text })); }
-  catch (e){ err.textContent = e.message; err.hidden = false; }
+  catch (e){ setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }
   finally { btn.disabled = false; btn.textContent = t("analyze"); }
 }
 
@@ -136,7 +159,12 @@ function defaultTrigger(m, facts){
   const short = m.deadline?.days || m.deadline?.none;          // qisqa muddatli holatlarda bugungi sana
   return iso(short ? new Date() : monthsAgo(1));
 }
+const pickCase = id => document.body.classList.contains("busy") ? null : choose({ scenario:id, confidence:1, summary:"", facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message));
 async function choose(a){
+  document.body.classList.add("busy");
+  try { await openCase(a); } finally { document.body.classList.remove("busy"); }
+}
+async function openCase(a){
   state.analysis = { ...a, lang: LANG };
   $("#resume").hidden = true;
   if (a.scenario === "boshqa"){ renderOut(); return; }
@@ -159,7 +187,8 @@ function renderOut(){
   state.plan = null;
   $("#v2").innerHTML = `<button class="back" type="button" data-go="1">${t("back")}</button>
     <div class="case-head"><span class="tag">${t("outTag")}</span><h1>${t("outTitle")}</h1>
-    <p>${esc(t("outText", { n: state.meta.domains.length, list: state.meta.domains.map(d => d.title.toLowerCase()).join(", "), summary: a.summary ? a.summary + " " : "" }))}</p></div>`;
+    <p>${esc(t("outText", { n: state.meta.domains.length, list: state.meta.domains.map(d => d.title.toLowerCase()).join(", "), summary: a.summary ? a.summary + " " : "" }))}</p></div>
+    <button class="btn primary" type="button" data-go="1" data-to="pickTitle">${t("outGo")}</button>`;
   [1,3].forEach(i => $("#v" + i).hidden = true); $("#v2").hidden = false;
   history.pushState(null, "", "#reja"); window.scrollTo({ top:0 }); $("#v2 h1").setAttribute("tabindex","-1"); $("#v2 h1").focus();
 }
@@ -191,7 +220,7 @@ function renderPlan(){
   $("#v2").innerHTML = `
     <button class="back" type="button" data-go="1">${t("otherSituation")}</button>
     <div class="case-head">
-      <span class="tag">${esc(state.meta.domains.find(d => d.id === info.domain)?.title || "")} · ${esc(info.short)} · ${esc(source)}</span>
+      <div class="headmeta"><span class="tag">${esc(state.meta.domains.find(d => d.id === info.domain)?.title || "")} · ${esc(info.short)}</span><span class="small muted">${esc(source)}</span></div>
       <h1>${esc(info.title)}</h1>
       <p>${esc(a.summary || info.lead)}</p>
       ${a.missing?.length ? `<p class="small warnline">${t("needForDoc")} ${a.missing.map(esc).join(", ")}</p>` : ""}
@@ -212,14 +241,15 @@ function renderPlan(){
     </div>
     <h2 class="sec">${t("whatToDo")}</h2>
     <ol class="steps" id="route"></ol>
+    <h2 class="sec">${t("evidenceH")} <span class="small muted evcount" id="evCount"></span></h2>
+    <p class="small muted evhint">${t("evidenceHint")}</p>
+    <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
     <h2 class="sec">${t("lawSays")}</h2>
     <div class="laws">${p.norms.slice(0, 3).map(law).join("")}</div>
     ${p.norms.length > 3 ? `<details class="more"><summary>${t("moreNorms", { n: p.norms.length - 3 })}</summary><div class="laws">${p.norms.slice(3).map(law).join("")}</div></details>` : ""}
     <div class="sources">${laws.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)} — lex.uz ↗</a>`).join("")}</div>
-    <h2 class="sec">${t("evidenceH")} <span class="small muted evcount" id="evCount"></span></h2>
-    <p class="small muted evhint">${t("evidenceHint")}</p>
-    <ul class="evid" id="evid">${p.evidence.map((e, i) => `<li><label><input type="checkbox" data-i="${i}" ${state.evidence.includes(i) ? "checked" : ""}> ${esc(e)}</label></li>`).join("")}</ul>
-    <div class="cta"><button class="btn ghost" type="button" id="printPlan">${t("printPlan")}</button><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
+    <div class="planextra"><button class="linkbtn" type="button" id="printPlan">${t("printPlan")}</button></div>
+    <div class="cta"><span class="small muted ctahint">${t("nextHint")}</span><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
   $("#printPlan").addEventListener("click", printPlan);
   renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
   $("#evid").addEventListener("change", e => {
@@ -251,7 +281,7 @@ function altsHTML(a){
 function renderDeadline(){
   const p = state.plan, cls = { low:"lv-ok", medium:"lv-warn", high:"lv-bad", expired:"lv-bad", info:"lv-ok" }[p.risk.level];
   const head = `<div class="cardhead"><div class="kicker">${esc(p.deadlineLabel)}</div><span class="pill ${cls}">${esc(p.risk.label)}</span></div>`;
-  const date = `<div class="inline"><div class="field"><label for="trigger">${esc(p.info.trigger)}</label><input type="date" id="trigger" value="${esc(p.trigger)}" max="${iso(new Date())}"></div></div>`;
+  const date = `<div class="inline"><div class="field"><label for="trigger">${esc(p.info.trigger)}</label><input type="date" id="trigger" value="${esc(p.trigger)}" max="${iso(new Date())}"><span class="hint">${t("dateHint")}</span></div></div>`;
   $("#deadlineCard").innerHTML = p.deadline == null ? `${head}
     <div class="big word">${t("unlimited")}</div>
     <div class="small tip">${esc(p.deadlineNote)}</div>${date}` : `${head}
@@ -322,16 +352,19 @@ window.addEventListener("afterprint", () => document.body.classList.remove("prin
 /* ---------- 3. Ariza ---------- */
 function fieldHTML(f){
   const v = form()[f.k] || "", hidden = f.docs && !f.docs.includes(state.recipient);
-  const ph = esc(f.hint || "");
+  // Namuna to‘ldirilgan qiymatga o‘xshamasligi uchun «Masalan:» bilan; sana maydoni placeholder ko‘rsatmaydi, unga oddiy izoh
+  const ph = f.hint && f.type !== "date" ? esc(`${t("eg")} ${f.hint}`) : "";
+  const note = f.hint && f.type === "date" ? `<span class="hint" id="h_${f.k}">${esc(f.hint)}</span>` : "";
+  const desc = `aria-describedby="${note ? `h_${f.k} ` : ""}e_${f.k}"`;
   let input;
-  if (f.type === "textarea") input = `<textarea id="f_${f.k}" data-k="${f.k}" placeholder="${ph}" maxlength="1500">${esc(v)}</textarea>`;
-  else if (f.type === "select") input = `<select id="f_${f.k}" data-k="${f.k}"><option value="">${t("choose")}</option>${f.options.map(o => `<option value="${esc(o.v)}" ${o.v === v ? "selected" : ""}>${esc(o.text)}</option>`).join("")}</select>`;
+  if (f.type === "textarea") input = `<textarea id="f_${f.k}" data-k="${f.k}" ${desc} placeholder="${ph}" maxlength="1500">${esc(v)}</textarea>`;
+  else if (f.type === "select") input = `<select id="f_${f.k}" data-k="${f.k}" ${desc}><option value="">${t("choose")}</option>${f.options.map(o => `<option value="${esc(o.v)}" ${o.v === v ? "selected" : ""}>${esc(o.text)}</option>`).join("")}</select>`;
   else {
     const t = { phone:'type="tel" inputmode="tel" autocomplete="tel"', money:'inputmode="numeric" autocomplete="off"', int:'inputmode="numeric" autocomplete="off"', date:`type="date" max="${iso(new Date())}"` }[f.type]
       || ({ fio:'autocomplete="name"', address:'autocomplete="street-address"' }[f.k] || 'autocomplete="off"');
-    input = `<input id="f_${f.k}" data-k="${f.k}" data-type="${f.type}" placeholder="${ph}" value="${esc(f.type === "money" && v ? fmtSum(v) : v)}" ${t} maxlength="200">`;
+    input = `<input id="f_${f.k}" data-k="${f.k}" data-type="${f.type}" ${desc} placeholder="${ph}" value="${esc(f.type === "money" && v ? fmtSum(v) : v)}" ${t} maxlength="200">`;
   }
-  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}<span class="err" id="e_${f.k}" hidden></span></div>`;
+  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}${note}<span class="err" id="e_${f.k}" role="alert" hidden></span></div>`;
 }
 function renderDocView(){
   const m = scenarioMeta(state.scn);
@@ -383,9 +416,14 @@ function renderMissing(){
   const el = $("#missing"), n = state.missing.length;
   el.hidden = false;
   el.classList.toggle("okay", n === 0);
-  el.textContent = n === 0 ? t("allFilled") : t("missingN", { n, list: state.missing.map(x => x.label).join(", ") });
-  document.querySelectorAll(".field.need").forEach(f => f.classList.remove("need"));
-  state.missing.forEach(x => document.querySelector(`[data-f="${x.k}"]`)?.classList.add("need"));
+  // To‘ldirilgan ulush: ko‘rinib turgan maydonlardagi qiymatlar va hali yetishmayotgan joylar bo‘yicha
+  const filled = [...document.querySelectorAll("#docForm .field:not([hidden]) [data-k]")].filter(x => x.dataset.k !== "extra" && x.value.trim()).length;
+  const pct = n === 0 ? 100 : Math.round(filled / (filled + n) * 100);
+  el.innerHTML = `<span>${esc(n === 0 ? t("allFilled") : t("missingN", { n, list: state.missing.map(x => x.label).join(", ") }))}</span><span class="mbar" aria-hidden="true"><i style="width:${pct}%"></i></span>`;
+  $("#dlNote").hidden = n === 0;
+  $("#dlNote").textContent = n ? t("dlNote", { n }) : "";
+  document.querySelectorAll(".field.need").forEach(f => { f.classList.remove("need"); f.querySelector("[data-k]")?.removeAttribute("aria-required"); });
+  state.missing.forEach(x => { const f = document.querySelector(`[data-f="${x.k}"]`); if (f){ f.classList.add("need"); f.querySelector("[data-k]")?.setAttribute("aria-required", "true"); } });
 }
 const partsHTML = ps => ps.map(p => p.v != null ? esc(p.v) : `<span class="ph">${esc(p.ph)}</span>`).join("");
 const partsText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
@@ -425,6 +463,7 @@ function formValid(){
   let ok = true;
   for (const el of document.querySelectorAll("#docForm [data-k]")){
     const f = fieldSpec(el.dataset.k); if (!f) continue;
+    if (el.closest("[hidden]")) continue;                 // joriy qabul qiluvchida ko‘rinmaydigan maydon yuklab olishni to‘smaydi
     const msg = validateField(f, el.value.trim()), e = $("#e_" + f.k);
     if (e){ e.textContent = msg; e.hidden = !msg; }
     el.setAttribute("aria-invalid", String(!!msg));
@@ -434,7 +473,12 @@ function formValid(){
 }
 
 async function download(fmt){
-  if (!formValid()){ toast(t("fixRed")); return; }
+  if (!formValid()){
+    toast(t("fixRed"));
+    const bad = $('#docForm [aria-invalid="true"]');
+    bad?.closest("details")?.setAttribute("open", ""); bad?.focus();
+    return;
+  }
   const btn = fmt === "docx" ? $("#dlDocx") : $("#dlPdf"), label = btn.textContent;
   btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span> ${esc(label)}`;
   try {
@@ -484,11 +528,11 @@ function demoFill(){
 /* ---------- Hodisalar ---------- */
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]");
-  if (g && !g.disabled){ go(Number(g.dataset.go)); return; }
+  if (g && !g.disabled){ go(Number(g.dataset.go)); if (g.dataset.to) $("#" + g.dataset.to).scrollIntoView(); return; }
   const alt = e.target.closest("[data-alt]");
   if (alt){ const a = state.analysis || {}; choose({ ...a, scenario: alt.dataset.alt, confidence: 1, summary:"", missing:[], normIds:[], facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
   const c = e.target.closest("[data-case]");
-  if (c){ choose({ scenario:c.dataset.case, confidence:1, summary:"", facts:{ form:{} }, source:"choice" }).catch(err => toast(err.message)); return; }
+  if (c){ pickCase(c.dataset.case); return; }
   const dm = e.target.closest("[data-domain]");
   if (dm){ renderDomain(dm.dataset.domain); return; }
   if (e.target.closest("#allDomains")){ renderDomains(); $("#cases .case")?.focus(); return; }
@@ -524,6 +568,10 @@ $("#missing").addEventListener("click", () => {
   if (el){ el.closest("details")?.setAttribute("open", ""); el.scrollIntoView({ block:"center" }); el.focus(); }
 });
 $("#home").addEventListener("click", () => go(1));
+$("#moreEx").addEventListener("click", e => {
+  $("#examples").classList.add("all"); e.currentTarget.hidden = true;
+  $("#examples .chipbtn:nth-child(4)")?.focus();
+});
 $("#demoFill").addEventListener("click", demoFill);
 $("#analyzeBtn").addEventListener("click", analyze);
 
@@ -565,7 +613,12 @@ $("#copyTxt").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(docText()); toast(t("copied")); }
   catch { const rg = document.createRange(); rg.selectNodeContents($("#paper")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); toast(t("selected")); }
 });
-$("#wipe").addEventListener("click", () => { store.clear(); try { localStorage.removeItem("huquqyol:v1"); } catch {} state.applicant = {}; state.formByScn = {}; toast(t("wiped")); setTimeout(() => { location.href = location.pathname; }, 600); });
+$("#dlgOk").addEventListener("click", () => $("#dlg").close("ok"));
+$("#dlgNo").addEventListener("click", () => $("#dlg").close("no"));
+$("#problem").addEventListener("input", () => { if (!$("#askErr").hidden) setAskErr(""); });
+$("#wipe").addEventListener("click", async () => {
+  if (!await confirmAction({ title:t("wipeT"), text:t("wipeP"), ok:t("del") })) return;
+  store.clear(); try { localStorage.removeItem("huquqyol:v1"); } catch {} state.applicant = {}; state.formByScn = {}; toast(t("wiped")); setTimeout(() => { location.href = location.pathname; }, 600); });
 
 /* ---------- Oflayn (PWA) ---------- */
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
