@@ -668,3 +668,14 @@ footer .checked{color:var(--ink)}
 .steplinks .ofjump{margin:0;min-height:44px;display:inline-flex;align-items:center;text-align:left}
 .steps li.medstep .body{border-style:dashed}
 @media print{.steplinks{display:none!important}}
+
+/* Onlayn yuborish (murojaat.gov.uz) */
+.online{margin-top:16px;border-left:4px solid var(--accent)}
+.online h2{font-family:var(--f-display);font-size:calc(19px * var(--fs));margin:0 0 10px}
+.onlineact{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.onlineact .btn{min-height:44px}
+.onstatus{font-weight:600;color:var(--ok)}
+.online ol{margin:12px 0 0;padding-left:1.3em;display:grid;gap:6px;font-size:calc(15px * var(--fs));overflow-wrap:anywhere}
+.online a,.onnext a{color:var(--accent);display:inline-block;padding:10px 0;margin:-10px 0}
+.onnext{margin:10px 0 0}
+@media print{.online{display:none!important}}

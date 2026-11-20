@@ -241,7 +241,22 @@ const M = {
   fxSrcLaw:{ uz:"{law} — lex.uz", ru:"{law} — lex.uz" },
   // Mediatsiya qadami
   medRegistry:{ uz:"Mediatorlar reyestri", ru:"Реестр медиаторов" },
-  medDoc:{ uz:"«Mediatsiya taklifi» xatini tayyorlash", ru:"Подготовить письмо «Предложение о медиации»" }
+  medDoc:{ uz:"«Mediatsiya taklifi» xatini tayyorlash", ru:"Подготовить письмо «Предложение о медиации»" },
+  // Onlayn yuborish (davlat idorasiga — murojaat.gov.uz)
+  onlineH:{ uz:"Onlayn yuborish", ru:"Отправить онлайн" },
+  copyOnline:{ uz:"murojaat.gov.uz uchun nusxalash", ru:"Скопировать для murojaat.gov.uz" },
+  on1:{ uz:"murojaat.gov.uz ni oching va OneID orqali kiring.", ru:"Откройте murojaat.gov.uz и войдите через OneID." },
+  on2:{ uz:"Tashkilotni tanlang: {org}.", ru:"Выберите организацию: {org}." },
+  on3:{ uz:"Nusxalangan matnni murojaat maydoniga joylang (Ctrl+V).", ru:"Вставьте скопированный текст в поле обращения (Ctrl+V)." },
+  on4:{ uz:"Ilova qiling: {list}.", ru:"Приложите: {list}." },
+  on5:{ uz:"Murojaat raqami va tekshirish kodini saqlang — javobni shu bilan kuzatasiz.", ru:"Сохраните номер обращения и код проверки — по ним вы отслеживаете ответ." },
+  onlineNext:{ uz:"15 kunda javob bo‘lmasa: yuqori turuvchi idoraga yoki pm.gov.uz orqali murojaat qiling.", ru:"Если за 15 дней ответа нет: обратитесь в вышестоящий орган или через pm.gov.uz." },
+  onlineCopied:{ uz:"Nusxalandi", ru:"Скопировано" },
+  onlineSelected:{ uz:"Matn belgilandi — Ctrl+C bilan nusxalang", ru:"Текст выделен — скопируйте через Ctrl+C" },
+  onlineMissT:{ uz:"Ba’zi joylar to‘ldirilmagan", ru:"Не все поля заполнены" },
+  onlineMissP:{ uz:"Matnda {n} ta bo‘sh joy [ ] bilan qoladi: {list}. Baribir nusxalaysizmi?", ru:"В тексте останутся пустые места [ ] ({n}): {list}. Всё равно скопировать?" },
+  copyAnyway:{ uz:"Baribir nusxalash", ru:"Всё равно скопировать" },
+  onlineOrgFallback:{ uz:"arizadagi idora", ru:"орган, указанный в заявлении" }
 };
 
 const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");

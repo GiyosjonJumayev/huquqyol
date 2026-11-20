@@ -152,6 +152,12 @@
           <button class="btn ghost" id="copyTxt" type="button">{{copy}}</button>
           <button class="btn ghost" id="ttsDoc" type="button" data-tts><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>{{ttsListen}}</button>
         </div>
+        <section class="card online" id="online" aria-labelledby="onlineH" hidden>
+          <h2 id="onlineH">{{onlineH}}</h2>
+          <div class="onlineact"><button class="btn primary" id="copyOnline" type="button">{{copyOnline}}</button><span class="onstatus" id="onlineStatus" role="status"></span></div>
+          <ol id="onlineSteps"></ol>
+          <p class="small onnext" id="onlineNext"></p>
+        </section>
         <section class="card howto" id="howto" aria-labelledby="howtoH"><h2 id="howtoH">{{howto}}</h2><ol id="howtoSteps"></ol><div class="howlinks" id="howtoLinks"></div><div id="howtoOffice" hidden></div></section>
       </div>
     </div>

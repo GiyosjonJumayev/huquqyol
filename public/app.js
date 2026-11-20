@@ -607,6 +607,8 @@ function renderDocView(){
   previewDoc();
 }
 function renderHowto(){
+  if ($("#onlineStatus")) $("#onlineStatus").textContent = "";
+  renderOnline();
   const d = scenarioMeta(state.scn).docs.find(x => x.id === state.recipient), h = d?.howto;
   $("#howto").hidden = !h;
   if (!h) return;
@@ -617,6 +619,44 @@ function renderHowto(){
   $("#howtoOffice").hidden = !o;
   $("#howtoOffice").innerHTML = o ? `<h3 class="ofwhere">${t("ofWhere")}</h3>${officeHTML(o, state.plan.officesChecked, true)}` : "";
 }
+// Davlat idorasiga yuboriladigan arizalar: murojaat.gov.uz orqali onlayn yuborish yo‘riqnomasi
+// (sud, ish beruvchi, sotuvchi, uy egasi, qarzdor, bank, sug‘urta va konsullik — bu yerga kirmaydi)
+const STATE_RECIPIENTS = new Set(["inspection", "agency", "higher", "cbu", "migration", "ariza", "taklif", "shikoyat"]);
+const ORG_FIELD = { ariza: "body", taklif: "body", shikoyat: "body", higher: "higherAgency" };
+const linkTo = (text, host) => esc(text).replace(host, `<a href="https://${host}/" target="_blank" rel="noopener noreferrer">${host}<span class="sr"> ${esc(t("newTab"))}</span></a>`);
+function onlineOrg(){
+  const d = scenarioMeta(state.scn)?.docs.find(x => x.id === state.recipient);
+  const typed = ORG_FIELD[state.recipient] && form()[ORG_FIELD[state.recipient]];
+  if (typed) return typed;
+  const office = d?.office && state.plan?.offices?.find(o => o.id === d.office);
+  if (office) return office.name;
+  const addr = state.blocks.find(b => b.t === "addr");
+  return addr?.lines?.[0] ? partsText(addr.lines[0]) : t("onlineOrgFallback");
+}
+function onlineAttachments(){
+  const i = state.blocks.findIndex(b => b.t === "sign"), list = i > 0 ? state.blocks[i - 1] : null;
+  return list?.t === "list" ? list.items.map(partsText).map(s => s.replace(/\.$/, "")) : [];
+}
+function renderOnline(){
+  const box = $("#online"); if (!box) return;
+  box.hidden = !STATE_RECIPIENTS.has(state.recipient);
+  if (box.hidden) return;
+  const att = onlineAttachments();
+  $("#onlineSteps").innerHTML = [
+    linkTo(t("on1"), "murojaat.gov.uz"),
+    esc(t("on2", { org: onlineOrg() })),
+    esc(t("on3")),
+    ...(att.length ? [esc(t("on4", { list: att.join("; ") }))] : []),
+    esc(t("on5"))
+  ].map(s => `<li>${s}</li>`).join("");
+  $("#onlineNext").innerHTML = linkTo(t("onlineNext"), "pm.gov.uz");
+}
+// Ariza matnini nusxalash (oddiy «Matnni nusxalash» va murojaat.gov.uz uchun bitta yo‘l)
+async function copyDocText(){
+  try { await navigator.clipboard.writeText(docText()); return "copied"; }
+  catch { const rg = document.createRange(); rg.selectNodeContents($("#paper")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); return "selected"; }
+}
+
 function syncVisibility(){
   for (const f of scenarioMeta(state.scn).fields){ const el = document.querySelector(`[data-f="${f.k}"]`); if (el) el.hidden = !!(f.docs && !f.docs.includes(state.recipient)); }
 }
@@ -639,6 +679,7 @@ async function previewDoc(){
     state.blocks = m.blocks; state.missing = m.missing || [];
     $("#paper").innerHTML = m.blocks.map(blockHTML).join("");
     renderMissing();
+    renderOnline();
   } catch (e){ if (seq === previewSeq) toast(e.message); }
 }
 function renderMissing(){
@@ -874,9 +915,13 @@ $("#problem").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctr
 $("#dlDocx").addEventListener("click", () => download("docx"));
 $("#dlPdf").addEventListener("click", () => download("pdf"));
 $("#printBtn").addEventListener("click", () => window.print());
-$("#copyTxt").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(docText()); toast(t("copied")); }
-  catch { const rg = document.createRange(); rg.selectNodeContents($("#paper")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); toast(t("selected")); }
+$("#copyTxt").addEventListener("click", async () => { toast(t(await copyDocText() === "copied" ? "copied" : "selected")); });
+$("#copyOnline").addEventListener("click", async () => {
+  const n = state.missing.length;
+  if (n && !await confirmAction({ title: t("onlineMissT"), text: t("onlineMissP", { n, list: state.missing.map(x => x.label).join(", ") }), ok: t("copyAnyway") })) return;
+  const msg = t(await copyDocText() === "copied" ? "onlineCopied" : "onlineSelected");
+  const st = $("#onlineStatus"); st.textContent = ""; setTimeout(() => { st.textContent = "✓ " + msg; }, 30);
+  setTimeout(() => { if (st.textContent.endsWith(msg)) st.textContent = ""; }, 6000);
 });
 $("#dlgOk").addEventListener("click", () => $("#dlg").close("ok"));
 $("#dlgNo").addEventListener("click", () => $("#dlg").close("no"));
