@@ -603,3 +603,16 @@ nav.langsw a[aria-current]{background:var(--surface);color:var(--ink)}
   .bars thead .barcell{display:none}
   .bars tbody th{overflow-wrap:break-word}
 }
+
+/* Hujjat rasmidan o‘qish */
+.btn.photobtn{display:inline-flex;align-items:center;gap:6px;min-height:44px}
+.btn.photobtn[hidden]{display:none}
+.btn.photobtn svg{width:20px;height:20px;flex:none}
+.photocard{margin:0 0 22px}
+.photocard .kicker{display:flex;align-items:center;gap:8px}
+.photocard .kicker svg{width:18px;height:18px}
+.photocard dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 18px;margin:10px 0 12px}
+.photocard dt{font-size:calc(12.5px * var(--fs));color:var(--muted)}
+.photocard dd{margin:2px 0 0;font-weight:600;overflow-wrap:anywhere}
+.photocard .reason{grid-column:1/-1}
+@media (max-width:480px){.btn.photobtn{width:44px;padding:0;justify-content:center}.btn.photobtn .plbl{display:none}}

@@ -17,6 +17,7 @@ import { makeT, LANGS, HTML_LANG } from "../public/i18n.js";
 import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
 import { stats, DEFAULT_FILE as STATS_FILE } from "./stats.js";
 import { statsPage } from "./statsPage.js";
+import { vPhoto, readPhoto } from "./photo.js";
 
 // Til: uz va ru o‘z bazasidan, cyr — uz natijasining kirill shakli
 const base = lang => lang === "ru" ? "ru" : "uz";
@@ -35,7 +36,19 @@ app.disable("x-powered-by");
 app.use(compression());
 app.use(httpsRedirect);
 app.use(securityHeaders);
-app.use("/api", rateLimit({ max: 600, name:"api" }), sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
+// Hujjat rasmi: alohida, kattaroq tana chegarasi (brauzer rasmni ~1600 px gacha kichraytirib yuboradi).
+// Umumiy /api chegarasi (32 KB) undan keyin ulanadi, shuning uchun bu marshrut undan oldin turadi.
+const apiLimit = rateLimit({ max: 600, name:"api" });
+const wrapEarly = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
+app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "5mb", strict: true }),
+  (req, res, next) => { req.lang = resolveLang(req); next(); },
+  wrapEarly(async (req, res) => {
+    const v = vPhoto(req.body);
+    const r = await readPhoto(v, base(req.lang));
+    stats.record("analyze", { scenario: r.scenario, ip: req.ip });
+    res.json(out(req.lang, r));
+  }));
+app.use("/api", apiLimit, sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
 app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 
 // Fayl nomi: faqat xavfsiz belgilar (sarlavhaga in’ektsiya bo‘lmasligi uchun)
@@ -174,7 +187,7 @@ app.use((err, req, res, next) => {
   const lang = req.lang || resolveLang(req);
   if (err.type === "entity.too.large") return res.status(413).json({ error: msg(lang, "tooLarge") });
   if (err.type === "entity.parse.failed") return res.status(400).json({ error: msg(lang, "badJson") });
-  const status = err.status && err.status < 500 ? err.status : 500;
+  const status = err.status && (err.status < 500 || err.key) ? err.status : 500;   // kalitli xatolar (masalan, AI yo‘q — 503) o‘z holatini saqlaydi
   if (status === 500) console.error("[server]", err.message);
   res.status(status).json({ error: status === 500 ? msg(lang, "server") : err.key ? msg(lang, err.key, err.vars) : err.message });
 });

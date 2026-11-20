@@ -1,5 +1,13 @@
 # O‘zgarishlar tarixi
 
+## 3.12.0 — 2026-11-20 · Hujjat rasmidan o‘qish
+- Bosh sahifada «Rasmdan» tugmasi: jarima qarori, chek, buyruq, bank xabarnomasi yoki kommunal hisob rasmi tanlanadi.
+- `POST /api/photo`: Claude vision rasmda ko‘rinib turgan faktlarni ajratadi — hujjat turi, kim chiqargani, raqami, sanasi, summasi, avtomobil raqami. Holat mavjud tahlil orqali tasniflanadi; muddat hujjat sanasidan kodda hisoblanadi, ariza maydonlari avtomatik to‘ladi.
+- Rejada «Hujjatdan o‘qildi» kartasi — fuqaro o‘qilgan ma’lumotni asl hujjat bilan solishtiradi.
+- Rasm brauzerda 1600 px gacha kichraytiriladi; serverda saqlanmaydi va logga yozilmaydi. Fayl turi birinchi baytlardan tekshiriladi, 3,5 MB chegarasi, alohida rate limit; boshqa API’larda 32 KB chegarasi o‘zgarmadi.
+- AI kaliti bo‘lmasa tugma ko‘rinmaydi, API tushunarli 503 xabarini qaytaradi.
+- 7 ta yangi test (jami 69).
+
 ## 3.11.0 — 2026-11-19 · Hakatonga tayyorgarlik
 - README: muammo, yechim, raqamlar, skrinshotlar, arxitektura sxemasi, yo‘l xaritasi.
 - DEMO.md: 3 daqiqalik pitch, 5 daqiqalik namoyish, zaxira reja, hakamlar savollari, sahnadan oldingi nazorat ro‘yxati.
