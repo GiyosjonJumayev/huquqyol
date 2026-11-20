@@ -366,11 +366,6 @@ html[data-fs="2"] .how,html[data-fs="3"] .how{grid-template-columns:minmax(0,1fr
   .domains:not(.list) .case b{font-size:calc(16px * var(--fs))}
 }
 
-/* «Qanday ishlaydi»: yo‘l chizig‘i */
-.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:36px 0 0;font-size:calc(14.5px * var(--fs))}
-.how li{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}
-.how .hn{width:30px;height:30px;font-size:calc(13.5px * var(--fs));background:var(--accent-soft)}
-@media (max-width:620px){.how{grid-template-columns:minmax(0,1fr);gap:12px;margin-top:28px}}
 
 /* Reja */
 .headmeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
