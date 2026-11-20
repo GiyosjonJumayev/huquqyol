@@ -9,6 +9,8 @@ import { toLatin } from "./text.js";
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5";
 let client = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 20_000, maxRetries: 1 }) : null;
 export const aiEnabled = () => !!client;
+export const aiClient = () => client;          // rasm tahlili (server/photo.js) shu mijozdan foydalanadi
+export { MODEL };
 export const _setClient = c => { client = c; }; // testlar uchun
 
 const safeForm = (s, form) => { try { return vForm(s, form); } catch { return {}; } };

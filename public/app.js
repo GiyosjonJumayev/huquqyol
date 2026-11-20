@@ -1,6 +1,6 @@
 // HuquqYo‘l — frontend. Huquqiy mantiq serverda (/api/*); bu fayl ko‘rsatadi, saqlaydi va yo‘naltiradi.
 import { esc, ICONS, examples, domainCardsHTML, examplesHTML } from "/shared.js";
-import { makeT, normLang } from "/i18n.js";
+import { makeT, normLang, fmtDate, fmtMoney } from "/i18n.js";
 import { toCyrillic as toCyr } from "/translit.js";
 import { getFs, setFs, ttsSupported, speak, pause as ttsPauseToggle, stop as ttsStop, isSpeaking } from "/a11y.js";
 const $ = s => document.querySelector(s);
@@ -218,7 +218,7 @@ function renderPlan(){
   const a0 = state.analysis || {}, a = a0.lang && a0.lang !== LANG ? { ...a0, summary:"", missing:[] } : a0;
   const focus = new Set(a.normIds || []);
   const law = n => `<div class="law">${badge(n)}<div><b>${esc(n.title)}${focus.has(n.id) ? ` <span class="tag">${t("forYou")}</span>` : ""}</b><p>${esc(n.text)}</p><span class="lawsrc">${esc(n.lawName)}</span></div></div>`;
-  const source = t(a.source === "ai" ? "srcAI" : a.source === "rules" ? "srcRules" : "srcChoice");
+  const source = t(a.source === "photo" ? "srcPhoto" : a.source === "ai" ? "srcAI" : a.source === "rules" ? "srcRules" : "srcChoice");
   const n0 = p.norms[0];
   const laws = [...new Map(p.norms.map(n => [n.law, { name:n.lawName, url:n.lawUrl }])).values()];
   const calcFields = m.fields.filter(f => f.calc);
@@ -232,6 +232,7 @@ function renderPlan(){
       ${a.missing?.length ? `<p class="small warnline">${t("needForDoc")} ${a.missing.map(esc).join(", ")}</p>` : ""}
       ${altsHTML(a)}
     </div>
+    ${photoCardHTML(a.photo)}
     <div class="summary">
       <div class="card" id="deadlineCard"></div>
       ${p.calc ? `<div class="card" id="calcCard">
@@ -278,6 +279,19 @@ function renderPlan(){
     const df = $("#f_" + k); if (df) df.value = e.target.value;
     onCalc();
   });
+}
+
+// Hujjat rasmidan o‘qilgan faktlar: foydalanuvchi asl hujjat bilan solishtirib tekshirishi uchun ochiq ko‘rsatiladi
+function photoCardHTML(ph){
+  if (!ph) return "";
+  const d = ph.date ? new Date(ph.date + "T00:00:00") : null;
+  const rows = [
+    ["pdType", ph.title || t("dt_" + (ph.docType || "boshqa"))], ["pdIssuer", ph.issuer], ["pdNumber", ph.number],
+    ["pdDate", d && !isNaN(d) ? fmtDate(d, LANG) : null], ["pdAmount", ph.amount ? fmtMoney(ph.amount, LANG) : null], ["pdPlate", ph.plate]
+  ].filter(([, v]) => v);
+  return `<div class="card photocard" id="photoCard"><div class="kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>${t("photoH")}</div>
+    <dl>${rows.map(([k, v]) => `<div><dt>${t(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}${ph.reason ? `<div class="reason"><dt>${t("pdReason")}</dt><dd>${esc(ph.reason)}</dd></div>` : ""}</dl>
+    <p class="small muted">${t("photoCheck")}</p></div>`;
 }
 
 // Tahlil ishonchi past bo‘lsa yoki boshqa holat ham yaqin chiqsa — bir bosishda almashtirish
@@ -719,6 +733,38 @@ $("#moreEx").addEventListener("click", e => {
 $("#demoFill").addEventListener("click", demoFill);
 $("#analyzeBtn").addEventListener("click", analyze);
 
+// Hujjat rasmidan o‘qish: rasm brauzerda 1600 px gacha kichraytiriladi (JPEG), serverga faqat o‘qish uchun yuboriladi
+const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+const readAsDataURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+async function shrinkPhoto(file){
+  const img = await loadImg(await readAsDataURL(file));
+  const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+  let q = 0.85, url = c.toDataURL("image/jpeg", q);
+  while (url.length > 4_400_000 && q > 0.4){ q -= 0.15; url = c.toDataURL("image/jpeg", q); }
+  return url;
+}
+async function readPhotoFile(file){
+  const btn = $("#photoBtn"), err = $("#askErr"), label = btn.innerHTML;
+  setAskErr("");
+  let image;
+  try { image = await shrinkPhoto(file); }
+  catch { setAskErr(t("photoBadFile")); return; }
+  btn.disabled = true; $("#analyzeBtn").disabled = true;
+  btn.innerHTML = `<span class="spin" aria-hidden="true"></span> ${t("photoReading")}`;
+  announce(t("photoReading"));
+  try { await choose(await getJSON("/api/photo", { image, note: $("#problem").value.trim().slice(0, 1000) })); }
+  catch (e){ setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }
+  finally { btn.disabled = false; $("#analyzeBtn").disabled = false; btn.innerHTML = label; }
+}
+$("#photoBtn").addEventListener("click", () => $("#photoIn").click());
+$("#photoIn").addEventListener("change", e => {
+  const f = e.target.files?.[0]; e.target.value = "";
+  if (f) readPhotoFile(f);
+});
+
 // Belgi hisoblagichi: chegara yaqinlashganda ko‘rsatiladi
 $("#problem").addEventListener("input", e => {
   const n = e.target.value.length, h = $("#askHint");
@@ -775,6 +821,7 @@ window.addEventListener("online", () => toast(t("online")));
 try {
   const embedded = document.getElementById("meta-data");
   state.meta = embedded ? JSON.parse(embedded.textContent) : await getJSON("/api/meta?lang=" + LANG);
+  $("#photoBtn").hidden = !state.meta.ai;                       // rasmdan o‘qish faqat AI yoqilganda ishlaydi
   renderStart();
   const saved = store.load();
   if (saved){ state.applicant = saved.applicant || {}; state.formByScn = saved.formByScn || {}; }

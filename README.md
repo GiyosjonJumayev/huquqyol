@@ -6,7 +6,7 @@
 ![WCAG](https://img.shields.io/badge/WCAG%202.2-AA-0e6b5c)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-> Fuqaro muammosini o‘z so‘zi bilan yozadi — bir daqiqada **qaysi qonun himoya qilishi**, **necha kun qolgani**, **qayerga borish** va **qaysi dalillarni yig‘ish** kerakligini biladi va **tayyor arizani** Word yoki PDF qilib oladi.
+> Fuqaro muammosini o‘z so‘zi bilan yozadi yoki **hujjat rasmini yuklaydi** — bir daqiqada **qaysi qonun himoya qilishi**, **necha kun qolgani**, **qayerga borish** va **qaysi dalillarni yig‘ish** kerakligini biladi va **tayyor arizani** Word yoki PDF qilib oladi.
 
 ![HuquqYo‘l — reja sahifasi](docs/screenshots/02-reja.png)
 
@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 93 unit + 10 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 100 unit + 10 brauzer |
 
 ## Ko‘rinishlar
 
@@ -72,7 +72,7 @@ Taqdimot ssenariysi, zaxira reja va hakamlar savollariga javoblar — [DEMO.md](
 ## Yo‘l xaritasi
 
 - my.sud.uz va my.gov.uz orqali arizani to‘g‘ridan-to‘g‘ri topshirish;
-- chek, qaror yoki kvitansiya rasmini o‘qish (OCR) va maydonlarni avtomatik to‘ldirish;
+- ko‘p sahifali hujjatlar va PDF fayldan o‘qish (bitta rasmdan o‘qish 3.12 da qo‘shildi);
 - Telegram bot (migrantlar uchun eng qulay kanal);
 - qoraqalpoq tili;
 - yuridik klinikalar va advokatlar bilan hamkorlik: murakkab ishni bir bosishda yuristga yo‘naltirish;
@@ -83,6 +83,8 @@ Taqdimot ssenariysi, zaxira reja va hakamlar savollariga javoblar — [DEMO.md](
 Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahlil qiladi va quyidagilarni beradi: tegishli qonun normalari (lex.uz havolasi bilan), qadamma-qadam reja, muddat va xavf bahosi, kalkulyator, hamda tayyor ariza. Ariza DOCX, PDF yoki chop etish uchun tayyor holatda chiqadi.
 
 **Uch tilda ishlaydi:** o‘zbek (lotin), o‘zbek (kirill) va rus. Til interfeys, normalar matni, qadamlar, kalkulyatorlar, xato xabarlari va tayyor arizaga birdek tatbiq etiladi. Rus tilidagi ariza ruscha rasmiy uslubda yoziladi («ИСКОВОЕ ЗАЯВЛЕНИЕ», «На основании изложенного прошу:»). Vaziyatni istalgan tilda yozish mumkin, jumladan o‘zbekcha kirillda.
+
+**Hujjat rasmidan o‘qish (AI yoqilganda).** «Rasmdan» tugmasi bilan jarima qarori, chek, ish beruvchi buyrug‘i, bank xabarnomasi yoki kommunal hisob rasmini tanlash mumkin. Claude rasmda ko‘rinib turgan faktlarni ajratadi: hujjat turi, kim chiqargani, raqami, sanasi, summasi, avtomobil raqami. So‘ng holat odatdagi tahlil orqali aniqlanadi, muddat hujjat sanasidan **kodda** hisoblanadi («Shikoyat berish uchun 7 kun qoldi»), ariza maydonlari o‘zi to‘ladi. Rejada «Hujjatdan o‘qildi» kartasi chiqadi — fuqaro uni asl hujjat bilan solishtiradi. Rasm brauzerda 1600 px gacha kichraytiriladi, serverda saqlanmaydi va logga yozilmaydi.
 
 Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa, ilova yaqin holatlarni taklif qiladi va bir bosishda almashtiradi. Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
 
@@ -112,7 +114,7 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 93 ta unit/API test (jumladan ruscha, kirillcha va Telegram bot)
+npm test                  # 100 ta unit/API test (jumladan ruscha, kirillcha, rasmdan o‘qish va Telegram bot)
 npm run test:e2e          # 10 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
@@ -184,6 +186,7 @@ test/              node:test — sana, reja, RAG, API, xavfsizlik, kirill, DOCX/
 |---|---|
 | `GET /api/meta` | holatlar ro‘yxati, AI holati |
 | `POST /api/analyze` `{text}` | holat, ishonch darajasi, faktlar, topilgan normalar |
+| `POST /api/photo` `{image: data:image/jpeg;base64,…, note?}` | hujjat rasmidan faktlar (`photo`) + holat, muddat sanasi va ariza maydonlari; AI kerak |
 | `POST /api/plan` `{scenario, triggerDate, amount, months}` | muddat, xavf, qadamlar, kompensatsiya |
 | `POST /api/document/preview` | hujjat bloklari (jonli ko‘rinish uchun) |
 | `POST /api/document/docx` / `pdf` | tayyor fayl |
