@@ -19,6 +19,9 @@ find "$NM/docx/dist" -name "*.iife.js" -delete
 rm -f "$NM"/pdfkit/js/pdfkit.browser* "$NM"/pdfkit/js/pdfkit.standalone.js
 find "$NM/dejavu-fonts-ttf/ttf" -type f ! -name "DejaVuSerif*.ttf" -delete
 rm -rf "$NM"/@tesseract.js-data/*/4.0.0           # OCR: faqat 4.0.0_best_int ishlatiladi
+# pdf.js: brauzerga faqat build/pdf.min.mjs, pdf.worker.min.mjs, cmaps va standard_fonts beriladi
+rm -rf "$NM"/pdfjs-dist/{legacy,web,types,image_decoders}
+find "$NM/pdfjs-dist/build" -type f ! -name "pdf.min.mjs" ! -name "pdf.worker.min.mjs" -delete
 find "$NM" -type d -empty -delete
 # Tutun testi: server yuklanadi, PDF va DOCX yasaladi
 node --input-type=module -e '

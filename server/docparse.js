@@ -78,7 +78,7 @@ export function pickAmount(text){
 
 // Hujjat raqami: «№ / Ne / No / N° / WN:» dan keyin
 export function pickNumber(text, latinDoc = true){
-  const m = /(?:№|N[eoº°]\.?|WN:?|Nr\.?|raqami?:?)\s*:?\s*([A-ZА-ЯЁ]{0,3}[\s-]?\d{3,12}(?:[/-]\d{1,6})?)/u.exec(text);
+  const m = /(?:№|N[eoº°]\.?|WN:?|Nr\.?|raqami?\s*:)\s*:?\s*([A-ZА-ЯЁ]{0,3}[\s-]?\d{2,12}(?:[/-][\dA-Za-zА-Яа-яЁё]{1,6})?)(?![\w‘])/u.exec(text);
   if (!m) return null;
   let v = m[1].replace(/\s+/g, " ").trim();
   if (latinDoc && /^[АВСЕНКМОРТХУ\s\d/-]+$/.test(v)) v = toLatinLook(v);

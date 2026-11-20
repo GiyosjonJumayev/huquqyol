@@ -289,7 +289,8 @@ function photoCardHTML(ph){
     ["pdType", ph.title || t("dt_" + (ph.docType || "boshqa"))], ["pdIssuer", ph.issuer], ["pdNumber", ph.number],
     ["pdDate", d && !isNaN(d) ? fmtDate(d, LANG) : null], ["pdAmount", ph.amount ? fmtMoney(ph.amount, LANG) : null], ["pdPlate", ph.plate]
   ].filter(([, v]) => v);
-  const eng = ph.engine ? `<span class="engine">${t(ph.engine === "ocr" ? "photoEngOcr" : "photoEngAi")}</span>` : "";
+  const engKey = { ocr:"photoEngOcr", ai:"photoEngAi", pdf:"photoEngPdf" }[ph.engine];
+  const eng = engKey ? `<span class="engine">${t(engKey)}${ph.kind === "pdf" && ph.engine !== "pdf" ? " · PDF" : ""}${ph.pages > 1 ? " · " + t("pdPages", { n: ph.pages }) : ""}</span>` : "";
   return `<div class="card photocard" id="photoCard"><div class="kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>${t("photoH")}${eng}</div>
     <dl>${rows.map(([k, v]) => `<div><dt>${t(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}${ph.reason ? `<div class="reason"><dt>${t("pdReason")}</dt><dd>${esc(ph.reason)}</dd></div>` : ""}</dl>
     ${ph.lowQuality ? `<p class="small warnline">${t("photoLow")}</p>` : ""}
@@ -756,22 +757,80 @@ function setPhotoPanel(open, { remember = true } = {}){
   $("#photoBtn").setAttribute("aria-expanded", String(open));
   if (remember) document.cookie = `hy_photo=${open ? 1 : 0}; path=/; max-age=31536000; samesite=lax`;
 }
+// PDF: pdf.js faqat PDF tanlanganda yuklanadi (o‘z serverimizdan). Matnli PDF — matn to‘g‘ridan-to‘g‘ri olinadi (OCR’dan aniq);
+// skanerlangan PDF — birinchi 3 sahifa rasmga aylantirilib, OCR’ga yuboriladi. Fayl serverga yuborilmaydi.
+const PDF_MAX_BYTES = 20 * 1024 * 1024, PDF_PAGES = 3;
+const isPdf = f => f && (f.type === "application/pdf" || /\.pdf$/i.test(f.name || ""));
+let pdfjsP = null;
+function loadPdfjs(){
+  const base = $("#photoIn").dataset.pdfjs;
+  pdfjsP ||= import(`${base}/pdf.min.mjs`).then(m => { m.GlobalWorkerOptions.workerSrc = `${base}/pdf.worker.min.mjs`; return m; })
+    .catch(e => { pdfjsP = null; throw e; });
+  return pdfjsP;
+}
+async function renderPage(page, maxSide){
+  const vp1 = page.getViewport({ scale: 1 });
+  const viewport = page.getViewport({ scale: Math.min(4, maxSide / Math.max(vp1.width, vp1.height)) });
+  const c = document.createElement("canvas");
+  c.width = Math.round(viewport.width); c.height = Math.round(viewport.height);
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: g, viewport, background: "#ffffff" }).promise;
+  let q = 0.88, url = c.toDataURL("image/jpeg", q);
+  while (url.length > 1_900_000 && q > 0.4){ q -= 0.12; url = c.toDataURL("image/jpeg", q); }
+  return url;
+}
+async function readPdf(file){
+  if (file.size > PDF_MAX_BYTES) throw new Error(t("pdfBig"));
+  const pdfjs = await loadPdfjs(), base = $("#photoIn").dataset.pdfjs;
+  let doc;
+  try {
+    doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false,
+      cMapUrl: `${base}/cmaps/`, cMapPacked: true, standardFontDataUrl: `${base}/standard_fonts/` }).promise;
+  } catch (e){ throw new Error(t(e?.name === "PasswordException" ? "pdfPassword" : "pdfBad")); }
+  try {
+    const n = Math.min(doc.numPages, PDF_PAGES);
+    let text = "";
+    for (let i = 1; i <= n; i++){
+      const tc = await (await doc.getPage(i)).getTextContent();
+      text += tc.items.map(it => (it.str || "") + (it.hasEOL ? "\n" : " ")).join("").replace(/[ \t]+\n/g, "\n") + "\n\n";
+    }
+    const hasText = text.replace(/\s/g, "").length >= 40;
+    const thumb = await renderPage(await doc.getPage(1), 160);
+    const images = [];
+    if (!hasText) for (let i = 1; i <= n; i++) images.push(await renderPage(await doc.getPage(i), 2000));
+    return { text: hasText ? text.trim().slice(0, 20000) : null, images, thumb, total: doc.numPages };
+  } finally { doc.destroy(); }
+}
+
 let photoBusy = false;
 async function readPhotoFile(file){
   if (photoBusy) return;
-  if (!file || !/^image\//.test(file.type || "image/")){ setAskErr(t("photoNotImg")); return; }
+  const pdf = isPdf(file);
+  if (!file || (!pdf && !/^image\//.test(file.type || "image/"))){ setAskErr(t("photoNotImg")); return; }
   setAskErr("");
-  let image;
-  try { image = await shrinkPhoto(file); }
-  catch { setAskErr(t("photoBadFile")); return; }
   setPhotoPanel(true, { remember:false });
   const panel = $("#photoPanel"), pick = $("#photoPick"), pickLabel = pick.innerHTML, err = $("#askErr");
   photoBusy = true; panel.classList.add("busy"); panel.setAttribute("aria-busy", "true");
-  $("#photoThumb").innerHTML = `<img src="${image}" alt="">`;
   pick.disabled = true; $("#analyzeBtn").disabled = true; $("#photoBtn").disabled = true;
-  pick.innerHTML = `<span class="spin" aria-hidden="true"></span> ${t("photoReading")}`;
-  announce(t("photoReading"));
-  try { await choose(await getJSON("/api/photo", { image, note: $("#problem").value.trim().slice(0, 1000) })); }
+  const busyText = t(pdf ? "pdfReading" : "photoReading");
+  pick.innerHTML = `<span class="spin" aria-hidden="true"></span> ${busyText}`;
+  announce(busyText);
+  try {
+    let body, total = 1;
+    if (pdf){
+      const r = await readPdf(file);
+      total = r.total;
+      $("#photoThumb").innerHTML = `<img src="${r.thumb}" alt="">`;
+      body = r.text ? { kind:"pdf", text: r.text } : { kind:"pdf", images: r.images };
+    } else {
+      let image;
+      try { image = await shrinkPhoto(file); } catch { throw new Error(t("photoBadFile")); }
+      $("#photoThumb").innerHTML = `<img src="${image}" alt="">`;
+      body = { image };
+    }
+    await choose(await getJSON("/api/photo", { ...body, note: $("#problem").value.trim().slice(0, 1000) }));
+    if (pdf && total > PDF_PAGES) toast(t("pdfFirstPages", { n: total, k: PDF_PAGES }));
+  }
   catch (e){ setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }
   finally {
     photoBusy = false; panel.classList.remove("busy"); panel.removeAttribute("aria-busy");
@@ -797,7 +856,7 @@ for (const el of [$("#photoPanel"), $(".ask")]){
   });
 }
 $("#problem").addEventListener("paste", e => {
-  const f = [...(e.clipboardData?.files || [])].find(x => /^image\//.test(x.type));
+  const f = [...(e.clipboardData?.files || [])].find(x => /^image\//.test(x.type) || isPdf(x));
   if (f){ e.preventDefault(); readPhotoFile(f); }
 });
 $("#photoBtn").setAttribute("aria-expanded", String(!$("#photoPanel").hidden));

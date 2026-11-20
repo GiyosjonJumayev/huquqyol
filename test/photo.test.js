@@ -155,3 +155,65 @@ test("POST /api/photo: rus tilida javob, hujjat matni transliteratsiya qilinmayd
     assert.equal(r.photo.docType, "yhxx_qarori");
   } finally { _setClient(null); }
 });
+
+// ---------- PDF ----------
+// Matnli PDF’dan brauzerda pdf.js olgan matn (buyruq-matnli.pdf dagi kabi)
+const PDF_TEXT = "«Bog‘bon Agro» MChJ\nToshkent sh., Yashnobod tumani, Mehnat ko‘chasi 12\nBUYRUQ № 112-k\nSana: 02.11.2026 Toshkent shahri\nXodimni ishdan bo‘shatish to‘g‘risida\nO‘zbekiston Respublikasi Mehnat kodeksining 161-moddasi asosida BUYURAMAN:\n1. Omborchi Karimov Aziz Botirovich 2026-yil 2-noyabrdan ishdan bo‘shatilsin.\n2. Buxgalteriyaga hisob-kitobni amalga oshirish topshirilsin.\nDirektor: B. Rahimov";
+
+test("vPhoto: PDF matni va ko‘p sahifali rasm tekshiruvi", () => {
+  assert.equal(vPhoto({ kind:"pdf", text: PDF_TEXT }).kind, "pdf");
+  assert.throws(() => vPhoto({ kind:"pdf", text:"  qisqa  " }), { key:"photoUnread" });
+  assert.throws(() => vPhoto({ kind:"pdf", text:"a".repeat(20_001) }), { key:"pdfLong" });
+  assert.equal(vPhoto({ kind:"pdf", images:[dataUrl(jpeg()), dataUrl(jpeg())] }).images.length, 2);
+  assert.throws(() => vPhoto({ images:[1, 2, 3, 4].map(() => dataUrl(jpeg())) }), { key:"photoFormat" });
+  assert.throws(() => vPhoto({ images:[dataUrl(jpeg()), "salom"] }), { key:"photoFormat" });
+});
+
+test("readPhoto: matnli PDF — OCR’siz, aniq; ishdan bo‘shatish buyrug‘i", async () => {
+  _setClient(null);
+  const r = await readPhoto(vPhoto({ kind:"pdf", text: PDF_TEXT }));
+  assert.equal(r.photo.engine, "pdf");
+  assert.equal(r.photo.docType, "ish_buyrugi");
+  assert.equal(r.scenario, "ishdan_boshatish");
+  assert.equal(r.photo.number, "112-k");
+  assert.equal(r.facts.eventDate, "2026-11-02");
+  assert.equal(r.facts.form.employer, "«Bog‘bon Agro» MChJ");
+  assert.equal(r.photo.lowQuality, false);
+});
+
+test("readPhoto: skanerlangan PDF (2 sahifa rasm) — har sahifa OCR qilinadi, matn birlashtiriladi", async () => {
+  _setClient(null);
+  const img = dataUrl(fixture("yhxx-qaror-foto.jpg"));
+  const r = await readPhoto(vPhoto({ kind:"pdf", images:[img, dataUrl(fixture("bosh.jpg"))] }));
+  assert.equal(r.photo.engine, "ocr");
+  assert.equal(r.photo.kind, "pdf");
+  assert.equal(r.photo.pages, 2);
+  assert.equal(r.scenario, "yhxx_jarima");
+  assert.equal(r.facts.form.decisionNumber, "AB 1234567");
+});
+
+test("readPhoto: AI bilan ko‘p sahifa — barcha sahifalar bitta so‘rovda", async () => {
+  const c = fakeClient({ doc:{ readable:true, doc_type:"chek", issuer:"«Texnomart» MChJ", date: daysAgo(2), amount_som:4850000, situation:"Tovar sifatsiz." },
+                         cls:{ scenario:"nuqsonli_tovar", confidence:0.9, summary:"", missing:[], norm_ids:[] } });
+  _setClient(c);
+  try {
+    const r = await readPhoto(vPhoto({ kind:"pdf", images:[dataUrl(jpeg()), dataUrl(jpeg())] }));
+    assert.equal(r.photo.engine, "ai");
+    assert.equal(c.calls[0].messages[0].content.filter(x => x.type === "image").length, 2);
+    assert.match(c.calls[0].messages[0].content.at(-1).text, /2 ta sahifasi/);
+  } finally { _setClient(null); }
+});
+
+test("POST /api/photo: PDF matni; pdf.js fayllari o‘z serverimizdan", async () => {
+  _setClient(null);
+  const r = await post({ kind:"pdf", text: PDF_TEXT });
+  assert.equal(r.status, 200);
+  assert.equal((await r.json()).scenario, "ishdan_boshatish");
+  const html = await (await fetch(base + "/")).text();
+  const pdfBase = /data-pdfjs="([^"]+)"/.exec(html)[1];
+  const js = await fetch(base + pdfBase + "/pdf.min.mjs");
+  assert.equal(js.status, 200);
+  assert.match(js.headers.get("content-type"), /javascript/);
+  assert.match(js.headers.get("cache-control"), /immutable/);
+  assert.equal((await fetch(base + pdfBase + "/pdf.worker.min.mjs")).status, 200);
+});

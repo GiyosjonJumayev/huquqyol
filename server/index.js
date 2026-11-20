@@ -28,6 +28,8 @@ const buildModel = req => { const v = vDocument(req.body); const m = documentMod
 const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const fontDir = pkg => join(dirname(require.resolve(`${pkg}/package.json`)), "files");
+const PDFJS_DIR = dirname(require.resolve("pdfjs-dist/package.json"));
+export const PDFJS_BASE = `/vendor/pdfjs-${require("pdfjs-dist/package.json").version}`;
 
 export const app = express();
 app.disable("x-powered-by");
@@ -41,7 +43,7 @@ app.use(securityHeaders);
 // Umumiy /api chegarasi (32 KB) undan keyin ulanadi, shuning uchun bu marshrut undan oldin turadi.
 const apiLimit = rateLimit({ max: 600, name:"api" });
 const wrapEarly = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
-app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "5mb", strict: true }),
+app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "8mb", strict: true }),
   (req, res, next) => { req.lang = resolveLang(req); next(); },
   wrapEarly(async (req, res) => {
     const v = vPhoto(req.body);
@@ -138,7 +140,7 @@ function renderIndex(lang){
     .replace("<!--EXAMPLES-->", examplesHTML(lang))
     .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
     .replace(`data-lang="${lang}" aria-pressed="false"`, `data-lang="${lang}" aria-pressed="true"`)
-    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff")) : k === "privacy" ? escAttr(t(meta.ai ? "privacyAi" : "privacy")) : escAttr(t(k)));
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "pdfjsBase" ? PDFJS_BASE : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff")) : k === "privacy" ? escAttr(t(meta.ai ? "privacyAi" : "privacy")) : escAttr(t(k)));
 }
 const INDEX = Object.fromEntries(LANGS.map(l => [l, renderIndex(l)]));
 app.get(["/", "/index.html"], (req, res) => {
@@ -167,6 +169,11 @@ for (const f of MODULES){
 
 // Shriftlar o‘zimizda (tashqi CDN yo‘q — maxfiylik va CSP uchun)
 const fontOpts = { maxAge:"365d", immutable:true };
+// PDF o‘qish (pdf.js) — faqat brauzerda, PDF tanlanganda yuklanadi. Versiya URL’da: bir yil keshlanadi.
+for (const f of ["pdf.min.mjs", "pdf.worker.min.mjs"])
+  app.get(`${PDFJS_BASE}/${f}`, (req, res) => res.set("Cache-Control", "public, max-age=31536000, immutable").type("js").sendFile(join(PDFJS_DIR, "build", f)));
+app.use(`${PDFJS_BASE}/cmaps`, express.static(join(PDFJS_DIR, "cmaps"), fontOpts));
+app.use(`${PDFJS_BASE}/standard_fonts`, express.static(join(PDFJS_DIR, "standard_fonts"), fontOpts));
 app.use("/fonts/onest", express.static(fontDir("@fontsource/onest"), fontOpts));
 app.use("/fonts/spectral", express.static(fontDir("@fontsource/spectral"), fontOpts));
 app.use("/fonts/jetbrains-mono", express.static(fontDir("@fontsource/jetbrains-mono"), fontOpts));

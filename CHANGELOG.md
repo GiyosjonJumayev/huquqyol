@@ -1,5 +1,15 @@
 # O‘zgarishlar tarixi
 
+## 3.14.0 — 2026-11-20 · PDF yuklash
+- Jarima qarori, chek yoki buyruqni **PDF** sifatida ham yuklash mumkin (panel, sudrab tashlash, Ctrl+V).
+- PDF brauzerning o‘zida pdf.js bilan ochiladi (o‘z serverimizdan, CDN yo‘q); PDF fayl serverga yuborilmaydi.
+- Matnli PDF (Word’dan saqlangan, elektron hujjat): matn to‘g‘ridan-to‘g‘ri olinadi — OCR’siz, xatosiz, 1–2 soniyada.
+- Skanerlangan PDF: birinchi 3 sahifa rasmga aylantirilib OCR qilinadi (AI kaliti bo‘lsa — barcha sahifalar bitta Claude so‘rovida).
+- Parol bilan himoyalangan, buzilgan yoki 20 MB dan katta PDF uchun tushunarli xabarlar; ko‘p sahifali PDF’da qaysi sahifalar o‘qilgani aytiladi.
+- Hujjat raqamlari «112-k», «45/sh» kabi harfli qo‘shimchalar bilan ham o‘qiladi.
+- `/api/photo`: `images` (1–3 sahifa) va `{kind:"pdf", text}`; so‘rov chegarasi 8 MB, rasmlar jami 6 MB.
+- Testlar: 83 unit + 12 brauzer testi (matnli va skanerlangan PDF namunalari bilan).
+
 ## 3.13.0 — 2026-11-20 · Bepul OCR: rasmdan o‘qish AI kalitisiz
 - Hujjat rasmi AI kalitisiz ham o‘qiladi: serverning o‘zida Tesseract OCR (WebAssembly) — rus, o‘zbek lotin va o‘zbek kirill. Internet, tashqi xizmat va pul kerak emas; til fayllari npm paketlaridan.
 - `server/docparse.js`: OCR matnidan qoidalar bilan hujjat turi, tashkilot, raqam, sana, summa, avtomobil raqami va sabab ajratiladi. OCR xatolariga chidamli: «№» → «Ne/WN:», «so‘m» → «5071.», «01 A» → «OLA», «S» → «$», lotin qatordagi adashgan kirill harflar («ПВВ» → «IIBB»).

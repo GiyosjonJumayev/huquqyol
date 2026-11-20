@@ -373,3 +373,35 @@ test("Hujjat rasmi: panel doim ko‘rinadi, AI kalitisiz OCR o‘qiydi, muddat v
   await p.waitForSelector("#askErr:not([hidden])");
   assert.deepEqual(p.errors, []);
 });
+
+test("PDF: matnli PDF (OCR’siz) va skanerlangan PDF (OCR) — tur, holat, muddat va ariza maydonlari", { skip }, async () => {
+  const p = await page();
+  const fx = name => fileURLToPath(new URL(`../fixtures/${name}`, import.meta.url));
+  await p.goto(base);
+  assert.match(await p.getAttribute("#photoIn", "accept"), /application\/pdf/);
+  // 1) Matnli PDF — ishdan bo‘shatish buyrug‘i
+  await p.setInputFiles("#photoIn", fx("buyruq-matnli.pdf"));
+  await p.waitForSelector("#photoCard", { timeout: 30_000 });
+  const card = await p.innerText("#photoCard");
+  assert.match(card, /PDF matni/);
+  assert.match(card, /112-k/);
+  assert.match(card, /Bog.bon Agro/);
+  assert.equal(await p.inputValue("#trigger"), "2026-11-02");
+  assert.match(await p.innerText("#v2 h1"), /bo.shat/i);
+  assert.deepEqual(await audit(p), []);
+  await p.click(".cta [data-go='3']");
+  await p.waitForSelector("#paper .ttl");
+  assert.equal(await p.inputValue("#f_employer"), "«Bog‘bon Agro» MChJ");
+  // 2) Skanerlangan PDF — ichida faqat rasm: sahifa rasmga aylantirilib OCR qilinadi
+  await p.goto(base + "#vaziyat");
+  await p.setInputFiles("#photoIn", fx("qaror-skan.pdf"));
+  await p.waitForFunction(() => /AB 1234567/.test(document.querySelector("#photoCard")?.innerText || ""), null, { timeout: 40_000 });
+  assert.match(await p.innerText("#photoCard"), /bepul OCR · PDF/);
+  assert.match(await p.innerText("#deadlineCard"), /Shikoyat berish uchun qoldi/i);
+  // 3) Buzilgan PDF — tushunarli xato
+  await p.goto(base + "#vaziyat");
+  await p.setInputFiles("#photoIn", { name:"buzuq.pdf", mimeType:"application/pdf", buffer: Buffer.from("%PDF-1.4 buzilgan fayl") });
+  await p.waitForSelector("#askErr:not([hidden])");
+  assert.match(await p.innerText("#askErr"), /PDF/);
+  assert.deepEqual(p.errors.filter(e => !/Invalid PDF|InvalidPDFException|Failed to load resource/i.test(e)), []);
+});

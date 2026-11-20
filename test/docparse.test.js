@@ -28,6 +28,8 @@ test("hujjat raqami: № / Ne / WN: — lotin hujjatda kirill o‘xshash harflar
   assert.equal(pickNumber("QAROR № АВ 1234567"), "AB 1234567");
   assert.equal(pickNumber("ПОСТАНОВЛЕНИЕ № АБ 7654321", false), "АБ 7654321");
   assert.equal(pickNumber("hech qanday raqam yo‘q"), null);
+  assert.equal(pickNumber("BUYRUQ № 112-k"), "112-k");
+  assert.equal(pickNumber("Buyruq № 45/sh sana"), "45/sh");
 });
 
 test("sana: belgilangan sana ustun, tug‘ilgan sana va kelajak tashlanadi; so‘zli oylar", () => {

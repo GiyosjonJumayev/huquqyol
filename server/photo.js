@@ -21,13 +21,35 @@ const MAGIC = {
   "image/webp": b => b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP"
 };
 
-export function vPhoto(body){
-  const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(typeof body?.image === "string" ? body.image : "");
+export const MAX_PAGES = 3;                 // ko‘p sahifali PDF: birinchi 3 sahifa
+export const MAX_TOTAL_BYTES = 6_000_000;
+export const MAX_PDF_TEXT = 20_000;
+
+function vImage(v){
+  const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(typeof v === "string" ? v : "");
   if (!m) throw new ValidationError("photoFormat");
   const buf = Buffer.from(m[2], "base64");
   if (buf.length > MAX_PHOTO_BYTES) throw new ValidationError("photoBig");
   if (buf.length < 100 || !MAGIC[m[1]](buf)) throw new ValidationError("photoFormat");
-  return { mediaType: m[1], data: m[2], note: clean(body?.note, 1000) };
+  return { mediaType: m[1], data: m[2], bytes: buf.length };
+}
+
+// Kirish uch xil bo‘ladi: bitta rasm (image), bir nechta sahifa rasmi (images — skanerlangan PDF),
+// yoki matnli PDF’dan brauzerda olingan matn (text, kind:"pdf") — bunda OCR kerak emas, matn aniq.
+export function vPhoto(body){
+  const note = clean(body?.note, 1000);
+  if (body?.kind === "pdf" && typeof body?.text === "string"){
+    const text = clean(body.text, MAX_PDF_TEXT + 1);
+    if (text.length > MAX_PDF_TEXT) throw new ValidationError("pdfLong");
+    if (text.replace(/\s/g, "").length < 20) throw new ValidationError("photoUnread");
+    return { text, note, kind:"pdf", images: [] };
+  }
+  const list = Array.isArray(body?.images) ? body.images : body?.image != null ? [body.image] : [];
+  if (!list.length || list.length > MAX_PAGES) throw new ValidationError("photoFormat");
+  const images = list.map(vImage);
+  if (images.reduce((s, i) => s + i.bytes, 0) > MAX_TOTAL_BYTES) throw new ValidationError("photoBig");
+  return { images: images.map(({ mediaType, data }) => ({ mediaType, data })), note, kind: body?.kind === "pdf" ? "pdf" : "image",
+           mediaType: images[0].mediaType, data: images[0].data };   // eski chaqiruvlar uchun birinchi rasm
 }
 
 const SYSTEM = `Sen hujjat rasmidan ma’lumot o‘quvchi yordamchisan. Rasm — O‘zbekistondagi rasmiy yoki maishiy hujjat (jarima qarori, buyruq, chek, bank xabarnomasi, kommunal hisob, shartnoma va h.k.).
@@ -81,10 +103,10 @@ export class PhotoError extends Error {
   constructor(key, status){ super(key); this.key = key; this.status = status; }
 }
 
-async function visionRead(client, { mediaType, data, note }){
+async function visionRead(client, { images, note }){
   const res = await client.messages.create({ model: MODEL, max_tokens: 600, system: SYSTEM, messages: [{ role:"user", content: [
-    { type:"image", source:{ type:"base64", media_type: mediaType, data } },
-    { type:"text", text: PROMPT(note) }
+    ...images.map(i => ({ type:"image", source:{ type:"base64", media_type: i.mediaType, data: i.data } })),
+    { type:"text", text: (images.length > 1 ? `Bu bitta hujjatning ${images.length} ta sahifasi.\n` : "") + PROMPT(note) }
   ] }] });
   const out = res.content.filter(c => c.type === "text").map(c => c.text).join("");
   return JSON.parse(out.slice(out.indexOf("{"), out.lastIndexOf("}") + 1));
@@ -100,20 +122,33 @@ export function scenarioForDoc(docType, text = ""){
 
 const hasFacts = d => d.readable && !!(d.issuer || d.amount || d.number || d.date || d.docType !== "boshqa");
 
-export async function readPhoto({ mediaType, data, note }, lang = "uz"){
-  const client = aiClient();
+export async function readPhoto(input, lang = "uz"){
+  const { note, text: pdfText, kind } = input;
+  const images = input.images?.length ? input.images : input.data ? [{ mediaType: input.mediaType, data: input.data }] : [];
   let doc = null, engine = "ai", ocr = null;
-  if (client){
-    try { doc = cleanDoc(await visionRead(client, { mediaType, data, note })); if (!hasFacts(doc)) doc = null; }
-    catch (e) { console.warn("[photo] AI xatosi, OCR ga o‘tildi:", e?.status || e?.name || "error"); doc = null; }   // rasm va matn logga yozilmaydi
-  }
-  if (!doc){
-    engine = "ocr";
-    ocr = await recognize(Buffer.from(data, "base64"));
-    const parsed = parseDocText(ocr.text);
-    ocr.text = parsed.text;                                        // ko‘rsatiladigan matn ham tuzatilgan holda
+  if (pdfText != null){
+    // Matnli PDF: matn brauzerda pdf.js bilan olingan — OCR va AI kerak emas, xato ham yo‘q
+    engine = "pdf";
+    const parsed = parseDocText(pdfText);
+    ocr = { text: parsed.text, confidence: 100 };
     doc = cleanDoc(parsed);
     if (!hasFacts(doc)) throw new PhotoError("photoUnread", 422);
+  } else {
+    const client = aiClient();
+    if (client){
+      try { doc = cleanDoc(await visionRead(client, { images, note })); if (!hasFacts(doc)) doc = null; }
+      catch (e) { console.warn("[photo] AI xatosi, OCR ga o‘tildi:", e?.status || e?.name || "error"); doc = null; }   // rasm va matn logga yozilmaydi
+    }
+    if (!doc){
+      engine = "ocr";
+      // Har bir sahifa navbat bilan o‘qiladi; matnlar birlashtiriladi, ishonch — o‘rtacha
+      const pages = [];
+      for (const img of images) pages.push(await recognize(Buffer.from(img.data, "base64")));
+      const parsed = parseDocText(pages.map(p => p.text).join("\n\n"));
+      ocr = { text: parsed.text, confidence: Math.round(pages.reduce((s, p) => s + p.confidence, 0) / pages.length) };   // ko‘rsatiladigan matn ham tuzatilgan holda
+      doc = cleanDoc(parsed);
+      if (!hasFacts(doc)) throw new PhotoError("photoUnread", 422);
+    }
   }
 
   // Tasniflash: o‘qilgan faktlar va fuqaro izohidan tuzilgan matn mavjud analyze() ga beriladi (bazadagi normalar bilan)
@@ -126,7 +161,7 @@ export async function readPhoto({ mediaType, data, note }, lang = "uz"){
   if (mapped && a.scenario !== mapped && (!note || a.scenario === "boshqa"))
     a = { ...a, scenario: mapped, confidence: Math.max(0.7, a.confidence || 0), summary: "", missing: [], normIds: [], facts:{ form:{} } };
 
-  const photo = { docType: doc.docType, title: doc.title, issuer: doc.issuer, number: doc.number, date: doc.date, amount: doc.amount, plate: doc.plate, reason: doc.reason, engine,
+  const photo = { docType: doc.docType, title: doc.title, issuer: doc.issuer, number: doc.number, date: doc.date, amount: doc.amount, plate: doc.plate, reason: doc.reason, engine, kind: kind || "image", pages: pdfText != null ? null : images.length,
     ...(ocr ? { confidence: ocr.confidence, lowQuality: ocr.confidence < 55, text: ocr.text.trim().slice(0, 3000) } : {}) };
   if (a.scenario === "boshqa" || !SCENARIO_BY_ID[a.scenario]) return { ...a, photo, source:"photo", analysisSource: a.source };
 
