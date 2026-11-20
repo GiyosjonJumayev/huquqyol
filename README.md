@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 100 unit + 10 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 101 unit + 10 brauzer |
 
 ## Ko‘rinishlar
 
@@ -114,7 +114,7 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 100 ta unit/API test (jumladan ruscha, kirillcha, rasmdan o‘qish va Telegram bot)
+npm test                  # 101 ta unit/API test (jumladan ruscha, kirillcha, rasmdan o‘qish va Telegram bot)
 npm run test:e2e          # 10 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
