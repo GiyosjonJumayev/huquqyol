@@ -240,7 +240,8 @@ function renderPlan(){
         <div class="money" id="calcValue">—</div>
         <div class="small muted" id="calcNote"></div>
         <div class="calcrows" id="calcRows" hidden></div>
-        <div class="inline">${calcFields.map(calcInput).join("")}</div></div>`
+        <div class="inline">${calcFields.map(calcInput).join("")}</div>
+        <details class="more fx" id="calcFx" hidden><summary>${t("fxSummary")}</summary><div id="fxBody"></div></details></div>`
       : `<div class="card"><div class="kicker">${t("mainRight")}</div>
         <div class="money right">${esc(n0.title)}</div>
         <p class="small muted">${esc(n0.text)}</p>
@@ -262,8 +263,12 @@ function renderPlan(){
     <div class="cta"><span class="small muted ctahint">${t("nextHint")}</span><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
   $("#printPlan").addEventListener("click", printPlan);
   $("#ttsPlan").addEventListener("click", () => readAloud(planItems()));
-  $("#route").addEventListener("click", e => { const b = e.target.closest("[data-of]"); if (b) jumpToOffice(b.dataset.of); });
+  $("#route").addEventListener("click", e => {
+    const b = e.target.closest("[data-of]"); if (b) return jumpToOffice(b.dataset.of);
+    const d = e.target.closest("[data-doc]"); if (d){ selectRecipient(d.dataset.doc); go(3); }
+  });
   renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
+  dateWords($("#calcCard"));
   $("#evid").addEventListener("change", e => {
     const i = Number(e.target.dataset.i); if (Number.isNaN(i)) return;
     state.evidence = e.target.checked ? [...new Set([...state.evidence, i])] : state.evidence.filter(x => x !== i);
@@ -307,6 +312,22 @@ function altsHTML(a){
   return `<div class="alts"><span class="small muted">${t("altTitle")}</span>${alts.map(m => `<button class="chipbtn" type="button" data-alt="${m.id}">${esc(m.title)}</button>`).join("")}</div>`;
 }
 
+// Har bir sana maydoni yonida tanlangan sana so‘z bilan: «= 19-avgust 2026-yil» / «= 19 августа 2026 г.»
+function dateWord(input){
+  const id = "dw_" + input.id;
+  let s = document.getElementById(id);
+  if (!s){
+    s = Object.assign(document.createElement("span"), { id, className: "dateword" });
+    input.after(s);
+    input.setAttribute("aria-describedby", `${input.getAttribute("aria-describedby") || ""} ${id}`.trim());
+  }
+  const d = input.value ? new Date(input.value + "T00:00:00") : null;
+  s.textContent = d && !isNaN(d) ? "= " + fmtDate(d, LANG) : "";
+}
+const dateWords = root => root?.querySelectorAll('input[type="date"]').forEach(dateWord);
+document.addEventListener("input", e => { if (e.target.matches?.('input[type="date"]')) dateWord(e.target); });
+document.addEventListener("change", e => { if (e.target.matches?.('input[type="date"]')) dateWord(e.target); });
+
 function renderDeadline(){
   const p = state.plan, cls = { low:"lv-ok", medium:"lv-warn", high:"lv-bad", expired:"lv-bad", info:"lv-ok" }[p.risk.level];
   const head = `<div class="cardhead"><div class="kicker">${esc(p.deadlineLabel)}</div><span class="pill ${cls}">${esc(p.risk.label)}</span></div>`;
@@ -321,6 +342,7 @@ function renderDeadline(){
     ${p.deadlineNote ? `<div class="small muted dnote">${esc(p.deadlineNote)}</div>` : ""}${date}
     ${p.daysLeft >= 0 ? `<button class="btn ghost sm calbtn" id="calBtn" type="button">${t("calendar")}</button>` : ""}`;
   applyWidths($("#deadlineCard"));
+  dateWords($("#deadlineCard"));
   $("#calBtn")?.addEventListener("click", downloadIcs);
   $("#trigger").addEventListener("change", e => {
     if (!e.target.value) return;
@@ -331,12 +353,18 @@ function renderDeadline(){
 
 function renderRoute(){
   const has = new Set((state.plan.offices || []).map(o => o.id));
-  $("#route").innerHTML = state.plan.steps.map((st, i) => `
-    <li><span class="num" aria-hidden="true">${i + 1}</span><div class="body">
+  const docs = new Set((scenarioMeta(state.scn)?.docs || []).map(d => d.id));
+  // Mediatsiya qadami: mediatorlar reyestri kartasiga va «Mediatsiya taklifi» xatiga havola
+  const links = st => [
+    ...(has.has(st.office) ? [`<button class="linkbtn ofjump" type="button" data-of="${esc(st.office)}">${t(st.office === "mediators" ? "medRegistry" : "ofContact")} ↓</button>`] : []),
+    ...(st.office === "mediators" && docs.has("mediatsiya") ? [`<button class="linkbtn ofjump" type="button" data-doc="mediatsiya">${t("medDoc")} →</button>`] : [])
+  ];
+  $("#route").innerHTML = state.plan.steps.map((st, i) => { const l = links(st); return `
+    <li${st.office === "mediators" ? ` class="medstep"` : ""}><span class="num" aria-hidden="true">${i + 1}</span><div class="body">
       <div class="row"><div><div class="org">${esc(st.org)}</div><h3>${esc(st.t)}</h3></div>
       <span class="when ${st.hot ? "hot" : ""}">${esc(st.when)}</span></div>
       <p>${esc(st.body)}</p>
-      ${has.has(st.office) ? `<button class="linkbtn ofjump" type="button" data-of="${esc(st.office)}">${t("ofContact")} ↓</button>` : ""}</div></li>`).join("");
+      ${l.length ? `<div class="steplinks">${l.join("")}</div>` : ""}</div></li>`; }).join("");
 }
 
 /* ---------- Idoralar: manzil va aloqa (rasmiy saytlardan) ---------- */
@@ -383,6 +411,49 @@ function renderCalc(){
   const rows = $("#calcRows");
   rows.hidden = !c.rows;
   rows.innerHTML = (c.rows || []).map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("");
+  renderFormula();
+}
+
+// «Bu summa qanday hisoblandi?» — server natijasi (calc.raw) va foydalanuvchi raqamlari bilan oddiy so‘zda.
+// Oyma-oy kunlar brauzerda MK 9-modda qoidasi bilan qayta hisoblanadi va FAQAT server summasi bilan aynan mos kelsa ko‘rsatiladi.
+const BUXGALTER_URL = "https://buxgalter.uz/";
+const dec = x => String(x).replace(".", ",");
+const addMonthsC = (d, n) => { const y = d.getFullYear(), m = d.getMonth() + n, last = new Date(y, m + 1, 0).getDate(); return new Date(y, m, Math.min(d.getDate(), last)); };
+const dayDiffC = (a, b) => Math.round((new Date(b.getFullYear(), b.getMonth(), b.getDate()) - new Date(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+const srcLink = (url, label) => `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)} ↗<span class="sr"> ${t("newTab")}</span></a>`;
+function formulaHTML(){
+  const p = state.plan, c = p.calc, r = c?.raw, type = scenarioMeta(state.scn)?.calc, f = cleanForm(), M = n => fmtMoney(n, LANG);
+  if (!r) return "";
+  const mainLaw = p.norms.find(n => n?.lawUrl);
+  const lawSrc = mainLaw ? srcLink(mainLaw.lawUrl, t("fxSrcLaw", { law: mainLaw.lawName })) : "";
+  let steps = [], srcs = [lawSrc];
+  if (type === "labor333"){
+    const amount = Number(f.amount) || 0, months = Math.max(1, Math.min(60, Math.round(Number(f.months) || 1))), share = amount / months;
+    const per = r.rate / 100 * 0.10, trig = new Date(p.trigger + "T00:00:00"), today = new Date();
+    const days = Array.from({ length: months }, (_, i) => dayDiffC(addMonthsC(trig, i), today)).filter(d => d > 0);
+    const sum = days.reduce((a, b) => a + b, 0), exact = sum > 0 && Math.round(share * sum * per) === r.literal;
+    steps = [t("fx333a", { amount: M(amount), months, share: M(share) }), t("fx333b", { rate: dec(r.rate), daily: dec(r.dailyPct) }),
+      exact ? t("fx333c", { list: days.map((d, i) => t("fxMonth", { i: i + 1, d })).join(", "), sum }) : t("fx333cShort", { max: r.maxDelayDays }),
+      ...(exact ? [t("fx333d", { share: M(share), sum, daily: dec(r.dailyPct), total: M(r.literal) })] : []),
+      t("fx333alt", { alt: M(r.alternative) })];
+    srcs = [srcLink(r.source, t("fxSrc333")), srcLink(BUXGALTER_URL, t("fxSrcAlt"))];
+  } else if (type === "consumerPenalty" && r.late){
+    steps = [t("fxPen", { price: M(Number(f.price) || 0), late: r.late, total: c.value })];
+  } else if (type === "loanCap"){
+    steps = [t("fxLoan", { loan: M(Number(f.loan) || 0), cap: M(r.cap) }), ...(r.excess ? [t("fxLoanEx", { charged: M(Number(f.charged) || 0), cap: M(r.cap), excess: M(r.excess) })] : [])];
+  } else if (type === "alimony"){
+    const frac = { 0.25:"1/4", [1/3]:"1/3", 0.5:"1/2" }[r.share] || "";
+    steps = [t("fxAl", { income: M(Number(f.income) || 0), frac, byIncome: M(r.byIncome), min: M(r.min) })];
+  }
+  if (!steps.length) return "";
+  return `<ol class="fxsteps">${steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+    <p class="fxsrc"><span>${t("fxSrc")}</span> ${srcs.filter(Boolean).join(" · ")}</p>`;
+}
+function renderFormula(){
+  const box = $("#calcFx"); if (!box) return;
+  const html = formulaHTML();
+  box.hidden = !html;
+  $("#fxBody").innerHTML = html;
 }
 function renderEvCount(){
   const inf = state.plan.evidenceInfo || [], must = inf.map((x, i) => x.need === "m" ? i : -1).filter(i => i >= 0);
@@ -535,10 +606,13 @@ function renderDocView(){
     ${[...groups].map(([g, fs]) => `<fieldset><legend>${esc(g)}</legend>${fs.map(fieldHTML).join("")}</fieldset>`).join("")}
     <details class="more" ${extra ? "open" : ""}><summary>${t("extraSummary")}</summary>
       <div class="field"><label for="f_extra">${t("extraLabel")}</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
+  dateWords($("#docForm"));
   renderHowto();
   previewDoc();
 }
 function renderHowto(){
+  if ($("#onlineStatus")) $("#onlineStatus").textContent = "";
+  renderOnline();
   const d = scenarioMeta(state.scn).docs.find(x => x.id === state.recipient), h = d?.howto;
   $("#howto").hidden = !h;
   if (!h) return;
@@ -549,6 +623,44 @@ function renderHowto(){
   $("#howtoOffice").hidden = !o;
   $("#howtoOffice").innerHTML = o ? `<h3 class="ofwhere">${t("ofWhere")}</h3>${officeHTML(o, state.plan.officesChecked, true)}` : "";
 }
+// Davlat idorasiga yuboriladigan arizalar: murojaat.gov.uz orqali onlayn yuborish yo‘riqnomasi
+// (sud, ish beruvchi, sotuvchi, uy egasi, qarzdor, bank, sug‘urta va konsullik — bu yerga kirmaydi)
+const STATE_RECIPIENTS = new Set(["inspection", "agency", "higher", "cbu", "migration", "ariza", "taklif", "shikoyat"]);
+const ORG_FIELD = { ariza: "body", taklif: "body", shikoyat: "body", higher: "higherAgency" };
+const linkTo = (text, host) => esc(text).replace(host, `<a href="https://${host}/" target="_blank" rel="noopener noreferrer">${host}<span class="sr"> ${esc(t("newTab"))}</span></a>`);
+function onlineOrg(){
+  const d = scenarioMeta(state.scn)?.docs.find(x => x.id === state.recipient);
+  const typed = ORG_FIELD[state.recipient] && form()[ORG_FIELD[state.recipient]];
+  if (typed) return typed;
+  const office = d?.office && state.plan?.offices?.find(o => o.id === d.office);
+  if (office) return office.name;
+  const addr = state.blocks.find(b => b.t === "addr");
+  return addr?.lines?.[0] ? partsText(addr.lines[0]) : t("onlineOrgFallback");
+}
+function onlineAttachments(){
+  const i = state.blocks.findIndex(b => b.t === "sign"), list = i > 0 ? state.blocks[i - 1] : null;
+  return list?.t === "list" ? list.items.map(partsText).map(s => s.replace(/\.$/, "")) : [];
+}
+function renderOnline(){
+  const box = $("#online"); if (!box) return;
+  box.hidden = !STATE_RECIPIENTS.has(state.recipient);
+  if (box.hidden) return;
+  const att = onlineAttachments();
+  $("#onlineSteps").innerHTML = [
+    linkTo(t("on1"), "murojaat.gov.uz"),
+    esc(t("on2", { org: onlineOrg() })),
+    esc(t("on3")),
+    ...(att.length ? [esc(t("on4", { list: att.join("; ") }))] : []),
+    esc(t("on5"))
+  ].map(s => `<li>${s}</li>`).join("");
+  $("#onlineNext").innerHTML = linkTo(t("onlineNext"), "pm.gov.uz");
+}
+// Ariza matnini nusxalash (oddiy «Matnni nusxalash» va murojaat.gov.uz uchun bitta yo‘l)
+async function copyDocText(){
+  try { await navigator.clipboard.writeText(docText()); return "copied"; }
+  catch { const rg = document.createRange(); rg.selectNodeContents($("#paper")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); return "selected"; }
+}
+
 function syncVisibility(){
   for (const f of scenarioMeta(state.scn).fields){ const el = document.querySelector(`[data-f="${f.k}"]`); if (el) el.hidden = !!(f.docs && !f.docs.includes(state.recipient)); }
 }
@@ -571,6 +683,7 @@ async function previewDoc(){
     state.blocks = m.blocks; state.missing = m.missing || [];
     $("#paper").innerHTML = m.blocks.map(blockHTML).join("");
     renderMissing();
+    renderOnline();
   } catch (e){ if (seq === previewSeq) toast(e.message); }
 }
 function renderMissing(){
@@ -703,14 +816,17 @@ document.addEventListener("click", e => {
   const lb = e.target.closest(".langsw [data-lang]");
   if (lb){ setLang(lb.dataset.lang); return; }
   const r = e.target.closest("#seg button");
-  if (r){
-    state.recipient = r.dataset.r; persist();
-    document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b === r)));
-    syncVisibility();
-    renderHowto();
-    previewDoc();
-  }
+  if (r) selectRecipient(r.dataset.r);
 });
+// Ariza oluvchisini tanlash (3-sahifadagi tugmalar va rejadagi havolalar uchun bitta yo‘l)
+function selectRecipient(id){
+  if (!scenarioMeta(state.scn)?.docs.some(d => d.id === id)) return;
+  state.recipient = id; persist();
+  document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.r === id)));
+  syncVisibility();
+  renderHowto();
+  previewDoc();
+}
 const onForm = debounce(previewDoc, 220);
 const onDocCalc = debounce(() => refreshPlan(false).catch(() => {}), 300);
 function onDocInput(e){
@@ -895,9 +1011,13 @@ $("#problem").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctr
 $("#dlDocx").addEventListener("click", () => download("docx"));
 $("#dlPdf").addEventListener("click", () => download("pdf"));
 $("#printBtn").addEventListener("click", () => window.print());
-$("#copyTxt").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(docText()); toast(t("copied")); }
-  catch { const rg = document.createRange(); rg.selectNodeContents($("#paper")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); toast(t("selected")); }
+$("#copyTxt").addEventListener("click", async () => { toast(t(await copyDocText() === "copied" ? "copied" : "selected")); });
+$("#copyOnline").addEventListener("click", async () => {
+  const n = state.missing.length;
+  if (n && !await confirmAction({ title: t("onlineMissT"), text: t("onlineMissP", { n, list: state.missing.map(x => x.label).join(", ") }), ok: t("copyAnyway") })) return;
+  const msg = t(await copyDocText() === "copied" ? "onlineCopied" : "onlineSelected");
+  const st = $("#onlineStatus"); st.textContent = ""; setTimeout(() => { st.textContent = "✓ " + msg; }, 30);
+  setTimeout(() => { if (st.textContent.endsWith(msg)) st.textContent = ""; }, 6000);
 });
 $("#dlgOk").addEventListener("click", () => $("#dlg").close("ok"));
 $("#dlgNo").addEventListener("click", () => $("#dlg").close("no"));

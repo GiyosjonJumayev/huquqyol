@@ -20,4 +20,5 @@ test("Lotin → kirill: asosiy qoidalar", () => {
 test("Havolalar o‘zgarmaydi; turli tutuq belgilari", () => {
   assert.equal(toCyrillic("manba: https://lex.uz/acts/-6257288"), "манба: https://lex.uz/acts/-6257288");
   assert.equal(toCyrillic("oʻgʻil o'g'il o’g’il"), "ўғил ўғил ўғил");
+  assert.equal(toCyrillic("OneID orqali kiring, Ctrl+V bosing"), "OneID орқали киринг, Ctrl+V босинг");   // tizim va tugma nomlari
 });

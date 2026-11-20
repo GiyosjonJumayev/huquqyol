@@ -15,6 +15,7 @@ Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=3000
 Environment=TRUST_PROXY=1
+Environment=TZ=Asia/Tashkent
 # Maxfiy kalit .env faylida (chmod 600) — app.cjs uni o‘zi o‘qiydi
 NoNewPrivileges=true
 ProtectSystem=strict

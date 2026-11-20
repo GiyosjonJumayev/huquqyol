@@ -67,7 +67,7 @@ test("Bosh sahifa serverda chiziladi; versiyali fayllar bir yil keshlanadi; gzip
   assert.equal(r.headers.get("cache-control"), "no-cache");
   assert.equal((html.match(/data-domain="/g) || []).length, 12);
   const meta = JSON.parse(html.match(/<script type="application\/json" id="meta-data">([\s\S]*?)<\/script>/)[1]);
-  assert.equal(meta.scenarios.length, 23);
+  assert.equal(meta.scenarios.length, 24);
   assert.ok(!/<\/script>[\s\S]*<script(?! type="application\/json")[^>]*>[^<]/.test(html.split('id="meta-data"')[1].slice(100)), "inline JS yo‘q");
   const css = html.match(/\/app\.css\?v=([a-f0-9]+)/);
   assert.ok(css, "app.css versiyalangan");

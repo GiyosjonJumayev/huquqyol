@@ -104,12 +104,35 @@
     </div>
     <p class="privacy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>{{privacy}}</span></p>
     </div>
+    <ul class="trust" aria-label="{{trustLabel}}">
+      <li><span class="tic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></span><span><b>{{tr1b}}</b> <span>— {{tr1}}</span></span></li>
+      <li><span class="tic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/><path d="M17 4l3 3M20 4l-3 3"/></svg></span><span><b>{{tr2b}}</b> <span>— {{tr2}}</span></span></li>
+      <li><span class="tic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><rect x="9.5" y="10" width="5" height="4.5" rx="1"/><path d="M10.5 10V8.8a1.5 1.5 0 0 1 3 0V10"/></svg></span><span><b>{{tr3b}}</b> <span>— {{tr3}}</span></span></li>
+      <li><span class="tic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/><path d="M7 8h1.5M15.5 8H17"/></svg></span><span><b>{{tr4b}}</b> <span>— {{tr4}}</span></span></li>
+    </ul>
     <div id="picker">
       <h2 class="sec" id="pickTitle">{{or}}</h2>
       <div class="pickhead" id="pickHead" hidden></div>
       <div class="domains" id="cases"><!--DOMAINS--></div>
     </div>
-    <ol class="how" aria-label="{{howLabel}}"><li><span class="hn">1</span>{{how1}}</li><li><span class="hn">2</span>{{how2}}</li><li><span class="hn">3</span>{{how3}}</li></ol>
+    <section class="howsec" aria-labelledby="howH">
+      <h2 class="sec" id="howH">{{howLabel}}</h2>
+      <ol class="how">
+        <li><span class="hn" aria-hidden="true">1</span><span><b>{{how1}}</b><span>{{howd1}}</span></span></li>
+        <li><span class="hn" aria-hidden="true">2</span><span><b>{{how2}}</b><span>{{howd2}}</span></span></li>
+        <li><span class="hn" aria-hidden="true">3</span><span><b>{{how3}}</b><span>{{howd3}}</span></span></li>
+      </ol>
+    </section>
+    <section class="portals" aria-labelledby="portalsH">
+      <h2 class="sec" id="portalsH">{{portalsH}}</h2>
+      <ol class="pflow">
+        <li><span class="pn" aria-hidden="true">1</span><span><b>{{pPrep}}</b><span class="pval">HuquqYo‘l</span></span></li>
+        <li class="arr" aria-hidden="true">→</li>
+        <li><span class="pn" aria-hidden="true">2</span><span><b>{{pSend}}</b><span class="pval"><a href="https://murojaat.gov.uz/" target="_blank" rel="noopener noreferrer">murojaat.gov.uz<span class="sr"> {{newTab}}</span></a> · <a href="https://pm.gov.uz/" target="_blank" rel="noopener noreferrer">pm.gov.uz<span class="sr"> {{newTab}}</span></a></span></span></li>
+        <li class="pother"><span class="pn" aria-hidden="true">+</span><span><b>{{pOther}}</b><span class="pval"><a href="https://yurxizmat.uz/" target="_blank" rel="noopener noreferrer">yurxizmat.uz<span class="sr"> {{newTab}}</span></a></span><span class="pnote">{{pOtherNote}}</span></span></li>
+      </ol>
+      <p class="pnoteall">{{portalsNote}}</p>
+    </section>
   </section>
 
   <!-- 2. Reja -->
@@ -135,6 +158,13 @@
           <button class="btn ghost" id="copyTxt" type="button">{{copy}}</button>
           <button class="btn ghost" id="ttsDoc" type="button" data-tts><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>{{ttsListen}}</button>
         </div>
+        <p class="dldisc">{{dlDisclaimer}}</p>
+        <section class="card online" id="online" aria-labelledby="onlineH" hidden>
+          <h2 id="onlineH">{{onlineH}}</h2>
+          <div class="onlineact"><button class="btn primary" id="copyOnline" type="button">{{copyOnline}}</button><span class="onstatus" id="onlineStatus" role="status"></span></div>
+          <ol id="onlineSteps"></ol>
+          <p class="small onnext" id="onlineNext"></p>
+        </section>
         <section class="card howto" id="howto" aria-labelledby="howtoH"><h2 id="howtoH">{{howto}}</h2><ol id="howtoSteps"></ol><div class="howlinks" id="howtoLinks"></div><div id="howtoOffice" hidden></div></section>
       </div>
     </div>
@@ -142,8 +172,8 @@
 
 </main>
   <footer>
-    <div><b>{{disclaimerB}}</b> {{disclaimer}}</div>
-    <div>{{sources}} <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz</a>. {{checked}}</div>
+    <div class="disclaim" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p><b>{{disclaimerB}}</b> {{disclaimer}}</p></div>
+    <div><b class="checked">{{checked}}</b> {{sources}} <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz<span class="sr"> {{newTab}}</span></a>.</div>
     <div>{{local}} <button class="linkbtn" id="wipe" type="button">{{wipe}}</button> · <a href="/statistika">{{stLink}}</a></div>
   </footer>
 </div>

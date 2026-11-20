@@ -22,8 +22,8 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 **Nimasi bilan ajralib turadi**
 
-- **Qonunni AI o‘ylab topmaydi.** 60 ta norma va 13 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
-- **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri, dam olish kuni → keyingi ish kuni).
+- **Qonunni AI o‘ylab topmaydi.** 62 ta norma va 14 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
+- **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri; yakshanba yoki bayram kuni → keyingi ish kuni). Bayramlar ro‘yxati — `server/holidays.js`; Ramazon va Qurbon hayiti sanalari har yili rasmiy e’londan keyin qo‘shiladi (yoki `HOLIDAYS_EXTRA`).
 - **Keksalar uchun:** 4 darajali katta shrift va matnlarni ovozli o‘qish.
 - **Maxfiylik:** ariza ma’lumotlari faqat qurilmada; anonim statistika faqat sanoq — matn, IP, cookie saqlanmaydi.
 - **Internetsiz ishlaydi** (PWA): shriftlar, bilim bazasi va hujjat generatori loyiha ichida.
@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 23 | 60 (53 tasi modda raqami bilan) | 53 × 3 til = 159 | 120 | 13 | 5 | 83 unit + 12 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 115 unit + 12 brauzer |
 
 ## Ko‘rinishlar
 
@@ -47,7 +47,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 ```mermaid
 flowchart LR
   U[Fuqaro: matn / ovoz / soha] --> A["/api/analyze"]
-  A --> R[BM25 qidiruv + kalit so‘zlar<br/>60 norma, 23 holat]
+  A --> R[BM25 qidiruv + kalit so‘zlar<br/>62 norma, 24 holat]
   R --> C{Claude bormi?}
   C -- ha --> AI[Claude: tasniflash va faktlar<br/>faqat bazadagi normalar]
   C -- yo‘q --> RU[Qoidalar bo‘yicha tasniflash]
@@ -89,7 +89,7 @@ Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahli
 Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa, ilova yaqin holatlarni taklif qiladi va bir bosishda almashtiradi. Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
 
 
-## Qamrab olingan sohalar (12 soha, 23 holat)
+## Qamrab olingan sohalar (12 soha, 24 holat)
 
 | Soha | Holatlar | Asosiy manba | Muddat | Kalkulyator | Arizalar |
 |---|---|---|---|---|---|
@@ -102,7 +102,7 @@ Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa,
 | Yo‘l-transport | YHXX jarimasiga shikoyat; OSGO bo‘yicha sug‘urta to‘lovi | MJtK; O‘RQ-155, 19, 23, 25-moddalar | 10 kun; 3 yil | 50% / 70% chegirma | Yuqori organ, sud, sug‘urtachi |
 | Pensiya va nafaqa | Pensiya rad etildi yoki kam hisoblandi; ijtimoiy nafaqa rad etildi | Pensiya ta’minoti to‘g‘risidagi qonun, 45, 47–49-moddalar; ma’muriy sud | 6 oy | — | Yuqori organ, ma’muriy sud |
 | Mehnat migrantlari | Bandlik agentligi aldovi; xorijda maosh berilmasligi yoki pasport olib qo‘yilishi | Xususiy bandlik agentliklari to‘g‘risidagi qonun (O‘RQ-501), 15, 15¹, 17, 20-moddalar | 3 yil; muddatsiz | — | Agentlik, Migratsiya agentligi, konsullik, sud |
-| Davlat idoralari | Javobsiz murojaat; noqonuniy qaror | Murojaatlar to‘g‘risidagi qonun (6, 28, 36-moddalar); ma’muriy sud | 15 kun + 6 oy; 6 oy | — | Yuqori organ, ma’muriy sud |
+| Davlat idoralari | Ariza, taklif yoki shikoyat yozish; javobsiz murojaat; noqonuniy qaror | Murojaatlar to‘g‘risidagi qonun (5, 6, 28, 36, 38-moddalar); ma’muriy sud | javob 15 kun (muddatsiz); 15 kun + 6 oy; 6 oy | — | Istalgan idora (ariza, taklif, shikoyat), yuqori organ, ma’muriy sud |
 | Boshqa jarimalar | Ma’muriy jarimaga shikoyat (inspeksiyalar va boshqa organlar) | MJtK (10 kunlik shikoyat muddati, 332¹-modda chegirmasi) | 10 kun | 50% / 70% chegirma sanalari bilan | Yuqori organ, sud |
 | Qarz | Qarzni undirish | Fuqarolik kodeksi, 150, 732-moddalar | 3 yil | — | Qarzdor, sud |
 
@@ -114,7 +114,7 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 83 ta unit/API test (jumladan ruscha, kirillcha, rasmdan OCR va PDF)
+npm test                  # 115 ta unit/API test (jumladan ruscha, kirillcha, rasmdan OCR, PDF va Telegram bot)
 npm run test:e2e          # 12 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
@@ -129,10 +129,41 @@ docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-ant-... huquqyol
 
 Bepul joylashtirish: Render’da repo ulanadi, `render.yaml` hamma narsani o‘zi sozlaydi (faqat `ANTHROPIC_API_KEY` ni kiriting). Railway va boshqa platformalarda start buyrug‘i `npm start`.
 
+## Telegram bot
+
+«Telegramda ham — odam turgan joyda»: xuddi saytdagi tahlil, reja, ariza (PDF + Word) va kalendar eslatmasi Telegram chatida. Bot sayt bilan bir xil dvigateldan foydalanadi (`server/analyze.js`, `plan.js`, `documents.js`) — muddat, summa va hujjat matni bir xil.
+
+Mahalliy ishga tushirish:
+
+1. Telegram’da [@BotFather](https://t.me/BotFather) ga `/newbot` yozing, nom bering va tokenni oling.
+2. `.env` fayliga qo‘shing: `TELEGRAM_BOT_TOKEN=123456789:AA...` (token maxfiy — repoga qo‘shmang).
+3. Ishga tushiring (alohida jarayon, sayt bilan parallel ishlashi mumkin):
+
+```bash
+npm install
+npm run bot               # «HuquqYo‘l bot ishga tushdi: @sizning_botingiz»
+```
+
+4. Telegram’da botingizni oching → `/start` → tilni tanlang → muammoni yozing.
+
+| Buyruq | Vazifa |
+|---|---|
+| `/start` | salom, maxfiylik, til tanlash |
+| `/help` | yordam |
+| `/lang` | tilni almashtirish (o‘zbek lotin / kirill, rus) |
+| `/sana` yoki `/sana 22.08.2026` | muddat hisoblanadigan sanani kiritish (22.08.2026, 2.8.2026 yoki 2026-08-22). Faol holatda shunchaki sanani yozish ham mumkin |
+| `/skip` | F.I.Sh. so‘ralganda — o‘tkazib yuborish |
+| `/delete` | bot xotirasidagi ma’lumotni darhol o‘chirish |
+
+Sana kiritilmasa, bot muddatni taxminiy deb aniq aytadi va «Sanani kiritish» tugmasini ko‘rsatadi. Matn noaniq bo‘lsa («qarzdorlik bor»), bitta aniqlashtiruvchi savol va 2–3 holat tugmasi chiqadi.
+
+Ishlash tartibi: long polling (webhook va ochiq port kerak emas). Sessiya faqat xotirada, 1 soat; foydalanuvchi matni logga yozilmaydi; har bir chat uchun daqiqasiga 20 ta xabar. Server o‘chsa, sessiyalar yo‘qoladi. Bot uchun HTTPS yoki domen kerak emas, lekin u doimiy ishlab turadigan jarayon: VPS’da `pm2 start bot/index.js --name huquqyol-bot` yoki systemd xizmati sifatida ishga tushiring.
+
 ## Fayllar tuzilishi
 
 ```
 public/            Frontend: 3 ekran (Vaziyat → Reja → Ariza), freymvorksiz JS
+bot/               Telegram bot (grammY): shu dvigatel ustida — tahlil, reja, ariza, .ics
 server/
   index.js         Express API, rate limit, statik fayllar
   analyze.js       Tahlil: RAG konteksti → Claude (JSON) → validatsiya; xato bo‘lsa qoidalar
@@ -250,7 +281,7 @@ Shablon sintaksisi:
   - O‘RQ-501 (xususiy bandlik agentliklari), 15, 15¹, 17, 20-moddalar;
   - Markaziy bankning iste’molchilar huquqlarini himoya qilish xizmati: (71) 200-00-44 (cbu.uz).
 - Modda raqamisiz berilgan normalar (banklar to‘g‘risidagi qonundagi javobgarlik va bank siri; Markaziy bankka shikoyat) mazmuni bo‘yicha tekshirilgan, lekin amaldagi tahrirdagi modda raqami tasdiqlanmagan. Ijtimoiy nafaqa bo‘yicha alohida qonun normasi keltirilmagan: holat Murojaatlar to‘g‘risidagi qonun va ma’muriy sud tartibiga tayanadi.
-- 333-modda kompensatsiyasini hisoblash usuli amaliyotda bahsli. Shuning uchun ilova past talqinni asosiy summa sifatida, yuqori talqinni esa oraliq sifatida ko‘rsatadi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
+- 333-modda kompensatsiyasi: asosiy summa — modda matni bo‘yicha (kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi; 14% da qarzning kuniga 1,4%). Ikkinchi qatorda hisobchilar talqini (buxgalter.uz: stavka yillik deb olinib, 365 ga bo‘linadi) ko‘rsatiladi. Yakuniy summani sud belgilaydi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
 - **Bu huquqiy maslahat emas.** Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi.
 
 ## Ko‘p tillilik

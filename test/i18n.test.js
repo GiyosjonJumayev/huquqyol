@@ -31,6 +31,13 @@ test("Ruscha baza o‘zbekchaga to‘liq mos: tuzilma, kalitlar, matnlar", () =>
   }
   for (const n of ru.NORMS) assert.ok(/[а-я]/i.test(n.title) && /[а-я]/i.test(n.text), n.id);
   assert.equal(ru.NORM_BY_ID.m333.article, "Статья 333");
+  assert.equal(ru.NORM_BY_ID.muddat.article, "Статья 560");      // sudga murojaat muddatlari — MK 560-modda
+  assert.equal(ru.NORM_BY_ID.sud.article, "Статья 558");         // bevosita sudda ko‘riladigan nizolar — MK 558-modda
+  assert.equal(ru.NORM_BY_ID.m562.article, "Статья 562");        // sud xarajatlaridan ozod qilish — MK 562-modda
+  assert.match(ru.NORM_BY_ID.m562.text, /судебных расходов/);
+  assert.doesNotMatch(ru.NORM_BY_ID.muddat.text, /судебных расходов/);
+  assert.match(uz.NORM_BY_ID.m562.text, /sud xarajatlari/);
+  assert.doesNotMatch(uz.NORM_BY_ID.m562.text, /davlat boj/i);
 });
 
 test("Til aniqlash: tana → ?lang → cookie → Accept-Language", () => {
@@ -61,7 +68,8 @@ test("API ruscha va kirillcha javob beradi, xatolar ham shu tilda", async () => 
   const p = await (await post("/api/plan", { scenario:"ish_haqi", triggerDate:"2026-08-01", form:{ amount:"9000000", months:"3" }, lang:"ru" })).json();
   assert.equal(p.info.title, "Не выплачивают зарплату");
   assert.match(p.deadlineText, /февраля 2027 г\./);
-  assert.match(p.calc.value, /^не менее .* сум$/);
+  assert.match(p.calc.value, /^[\d\s]+ сум$/);
+  assert.match(p.calc.rows[0][0], /ст\. 333 ТК/);
   const c = await (await post("/api/plan", { scenario:"jarima", lang:"cyr" })).json();
   assert.ok(c.info.title === "Жаримага рози эмасман" && c.scenario === "jarima" && /^\d{4}-/.test(c.trigger));
   const m = await (await fetch(base + "/api/meta?lang=ru")).json();
@@ -96,6 +104,10 @@ test("Ruscha matndan 11 holat tasniflanadi (AIsiz)", async () => {
     "Третий день нет газа, отключили без предупреждения": "kommunal_sifat",
     "Друг не возвращает долг 20 млн сум, есть расписка": "qarz",
     "Иш берувчим 3 ойдан бери маош бермаяпти": "ish_haqi",
+    "Хочу подать предложение в хокимият по благоустройству": "murojaat_umumiy",
+    "Хочу написать заявление в хокимият": "murojaat_umumiy",
+    "Подал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
+    "Написал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
     "Соседская собака укусила меня": "boshqa"
   };
   for (const [t, want] of Object.entries(cases)) assert.equal((await analyze(t, "ru")).scenario, want, t);

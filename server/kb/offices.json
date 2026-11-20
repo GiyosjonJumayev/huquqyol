@@ -367,6 +367,18 @@
    "src": "https://pm.gov.uz/"
   },
   {
+   "id": "mediators",
+   "name": "Professional mediatorlar reyestri",
+   "role": "Adliya vazirligi yuritadigan professional mediatorlar reyestri. Mediatorni nizo tomonlari birgalikda tanlaydi.",
+   "links": [
+    {
+     "label": "Professional mediatorlar reyestri — gov.uz/adliya",
+     "url": "https://gov.uz/oz/adliya/sections/professional-mediatorlar-reyestri"
+    }
+   ],
+   "src": "https://gov.uz/oz/adliya/sections/professional-mediatorlar-reyestri"
+  },
+  {
    "id": "mfa",
    "name": "O‘zbekistonning xorijdagi elchixona va konsulliklari",
    "role": "Xorijda pasport yo‘qolsa yoki olib qo‘yilsa, konsullik yordami va qaytish hujjati. Aloqa ma’lumotlari davlatga qarab farq qiladi.",

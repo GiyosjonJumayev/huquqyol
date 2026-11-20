@@ -21,6 +21,7 @@ const EX = {
   uz: [
     "Ish beruvchim 3 oydan beri maosh bermayapti, qarzi 9 million so‘m",
     "«Texnomart» do‘konidan olgan televizor 2 haftada buzildi, almashtirmayapti",
+    "Hokimlikka ko‘chadagi chiroqlar haqida taklif bermoqchiman",
     "Sobiq erim 2 ta bolamga aliment to‘lamayapti",
     "Hokimlikka murojaat qildim, bir oydan beri javob yo‘q",
     "YHXB radar bo‘yicha noto‘g‘ri jarima soldi",
@@ -34,6 +35,7 @@ const EX = {
   ru: [
     "Работодатель 3 месяца не платит зарплату, долг 9 млн сум",
     "Телевизор из магазина «Texnomart» сломался через 2 недели, не меняют",
+    "Хочу подать в хокимият предложение по уличному освещению",
     "Бывший муж не платит алименты на двоих детей",
     "Обратился в хокимият, уже месяц нет ответа",
     "СБДД выписали неправильный штраф по радару",

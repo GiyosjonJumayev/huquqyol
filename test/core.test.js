@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { addMonths, deadlineFrom, toISO } from "../server/dates.js";
+import { isHoliday } from "../server/holidays.js";
 import { buildPlan, compensation } from "../server/plan.js";
 import { rankScenarios, retrieve } from "../server/rag.js";
 import { extractFacts } from "../server/facts.js";
@@ -10,6 +11,23 @@ test("MK 9-modda: oy oxiri va yakshanba", () => {
   assert.equal(toISO(addMonths(new Date(2026, 0, 31), 1)), "2026-02-28");
   assert.equal(toISO(deadlineFrom(new Date(2026, 7, 31), 6)), "2027-03-01"); // 28-fev yakshanba → dushanba
   assert.equal(toISO(deadlineFrom(new Date(2026, 7, 4), 6)), "2027-02-04");
+});
+
+test("MK 9-modda: bayram kunlari — keyingi ish kuni", () => {
+  assert.equal(toISO(deadlineFrom(new Date(2026, 5, 8), 6)), "2026-12-09");     // 8-dek (Konstitutsiya kuni, seshanba) → 9-dek
+  assert.equal(toISO(deadlineFrom(new Date(2025, 8, 21), 6)), "2026-03-23");    // 21-mart (Navro‘z, shanba) + yakshanba → dushanba
+  assert.equal(toISO(deadlineFrom(new Date(2025, 8, 20), 6)), "2026-03-23");    // 20-mart Ramazon hayiti → 21 → 22 → 23
+  assert.equal(toISO(deadlineFrom(new Date(2025, 10, 27), 6)), "2026-05-28");   // Qurbon hayiti 2026-05-27
+  assert.equal(toISO(deadlineFrom(new Date(2026, 6, 1), { days:92 })), "2026-10-02"); // 1-oktabr → 2-oktabr
+  assert.ok(!isHoliday(new Date(2027, 2, 10)), "2027 ko‘chma bayramlari taxmin qilinmaydi");
+  const prev = process.env.HOLIDAYS_EXTRA;
+  try {
+    process.env.HOLIDAYS_EXTRA = "2027-03-10, 2027-05-16";
+    assert.ok(isHoliday(new Date(2027, 2, 10)) && isHoliday(new Date(2027, 4, 16)));
+    assert.equal(toISO(deadlineFrom(new Date(2026, 8, 10), 6)), "2027-03-11");
+  } finally {
+    if (prev === undefined) delete process.env.HOLIDAYS_EXTRA; else process.env.HOLIDAYS_EXTRA = prev;
+  }
 });
 
 test("Reja: muddat, xavf va qadamlar", () => {
@@ -26,8 +44,25 @@ test("333-modda kompensatsiyasi: har oy o‘z muddatidan", () => {
   const c = compensation({ amount:3_000_000, months:3, trigger:new Date(2026, 7, 4), today:new Date(2026, 10, 4), rate:14 });
   // 1 mln × (92 + 61 + 31) kun
   assert.equal(c.maxDelayDays, 92);
-  assert.equal(c.low, Math.round(1_000_000 * 184 * 0.14 / 365));
-  assert.equal(c.high, Math.round(1_000_000 * 184 * 0.14 * 0.10));
+  assert.equal(c.literal, Math.round(1_000_000 * 184 * 0.14 * 0.10));
+  assert.equal(c.alternative, Math.round(1_000_000 * 184 * 0.14 * 0.10 / 365));
+  assert.equal(c.dailyPct, 1.4);
+  assert.ok(!("low" in c) && !("high" in c));
+});
+
+test("333-modda: demo holati (9 mln, 3 oy, 2026-08-20 → 2026-11-20)", () => {
+  const c = compensation({ amount:9_000_000, months:3, trigger:new Date(2026, 7, 20), today:new Date(2026, 10, 20), rate:14 });
+  assert.equal(c.literal, 7_728_000);       // 3 mln × (92 + 61 + 31) × 1,4%
+  assert.equal(c.alternative, 21_173);
+  const p = buildPlan({ scenario:"ish_haqi", triggerDate:"2026-08-20", today:new Date(2026, 10, 20), form:{ amount:"9000000", months:"3" } });
+  assert.match(p.calc.value, /^7\s728\s000 so‘m$/);
+  assert.equal(p.calc.rows.length, 2);
+  assert.match(p.calc.rows[1][1], /21\s173/);
+  assert.match(p.calc.note, /1,4%/);
+  assert.match(p.calc.note, /Asosiy manba: https:\/\/lex\.uz\/acts\/-6257288/);
+  assert.match(p.calc.note, /Hisobchilar talqini \(buxgalter\.uz\)/);
+  assert.match(p.calc.rows[1][0], /^Hisobchilar talqini/);
+  assert.doesNotMatch(JSON.stringify(p.calc), /211\s?726/);
 });
 
 test("Holat tasnifi (oflayn)", () => {

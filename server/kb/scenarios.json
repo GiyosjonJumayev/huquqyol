@@ -29,7 +29,9 @@
    "m333",
    "m25",
    "muddat",
-   "m9"
+   "m562",
+   "m9",
+   "med7"
   ],
   "deadline": {
    "months": 6,
@@ -54,6 +56,13 @@
     "when": "1–2 hafta ichida",
     "body": "Inspektor tekshiradi va ish beruvchiga majburiy ko‘rsatma beradi.",
     "office": "dmi"
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi (MK 560-modda). Ish beruvchiga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -114,7 +123,8 @@
     "type": "text",
     "group": "Ish joyi",
     "docs": [
-     "employer"
+     "employer",
+     "mediatsiya"
     ],
     "hint": "direktor"
    },
@@ -217,6 +227,42 @@
     "office": "dmi"
    },
    {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{employer}} rahbari",
+     "{{boss}}ga",
+     "xodim {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda ish haqi to‘lanmagani[?amount] (qarz: {{amount}})[/] bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Mehnat kodeksining 560-moddasiga ko‘ra nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi.",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
+   },
+   {
     "id": "court",
     "label": "Sudga",
     "to": [
@@ -230,7 +276,7 @@
      "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
      "{{trigger}}dan boshlab [?months]{{months}} oy davomida [/]menga ish haqi to‘lanmagan. Ish haqi bo‘yicha qarz miqdori {{amount}}ni tashkil etadi.",
      "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga ko‘ra ish beruvchi ish haqini har yarim oyda kamida bir marta, belgilangan muddatlarda to‘liq hajmda to‘lashi shart. Kodeksning 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun ish beruvchi, aybi bor-yo‘qligidan qat’i nazar, pulli kompensatsiya to‘laydi.",
-     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+     "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
     "asks": [
@@ -289,6 +335,7 @@
   ],
   "offices": [
    "dmi",
+   "mediators",
    "courts"
   ]
  },
@@ -322,6 +369,7 @@
    "m165",
    "sud",
    "muddat",
+   "m562",
    "m171",
    "m9"
   ],
@@ -427,7 +475,7 @@
     "body": [
      "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
      "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat shartnomasi bekor qilindi. Bo‘shatish qonuniy asossiz va belgilangan tartib buzilgan holda amalga oshirildi: Mehnat kodeksining 161-moddasiga ko‘ra ish beruvchi tashabbusi bilan bekor qilish asoslangan bo‘lishi, 165-moddaga ko‘ra esa xodim oldindan yozma ogohlantirilishi shart.",
-     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+     "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
     "asks": [
@@ -548,7 +596,9 @@
    "m218",
    "m220",
    "m231",
-   "muddat"
+   "muddat",
+   "m562",
+   "med7"
   ],
   "deadline": {
    "months": 6,
@@ -570,6 +620,13 @@
     "when": "Rad javobidan keyin",
     "body": "Inspektor ish beruvchiga ta’til berish yuzasidan ko‘rsatma beradi.",
     "office": "dmi"
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi (MK 560-modda). Ish beruvchiga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -611,7 +668,8 @@
     "type": "text",
     "group": "Ish joyi",
     "docs": [
-     "employer"
+     "employer",
+     "mediatsiya"
     ],
     "hint": "direktor"
    },
@@ -709,6 +767,42 @@
      ]
     },
     "office": "dmi"
+   },
+   {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{employer}} rahbari",
+     "{{boss}}ga",
+     "xodim {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda mehnat ta’tili berilmagani bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Mehnat kodeksining 560-moddasiga ko‘ra nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi.",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
    }
   ],
   "evidenceInfo": [
@@ -735,6 +829,7 @@
   ],
   "offices": [
    "dmi",
+   "mediators",
    "courts"
   ]
  },
@@ -766,7 +861,9 @@
    "hisob",
    "m171",
    "m333",
-   "muddat"
+   "muddat",
+   "m562",
+   "med7"
   ],
   "deadline": {
    "months": 6,
@@ -791,6 +888,13 @@
     "when": "3 kundan keyin",
     "body": "Daftarcha berilmagani ham alohida qoidabuzarlik sifatida ko‘riladi.",
     "office": "dmi"
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi (MK 560-modda). Ish beruvchiga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -851,7 +955,8 @@
     "type": "text",
     "group": "Ish joyi",
     "docs": [
-     "employer"
+     "employer",
+     "mediatsiya"
     ],
     "hint": "direktor"
    },
@@ -952,6 +1057,42 @@
     "office": "dmi"
    },
    {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{employer}} rahbari",
+     "{{boss}}ga",
+     "xodim {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda bo‘shatishdagi hisob-kitob[?amount] (qarz: {{amount}})[/] bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Mehnat kodeksining 560-moddasiga ko‘ra nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi.",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
+   },
+   {
     "id": "court",
     "label": "Sudga",
     "to": [
@@ -963,7 +1104,7 @@
     "body": [
      "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
      "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish beruvchi hozirgacha men bilan to‘liq hisob-kitob qilmagan[?amount] (qarz: {{amount}})[/] va mehnat daftarchasini (elektron ko‘chirmasini) bermagan. Mehnat kodeksiga ko‘ra barcha summalar shartnoma bekor qilingan kuni, xodim ishlamagan bo‘lsa, talabdan keyin 3 kun ichida to‘lanishi, 171-moddaga ko‘ra esa daftarcha va buyruq ko‘chirmasi o‘sha kuni berilishi shart.",
-     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+     "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
     "asks": [
@@ -1023,6 +1164,7 @@
   ],
   "offices": [
    "dmi",
+   "mediators",
    "courts"
   ]
  },
@@ -1067,7 +1209,8 @@
    "ihq16",
    "ihq22",
    "ihq23",
-   "ihq29"
+   "ihq29",
+   "med7"
   ],
   "deadline": {
    "months": 6,
@@ -1093,6 +1236,13 @@
     "when": "7 kundan keyin",
     "body": "Raqobat va iste’molchilar qo‘mitasining hududiy boshqarmasiga ariza. Tekshiruv bepul.",
     "office": "raqobat"
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Sudga murojaat muddatini kuzatib boring: kelishuvga erishilmasa, sudga o‘z vaqtida murojaat qiling. Qarshi tomonga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -1284,6 +1434,41 @@
     "office": "raqobat"
    },
    {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{seller}} rahbariga",
+     "manzil: {{sellerAddress}}",
+     "xaridor {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda sotib olingan {{product}}dagi nuqson[?price] (narxi: {{price}})[/] bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
+   },
+   {
     "id": "court",
     "label": "Sudga",
     "to": [
@@ -1355,6 +1540,7 @@
   ],
   "offices": [
    "raqobat",
+   "mediators",
    "courts"
   ]
  },
@@ -1801,6 +1987,8 @@
    "не отвечают",
    "не ответил",
    "без ответа",
+   "нет ответа",
+   "ответа нет",
    "хокимият",
    "госорган",
    "приёмн"
@@ -2199,6 +2387,7 @@
    "sanitariya",
    "obodonlashtirish",
    "jarima soldi",
+   "jarimaga",
    "штраф",
    "протокол",
    "постановлени",
@@ -2437,7 +2626,8 @@
   ],
   "norms": [
    "fk732",
-   "fk150"
+   "fk150",
+   "med7"
   ],
   "deadline": {
    "years": 3,
@@ -2453,6 +2643,13 @@
     "t": "Yozma talabnoma yuboring",
     "when": "Bugun",
     "body": "Pochta orqali xabarnoma bilan. Muddat belgilanmagan bo‘lsa, talab qilingan sana muhim."
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Sudga murojaat muddatini kuzatib boring: kelishuvga erishilmasa, sudga o‘z vaqtida murojaat qiling. Qarshi tomonga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -2560,6 +2757,41 @@
     }
    },
    {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{debtor}}ga",
+     "manzil: {{debtorAddress}}",
+     "{{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda qarz[?amount] ({{amount}})[/] qaytarilmagani bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
+   },
+   {
     "id": "court",
     "label": "Sudga",
     "to": [
@@ -2627,6 +2859,7 @@
    }
   ],
   "offices": [
+   "mediators",
    "courts",
    "mib"
   ]
@@ -2663,7 +2896,8 @@
   "norms": [
    "fk1023",
    "fk540",
-   "fk150"
+   "fk150",
+   "med7"
   ],
   "deadline": {
    "years": 3,
@@ -2679,6 +2913,13 @@
     "t": "Yozma talabnoma yuboring",
     "when": "Bugun",
     "body": "Uy soz holatda topshirilganini tasdiqlovchi dalillarni (foto, video, dalolatnoma) ilova qiling. Pochta orqali xabarnoma bilan yuborish ham mumkin."
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Sudga murojaat muddatini kuzatib boring: kelishuvga erishilmasa, sudga o‘z vaqtida murojaat qiling. Qarshi tomonga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -2788,6 +3029,41 @@
     }
    },
    {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{landlord}}ga",
+     "manzil: {{landlordAddress}}",
+     "{{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda ijara garov puli[?deposit] ({{deposit}})[/] qaytarilmagani bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
+   },
+   {
     "id": "court",
     "label": "Sudga",
     "to": [
@@ -2859,6 +3135,7 @@
    }
   ],
   "offices": [
+   "mediators",
    "courts",
    "mib"
   ]
@@ -3135,7 +3412,8 @@
    "fk1023",
    "ihq23",
    "ihq29",
-   "fk150"
+   "fk150",
+   "med7"
   ],
   "deadline": {
    "years": 3,
@@ -3158,6 +3436,13 @@
     "when": "Javob bo‘lmasa",
     "body": "Raqobat va iste’molchilar qo‘mitasining hududiy boshqarmasiga ariza. Tekshiruv bepul.",
     "office": "raqobat"
+   },
+   {
+    "org": "Mediator",
+    "t": "Mediator orqali kelishib ko‘ring (ixtiyoriy)",
+    "when": "Sudga murojaat qilishdan oldin",
+    "body": "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda). Sudga murojaat muddatini kuzatib boring: kelishuvga erishilmasa, sudga o‘z vaqtida murojaat qiling. Qarshi tomonga «Mediatsiya taklifi» xatini yuboring.",
+    "office": "mediators"
    },
    {
     "org": "Sud",
@@ -3312,6 +3597,40 @@
     "office": "raqobat"
    },
    {
+    "id": "mediatsiya",
+    "label": "Mediatsiya taklifi",
+    "to": [
+     "{{provider}} rahbariga",
+     "abonent {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "O‘rtamizda {{service}} xizmati uchun hisob[?overcharge] (ortiqcha hisoblangan summa: {{overcharge}})[/] bo‘yicha kelishmovchilik mavjud.",
+     "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda).",
+     "Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+     "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."
+    ],
+    "attach": [
+     "Nizoga oid hujjatlar nusxalari (bo‘lsa)"
+    ],
+    "sub": "nizoni mediatsiya orqali hal qilish to‘g‘risida",
+    "closing": "Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.",
+    "howto": {
+     "steps": [
+      "Arizani 2 nusxada chop eting va har ikkisini imzolang.",
+      "Birinchi nusxani topshiring. Ikkinchisiga qabul qilgan shaxsning imzosi, sana va kiruvchi raqamni qo‘ydiring.",
+      "Qabul qilishdan bosh tortsa, buyurtma xat orqali xabarnoma bilan yuboring va pochta kvitansiyasini saqlang.",
+      "Topshirgan sanani yozib qo‘ying: keyingi muddatlar shu kundan hisoblanadi."
+     ],
+     "links": []
+    },
+    "office": "mediators"
+   },
+   {
     "id": "court",
     "label": "Sudga",
     "to": [
@@ -3378,6 +3697,7 @@
   ],
   "offices": [
    "raqobat",
+   "mediators",
    "courts"
   ]
  },
@@ -3403,6 +3723,10 @@
    "radiator",
    "avariya",
    "kommunal xizmat",
+   "svet yo‘qligi",
+   "gaz yo‘qligi",
+   "suv yo‘qligi",
+   "tok yo‘qligi",
    "нет света",
    "нет газа",
    "нет воды",
@@ -5792,6 +6116,249 @@
    "mfa",
    "migration",
    "courts"
+  ]
+ },
+ {
+  "id": "murojaat_umumiy",
+  "domain": "davlat",
+  "title": "Davlat idorasiga ariza, taklif yoki shikoyat yozish",
+  "card": "Hokimlik yoki boshqa idoraga rasmiy murojaat tayyorlash",
+  "short": "Ariza, taklif, shikoyat",
+  "lead": "Davlat idorasiga ariza, taklif yoki shikoyatni yozma, elektron yoki og‘zaki shaklda yuborish mumkin. Yozma murojaatda F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart. Idora 15 kunda, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob beradi.",
+  "keywords": [
+   "ariza yozmoqchiman",
+   "hokimlikka murojaat",
+   "taklif bermoqchiman",
+   "shikoyat qilmoqchiman",
+   "davlat idorasiga",
+   "заявление в госорган",
+   "жалоба",
+   "предложение",
+   "заявление в хокимият",
+   "написать в хокимият"
+  ],
+  "norms": [
+   "mq5",
+   "mq6",
+   "mq28",
+   "mq36",
+   "mq38"
+  ],
+  "deadline": {
+   "none": true,
+   "label": "Murojaat muddati",
+   "note": "Murojaatni topshirganingizdan keyin idora 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob berishi shart (28-modda). Javob bo‘lmasa, «Javobsiz murojaat» holatidan foydalaning."
+  },
+  "trigger": "Murojaat topshirilgan sana",
+  "calc": null,
+  "partyField": "body",
+  "steps": [
+   {
+    "org": "Siz",
+    "t": "Murojaat turini tanlang va yozing",
+    "when": "Bugun",
+    "body": "Ariza — huquqingizni amalga oshirishda yordam so‘rash; taklif — davlat va jamiyat faoliyatini takomillashtirishga doir tavsiyalar bayon etilgan murojaat; shikoyat — buzilgan huquqingizni tiklashni talab qilish. F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart (6-modda)."
+   },
+   {
+    "org": "Mas’ul idora",
+    "t": "Mas’ul idoraga topshiring",
+    "when": "Tayyor bo‘lgach",
+    "body": "murojaat.gov.uz, idoraning virtual qabulxonasi, shaxsan yoki pochta orqali: barcha shakllar teng kuchga ega (5-modda)."
+   },
+   {
+    "org": "Mas’ul idora",
+    "t": "Kiruvchi raqamni saqlang",
+    "when": "Topshirgan kuni",
+    "body": "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring. Elektron murojaatda uning raqamini yozib oling."
+   },
+   {
+    "org": "Mas’ul idora",
+    "t": "Javobni kuting",
+    "when": "{t+15} gacha",
+    "body": "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak (28-modda). Muddat uzaytirilsa, sizga xabar berilishi shart."
+   },
+   {
+    "org": "Yuqori organ",
+    "t": "Javob bo‘lmasa — shikoyat",
+    "when": "Muddat o‘tgach",
+    "body": "Yuqori turuvchi organga yoki Prezidentning virtual qabulxonasiga (pm.gov.uz). Shikoyat matni «Javobsiz murojaat» holatida tayyor."
+   },
+   {
+    "org": "Ma’muriy sud",
+    "t": "Harakatsizlik ustidan sudga",
+    "when": "Kerak bo‘lsa",
+    "body": "Murojaat ko‘rib chiqilmasa, idoraning harakatsizligi ustidan ma’muriy sudga murojaat qilish mumkin (36-modda). Ariza «Javobsiz murojaat» holatida tayyorlanadi.",
+    "office": "courts"
+   }
+  ],
+  "evidence": [
+   "Holatni tasdiqlovchi hujjatlar nusxalari",
+   "Idoradan ilgari olingan javoblar (bo‘lsa)",
+   "Fotosuratlar (bo‘lsa)"
+  ],
+  "fields": [
+   {
+    "k": "body",
+    "label": "Qaysi idoraga",
+    "ph": "idora nomi",
+    "type": "text",
+    "group": "Murojaat",
+    "hint": "Chilonzor tumani hokimligi"
+   },
+   {
+    "k": "subject",
+    "label": "Qisqacha mavzu",
+    "ph": "mavzu",
+    "type": "text",
+    "group": "Murojaat",
+    "hint": "Mahalladagi yo‘lni ta’mirlash"
+   },
+   {
+    "k": "facts",
+    "label": "Nima bo‘ldi",
+    "ph": "holat bayoni",
+    "type": "textarea",
+    "group": "Murojaat",
+    "hint": "Ko‘chamizdagi yo‘l 2 yildan beri ta’mirlanmagan, yomg‘irdan keyin suv to‘planib qoladi."
+   },
+   {
+    "k": "request",
+    "label": "Nimani so‘raysiz",
+    "ph": "so‘rov yoki taklif",
+    "type": "textarea",
+    "group": "Murojaat",
+    "hint": "yo‘lni 2027-yil ta’mirlash rejasiga kiritishni"
+   }
+  ],
+  "docs": [
+   {
+    "id": "ariza",
+    "label": "Ariza",
+    "to": [
+     "{{body}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Murojaat mavzusi: {{subject}}.",
+     "{{facts}}",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "{{request}}",
+     "murojaatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."
+    ],
+    "attach": [
+     "Holatni tasdiqlovchi hujjatlar nusxalari"
+    ],
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
+   },
+   {
+    "id": "taklif",
+    "label": "Taklif",
+    "to": [
+     "{{body}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "Murojaat mavzusi: {{subject}}.",
+     "{{facts}}",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "{{request}}"
+    ],
+    "attach": [
+     "Holatni tasdiqlovchi hujjatlar nusxalari"
+    ],
+    "closing": "Taklifim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishingizni so‘rayman.",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
+   },
+   {
+    "id": "shikoyat",
+    "label": "Shikoyat",
+    "to": [
+     "{{body}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "SHIKOYAT",
+    "body": [
+     "Murojaat mavzusi: {{subject}}.",
+     "{{facts}}",
+     "Ushbu holat bilan huquq va qonuniy manfaatlarim buzilgan deb hisoblayman.",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "{{request}}",
+     "shikoyatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."
+    ],
+    "attach": [
+     "Holatni tasdiqlovchi hujjatlar nusxalari",
+     "Avvalgi murojaat va olingan javob nusxalari (bo‘lsa)"
+    ],
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
+   }
+  ],
+  "evidenceInfo": [
+   {
+    "need": "m",
+    "how": "Shartnoma, ma’lumotnoma, qaror yoki boshqa hujjat — murojaatdagi faktlarni tasdiqlaydigan har qanday hujjat nusxasi."
+   },
+   {
+    "need": "f",
+    "how": "Shu masala bo‘yicha avval murojaat qilgan bo‘lsangiz, javob nusxasi: masala ilgari ko‘tarilganini ko‘rsatadi."
+   },
+   {
+    "need": "f",
+    "how": "Muammo ko‘rinadigan suratlar, olingan sanasi bilan."
+   }
+  ],
+  "offices": [
+   "courts",
+   "pm"
   ]
  }
 ]

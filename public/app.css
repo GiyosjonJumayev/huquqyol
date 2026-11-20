@@ -307,9 +307,15 @@ details.more{margin-top:10px}
 .nf p{color:var(--muted);margin:6px 0 22px}
 
 /* Qanday ishlaydi, ovoz, belgi hisoblagichi, muqobil holatlar */
-.how{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;padding:0;margin:-12px 0 26px;font-size:calc(14.5px * var(--fs));color:var(--ink)}
-.how li{display:flex;align-items:center;gap:8px}
-.how .hn{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:calc(12px * var(--fs));font-weight:700;background:var(--chip);color:var(--accent)}
+/* Qanday ishlaydi: 3 ta raqamli karta */
+.how{list-style:none;padding:0;margin:0 0 8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:none}
+.how li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);min-width:0}
+.how li > span:last-child{display:grid;gap:2px;min-width:0;overflow-wrap:anywhere}
+.how b{font-size:calc(16px * var(--fs))}
+.how li > span:last-child > span{color:var(--muted);font-size:calc(14px * var(--fs))}
+.how .hn{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:calc(17px * var(--fs));font-weight:700;background:var(--accent);color:var(--accent-ink)}
+@media (max-width:720px){.how{grid-template-columns:minmax(0,1fr)}}
+html[data-fs="2"] .how,html[data-fs="3"] .how{grid-template-columns:minmax(0,1fr)}
 .askact{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
 .kbd{font-size:calc(12.5px * var(--fs))}
 .kbd.count{font-variant-numeric:tabular-nums}
@@ -321,7 +327,7 @@ details.more{margin-top:10px}
 @media (prefers-reduced-motion:reduce){.btn.icon[aria-pressed="true"]{animation:none}}
 .alts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
 .alts .small{margin-right:2px}
-@media (max-width:560px){.kbd:not(.count){display:none}.how{flex-direction:column;gap:8px}}
+@media (max-width:560px){.kbd:not(.count){display:none}}
 
 /* ---- v3.4: bosh sahifa va oqim soddaligi ---- */
 .view{padding-top:8px}
@@ -360,11 +366,6 @@ details.more{margin-top:10px}
   .domains:not(.list) .case b{font-size:calc(16px * var(--fs))}
 }
 
-/* «Qanday ishlaydi»: yo‘l chizig‘i */
-.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:36px 0 0;font-size:calc(14.5px * var(--fs))}
-.how li{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}
-.how .hn{width:30px;height:30px;font-size:calc(13.5px * var(--fs));background:var(--accent-soft)}
-@media (max-width:620px){.how{grid-template-columns:minmax(0,1fr);gap:12px;margin-top:28px}}
 
 /* Reja */
 .headmeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
@@ -612,6 +613,72 @@ nav.langsw a[aria-current]{background:var(--surface);color:var(--ink)}
 .photocard dt{font-size:calc(12.5px * var(--fs));color:var(--muted)}
 .photocard dd{margin:2px 0 0;font-weight:600;overflow-wrap:anywhere}
 .photocard .reason{grid-column:1/-1}
+@media (max-width:480px){.btn.photobtn{width:44px;padding:0;justify-content:center}.btn.photobtn .plbl{display:none}}
+
+/* Ishonch qatori: yashil blok ostida 4 ta karta */
+.trust{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.trust li{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:calc(14px * var(--fs));line-height:1.4;min-width:0}
+.trust b{color:var(--ink)}
+.trust li > span:last-child{min-width:0;overflow-wrap:anywhere}
+.trust li > span:last-child > span{color:var(--muted)}
+.tic{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.tic svg{width:20px;height:20px}
+@media (max-width:900px){.trust{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.trust{grid-template-columns:minmax(0,1fr)}}
+@media (min-width:521px){html[data-fs="2"] .trust{grid-template-columns:repeat(2,minmax(0,1fr))}}
+html[data-fs="3"] .trust{grid-template-columns:minmax(0,1fr)}
+
+/* Davlat portallari bilan birga: 1 Tayyorlash → 2 Yuborish; + Boshqa hujjatlar */
+.pflow{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.pflow > li:not(.arr){display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.pflow > li > span:last-child{display:grid;gap:2px;min-width:0;overflow-wrap:anywhere}
+.pflow .pn{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:calc(17px * var(--fs));font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.pflow .pval{font-weight:600}
+.pflow a{color:var(--accent);text-underline-offset:3px;display:inline-block;padding:10px 0;margin:-10px 0}
+.pflow .pnote{color:var(--muted);font-size:calc(14px * var(--fs))}
+.pflow .arr{align-self:center;font-size:calc(24px * var(--fs));color:var(--accent);line-height:1}
+.pflow .pother{border-style:dashed!important;background:transparent!important}
+.pnoteall{margin:12px 0 0;color:var(--ink);font-size:calc(15px * var(--fs))}
+@media (max-width:900px){.pflow{grid-template-columns:minmax(0,1fr)}.pflow .arr{justify-self:center;transform:rotate(90deg)}}
+html[data-fs="2"] .pflow,html[data-fs="3"] .pflow{grid-template-columns:minmax(0,1fr)}
+html[data-fs="2"] .pflow .arr,html[data-fs="3"] .pflow .arr{justify-self:center;transform:rotate(90deg)}
+
+/* Footer: ko‘rinadigan ogohlantirish bloki */
+footer .disclaim{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;color:var(--ink);font-size:calc(14.5px * var(--fs))}
+footer .disclaim svg{flex:none;width:20px;height:20px;color:var(--warn);margin-top:2px}
+footer .disclaim p{margin:0}
+footer .checked{color:var(--ink)}
+
+/* Sana so‘z bilan (sana maydoni yonida) */
+.dateword{display:block;margin-top:4px;font-size:calc(14px * var(--fs));font-weight:600;color:var(--ink)}
+.dateword:empty{display:none}
+
+/* Kalkulyator formulasi */
+.fx{margin-top:12px}
+.fx summary{min-height:44px;display:flex;align-items:center}
+.fxsteps{margin:6px 0 8px;padding-left:22px;display:grid;gap:4px;font-size:calc(14.5px * var(--fs))}
+.fxsrc{margin:0;font-size:calc(13.5px * var(--fs));color:var(--muted);overflow-wrap:anywhere}
+.fxsrc a{color:var(--accent);display:inline-block;padding:10px 0;margin:-10px 0}
+
+/* Qadam ostidagi havolalar (idora kartasi, tegishli xat) — 44px teginish maydoni */
+.steplinks{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:4px}
+.steplinks .ofjump{margin:0;min-height:44px;display:inline-flex;align-items:center;text-align:left}
+.steps li.medstep .body{border-style:dashed}
+@media print{.steplinks{display:none!important}}
+
+/* Onlayn yuborish (murojaat.gov.uz) */
+.online{margin-top:16px;border-left:4px solid var(--accent)}
+.online h2{font-family:var(--f-display);font-size:calc(19px * var(--fs));margin:0 0 10px}
+.onlineact{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.onlineact .btn{min-height:44px}
+.onstatus{font-weight:600;color:var(--ok)}
+.online ol{margin:12px 0 0;padding-left:1.3em;display:grid;gap:6px;font-size:calc(15px * var(--fs));overflow-wrap:anywhere}
+.online a,.onnext a{color:var(--accent);display:inline-block;padding:10px 0;margin:-10px 0}
+.onnext{margin:10px 0 0}
+@media print{.online{display:none!important}}
+
+/* Yuklab olish tugmalari ostidagi eslatma */
+.dldisc{margin:10px 0 0;font-size:calc(13.5px * var(--fs));color:var(--muted)}
 /* Rasm yuklash paneli (bosh sahifa): doim ko‘rinadi, × bilan yopiladi; rasmni sudrab tashlash yoki Ctrl+V */
 .photopanel{position:relative;display:flex;align-items:center;gap:14px;margin-top:14px;padding:14px 16px;border:1.5px dashed var(--hero-line);border-radius:16px;background:rgba(255,255,255,.07);transition:background .15s,border-color .15s}
 .photopanel[hidden]{display:none}

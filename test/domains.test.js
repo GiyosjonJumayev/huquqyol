@@ -18,7 +18,7 @@ test("Bilim bazasi yaxlit: har bir norma, maydon va shablon kaliti mavjud", () =
   }
 });
 
-test("23 holat matndan to‘g‘ri tasniflanadi", () => {
+test("24 holat matndan to‘g‘ri tasniflanadi", () => {
   const cases = {
     "Ish beruvchim 3 oydan beri maosh bermayapti": "ish_haqi",
     "Meni ogohlantirmasdan ishdan bo‘shatishdi": "ishdan_boshatish",
@@ -42,7 +42,41 @@ test("23 holat matndan to‘g‘ri tasniflanadi", () => {
     "Kam ta’minlangan oila sifatida bolalar nafaqasini rad etishdi": "ijtimoiy_nafaqa",
     "Koreyaga ishga yuboramiz deb agentlik pul olib, aldadi": "migrant_agentlik",
     "Rossiyada ishlayapman, ish beruvchi pasportimni olib qo‘ydi va maosh bermayapti": "migrant_xorij",
-    "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor": "qarz"
+    "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor": "qarz",
+    "Hokimlikka ariza yozmoqchiman, mahallamizdagi yo‘l buzilgan": "murojaat_umumiy"
+  };
+  for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
+});
+
+// Umumiy murojaat (ariza/taklif/shikoyat) qo‘shilganda mavjud holatlar o‘z o‘rnida qolishi kerak
+test("Regressiya: umumiy murojaat mavjud holatlarni egallab olmaydi", () => {
+  const cases = {
+    "Ish beruvchim 3 oydan beri maosh bermayapti": "ish_haqi",
+    "Meni ogohlantirmasdan ishdan bo‘shatishdi": "ishdan_boshatish",
+    "hokimlikka ariza yozdim 2 oy javob yo'q": "murojaat_javobsiz",
+    "hokimlikka ariza yozdim 2 oy javob yo‘q": "murojaat_javobsiz",
+    "Hokimlikka murojaat qildim, bir oydan beri javob bermayapti": "murojaat_javobsiz",
+    "Menga noto‘g‘ri jarima solishdi, shikoyat qilmoqchiman": "jarima",
+    "YHXB radar bo‘yicha noto‘g‘ri jarima soldi": "yhxx_jarima",
+    "Do‘kondan telefon oldim, buzilib qoldi, almashtirib berishmayapti": "nuqsonli_tovar",
+    "Работодатель 3 месяца не платит зарплату": "ish_haqi",
+    "Меня уволили без предупреждения": "ishdan_boshatish",
+    "Подал жалобу в хокимият, нет ответа уже 2 месяца": "murojaat_javobsiz",
+    "Не согласен со штрафом, хочу подать жалобу": "jarima",
+    "Купил телевизор, сломался, магазин не меняет": "nuqsonli_tovar",
+    // umumiy kalit so‘zlar («shikoyat qilmoqchiman», «жалоба») aniq holatni bosib ketmasligi
+    "Jarimaga shikoyat qilmoqchiman": "jarima",
+    "Жалоба на штраф": "jarima",
+    "YHXB jarimasi ustidan shikoyat qilmoqchiman": "yhxx_jarima",
+    "Хочу подать жалобу на штраф ГАИ по радару": "yhxx_jarima",
+    "Svet yo‘qligi bo‘yicha shikoyat qilmoqchiman": "kommunal_sifat",
+    "Pensiya jamg‘armasi ustidan shikoyat qilmoqchiman": "pensiya",
+    "Bank ustidan shikoyat qilmoqchiman, kartamdan pul yechildi": "bank_karta",
+    "Жалоба на хокима, незаконное решение о сносе": "organ_qarori",
+    // «заявление в хокимият» (umumiy) javobsiz murojaatni bosib ketmasligi
+    "Подал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
+    "Написал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
+    "Обратился в хокимият, ответа нет 2 месяца": "murojaat_javobsiz"
   };
   for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
 });
@@ -81,7 +115,7 @@ test("Kalkulyatorlar", () => {
 test("Yangi holatlar: muddatlar va OSGO qaror sanasi", () => {
   const p = (scenario, triggerDate) => buildPlan({ scenario, triggerDate, today });
   assert.equal(p("yhxx_jarima", "2026-11-01").deadline, "2026-11-11");
-  assert.equal(p("ijara_depozit", "2026-10-01").deadline, "2029-10-01");
+  assert.equal(p("ijara_depozit", "2026-10-01").deadline, "2029-10-02");   // 1-oktabr bayram → keyingi ish kuni
   assert.equal(p("pensiya", "2026-10-01").deadline, "2027-04-01");
   assert.equal(p("ijara_chiqarish", "2026-10-01").deadline, null);
   assert.ok(p("osgo", "2026-10-01").steps[1].when.includes("16-oktabr 2026-yil"));   // ariza + 15 kun

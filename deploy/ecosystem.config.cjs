@@ -6,6 +6,6 @@ module.exports = {
     cwd: __dirname + "/..",
     instances: 1,                 // rate limit xotirada — bitta jarayon yetarli va to‘g‘ri
     max_memory_restart: "300M",
-    env: { NODE_ENV: "production", HOST: "127.0.0.1", PORT: 3000, TRUST_PROXY: "1" }
+    env: { NODE_ENV: "production", HOST: "127.0.0.1", PORT: 3000, TRUST_PROXY: "1", TZ: "Asia/Tashkent" }
   }]
 };

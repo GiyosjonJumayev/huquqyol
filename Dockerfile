@@ -1,5 +1,6 @@
 FROM node:22-alpine
-ENV NODE_ENV=production PORT=3000
+# TZ: sanalar (muddat, «kelajakdagi sana» tekshiruvi) Toshkent vaqti bo‘yicha; Node o‘z ICU tz bazasidan foydalanadi
+ENV NODE_ENV=production PORT=3000 TZ=Asia/Tashkent
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force

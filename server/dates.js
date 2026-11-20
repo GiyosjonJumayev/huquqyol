@@ -1,3 +1,5 @@
+import { isHoliday } from "./holidays.js";
+
 const MONTHS = ["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
 
 export const startOfDay = (d = new Date()) => { const r = new Date(d); r.setHours(0,0,0,0); return r; };
@@ -18,7 +20,12 @@ export function addMonths(d, n){
   const last = new Date(y, m + 1, 0).getDate();
   return new Date(y, m, Math.min(day, last));
 }
-const sundayShift = d => d.getDay() === 0 ? addDays(d, 1) : d;   // oxirgi kun yakshanba bo‘lsa — keyingi ish kuni
+// Oxirgi kun ishlanmaydigan kun (yakshanba yoki bayram) bo‘lsa — keyingi birinchi ish kuni (MK 9-modda)
+export const isNonWorking = d => d.getDay() === 0 || isHoliday(d);
+export function nextWorkingDay(d){
+  while (isNonWorking(d)) d = addDays(d, 1);
+  return d;
+}
 
 // spec: { days | months | years, offsetDays? } yoki { none:true }; eski chaqiruv uchun raqam = oylar
 export function deadlineFrom(trigger, spec){
@@ -28,6 +35,6 @@ export function deadlineFrom(trigger, spec){
   if (spec.days) d = addDays(d, spec.days);
   if (spec.months) d = addMonths(d, spec.months);
   if (spec.years) d = addMonths(d, spec.years * 12);
-  return sundayShift(d);
+  return nextWorkingDay(d);
 }
 export const termText = spec => !spec || spec.none ? "" : spec.years ? `${spec.years} yil` : spec.months ? `${spec.months} oy` : `${spec.days} kun`;

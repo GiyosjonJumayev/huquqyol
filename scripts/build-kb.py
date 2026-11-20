@@ -19,6 +19,7 @@ LAWS = {
   "mfo":  {"name":"Mikromoliya faoliyati to‘g‘risidagi qonun", "full":"«Nobank kredit tashkilotlari va mikromoliya faoliyati to‘g‘risida»gi Qonun (O‘RQ-765, 20.04.2022)", "url":"https://lex.uz/acts/5972413"},
   "osgo": {"name":"OSGO to‘g‘risidagi qonun", "full":"«Transport vositalari egalarining fuqarolik javobgarligini majburiy sug‘urta qilish to‘g‘risida»gi Qonun (O‘RQ-155, 21.04.2008)", "url":"https://lex.uz/acts/1342476"},
   "pens": {"name":"Pensiya ta’minoti to‘g‘risidagi qonun", "full":"«Fuqarolarning davlat pensiya ta’minoti to‘g‘risida»gi Qonun (938-XII, 03.09.1993)", "url":"https://lex.uz/acts/112312"},
+  "med":  {"name":"Mediatsiya to‘g‘risidagi qonun", "full":"«Mediatsiya to‘g‘risida»gi Qonun (O‘RQ-482, 03.07.2018)", "url":"https://lex.uz/docs/3805229"},
   "xab":  {"name":"Xususiy bandlik agentliklari to‘g‘risidagi qonun", "full":"«Xususiy bandlik agentliklari to‘g‘risida»gi Qonun (O‘RQ-501, 16.10.2018)", "url":"https://lex.uz/docs/3992894"}
 }
 
@@ -31,7 +32,7 @@ DOMAINS = [
   {"id":"bank",      "title":"Bank va mikroqarz",   "desc":"Kartadan pul yechildi, ortiqcha foiz"},
   {"id":"transport", "title":"Yo‘l-transport",      "desc":"YHXX jarimasi, OSGO sug‘urtasi"},
   {"id":"nafaqa",    "title":"Pensiya va nafaqa",   "desc":"Pensiya yoki nafaqa rad etildi"},
-  {"id":"davlat",    "title":"Davlat idoralari",    "desc":"Javobsiz murojaat, noqonuniy qaror"},
+  {"id":"davlat",    "title":"Davlat idoralari",    "desc":"Ariza va shikoyat, javobsiz murojaat, noqonuniy qaror"},
   {"id":"jarima",    "title":"Boshqa jarimalar",    "desc":"Inspeksiya va boshqa organlar jarimasi"},
   {"id":"migrant",   "title":"Mehnat migrantlari",  "desc":"Agentlik aldovi, xorijdagi muammo"},
   {"id":"fuqarolik", "title":"Qarz",                "desc":"Qarzga bergan pulni undirish"}
@@ -52,8 +53,10 @@ norm("m217","mk","217-modda","Har yilgi asosiy ta’til","Har bir xodim har yili
 norm("m218","mk","218-modda","Uzaytirilgan asosiy ta’til","18 yoshgacha bo‘lganlar va I–II guruh nogironligi bo‘lgan xodimlarga 30 kalendar kun, davlat hokimiyati va boshqaruvi organlari xodimlariga 27 kalendar kun.")
 norm("m220","mk","220-modda","Ish staji uchun qo‘shimcha ta’til","Bitta tashkilot yoki tarmoqda ishlangan har 5 yil uchun 2 kalendar kun, jami 8 kundan oshmaydigan qo‘shimcha ta’til beriladi.")
 norm("m231","mk","231-modda","Ta’tilni qismlarga bo‘lish","Ta’tilni qismlarga bo‘lish mumkin, lekin qismlardan biri kamida 14 kalendar kun bo‘lishi kerak.")
-norm("muddat","mk","34-bob","Sudga murojaat qilish muddatlari","Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi. Xodimlar sud xarajatlaridan ozod.")
-norm("sud","mk","34-bob","Bevosita sudda ko‘riladigan nizolar","Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi.")
+norm("muddat","mk","560-modda","Sudga murojaat qilish muddatlari","Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi.")
+norm("m562","mk","562-modda","Xodimlarni sud xarajatlaridan ozod qilish","Xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi.")
+norm("sud","mk","558-modda","Bevosita sudda ko‘riladigan nizolar","Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi.")
+norm("med7","med","7-modda","Mediatsiyaning ixtiyoriyligi","Mediatsiya tomonlarning o‘zaro ixtiyoriy roziligi bilan qo‘llaniladi. Tomonlar mediatsiyadan uning istalgan bosqichida voz kechishi mumkin. Mediatsiya jarayonida yarashishga majburlash taqiqlanadi.")
 norm("m9","mk","9-modda","Muddatlarni hisoblash","Muddat boshlanish sanasidan keyingi kundan hisoblanadi. Oylar bilan hisoblanadigan muddat oxirgi oyning tegishli sanasida tugaydi. Oxirgi kun ishlanmaydigan kunga to‘g‘ri kelsa, keyingi birinchi ish kuni muddat tugaydi.")
 
 # ---- Iste’molchi ----
@@ -151,7 +154,7 @@ def COURT_TO(extra=None):
 INTRO_NOW = "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman."
 INTRO_PAST = "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman."
 EMP_CLOSE = "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
-COURT_FEE = "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+COURT_FEE = "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
 def INSP_ASKS(mid): return ["ish beruvchi {{employer}} faoliyatida mehnat qonunchiligiga rioya etilishini tekshirishni;", mid, "aybdor mansabdor shaxslarni qonunda belgilangan javobgarlikka tortish masalasini ko‘rib chiqishni."]
 INSP_ATT = ["Ish beruvchiga berilgan talabnoma nusxasi", "Mehnat shartnomasi nusxasi"]
 COURT_ATT = ["Da’vo arizasining javobgar uchun nusxasi", "Pasport nusxasi", "Mehnat shartnomasi nusxasi"]
@@ -171,7 +174,7 @@ WAGE_P2 = "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga k
 scen(id="ish_haqi", domain="mehnat", title="Ish haqi to‘lanmayapti", card="Maosh kechikyapti yoki umuman berilmayapti", short="Ish haqi",
   lead="Ish beruvchi ish haqini oyiga kamida ikki marta to‘lashi shart. Kechiktirilgan har bir kun uchun sizga qo‘shimcha kompensatsiya tegadi.",
   keywords=["maosh","oylik","ish haqi","ish haqqi","zarplata","avans","bo‘nak","ish beruvchi"],
-  norms=["m253","m333","m25","muddat","m9"],
+  norms=["m253","m333","m25","muddat","m562","m9"],
   deadline={"months":6, "label":"Sudga murojaat uchun qoldi"}, trigger="Birinchi to‘lanmagan maosh sanasi",
   calc={"type":"labor333"}, partyField="employer", amountField="amount",
   steps=[{"org":"Ish beruvchi","t":"Yozma talabnoma bering","when":"Bugun","body":"2 nusxada; ikkinchisiga qabul belgisi va sana qo‘ydiring."},
@@ -195,7 +198,7 @@ DISM_P = "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat 
 scen(id="ishdan_boshatish", domain="mehnat", title="Noqonuniy ishdan bo‘shatishdi", card="Ogohlantirmasdan yoki asossiz bo‘shatishdi", short="Ishdan bo‘shatish",
   lead="Ish beruvchi sizni faqat qonunda sanalgan asos bilan va tartibga rioya qilib bo‘shatishi mumkin. Aks holda sud sizni ishga tiklaydi.",
   keywords=["bo‘shat","haydash","haydab","ishdan chiqar","uvol","ozod qil","qisqart","shtat","ishga tikla","ogohlantir"],
-  norms=["m161","m165","sud","muddat","m171","m9"],
+  norms=["m161","m165","sud","muddat","m562","m171","m9"],
   deadline={"months":3, "label":"Sudga murojaat uchun qoldi"}, trigger="Bo‘shatish buyrug‘i qo‘lingizga tekkan sana",
   calc=None, partyField="employer",
   steps=[{"org":"Ish beruvchi","t":"Buyruq va daftarchani so‘rang","when":"Darhol","body":"Buyruq nusxasini olgan sanani yozib qo‘ying: muddat shu kundan boshlanadi."},
@@ -217,7 +220,7 @@ LEAVE_INSP = "Mehnat kodeksining 217-moddasiga ko‘ra har bir xodim har yili ka
 scen(id="tatil", domain="mehnat", title="Ta’tilga chiqarishmayapti", card="Yillik ta’til berilmayapti yoki qisqartirildi", short="Ta’til",
   lead="Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan ta’tilga haqli. Ish beruvchi uni bermasligi mumkin emas.",
   keywords=["ta’til","tatil","otpusk","dam ol"],
-  norms=["m217","m218","m220","m231","muddat"],
+  norms=["m217","m218","m220","m231","muddat","m562"],
   deadline={"months":6, "label":"Sudga murojaat uchun qoldi"}, trigger="Ta’til rad etilgan sana",
   calc=None, partyField="employer",
   steps=[{"org":"Ish beruvchi","t":"Ta’til so‘rab ariza yozing","when":"Bugun","body":"Kunlar soni va sanani ko‘rsating, ta’tillar grafigini so‘rang."},
@@ -238,7 +241,7 @@ CALC_P = "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish b
 scen(id="hisob_kitob", domain="mehnat", title="Bo‘shatganda hisob-kitob qilinmadi", card="Oxirgi pul yoki mehnat daftarcha berilmadi", short="Hisob-kitob",
   lead="Ishdan ketgan kuningiz barcha pul va mehnat daftarchasi berilishi shart. Kechiktirilgan har bir kun uchun kompensatsiya tegadi.",
   keywords=["hisob-kitob","hisob kitob","raschyot","rasschet","daftarcha","trudovoy","ishdan ketdim","ishdan ketganman","bo‘shab ketdim"],
-  norms=["hisob","m171","m333","muddat"],
+  norms=["hisob","m171","m333","muddat","m562"],
   deadline={"months":6, "label":"Sudga murojaat uchun qoldi"}, trigger="Oxirgi ish kuningiz",
   calc={"type":"labor333"}, partyField="employer", amountField="amount",
   steps=[{"org":"Ish beruvchi","t":"Hisob-kitobni yozma talab qiling","when":"Bugun","body":"Qonun bo‘yicha pul talabdan keyin 3 kun ichida to‘lanishi kerak."},
@@ -428,7 +431,7 @@ FINE_P2 = "Men ushbu qarorga quyidagi asoslarga ko‘ra rozi emasman: {{reason}}
 FINE_P3 = "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan e’tiboran o‘n kun ichida shikoyat qilinishi mumkin. Shikoyat muddati o‘tkazib yuborilmagan."
 scen(id="jarima", domain="jarima", title="Jarimaga rozi emasman", card="Inspeksiya, hokimlik yoki boshqa organ noto‘g‘ri jarima soldi", short="Jarima",
   lead="Jarima to‘g‘risidagi qaror ustidan qaror nusxasini olgan kundan 10 kun ichida shikoyat qilish mumkin. Diqqat: shikoyat qilsangiz, tez to‘lash chegirmasi (50 yoki 70 foiz) qo‘llanmaydi.",
-  keywords=["jarima","shtraf","bayonnoma","protokol","ma’muriy javobgarlik","inspeksiya","soliq inspeksiyasi","sanitariya","obodonlashtirish","jarima soldi"],
+  keywords=["jarima","shtraf","bayonnoma","protokol","ma’muriy javobgarlik","inspeksiya","soliq inspeksiyasi","sanitariya","obodonlashtirish","jarima soldi","jarimaga"],
   norms=["mjtk_shik","mjtk332","yhxx_el"],
   deadline={"days":10, "label":"Shikoyat berish uchun qoldi"}, trigger="Jarima qarorini olgan sana",
   calc={"type":"fineDiscount"}, partyField="organ", amountField="fine",
@@ -597,7 +600,7 @@ QUAL_P1 = UT_INTRO + " va to‘lovlarni o‘z vaqtida amalga oshiraman. {{trigge
 QUAL_P2 = "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 19-moddasiga ko‘ra ijrochi xizmatni shartnomada belgilangan muddatda, hajmda va sifatda ko‘rsatishi shart. Xizmatda nuqson bo‘lsa, iste’molchi uni bartaraf etishni va narxni mutanosib kamaytirishni talab qilishga haqli; nuqson talabdan keyin 20 kun ichida bartaraf etilmasa, har bir kechikkan kun uchun xizmat narxining 1 foizi miqdorida penya to‘lanadi."
 scen(id="kommunal_sifat", domain="kommunal", title="Kommunal xizmat uzildi yoki sifatsiz", card="Svet, gaz yoki suv uzoq vaqt yo‘q, bosim past yoki ogohlantirmasdan uzib qo‘yishdi", short="Sifatsiz xizmat",
   lead="Xizmat ko‘rsatuvchi xizmatni shartnomadagi hajm va sifatda ko‘rsatishi shart. Ko‘rsatilmagan xizmat uchun to‘lov qayta hisoblanadi; nuqson 20 kunda tuzatilmasa, har kun uchun xizmat narxining 1 foizi penya to‘lanadi.",
-  keywords=["svet yo‘q","gaz yo‘q","suv yo‘q","tok yo‘q","uzib qo‘y","o‘chirib qo‘y","bosim past","kuchlanish","issiq suv","isitish","otopleniya","radiator","avariya","kommunal xizmat"],
+  keywords=["svet yo‘q","gaz yo‘q","suv yo‘q","tok yo‘q","uzib qo‘y","o‘chirib qo‘y","bosim past","kuchlanish","issiq suv","isitish","otopleniya","radiator","avariya","kommunal xizmat","svet yo‘qligi","gaz yo‘qligi","suv yo‘qligi","tok yo‘qligi"],
   norms=["ihq19","ihq22","ihq23","ihq29"],
   deadline={"months":6, "label":"Talab qo‘yish uchun qoldi", "note":"Xizmatdagi nuqson bo‘yicha talab, kafolat bo‘lmasa, 6 oy ichida qo‘yiladi (19-modda). Kechiktirmang."},
   trigger="Xizmat uzilgan yoki sifatsiz bo‘lgan sana",
@@ -900,6 +903,85 @@ scen(id="migrant_xorij", domain="migrant", title="Xorijda maosh berilmadi yoki p
         closing="Talabim bajarilmagan taqdirda Migratsiya agentligiga va sudga murojaat qilishimni ma’lum qilaman.")
   ])
 
+# ===== UMUMIY MUROJAAT (oxirida: teng ballda aniq holat ustun bo‘lishi uchun) =====
+# Umumiy murojaat: ariza, taklif, shikoyat (Murojaatlar to‘g‘risidagi qonun; 6-modda talablari — F.I.Sh., manzil, idora, mohiyat, imzo)
+GEN_TO = ["{{body}}ga", "fuqaro {{applicant}} dan"]
+GEN_SUBJ = "Murojaat mavzusi: {{subject}}."
+GEN_LAW = "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+GEN_ATT = ["Holatni tasdiqlovchi hujjatlar nusxalari"]
+scen(id="murojaat_umumiy", domain="davlat", title="Davlat idorasiga ariza, taklif yoki shikoyat yozish", card="Hokimlik yoki boshqa idoraga rasmiy murojaat tayyorlash", short="Ariza, taklif, shikoyat",
+  lead="Davlat idorasiga ariza, taklif yoki shikoyatni yozma, elektron yoki og‘zaki shaklda yuborish mumkin. Yozma murojaatda F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart. Idora 15 kunda, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob beradi.",
+  keywords=["ariza yozmoqchiman","hokimlikka murojaat","taklif bermoqchiman","shikoyat qilmoqchiman","davlat idorasiga"],
+  norms=["mq5","mq6","mq28","mq36","mq38"],
+  deadline={"none":True, "label":"Murojaat muddati", "note":"Murojaatni topshirganingizdan keyin idora 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob berishi shart (28-modda). Javob bo‘lmasa, «Javobsiz murojaat» holatidan foydalaning."},
+  trigger="Murojaat topshirilgan sana",
+  calc=None, partyField="body",
+  steps=[{"org":"Siz","t":"Murojaat turini tanlang va yozing","when":"Bugun","body":"Ariza — huquqingizni amalga oshirishda yordam so‘rash; taklif — davlat va jamiyat faoliyatini takomillashtirishga doir tavsiyalar bayon etilgan murojaat; shikoyat — buzilgan huquqingizni tiklashni talab qilish. F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart (6-modda)."},
+         {"org":"Mas’ul idora","t":"Mas’ul idoraga topshiring","when":"Tayyor bo‘lgach","body":"murojaat.gov.uz, idoraning virtual qabulxonasi, shaxsan yoki pochta orqali: barcha shakllar teng kuchga ega (5-modda)."},
+         {"org":"Mas’ul idora","t":"Kiruvchi raqamni saqlang","when":"Topshirgan kuni","body":"Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring. Elektron murojaatda uning raqamini yozib oling."},
+         {"org":"Mas’ul idora","t":"Javobni kuting","when":"{t+15} gacha","body":"Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak (28-modda). Muddat uzaytirilsa, sizga xabar berilishi shart."},
+         {"org":"Yuqori organ","t":"Javob bo‘lmasa — shikoyat","when":"Muddat o‘tgach","body":"Yuqori turuvchi organga yoki Prezidentning virtual qabulxonasiga (pm.gov.uz). Shikoyat matni «Javobsiz murojaat» holatida tayyor."},
+         {"org":"Ma’muriy sud","t":"Harakatsizlik ustidan sudga","when":"Kerak bo‘lsa","body":"Murojaat ko‘rib chiqilmasa, idoraning harakatsizligi ustidan ma’muriy sudga murojaat qilish mumkin (36-modda). Ariza «Javobsiz murojaat» holatida tayyorlanadi."}],
+  evidence=["Holatni tasdiqlovchi hujjatlar nusxalari","Idoradan ilgari olingan javoblar (bo‘lsa)","Fotosuratlar (bo‘lsa)"],
+  fields=[
+    F("body","Qaysi idoraga","idora nomi", group=GOV, hint="Chilonzor tumani hokimligi"),
+    F("subject","Qisqacha mavzu","mavzu", group=GOV, hint="Mahalladagi yo‘lni ta’mirlash"),
+    F("facts","Nima bo‘ldi","holat bayoni","textarea", group=GOV, hint="Ko‘chamizdagi yo‘l 2 yildan beri ta’mirlanmagan, yomg‘irdan keyin suv to‘planib qoladi."),
+    F("request","Nimani so‘raysiz","so‘rov yoki taklif","textarea", group=GOV, hint="yo‘lni 2027-yil ta’mirlash rejasiga kiritishni")
+  ],
+  docs=[
+    doc("ariza","Ariza", GEN_TO, "ARIZA", [GEN_SUBJ, "{{facts}}", GEN_LAW],
+        ["{{request}}","murojaatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."], GEN_ATT),
+    doc("taklif","Taklif", GEN_TO, "TAKLIF", [GEN_SUBJ, "{{facts}}", GEN_LAW],
+        ["{{request}}"], GEN_ATT, askLabel="Taklif qilaman:",
+        closing="Taklifim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishingizni so‘rayman."),
+    doc("shikoyat","Shikoyat", GEN_TO, "SHIKOYAT", [GEN_SUBJ, "{{facts}}", "Ushbu holat bilan huquq va qonuniy manfaatlarim buzilgan deb hisoblayman.", GEN_LAW],
+        ["{{request}}","shikoyatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."],
+        GEN_ATT + ["Avvalgi murojaat va olingan javob nusxalari (bo‘lsa)"])
+  ])
+
+
+# ===== MEDIATSIYA (ixtiyoriy qadam + mediatsiya taklifi xati) =====
+# «Mediatsiya to‘g‘risida»gi Qonun (ZRU-482): 7-modda — ixtiyoriylik; 22-modda — mediatorni tomonlar birgalikda tanlaydi.
+# Sud muddati to‘xtashi faqat mehnat nizolari uchun aytiladi (MK 560-modda). Boshqa holatlarda bu da’vo qilinmaydi.
+MED_LABOR = {"ish_haqi", "hisob_kitob", "tatil"}
+MED_DISPUTE = {
+  "ish_haqi": "ish haqi to‘lanmagani[?amount] (qarz: {{amount}})[/]",
+  "hisob_kitob": "bo‘shatishdagi hisob-kitob[?amount] (qarz: {{amount}})[/]",
+  "tatil": "mehnat ta’tili berilmagani",
+  "nuqsonli_tovar": "sotib olingan {{product}}dagi nuqson[?price] (narxi: {{price}})[/]",
+  "ijara_depozit": "ijara garov puli[?deposit] ({{deposit}})[/] qaytarilmagani",
+  "qarz": "qarz[?amount] ({{amount}})[/] qaytarilmagani",
+  "kommunal_hisob": "{{service}} xizmati uchun hisob[?overcharge] (ortiqcha hisoblangan summa: {{overcharge}})[/]",
+}
+MED_VOLUNTARY = "Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda)."
+MED_PAUSE = "Nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi (MK 560-modda)."
+def med_step(labor):
+    body = "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. " + MED_VOLUNTARY + " "
+    body += (MED_PAUSE + " Ish beruvchiga «Mediatsiya taklifi» xatini yuboring.") if labor else \
+            "Sudga murojaat muddatini kuzatib boring: kelishuvga erishilmasa, sudga o‘z vaqtida murojaat qiling. Qarshi tomonga «Mediatsiya taklifi» xatini yuboring."
+    return {"org":"Mediator", "t":"Mediator orqali kelishib ko‘ring (ixtiyoriy)", "when":"Sudga murojaat qilishdan oldin", "body": body}
+def med_doc(sc):
+    labor = sc["id"] in MED_LABOR
+    body = ["O‘rtamizda " + MED_DISPUTE[sc["id"]] + " bo‘yicha kelishmovchilik mavjud.",
+            "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda)."]
+    if labor: body.append("Mehnat kodeksining 560-moddasiga ko‘ra nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi.")
+    body.append("Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda.")
+    return doc("mediatsiya", "Mediatsiya taklifi", list(sc["docs"][0]["to"]), "TAKLIF", body,
+               ["nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+                "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."],
+               ["Nizoga oid hujjatlar nusxalari (bo‘lsa)"], sub="nizoni mediatsiya orqali hal qilish to‘g‘risida", askLabel="Taklif qilaman:",
+               closing="Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.")
+for sc in S:
+    if sc["id"] not in MED_DISPUTE: continue
+    ci = next(i for i, st in enumerate(sc["steps"]) if st["org"] == "Sud")
+    sc["steps"].insert(ci, med_step(sc["id"] in MED_LABOR))
+    di = next((i for i, d in enumerate(sc["docs"]) if d["id"] == "court"), len(sc["docs"]))
+    first = sc["docs"][0]["id"]
+    sc["docs"].insert(di, med_doc(sc))
+    for f in sc["fields"]:                       # xat manzilidagi maydonlar (masalan, rahbar F.I.Sh.) shu xatda ham ko‘rinsin
+        if f.get("docs") and first in f["docs"]: f["docs"] = f["docs"] + ["mediatsiya"]
+    sc["norms"] = sc["norms"] + ["med7"]
 
 # ---------- «Qanday topshiriladi» ----------
 L_SUD = {"label":"Sudlarning interaktiv xizmatlari — my.sud.uz", "url":"https://my.sud.uz/"}
@@ -940,7 +1022,7 @@ FEE = {
 }
 # Hujjat turi va sud boji turi (ruscha baza ham shu funksiyalardan foydalanadi)
 FINE_IDS = {"jarima", "yhxx_jarima"}
-PRIVATE_DOCS = {"employer","seller","debtor","landlord","provider","bank","lender","insurer","recruiter"}
+PRIVATE_DOCS = {"mediatsiya","employer","seller","debtor","landlord","provider","bank","lender","insurer","recruiter"}
 def howto_kind(sc, d):
     if sc["id"] in FINE_IDS: return "fine"
     if d["id"] in PRIVATE_DOCS: return "private"

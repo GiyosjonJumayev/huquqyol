@@ -115,6 +115,12 @@ OFFICES = {
     "links": [L("Murojaat yuborish — pm.gov.uz", "https://pm.gov.uz/"), L("Yagona murojaatlar platformasi — murojaat.gov.uz", "https://murojaat.gov.uz/")],
     "src": "https://pm.gov.uz/"
   },
+  "mediators": {
+    "name": "Professional mediatorlar reyestri",
+    "role": "Adliya vazirligi yuritadigan professional mediatorlar reyestri. Mediatorni nizo tomonlari birgalikda tanlaydi.",
+    "links": [L("Professional mediatorlar reyestri — gov.uz/adliya", "https://gov.uz/oz/adliya/sections/professional-mediatorlar-reyestri")],
+    "src": "https://gov.uz/oz/adliya/sections/professional-mediatorlar-reyestri"
+  },
   "mfa": {
     "name": "O‘zbekistonning xorijdagi elchixona va konsulliklari",
     "role": "Xorijda pasport yo‘qolsa yoki olib qo‘yilsa, konsullik yordami va qaytish hujjati. Aloqa ma’lumotlari davlatga qarab farq qiladi.",
@@ -177,6 +183,8 @@ OFFICES_RU = {
   "pm": {"name":"Виртуальная приёмная Президента", "role":"Если орган не отвечает или вопрос не решён, можно направить обращение.",
          "phones":[{"label":"Короткий номер"}, {"label":"Бесплатный номер"}],
          "links":[{"label":"Отправить обращение — pm.gov.uz"}, {"label":"Единая платформа обращений — murojaat.gov.uz"}]},
+  "mediators": {"name":"Реестр профессиональных медиаторов", "role":"Реестр профессиональных медиаторов, который ведёт Министерство юстиции. Медиатора стороны спора выбирают совместно.",
+                "links":[{"label":"Реестр профессиональных медиаторов — gov.uz/adliya"}]},
   "mfa": {"name":"Посольства и консульства Узбекистана за рубежом",
           "role":"Консульская помощь и документ на возвращение, если паспорт утерян или удерживается за рубежом. Контакты зависят от страны.",
           "links":[{"label":"Список консульств и контакты — Министерство иностранных дел"}, {"label":"Электронная очередь в консульство — e-navbat.mfa.uz"}]}
@@ -186,14 +194,14 @@ OFFICES_RU = {
 ORG_OFFICE = {
   "Mehnat inspeksiyasi": "dmi", "Iste’molchilar qo‘mitasi": "raqobat", "Markaziy bank": "cbu", "Migratsiya agentligi": "migration",
   "Pensiya jamg‘armasi": "pension", "«Inson» markazi": "social", "Majburiy ijro byurosi": "mib", "Sud": "courts", "Ma’muriy sud": "courts",
-  "Yuqori organ yoki sud": "courts", "YHXX yoki sud": "courts", "Politsiya": "iiv", "Elektron": "egov", "Xalq qabulxonasi": "pm", "Konsullik": "mfa"
+  "Yuqori organ yoki sud": "courts", "YHXX yoki sud": "courts", "Politsiya": "iiv", "Elektron": "egov", "Xalq qabulxonasi": "pm", "Konsullik": "mfa", "Mediator": "mediators"
 }
 # Holatga xos qo‘shimchalar: qadamda tilga olinmagan, lekin foydali idora; yoki umumiy «Yuqori organ» ning aniq ma’nosi
-EXTRA_OFFICES = {"osgo": ["napp"], "organ_qarori": ["pm"]}
+EXTRA_OFFICES = {"osgo": ["napp"], "organ_qarori": ["pm"], "murojaat_umumiy": ["pm"]}
 STEP_OVERRIDE = {("pensiya", "Yuqori organ"): "pension", ("ijtimoiy_nafaqa", "Yuqori organ"): "social"}
 
 # Ariza qabul qiluvchisi → idora («Qanday topshiriladi» ostida aloqa ma’lumoti)
-DOC_OFFICE = {"inspection": "dmi", "agency": "raqobat", "cbu": "cbu", "migration": "migration", "consul": "mfa", "court": "courts"}
+DOC_OFFICE = {"mediatsiya": "mediators", "inspection": "dmi", "agency": "raqobat", "cbu": "cbu", "migration": "migration", "consul": "mfa", "court": "courts"}
 DOC_OVERRIDE = {("pensiya", "higher"): "pension", ("ijtimoiy_nafaqa", "higher"): "social"}
 
 def attach(S):
