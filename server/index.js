@@ -18,6 +18,7 @@ import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
 import { stats, DEFAULT_FILE as STATS_FILE } from "./stats.js";
 import { statsPage } from "./statsPage.js";
 import { vPhoto, readPhoto } from "./photo.js";
+import { warmUp as ocrWarmUp, shutdown as ocrShutdown, ocrEnabled } from "./ocr.js";
 
 // Til: uz va ru o‘z bazasidan, cyr — uz natijasining kirill shakli
 const base = lang => lang === "ru" ? "ru" : "uz";
@@ -27,6 +28,8 @@ const buildModel = req => { const v = vDocument(req.body); const m = documentMod
 const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const fontDir = pkg => join(dirname(require.resolve(`${pkg}/package.json`)), "files");
+const PDFJS_DIR = dirname(require.resolve("pdfjs-dist/package.json"));
+export const PDFJS_BASE = `/vendor/pdfjs-${require("pdfjs-dist/package.json").version}`;
 
 export const app = express();
 app.disable("x-powered-by");
@@ -40,7 +43,7 @@ app.use(securityHeaders);
 // Umumiy /api chegarasi (32 KB) undan keyin ulanadi, shuning uchun bu marshrut undan oldin turadi.
 const apiLimit = rateLimit({ max: 600, name:"api" });
 const wrapEarly = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
-app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "5mb", strict: true }),
+app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "8mb", strict: true }),
   (req, res, next) => { req.lang = resolveLang(req); next(); },
   wrapEarly(async (req, res) => {
     const v = vPhoto(req.body);
@@ -55,7 +58,7 @@ app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 const safeName = s => String(s).replace(/[^A-Za-z0-9._-]/g, "_").slice(0, 120);
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 
-app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
+app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
 // Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
 function metaOf(lang){
@@ -137,7 +140,7 @@ function renderIndex(lang){
     .replace("<!--EXAMPLES-->", examplesHTML(lang))
     .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
     .replace(`data-lang="${lang}" aria-pressed="false"`, `data-lang="${lang}" aria-pressed="true"`)
-    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff")) : k === "privacy" ? escAttr(t(meta.ai ? "privacyAi" : "privacy")) : escAttr(t(k)));
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "pdfjsBase" ? PDFJS_BASE : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff")) : k === "privacy" ? escAttr(t(meta.ai ? "privacyAi" : "privacy")) : escAttr(t(k)));
 }
 const INDEX = Object.fromEntries(LANGS.map(l => [l, renderIndex(l)]));
 app.get(["/", "/index.html"], (req, res) => {
@@ -145,7 +148,9 @@ app.get(["/", "/index.html"], (req, res) => {
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });   // ?lang=ru havolasi tilni eslab qoladi
   // Tanlangan shrift o‘lchami (cookie) sahifa chizilishidan oldin qo‘llanadi — matn «sakramaydi»
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
-  const html = fs ? INDEX[req.lang].replace("<html ", `<html data-fs="${fs}" `) : INDEX[req.lang];
+  let html = fs ? INDEX[req.lang].replace("<html ", `<html data-fs="${fs}" `) : INDEX[req.lang];
+  // Foydalanuvchi rasm panelini yopgan bo‘lsa (cookie), sahifa shu holatda chiziladi — panel «miltillamaydi»
+  if (/(?:^|;\s*)hy_photo=0(?:;|$)/.test(req.headers.cookie || "")) html = html.replace('id="photoPanel"', 'id="photoPanel" hidden');
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(html);
 });
 app.get("/statistika", (req, res) => {
@@ -164,6 +169,11 @@ for (const f of MODULES){
 
 // Shriftlar o‘zimizda (tashqi CDN yo‘q — maxfiylik va CSP uchun)
 const fontOpts = { maxAge:"365d", immutable:true };
+// PDF o‘qish (pdf.js) — faqat brauzerda, PDF tanlanganda yuklanadi. Versiya URL’da: bir yil keshlanadi.
+for (const f of ["pdf.min.mjs", "pdf.worker.min.mjs"])
+  app.get(`${PDFJS_BASE}/${f}`, (req, res) => res.set("Cache-Control", "public, max-age=31536000, immutable").type("js").sendFile(join(PDFJS_DIR, "build", f)));
+app.use(`${PDFJS_BASE}/cmaps`, express.static(join(PDFJS_DIR, "cmaps"), fontOpts));
+app.use(`${PDFJS_BASE}/standard_fonts`, express.static(join(PDFJS_DIR, "standard_fonts"), fontOpts));
 app.use("/fonts/onest", express.static(fontDir("@fontsource/onest"), fontOpts));
 app.use("/fonts/spectral", express.static(fontDir("@fontsource/spectral"), fontOpts));
 app.use("/fonts/jetbrains-mono", express.static(fontDir("@fontsource/jetbrains-mono"), fontOpts));
@@ -196,11 +206,12 @@ app.use((err, req, res, next) => {
 // faqat Nginx orqali ochiladi. Passenger’da port raqam emas, soket yo‘li bo‘lishi mumkin.
 export function start({ port = process.env.PORT || 3000, host = process.env.HOST } = {}){
   stats.attachFile(STATS_FILE);                                   // anonim statistika faqat haqiqiy ishga tushirishda diskka yoziladi
+  ocrWarmUp();                                                    // OCR til fayllari oldindan yuklanadi (birinchi rasm tezroq o‘qiladi)
   const p = /^\d+$/.test(String(port)) ? Number(port) : port;
   const onListen = () => console.log(`HuquqYo‘l ishga tushdi: ${typeof p === "number" ? `http://${host || "localhost"}:${p}` : p}  (AI: ${aiEnabled() ? "Claude" : "o‘chiq — qidiruv rejimi"})`);
   const server = host && typeof p === "number" ? app.listen(p, host, onListen) : app.listen(p, onListen);
   server.requestTimeout = 30_000; server.headersTimeout = 15_000; server.keepAliveTimeout = 65_000;
-  const stop = () => { stats.close(); server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 8000).unref(); };   // statistika diskka yoziladi
+  const stop = () => { stats.close(); ocrShutdown(); server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 8000).unref(); };   // statistika diskka yoziladi
   process.once("SIGTERM", stop); process.once("SIGINT", stop);
   return server;
 }
