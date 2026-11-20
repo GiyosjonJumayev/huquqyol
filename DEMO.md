@@ -7,7 +7,7 @@ Bu fayl sahnaga chiqishdan oldin o‘qiladi. Uch qism: **pitch (3 daqiqa)**, **j
 ## Sahnadan 30 daqiqa oldin — nazorat ro‘yxati
 
 - [ ] `npm ci && npm start` → http://localhost:3000 ochiladi. Internetsiz ham ishlaydi: shriftlar, bilim bazasi va hujjat generatori loyiha ichida.
-- [ ] `npm test` (61 test) va `npm run test:e2e` (10 brauzer testi) yashil.
+- [ ] `npm test` (69 test) va `npm run test:e2e` (10 brauzer testi) yashil.
 - [ ] AI rejimi kerak bo‘lsa, `.env` da `ANTHROPIC_API_KEY`; `/api/health` → `"ai":true`. Kalit bo‘lmasa ham hammasi ishlaydi (qidiruv + qoidalar rejimi) — buni ataylab ko‘rsatish mumkin.
 - [ ] Brauzer: **Edge** (o‘zbekcha tabiiy ovoz bor — ovozli o‘qishni shunda ko‘rsating). Masshtab 110–125%, qorong‘i mavzu o‘chiq.
 - [ ] Oldindan ochilgan tablar: `/?lang=uz`, `/?lang=ru`, `/statistika`.
@@ -47,10 +47,11 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 2. **Qayerga borish va dalillar (40 s).** Qadam ostidagi «Manzil va aloqa ↓» → Davlat mehnat inspeksiyasi kartasi: manzil, ishonch telefoni (bosilsa qo‘ng‘iroq), manba va tekshirilgan sana. Pastda dalillar: «MUHIM» belgilari va har biri qayerdan olinishi.
 3. **Ariza (50 s).** **Ariza tayyorlash** → **Namuna bilan to‘ldirish** — hujjat ko‘z oldida to‘ladi. «Kimga»: ish beruvchi → inspeksiya → sud — matn o‘zgaradi. **PDF** yuklab oling va oching.
 4. **Til (20 s).** **Рус** — o‘sha ariza ruscha rasmiy uslubda («ТРЕБОВАНИЕ», «Требую:»), kiritilgan ma’lumotlar saqlanadi. **Ўзб** — kirill.
-5. **Yangi soha (40 s).** Bosh sahifa → «Kartamdan bilmagan holda 2 million so‘m yechib olishdi». Qadamlar: kartani bloklash → politsiya (102) → Markaziy bank (71) 200-00-44 → sud. Yoki migrant: «Rossiyada ishlayapman, ish beruvchi pasportimni olib qo‘ydi» → Migratsiya agentligining Moskva, Seul, Istanbul raqamlari.
-6. **Keksalar uchun (40 s).** **Aa Qulaylik** → «Eng katta» shrift — butun sayt kattalashadi. **Tinglash** — reja ovozda o‘qiladi, o‘qilayotgan qadam belgilanadi. Esc — to‘xtatish.
-7. **Statistika (20 s).** `/statistika`: namoyish davomida ochilgan holatlar shu yerda — sohalar bo‘yicha. «Matn, IP, cookie saqlanmaydi — faqat sanoq.»
-8. **Yakun (10 s).** «Bir daqiqada: qonun, muddat, qayerga borish, dalillar va tayyor ariza. Bepul, uch tilda, internetsiz ham.»
+5. **Rasmdan (40 s) — AI kaliti kerak.** Bosh sahifa → **Rasmdan** → YHXX jarima qarori rasmini tanlang (oldindan telefonda yoki noutbukda tayyorlab qo‘ying). «Hujjatdan o‘qildi» kartasi: organ, qaror raqami, sana, summa, avtomobil raqami. Muddat kartasi: «Shikoyat berish uchun N kun qoldi» — hujjat sanasidan. **Ariza** → maydonlar o‘zi to‘lgan. Ayting: «AI faqat rasmdagi faktni o‘qidi, muddatni kod hisobladi — va siz uni tekshirasiz».
+6. **Yangi soha (40 s).** Bosh sahifa → «Kartamdan bilmagan holda 2 million so‘m yechib olishdi». Qadamlar: kartani bloklash → politsiya (102) → Markaziy bank (71) 200-00-44 → sud. Yoki migrant: «Rossiyada ishlayapman, ish beruvchi pasportimni olib qo‘ydi» → Migratsiya agentligining Moskva, Seul, Istanbul raqamlari.
+7. **Keksalar uchun (40 s).** **Aa Qulaylik** → «Eng katta» shrift — butun sayt kattalashadi. **Tinglash** — reja ovozda o‘qiladi, o‘qilayotgan qadam belgilanadi. Esc — to‘xtatish.
+8. **Statistika (20 s).** `/statistika`: namoyish davomida ochilgan holatlar shu yerda — sohalar bo‘yicha. «Matn, IP, cookie saqlanmaydi — faqat sanoq.»
+9. **Yakun (10 s).** «Bir daqiqada: qonun, muddat, qayerga borish, dalillar va tayyor ariza. Bepul, uch tilda, internetsiz ham.»
 
 ---
 
@@ -83,7 +84,7 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 | Bu yuristni almashtiradimi? | Yo‘q. Bu birinchi qadam: fuqaro huquqini va muddatini biladi, tayyor hujjat bilan boradi. Murakkab ishda yuristga murojaat qilish tavsiya etiladi — ilova buni har sahifada aytadi. |
 | Biznes model / barqarorlik? | Fuqarolar uchun bepul. Yo‘nalishlar: yuridik klinikalar va advokatlar uchun B2B (murojaatni yuristga yo‘naltirish), HR bo‘limlari uchun mehnat qonuni tekshiruvi, davlat organlari uchun anonim statistika (qaysi muammolar ko‘p), my.gov.uz / my.sud.uz bilan integratsiya. Server xarajati past: AI ixtiyoriy, qolgani oddiy Node.js. |
 | Masshtab? | Bitta Node.js jarayoni; holat yo‘q (stateless), shuning uchun gorizontal kengayadi. Statistika — kichik JSON fayl; kerak bo‘lsa ma’lumotlar bazasiga o‘tkaziladi. |
-| Keyingi qadamlar? | Yo‘l xaritasi README’da: my.sud.uz’ga to‘g‘ridan-to‘g‘ri topshirish, chek/qaror rasmini o‘qish (OCR), Telegram bot, qoraqalpoq tili, yuridik klinikalar bilan hamkorlik. |
+| Keyingi qadamlar? | Yo‘l xaritasi README’da: my.sud.uz’ga to‘g‘ridan-to‘g‘ri topshirish, ko‘p sahifali hujjat va PDF’dan o‘qish, Telegram bot, qoraqalpoq tili, yuridik klinikalar bilan hamkorlik. |
 
 ---
 
@@ -99,6 +100,6 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 | Idoralar (rasmiy manba bilan) | 13 |
 | Kalkulyatorlar | 5 — MK 333 kompensatsiya, iste’molchi penyasi, aliment, jarima chegirmasi, mikroqarz chegarasi |
 | Tillar | o‘zbek (lotin, kirill), rus |
-| Testlar | 61 unit/API + 10 brauzer (axe bilan) |
+| Testlar | 69 unit/API + 10 brauzer (axe bilan) |
 
 Lighthouse ballarini ko‘rsatmoqchi bo‘lsangiz, sahnadan oldin o‘zingiz o‘lchang: Chrome yoki Edge → DevTools → **Lighthouse** → Mobile va Desktop. Natijani slaydga faqat o‘lchangan qiymat bilan yozing.

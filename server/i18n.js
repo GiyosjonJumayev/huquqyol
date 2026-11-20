@@ -42,7 +42,12 @@ const M = {
   notFound:{ uz:"Topilmadi.", ru:"Не найдено." },
   format:{ uz:"Format: docx yoki pdf.", ru:"Формат: docx или pdf." },
   server:{ uz:"Serverda xatolik yuz berdi.", ru:"На сервере произошла ошибка." },
-  origin:{ uz:"So‘rov boshqa saytdan yuborilgan.", ru:"Запрос отправлен с другого сайта." }
+  origin:{ uz:"So‘rov boshqa saytdan yuborilgan.", ru:"Запрос отправлен с другого сайта." },
+  photoFormat:{ uz:"Rasm JPG, PNG yoki WEBP formatida bo‘lishi kerak.", ru:"Фото должно быть в формате JPG, PNG или WEBP." },
+  photoBig:{ uz:"Rasm juda katta. Kichikroq rasm yuboring.", ru:"Фото слишком большое. Отправьте фото поменьше." },
+  photoNoAi:{ uz:"Rasmdan o‘qish uchun AI kerak — u hozir o‘chiq. Vaziyatni matn bilan yozing.", ru:"Для чтения фото нужен ИИ — сейчас он выключен. Опишите ситуацию текстом." },
+  photoAi:{ uz:"Rasmni hozir o‘qib bo‘lmadi. Birozdan keyin urinib ko‘ring yoki vaziyatni matn bilan yozing.", ru:"Сейчас не удалось прочитать фото. Попробуйте позже или опишите ситуацию текстом." },
+  photoUnread:{ uz:"Rasmda hujjatni o‘qib bo‘lmadi. Hujjatni yorug‘ joyda, to‘liq va tekis suratga oling.", ru:"Не удалось прочитать документ на фото. Сфотографируйте его целиком, ровно и при хорошем свете." }
 };
 export function msg(lang, key, vars = {}){
   const m = M[key]; if (!m) return key;
@@ -52,8 +57,8 @@ export function msg(lang, key, vars = {}){
 
 // Javobdagi barcha matnlarni kirillga o‘girish. Identifikator, URL va texnik kalitlar o‘zgarmaydi.
 const KEEP = new Set(["id","k","v","type","domain","law","scenario","recipient","level","calc","url","lawUrl","lex","source","model",
-  "partyField","amountField","fallbackReason","lang","fmt"]);
-const SKIP_TREE = new Set(["retrieval", "keywords", "raw", "form"]);
+  "partyField","amountField","fallbackReason","lang","fmt","docType","analysisSource"]);
+const SKIP_TREE = new Set(["retrieval", "keywords", "raw", "form", "photo"]);   // photo — hujjatdan o‘qilgan asl matn
 export function deepCyr(x, key){
   if (typeof x === "string") return KEEP.has(key) ? x : toCyrillic(x);
   if (Array.isArray(x)) return x.map(v => deepCyr(v, key));
