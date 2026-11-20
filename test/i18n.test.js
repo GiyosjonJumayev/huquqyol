@@ -61,7 +61,8 @@ test("API ruscha va kirillcha javob beradi, xatolar ham shu tilda", async () => 
   const p = await (await post("/api/plan", { scenario:"ish_haqi", triggerDate:"2026-08-01", form:{ amount:"9000000", months:"3" }, lang:"ru" })).json();
   assert.equal(p.info.title, "Не выплачивают зарплату");
   assert.match(p.deadlineText, /февраля 2027 г\./);
-  assert.match(p.calc.value, /^не менее .* сум$/);
+  assert.match(p.calc.value, /^[\d\s]+ сум$/);
+  assert.match(p.calc.rows[0][0], /ст\. 333 ТК/);
   const c = await (await post("/api/plan", { scenario:"jarima", lang:"cyr" })).json();
   assert.ok(c.info.title === "Жаримага рози эмасман" && c.scenario === "jarima" && /^\d{4}-/.test(c.trigger));
   const m = await (await fetch(base + "/api/meta?lang=ru")).json();

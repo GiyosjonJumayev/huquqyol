@@ -247,7 +247,7 @@ Shablon sintaksisi:
   - O‘RQ-501 (xususiy bandlik agentliklari), 15, 15¹, 17, 20-moddalar;
   - Markaziy bankning iste’molchilar huquqlarini himoya qilish xizmati: (71) 200-00-44 (cbu.uz).
 - Modda raqamisiz berilgan normalar (banklar to‘g‘risidagi qonundagi javobgarlik va bank siri; Markaziy bankka shikoyat) mazmuni bo‘yicha tekshirilgan, lekin amaldagi tahrirdagi modda raqami tasdiqlanmagan. Ijtimoiy nafaqa bo‘yicha alohida qonun normasi keltirilmagan: holat Murojaatlar to‘g‘risidagi qonun va ma’muriy sud tartibiga tayanadi.
-- 333-modda kompensatsiyasini hisoblash usuli amaliyotda bahsli. Shuning uchun ilova past talqinni asosiy summa sifatida, yuqori talqinni esa oraliq sifatida ko‘rsatadi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
+- 333-modda kompensatsiyasi: asosiy summa — modda matni bo‘yicha (kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi; 14% da qarzning kuniga 1,4%). Ikkinchi qatorda muqobil talqin (stavka yillik deb olinib, 365 ga bo‘linadi) ko‘rsatiladi. Yakuniy summani sud belgilaydi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
 - **Bu huquqiy maslahat emas.** Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi.
 
 ## Ko‘p tillilik

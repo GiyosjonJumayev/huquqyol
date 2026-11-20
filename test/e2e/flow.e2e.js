@@ -131,7 +131,7 @@ test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til alma
   await p.click("#analyzeBtn");
   await p.waitForSelector("#deadlineCard .big");
   assert.equal(await p.innerText("#v2 h1"), "Не выплачивают зарплату");
-  assert.match(await p.innerText("#calcValue"), /не менее .* сум/);
+  assert.match(await p.innerText("#calcValue"), /^[\d\s]+ сум$/);
   assert.deepEqual(await audit(p), []);
   const ics = p.waitForEvent("download");
   await p.click("#calBtn");
