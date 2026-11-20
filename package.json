@@ -33,6 +33,7 @@
     "grammy": "1.46.0",
     "pdfjs-dist": "4.10.38",
     "pdfkit": "0.20.2",
+    "pg": "8.23.1",
     "tesseract.js": "7.0.0"
   },
   "devDependencies": {
