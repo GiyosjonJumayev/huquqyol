@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 89 unit + 10 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 93 unit + 10 brauzer |
 
 ## Ko‘rinishlar
 
@@ -112,7 +112,7 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 89 ta unit/API test (jumladan ruscha, kirillcha va Telegram bot)
+npm test                  # 93 ta unit/API test (jumladan ruscha, kirillcha va Telegram bot)
 npm run test:e2e          # 10 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
@@ -149,9 +149,11 @@ npm run bot               # «HuquqYo‘l bot ishga tushdi: @sizning_botingiz»
 | `/start` | salom, maxfiylik, til tanlash |
 | `/help` | yordam |
 | `/lang` | tilni almashtirish (o‘zbek lotin / kirill, rus) |
-| `/sana YYYY-MM-DD` | muddat hisoblanadigan sanani o‘zgartirish |
+| `/sana` yoki `/sana 22.08.2026` | muddat hisoblanadigan sanani kiritish (22.08.2026, 2.8.2026 yoki 2026-08-22). Faol holatda shunchaki sanani yozish ham mumkin |
 | `/skip` | F.I.Sh. so‘ralganda — o‘tkazib yuborish |
 | `/delete` | bot xotirasidagi ma’lumotni darhol o‘chirish |
+
+Sana kiritilmasa, bot muddatni taxminiy deb aniq aytadi va «Sanani kiritish» tugmasini ko‘rsatadi. Matn noaniq bo‘lsa («qarzdorlik bor»), bitta aniqlashtiruvchi savol va 2–3 holat tugmasi chiqadi.
 
 Ishlash tartibi: long polling (webhook va ochiq port kerak emas). Sessiya faqat xotirada, 1 soat; foydalanuvchi matni logga yozilmaydi; har bir chat uchun daqiqasiga 20 ta xabar. Server o‘chsa, sessiyalar yo‘qoladi. Bot uchun HTTPS yoki domen kerak emas, lekin u doimiy ishlab turadigan jarayon: VPS’da `pm2 start bot/index.js --name huquqyol-bot` yoki systemd xizmati sifatida ishga tushiring.
 
