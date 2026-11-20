@@ -72,7 +72,11 @@ test("Regressiya: umumiy murojaat mavjud holatlarni egallab olmaydi", () => {
     "Svet yo‘qligi bo‘yicha shikoyat qilmoqchiman": "kommunal_sifat",
     "Pensiya jamg‘armasi ustidan shikoyat qilmoqchiman": "pensiya",
     "Bank ustidan shikoyat qilmoqchiman, kartamdan pul yechildi": "bank_karta",
-    "Жалоба на хокима, незаконное решение о сносе": "organ_qarori"
+    "Жалоба на хокима, незаконное решение о сносе": "organ_qarori",
+    // «заявление в хокимият» (umumiy) javobsiz murojaatni bosib ketmasligi
+    "Подал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
+    "Написал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
+    "Обратился в хокимият, ответа нет 2 месяца": "murojaat_javobsiz"
   };
   for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
 });

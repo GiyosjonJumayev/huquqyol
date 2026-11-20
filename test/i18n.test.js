@@ -105,6 +105,9 @@ test("Ruscha matndan 11 holat tasniflanadi (AIsiz)", async () => {
     "Друг не возвращает долг 20 млн сум, есть расписка": "qarz",
     "Иш берувчим 3 ойдан бери маош бермаяпти": "ish_haqi",
     "Хочу подать предложение в хокимият по благоустройству": "murojaat_umumiy",
+    "Хочу написать заявление в хокимият": "murojaat_umumiy",
+    "Подал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
+    "Написал заявление в хокимият, ответа нет 2 месяца": "murojaat_javobsiz",
     "Соседская собака укусила меня": "boshqa"
   };
   for (const [t, want] of Object.entries(cases)) assert.equal((await analyze(t, "ru")).scenario, want, t);

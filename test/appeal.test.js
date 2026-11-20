@@ -25,10 +25,14 @@ test("Umumiy murojaat: tuzilma — davlat sohasi, normalar, muddatsiz, 3 hujjat,
   assert.deepEqual(s.fields.map(f => f.k), ["body", "subject", "facts", "request"]);
   assert.deepEqual(s.fields.map(f => f.type), ["text", "text", "textarea", "textarea"]);
   assert.ok(s.offices.includes("pm"));
-  for (const k of ["ariza yozmoqchiman", "hokimlikka murojaat", "taklif bermoqchiman", "shikoyat qilmoqchiman", "davlat idorasiga", "заявление в госорган", "жалоба", "предложение"])
+  for (const k of ["ariza yozmoqchiman", "hokimlikka murojaat", "taklif bermoqchiman", "shikoyat qilmoqchiman", "davlat idorasiga", "заявление в госорган", "жалоба", "предложение", "заявление в хокимият", "написать в хокимият"])
     assert.ok(s.keywords.includes(k), k);
   assert.equal(r.title, "Заявление, предложение или жалоба в госорган");
   assert.match(r.deadline.note, /15 дней.*1 месяца.*ст\. 28.*«Обращение без ответа»/);
+  // «taklif» ta’rifi — Qonun matni bo‘yicha
+  assert.ok(s.steps[0].body.includes("taklif — davlat va jamiyat faoliyatini takomillashtirishga doir tavsiyalar bayon etilgan murojaat"));
+  assert.ok(r.steps[0].body.includes("предложение — обращение с рекомендациями по совершенствованию деятельности государства и общества"));
+  assert.ok(!s.steps[0].body.includes("idora ishini yaxshilash") && !r.steps[0].body.includes("улучшению работы органа"));
 });
 
 test("Umumiy murojaat: reja — muddat yo‘q, javob kutish 15 kun, pm.gov.uz va ma’muriy sud", () => {

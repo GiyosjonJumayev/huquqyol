@@ -1805,6 +1805,8 @@
    "не отвечают",
    "не ответил",
    "без ответа",
+   "нет ответа",
+   "ответа нет",
    "хокимият",
    "госорган",
    "приёмн"
@@ -5818,7 +5820,9 @@
    "davlat idorasiga",
    "заявление в госорган",
    "жалоба",
-   "предложение"
+   "предложение",
+   "заявление в хокимият",
+   "написать в хокимият"
   ],
   "norms": [
    "mq5",
@@ -5840,7 +5844,7 @@
     "org": "Siz",
     "t": "Murojaat turini tanlang va yozing",
     "when": "Bugun",
-    "body": "Ariza — huquqingizni amalga oshirishda yordam so‘rash; taklif — idora ishini yaxshilash bo‘yicha fikr; shikoyat — buzilgan huquqingizni tiklashni talab qilish. F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart (6-modda)."
+    "body": "Ariza — huquqingizni amalga oshirishda yordam so‘rash; taklif — davlat va jamiyat faoliyatini takomillashtirishga doir tavsiyalar bayon etilgan murojaat; shikoyat — buzilgan huquqingizni tiklashni talab qilish. F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart (6-modda)."
    },
    {
     "org": "Mas’ul idora",
