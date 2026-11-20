@@ -90,3 +90,13 @@ test("Umumiy murojaat: ruscha hujjatlar ham 6-modda talablariga mos", () => {
     assert.ok(t.includes("статье 28 Закона «Об обращениях физических и юридических лиц»"));
   }
 });
+
+test("Bosh sahifa namunasi: «…chiroqlar haqida taklif bermoqchiman» umumiy murojaatga olib boradi (uz, kirill, ru)", async () => {
+  const { examples } = await import("../public/shared.js");
+  const { analyze } = await import("../server/analyze.js");
+  for (const lang of ["uz", "cyr", "ru"]){
+    const ex = examples(lang)[2];
+    assert.match(ex, /chiroq|чироқ|освещени/, lang);
+    assert.equal((await analyze(ex, lang === "ru" ? "ru" : "uz")).scenario, "murojaat_umumiy", `${lang}: ${ex}`);
+  }
+});
