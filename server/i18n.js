@@ -59,7 +59,7 @@ export function msg(lang, key, vars = {}){
 
 // Javobdagi barcha matnlarni kirillga o‘girish. Identifikator, URL va texnik kalitlar o‘zgarmaydi.
 const KEEP = new Set(["id","k","v","type","domain","law","scenario","recipient","level","calc","url","lawUrl","lex","source","model",
-  "partyField","amountField","fallbackReason","lang","fmt","docType","analysisSource"]);
+  "partyField","amountField","fallbackReason","lang","fmt","docType","analysisSource","from","field","kind","for"]);
 const SKIP_TREE = new Set(["retrieval", "keywords", "raw", "form", "photo"]);   // photo — hujjatdan o‘qilgan asl matn
 export function deepCyr(x, key){
   if (typeof x === "string") return KEEP.has(key) ? x : toCyrillic(x);

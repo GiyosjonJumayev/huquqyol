@@ -1,0 +1,1682 @@
+{
+ "checked": "2026-11-20",
+ "source": {
+  "label": "PF-6034-son Farmon (24.07.2020), 10-ilova",
+  "url": "https://lex.uz/docs/4910826"
+ },
+ "regions": [
+  {
+   "name": "Qoraqalpog‘iston Respublikasi",
+   "cyr": "Қорақалпоғистон Республикаси",
+   "center": "Nukus",
+   "admin": "Nukus tumanlararo ma’muriy sudi",
+   "adminCyr": "Нукус туманлараро маъмурий суди",
+   "hokimlik": "Qoraqalpog‘iston Respublikasi Vazirlar Kengashi",
+   "prokuratura": "Qoraqalpog‘iston Respublikasi prokuraturasi",
+   "by": "Qoraqalpog‘iston Respublikasi bo‘yicha",
+   "ru": {
+    "hokimlik": "Совет Министров Республики Каракалпакстан",
+    "prokuratura": "Прокуратура Республики Каракалпакстан",
+    "by": "по Республике Каракалпакстан"
+   },
+   "districts": [
+    {
+     "name": "Amudaryo tumani",
+     "kind": "tuman",
+     "cyr": "Амударё тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Amudaryo tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Амударё туман суди"
+    },
+    {
+     "name": "Beruniy tumani",
+     "kind": "tuman",
+     "cyr": "Беруний тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Beruniy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Беруний туманлараро суди"
+    },
+    {
+     "name": "To‘rtko‘l tumani",
+     "kind": "tuman",
+     "cyr": "Тўрткўл тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Beruniy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Беруний туманлараро суди"
+    },
+    {
+     "name": "Ellikqal’a tumani",
+     "kind": "tuman",
+     "cyr": "Элликқалъа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Beruniy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Беруний туманлараро суди"
+    },
+    {
+     "name": "Qonliko‘l tumani",
+     "kind": "tuman",
+     "cyr": "Қонликўл тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘ng‘irot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўнғирот туманлараро суди"
+    },
+    {
+     "name": "Qo‘ng‘irot tumani",
+     "kind": "tuman",
+     "cyr": "Қўнғирот тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘ng‘irot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўнғирот туманлараро суди"
+    },
+    {
+     "name": "Mo‘ynoq tumani",
+     "kind": "tuman",
+     "cyr": "Мўйноқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘ng‘irot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўнғирот туманлараро суди"
+    },
+    {
+     "name": "Shumanay tumani",
+     "kind": "tuman",
+     "cyr": "Шуманай тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘ng‘irot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўнғирот туманлараро суди"
+    },
+    {
+     "name": "Nukus shahri",
+     "kind": "shahar",
+     "cyr": "Нукус шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Nukus tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Нукус туманлараро суди"
+    },
+    {
+     "name": "Nukus tumani",
+     "kind": "tuman",
+     "cyr": "Нукус тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Nukus tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Нукус туманлараро суди"
+    },
+    {
+     "name": "Xo‘jayli tumani",
+     "kind": "tuman",
+     "cyr": "Хўжайли тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Nukus tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Нукус туманлараро суди"
+    },
+    {
+     "name": "Taxiatosh tumani",
+     "kind": "tuman",
+     "cyr": "Тахиатош тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Nukus tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Нукус туманлараро суди"
+    },
+    {
+     "name": "Qorao‘zak tumani",
+     "kind": "tuman",
+     "cyr": "Қораўзак тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chimboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чимбой туманлараро суди"
+    },
+    {
+     "name": "Kegeyli tumani",
+     "kind": "tuman",
+     "cyr": "Кегейли тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chimboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чимбой туманлараро суди"
+    },
+    {
+     "name": "Taxtako‘pir tumani",
+     "kind": "tuman",
+     "cyr": "Тахтакўпир тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chimboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чимбой туманлараро суди"
+    },
+    {
+     "name": "Chimboy tumani",
+     "kind": "tuman",
+     "cyr": "Чимбой тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chimboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чимбой туманлараро суди"
+    },
+    {
+     "name": "Bo‘zatov tumani",
+     "kind": "tuman",
+     "cyr": "Бўзатов тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chimboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чимбой туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Andijon viloyati",
+   "cyr": "Андижон вилояти",
+   "center": "Andijon",
+   "admin": "Andijon tumanlararo ma’muriy sudi",
+   "adminCyr": "Андижон туманлараро маъмурий суди",
+   "hokimlik": "Andijon viloyati hokimligi",
+   "prokuratura": "Andijon viloyati prokuraturasi",
+   "by": "Andijon viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Андижанской области",
+    "prokuratura": "Прокуратура Андижанской области",
+    "by": "по Андижанской области"
+   },
+   "districts": [
+    {
+     "name": "Andijon shahri",
+     "kind": "shahar",
+     "cyr": "Андижон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Andijon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Андижон туманлараро суди"
+    },
+    {
+     "name": "Oltinko‘l tumani",
+     "kind": "tuman",
+     "cyr": "Олтинкўл тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Andijon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Андижон туманлараро суди"
+    },
+    {
+     "name": "Andijon tumani",
+     "kind": "tuman",
+     "cyr": "Андижон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Andijon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Андижон туманлараро суди"
+    },
+    {
+     "name": "Asaka tumani",
+     "kind": "tuman",
+     "cyr": "Асака тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Asaka tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Асака туманлараро суди"
+    },
+    {
+     "name": "Marhamat tumani",
+     "kind": "tuman",
+     "cyr": "Марҳамат тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Asaka tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Асака туманлараро суди"
+    },
+    {
+     "name": "Bo‘ston tumani",
+     "kind": "tuman",
+     "cyr": "Бўстон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bo‘ston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бўстон туманлараро суди"
+    },
+    {
+     "name": "Ulug‘nor tumani",
+     "kind": "tuman",
+     "cyr": "Улуғнор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bo‘ston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бўстон туманлараро суди"
+    },
+    {
+     "name": "Shahrixon tumani",
+     "kind": "tuman",
+     "cyr": "Шаҳрихон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bo‘ston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бўстон туманлараро суди"
+    },
+    {
+     "name": "Baliqchi tumani",
+     "kind": "tuman",
+     "cyr": "Балиқчи тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Izboskan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Избоскан туманлараро суди"
+    },
+    {
+     "name": "Izboskan tumani",
+     "kind": "tuman",
+     "cyr": "Избоскан тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Izboskan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Избоскан туманлараро суди"
+    },
+    {
+     "name": "Paxtaobod tumani",
+     "kind": "tuman",
+     "cyr": "Пахтаобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Izboskan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Избоскан туманлараро суди"
+    },
+    {
+     "name": "Xonobod shahri",
+     "kind": "shahar",
+     "cyr": "Хонобод шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘rg‘ontepa tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўрғонтепа туманлараро суди"
+    },
+    {
+     "name": "Qo‘rg‘ontepa tumani",
+     "kind": "tuman",
+     "cyr": "Қўрғонтепа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘rg‘ontepa tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўрғонтепа туманлараро суди"
+    },
+    {
+     "name": "Buloqboshi tumani",
+     "kind": "tuman",
+     "cyr": "Булоқбоши тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Xo‘jaobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Хўжаобод туманлараро суди"
+    },
+    {
+     "name": "Jalaquduq tumani",
+     "kind": "tuman",
+     "cyr": "Жалақудуқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Xo‘jaobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Хўжаобод туманлараро суди"
+    },
+    {
+     "name": "Xo‘jaobod tumani",
+     "kind": "tuman",
+     "cyr": "Хўжаобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Xo‘jaobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Хўжаобод туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Buxoro viloyati",
+   "cyr": "Бухоро вилояти",
+   "center": "Buxoro",
+   "admin": "Buxoro tumanlararo ma’muriy sudi",
+   "adminCyr": "Бухоро туманлараро маъмурий суди",
+   "hokimlik": "Buxoro viloyati hokimligi",
+   "prokuratura": "Buxoro viloyati prokuraturasi",
+   "by": "Buxoro viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Бухарской области",
+    "prokuratura": "Прокуратура Бухарской области",
+    "by": "по Бухарской области"
+   },
+   "districts": [
+    {
+     "name": "Buxoro shahri",
+     "kind": "shahar",
+     "cyr": "Бухоро шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Buxoro tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бухоро туманлараро суди"
+    },
+    {
+     "name": "Buxoro tumani",
+     "kind": "tuman",
+     "cyr": "Бухоро тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Buxoro tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бухоро туманлараро суди"
+    },
+    {
+     "name": "G‘ijduvon tumani",
+     "kind": "tuman",
+     "cyr": "Ғиждувон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha G‘ijduvon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ғиждувон туманлараро суди"
+    },
+    {
+     "name": "Shofirkon tumani",
+     "kind": "tuman",
+     "cyr": "Шофиркон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha G‘ijduvon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ғиждувон туманлараро суди"
+    },
+    {
+     "name": "Kogon shahri",
+     "kind": "shahar",
+     "cyr": "Когон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Kogon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Когон туманлараро суди"
+    },
+    {
+     "name": "Kogon tumani",
+     "kind": "tuman",
+     "cyr": "Когон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kogon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Когон туманлараро суди"
+    },
+    {
+     "name": "Qorovulbozor tumani",
+     "kind": "tuman",
+     "cyr": "Қоровулбозор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kogon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Когон туманлараро суди"
+    },
+    {
+     "name": "Olot tumani",
+     "kind": "tuman",
+     "cyr": "Олот тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qorako‘l tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қоракўл туманлараро суди"
+    },
+    {
+     "name": "Qorako‘l tumani",
+     "kind": "tuman",
+     "cyr": "Қоракўл тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qorako‘l tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қоракўл туманлараро суди"
+    },
+    {
+     "name": "Vobkent tumani",
+     "kind": "tuman",
+     "cyr": "Вобкент тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Peshku tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Пешку туманлараро суди"
+    },
+    {
+     "name": "Peshku tumani",
+     "kind": "tuman",
+     "cyr": "Пешку тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Peshku tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Пешку туманлараро суди"
+    },
+    {
+     "name": "Jondor tumani",
+     "kind": "tuman",
+     "cyr": "Жондор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Romitan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ромитан туманлараро суди"
+    },
+    {
+     "name": "Romitan tumani",
+     "kind": "tuman",
+     "cyr": "Ромитан тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Romitan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ромитан туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Jizzax viloyati",
+   "cyr": "Жиззах вилояти",
+   "center": "Jizzax",
+   "admin": "Jizzax tumanlararo ma’muriy sudi",
+   "adminCyr": "Жиззах туманлараро маъмурий суди",
+   "hokimlik": "Jizzax viloyati hokimligi",
+   "prokuratura": "Jizzax viloyati prokuraturasi",
+   "by": "Jizzax viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Джизакской области",
+    "prokuratura": "Прокуратура Джизакской области",
+    "by": "по Джизакской области"
+   },
+   "districts": [
+    {
+     "name": "Baxmal tumani",
+     "kind": "tuman",
+     "cyr": "Бахмал тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha G‘allaorol tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ғаллаорол туманлараро суди"
+    },
+    {
+     "name": "G‘allaorol tumani",
+     "kind": "tuman",
+     "cyr": "Ғаллаорол тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha G‘allaorol tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ғаллаорол туманлараро суди"
+    },
+    {
+     "name": "Do‘stlik tumani",
+     "kind": "tuman",
+     "cyr": "Дўстлик тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Do‘stlik tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Дўстлик туманлараро суди"
+    },
+    {
+     "name": "Mirzacho‘l tumani",
+     "kind": "tuman",
+     "cyr": "Мирзачўл тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Do‘stlik tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Дўстлик туманлараро суди"
+    },
+    {
+     "name": "Arnasoy tumani",
+     "kind": "tuman",
+     "cyr": "Арнасой тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Do‘stlik tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Дўстлик туманлараро суди"
+    },
+    {
+     "name": "Paxtakor tumani",
+     "kind": "tuman",
+     "cyr": "Пахтакор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Paxtakor tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Пахтакор туман суди"
+    },
+    {
+     "name": "Jizzax shahri",
+     "kind": "shahar",
+     "cyr": "Жиззах шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Jizzax tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Жиззах туманлараро суди"
+    },
+    {
+     "name": "Sharof Rashidov tumani",
+     "kind": "tuman",
+     "cyr": "Шароф Рашидов тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Jizzax tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Жиззах туманлараро суди"
+    },
+    {
+     "name": "Zafarobod tumani",
+     "kind": "tuman",
+     "cyr": "Зафаробод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Jizzax tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Жиззах туманлараро суди"
+    },
+    {
+     "name": "Zomin tumani",
+     "kind": "tuman",
+     "cyr": "Зомин тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Zarbdor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зарбдор туманлараро суди"
+    },
+    {
+     "name": "Zarbdor tumani",
+     "kind": "tuman",
+     "cyr": "Зарбдор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Zarbdor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зарбдор туманлараро суди"
+    },
+    {
+     "name": "Yangiobod tumani",
+     "kind": "tuman",
+     "cyr": "Янгиобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Zarbdor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зарбдор туманлараро суди"
+    },
+    {
+     "name": "Forish tumani",
+     "kind": "tuman",
+     "cyr": "Фориш тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Forish tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Фориш туман суди"
+    }
+   ]
+  },
+  {
+   "name": "Qashqadaryo viloyati",
+   "cyr": "Қашқадарё вилояти",
+   "center": "Qarshi",
+   "admin": "Qarshi tumanlararo ma’muriy sudi",
+   "adminCyr": "Қарши туманлараро маъмурий суди",
+   "hokimlik": "Qashqadaryo viloyati hokimligi",
+   "prokuratura": "Qashqadaryo viloyati prokuraturasi",
+   "by": "Qashqadaryo viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Кашкадарьинской области",
+    "prokuratura": "Прокуратура Кашкадарьинской области",
+    "by": "по Кашкадарьинской области"
+   },
+   "districts": [
+    {
+     "name": "Dehqonobod tumani",
+     "kind": "tuman",
+     "cyr": "Деҳқонобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha G‘uzor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ғузор туманлараро суди"
+    },
+    {
+     "name": "G‘uzor tumani",
+     "kind": "tuman",
+     "cyr": "Ғузор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha G‘uzor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ғузор туманлараро суди"
+    },
+    {
+     "name": "Qarshi shahri",
+     "kind": "shahar",
+     "cyr": "Қарши шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Qarshi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қарши туманлараро суди"
+    },
+    {
+     "name": "Qarshi tumani",
+     "kind": "tuman",
+     "cyr": "Қарши тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qarshi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қарши туманлараро суди"
+    },
+    {
+     "name": "Nishon tumani",
+     "kind": "tuman",
+     "cyr": "Нишон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qarshi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қарши туманлараро суди"
+    },
+    {
+     "name": "Koson tumani",
+     "kind": "tuman",
+     "cyr": "Косон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Koson tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Косон туманлараро суди"
+    },
+    {
+     "name": "Muborak tumani",
+     "kind": "tuman",
+     "cyr": "Муборак тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Koson tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Косон туманлараро суди"
+    },
+    {
+     "name": "Kasbi tumani",
+     "kind": "tuman",
+     "cyr": "Касби тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kasbi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Касби туманлараро суди"
+    },
+    {
+     "name": "Mirishkor tumani",
+     "kind": "tuman",
+     "cyr": "Миришкор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kasbi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Касби туманлараро суди"
+    },
+    {
+     "name": "Chiroqchi tumani",
+     "kind": "tuman",
+     "cyr": "Чироқчи тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chiroqchi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чироқчи туманлараро суди"
+    },
+    {
+     "name": "Ko‘kdala tumani",
+     "kind": "tuman",
+     "cyr": "Кўкдала тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chiroqchi tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чироқчи туманлараро суди"
+    },
+    {
+     "name": "Shahrisabz shahri",
+     "kind": "shahar",
+     "cyr": "Шаҳрисабз шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Shahrisabz tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шаҳрисабз туманлараро суди"
+    },
+    {
+     "name": "Kitob tumani",
+     "kind": "tuman",
+     "cyr": "Китоб тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shahrisabz tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шаҳрисабз туманлараро суди"
+    },
+    {
+     "name": "Shahrisabz tumani",
+     "kind": "tuman",
+     "cyr": "Шаҳрисабз тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shahrisabz tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шаҳрисабз туманлараро суди"
+    },
+    {
+     "name": "Qamashi tumani",
+     "kind": "tuman",
+     "cyr": "Қамаши тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yakkabog‘ tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Яккабоғ туманлараро суди"
+    },
+    {
+     "name": "Yakkabog‘ tumani",
+     "kind": "tuman",
+     "cyr": "Яккабоғ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yakkabog‘ tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Яккабоғ туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Navoiy viloyati",
+   "cyr": "Навоий вилояти",
+   "center": "Navoiy",
+   "admin": "Navoiy tumanlararo ma’muriy sudi",
+   "adminCyr": "Навоий туманлараро маъмурий суди",
+   "hokimlik": "Navoiy viloyati hokimligi",
+   "prokuratura": "Navoiy viloyati prokuraturasi",
+   "by": "Navoiy viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Навоийской области",
+    "prokuratura": "Прокуратура Навоийской области",
+    "by": "по Навоийской области"
+   },
+   "districts": [
+    {
+     "name": "Zarafshon shahri",
+     "kind": "shahar",
+     "cyr": "Зарафшон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Zarafshon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зарафшон туманлараро суди"
+    },
+    {
+     "name": "Tomdi tumani",
+     "kind": "tuman",
+     "cyr": "Томди тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Zarafshon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зарафшон туманлараро суди"
+    },
+    {
+     "name": "Navoiy shahri",
+     "kind": "shahar",
+     "cyr": "Навоий шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Karmana tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Кармана туманлараро суди"
+    },
+    {
+     "name": "Karmana tumani",
+     "kind": "tuman",
+     "cyr": "Кармана тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Karmana tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Кармана туманлараро суди"
+    },
+    {
+     "name": "Qiziltepa tumani",
+     "kind": "tuman",
+     "cyr": "Қизилтепа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Karmana tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Кармана туманлараро суди"
+    },
+    {
+     "name": "Xatirchi tumani",
+     "kind": "tuman",
+     "cyr": "Хатирчи тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Xatirchi tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Хатирчи туман суди"
+    },
+    {
+     "name": "Konimex tumani",
+     "kind": "tuman",
+     "cyr": "Конимех тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Navbahor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Навбаҳор туманлараро суди"
+    },
+    {
+     "name": "Navbahor tumani",
+     "kind": "tuman",
+     "cyr": "Навбаҳор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Navbahor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Навбаҳор туманлараро суди"
+    },
+    {
+     "name": "Nurota tumani",
+     "kind": "tuman",
+     "cyr": "Нурота тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Navbahor tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Навбаҳор туманлараро суди"
+    },
+    {
+     "name": "Uchquduq tumani",
+     "kind": "tuman",
+     "cyr": "Учқудуқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Uchquduq tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Учқудуқ туман суди"
+    }
+   ]
+  },
+  {
+   "name": "Namangan viloyati",
+   "cyr": "Наманган вилояти",
+   "center": "Namangan",
+   "admin": "Namangan tumanlararo ma’muriy sudi",
+   "adminCyr": "Наманган туманлараро маъмурий суди",
+   "hokimlik": "Namangan viloyati hokimligi",
+   "prokuratura": "Namangan viloyati prokuraturasi",
+   "by": "Namangan viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Наманганской области",
+    "prokuratura": "Прокуратура Наманганской области",
+    "by": "по Наманганской области"
+   },
+   "districts": [
+    {
+     "name": "Namangan shahri",
+     "kind": "shahar",
+     "cyr": "Наманган шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Namangan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Наманган туманлараро суди"
+    },
+    {
+     "name": "Mingbuloq tumani",
+     "kind": "tuman",
+     "cyr": "Мингбулоқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Namangan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Наманган туманлараро суди"
+    },
+    {
+     "name": "Namangan tumani",
+     "kind": "tuman",
+     "cyr": "Наманган тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Namangan tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Наманган туманлараро суди"
+    },
+    {
+     "name": "Norin tumani",
+     "kind": "tuman",
+     "cyr": "Норин тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Uchqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Учқўрғон туманлараро суди"
+    },
+    {
+     "name": "Uychi tumani",
+     "kind": "tuman",
+     "cyr": "Уйчи тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Uchqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Учқўрғон туманлараро суди"
+    },
+    {
+     "name": "Uchqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Учқўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Uchqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Учқўрғон туманлараро суди"
+    },
+    {
+     "name": "Pop tumani",
+     "kind": "tuman",
+     "cyr": "Поп тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chust tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чуст туманлараро суди"
+    },
+    {
+     "name": "To‘raqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Тўрақўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chust tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чуст туманлараро суди"
+    },
+    {
+     "name": "Chust tumani",
+     "kind": "tuman",
+     "cyr": "Чуст тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chust tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чуст туманлараро суди"
+    },
+    {
+     "name": "Kosonsoy tumani",
+     "kind": "tuman",
+     "cyr": "Косонсой тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yangiqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Янгиқўрғон туманлараро суди"
+    },
+    {
+     "name": "Chortoq tumani",
+     "kind": "tuman",
+     "cyr": "Чортоқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yangiqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Янгиқўрғон туманлараро суди"
+    },
+    {
+     "name": "Yangiqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Янгиқўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yangiqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Янгиқўрғон туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Samarqand viloyati",
+   "cyr": "Самарқанд вилояти",
+   "center": "Samarqand",
+   "admin": "Samarqand tumanlararo ma’muriy sudi",
+   "adminCyr": "Самарқанд туманлараро маъмурий суди",
+   "hokimlik": "Samarqand viloyati hokimligi",
+   "prokuratura": "Samarqand viloyati prokuraturasi",
+   "by": "Samarqand viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Самаркандской области",
+    "prokuratura": "Прокуратура Самаркандской области",
+    "by": "по Самаркандской области"
+   },
+   "districts": [
+    {
+     "name": "Bulung‘ur tumani",
+     "kind": "tuman",
+     "cyr": "Булунғур тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Jomboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Жомбой туманлараро суди"
+    },
+    {
+     "name": "Jomboy tumani",
+     "kind": "tuman",
+     "cyr": "Жомбой тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Jomboy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Жомбой туманлараро суди"
+    },
+    {
+     "name": "Ishtixon tumani",
+     "kind": "tuman",
+     "cyr": "Иштихон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Ishtixon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Иштихон туманлараро суди"
+    },
+    {
+     "name": "Qo‘shrabot tumani",
+     "kind": "tuman",
+     "cyr": "Қўшработ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Ishtixon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Иштихон туманлараро суди"
+    },
+    {
+     "name": "Kattaqo‘rg‘on shahri",
+     "kind": "shahar",
+     "cyr": "Каттақўрғон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Kattaqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Каттақўрғон туманлараро суди"
+    },
+    {
+     "name": "Kattaqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Каттақўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kattaqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Каттақўрғон туманлараро суди"
+    },
+    {
+     "name": "Narpay tumani",
+     "kind": "tuman",
+     "cyr": "Нарпай тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kattaqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Каттақўрғон туманлараро суди"
+    },
+    {
+     "name": "Paxtachi tumani",
+     "kind": "tuman",
+     "cyr": "Пахтачи тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Kattaqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Каттақўрғон туманлараро суди"
+    },
+    {
+     "name": "Samarqand shahri",
+     "kind": "shahar",
+     "cyr": "Самарқанд шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Samarqand shahar sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Самарқанд шаҳар суди"
+    },
+    {
+     "name": "Samarqand tumani",
+     "kind": "tuman",
+     "cyr": "Самарқанд тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Tayloq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Тайлоқ туманлараро суди"
+    },
+    {
+     "name": "Tayloq tumani",
+     "kind": "tuman",
+     "cyr": "Тайлоқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Tayloq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Тайлоқ туманлараро суди"
+    },
+    {
+     "name": "Urgut tumani",
+     "kind": "tuman",
+     "cyr": "Ургут тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Urgut tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ургут туман суди"
+    },
+    {
+     "name": "Oqdaryo tumani",
+     "kind": "tuman",
+     "cyr": "Оқдарё тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Payariq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Пайариқ туманлараро суди"
+    },
+    {
+     "name": "Payariq tumani",
+     "kind": "tuman",
+     "cyr": "Пайариқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Payariq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Пайариқ туманлараро суди"
+    },
+    {
+     "name": "Pastdarg‘om tumani",
+     "kind": "tuman",
+     "cyr": "Пастдарғом тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Pastdarg‘om tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Пастдарғом туман суди"
+    },
+    {
+     "name": "Nurobod tumani",
+     "kind": "tuman",
+     "cyr": "Нуробод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Nurobod tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Нуробод туман суди"
+    }
+   ]
+  },
+  {
+   "name": "Surxondaryo viloyati",
+   "cyr": "Сурхондарё вилояти",
+   "center": "Termiz",
+   "admin": "Termiz tumanlararo ma’muriy sudi",
+   "adminCyr": "Термиз туманлараро маъмурий суди",
+   "hokimlik": "Surxondaryo viloyati hokimligi",
+   "prokuratura": "Surxondaryo viloyati prokuraturasi",
+   "by": "Surxondaryo viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Сурхандарьинской области",
+    "prokuratura": "Прокуратура Сурхандарьинской области",
+    "by": "по Сурхандарьинской области"
+   },
+   "districts": [
+    {
+     "name": "Boysun tumani",
+     "kind": "tuman",
+     "cyr": "Бойсун тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Boysun tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бойсун туман суди"
+    },
+    {
+     "name": "Oltinsoy tumani",
+     "kind": "tuman",
+     "cyr": "Олтинсой тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Denov tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Денов туманлараро суди"
+    },
+    {
+     "name": "Denov tumani",
+     "kind": "tuman",
+     "cyr": "Денов тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Denov tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Денов туманлараро суди"
+    },
+    {
+     "name": "Sho‘rchi tumani",
+     "kind": "tuman",
+     "cyr": "Шўрчи тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Denov tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Денов туманлараро суди"
+    },
+    {
+     "name": "Jarqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Жарқўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qumqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қумқўрғон туманлараро суди"
+    },
+    {
+     "name": "Qiziriq tumani",
+     "kind": "tuman",
+     "cyr": "Қизириқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qumqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қумқўрғон туманлараро суди"
+    },
+    {
+     "name": "Qumqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Қумқўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qumqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қумқўрғон туманлараро суди"
+    },
+    {
+     "name": "Bandixon tumani",
+     "kind": "tuman",
+     "cyr": "Бандихон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qumqo‘rg‘on tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қумқўрғон туманлараро суди"
+    },
+    {
+     "name": "Sariosiyo tumani",
+     "kind": "tuman",
+     "cyr": "Сариосиё тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sariosiyo tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Сариосиё туманлараро суди"
+    },
+    {
+     "name": "Uzun tumani",
+     "kind": "tuman",
+     "cyr": "Узун тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sariosiyo tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Сариосиё туманлараро суди"
+    },
+    {
+     "name": "Termiz shahri",
+     "kind": "shahar",
+     "cyr": "Термиз шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Termiz tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Термиз туманлараро суди"
+    },
+    {
+     "name": "Termiz tumani",
+     "kind": "tuman",
+     "cyr": "Термиз тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Termiz tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Термиз туманлараро суди"
+    },
+    {
+     "name": "Angor tumani",
+     "kind": "tuman",
+     "cyr": "Ангор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sherobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шеробод туманлараро суди"
+    },
+    {
+     "name": "Muzrabot tumani",
+     "kind": "tuman",
+     "cyr": "Музработ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sherobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шеробод туманлараро суди"
+    },
+    {
+     "name": "Sherobod tumani",
+     "kind": "tuman",
+     "cyr": "Шеробод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sherobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шеробод туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Sirdaryo viloyati",
+   "cyr": "Сирдарё вилояти",
+   "center": "Guliston",
+   "admin": "Guliston tumanlararo ma’muriy sudi",
+   "adminCyr": "Гулистон туманлараро маъмурий суди",
+   "hokimlik": "Sirdaryo viloyati hokimligi",
+   "prokuratura": "Sirdaryo viloyati prokuraturasi",
+   "by": "Sirdaryo viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Сырдарьинской области",
+    "prokuratura": "Прокуратура Сырдарьинской области",
+    "by": "по Сырдарьинской области"
+   },
+   "districts": [
+    {
+     "name": "Oqoltin tumani",
+     "kind": "tuman",
+     "cyr": "Оқолтин тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Oqoltin tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Оқолтин туманлараро суди"
+    },
+    {
+     "name": "Sardoba tumani",
+     "kind": "tuman",
+     "cyr": "Сардоба тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Oqoltin tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Оқолтин туманлараро суди"
+    },
+    {
+     "name": "Shirin shahri",
+     "kind": "shahar",
+     "cyr": "Ширин шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Boyovut tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боёвут туманлараро суди"
+    },
+    {
+     "name": "Boyovut tumani",
+     "kind": "tuman",
+     "cyr": "Боёвут тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Boyovut tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боёвут туманлараро суди"
+    },
+    {
+     "name": "Xovos tumani",
+     "kind": "tuman",
+     "cyr": "Ховос тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Boyovut tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боёвут туманлараро суди"
+    },
+    {
+     "name": "Guliston shahri",
+     "kind": "shahar",
+     "cyr": "Гулистон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Guliston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Гулистон туманлараро суди"
+    },
+    {
+     "name": "Yangiyer shahri",
+     "kind": "shahar",
+     "cyr": "Янгиер шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Guliston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Гулистон туманлараро суди"
+    },
+    {
+     "name": "Guliston tumani",
+     "kind": "tuman",
+     "cyr": "Гулистон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Guliston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Гулистон туманлараро суди"
+    },
+    {
+     "name": "Mirzaobod tumani",
+     "kind": "tuman",
+     "cyr": "Мирзаобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Guliston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Гулистон туманлараро суди"
+    },
+    {
+     "name": "Sayxunobod tumani",
+     "kind": "tuman",
+     "cyr": "Сайхунобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sirdaryo tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Сирдарё туманлараро суди"
+    },
+    {
+     "name": "Sirdaryo tumani",
+     "kind": "tuman",
+     "cyr": "Сирдарё тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Sirdaryo tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Сирдарё туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Toshkent viloyati",
+   "cyr": "Тошкент вилояти",
+   "center": "Nurafshon",
+   "admin": "Nurafshon tumanlararo ma’muriy sudi",
+   "adminCyr": "Нурафшон туманлараро маъмурий суди",
+   "hokimlik": "Toshkent viloyati hokimligi",
+   "prokuratura": "Toshkent viloyati prokuraturasi",
+   "by": "Toshkent viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Ташкентской области",
+    "prokuratura": "Прокуратура Ташкентской области",
+    "by": "по Ташкентской области"
+   },
+   "districts": [
+    {
+     "name": "Olmaliq shahri",
+     "kind": "shahar",
+     "cyr": "Олмалиқ шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Ohangaron tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Оҳангарон туманлараро суди"
+    },
+    {
+     "name": "Angren shahri",
+     "kind": "shahar",
+     "cyr": "Ангрен шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Ohangaron tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Оҳангарон туманлараро суди"
+    },
+    {
+     "name": "Ohangaron shahri",
+     "kind": "shahar",
+     "cyr": "Оҳангарон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Ohangaron tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Оҳангарон туманлараро суди"
+    },
+    {
+     "name": "Ohangaron tumani",
+     "kind": "tuman",
+     "cyr": "Оҳангарон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Ohangaron tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Оҳангарон туманлараро суди"
+    },
+    {
+     "name": "Bekobod shahri",
+     "kind": "shahar",
+     "cyr": "Бекобод шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Bekobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бекобод туманлараро суди"
+    },
+    {
+     "name": "Bekobod tumani",
+     "kind": "tuman",
+     "cyr": "Бекобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bekobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Бекобод туманлараро суди"
+    },
+    {
+     "name": "Zangiota tumani",
+     "kind": "tuman",
+     "cyr": "Зангиота тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Zangiota tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зангиота туманлараро суди"
+    },
+    {
+     "name": "Toshkent tumani",
+     "kind": "tuman",
+     "cyr": "Тошкент тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Zangiota tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Зангиота туманлараро суди"
+    },
+    {
+     "name": "Yangiyo‘l shahri",
+     "kind": "shahar",
+     "cyr": "Янгийўл шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Yangiyo‘l tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Янгийўл туманлараро суди"
+    },
+    {
+     "name": "Yangiyo‘l tumani",
+     "kind": "tuman",
+     "cyr": "Янгийўл тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yangiyo‘l tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Янгийўл туманлараро суди"
+    },
+    {
+     "name": "Oqqo‘rg‘on tumani",
+     "kind": "tuman",
+     "cyr": "Оққўрғон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Quyichirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қуйичирчиқ туманлараро суди"
+    },
+    {
+     "name": "Quyichirchiq tumani",
+     "kind": "tuman",
+     "cyr": "Қуйичирчиқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Quyichirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қуйичирчиқ туманлараро суди"
+    },
+    {
+     "name": "Chinoz tumani",
+     "kind": "tuman",
+     "cyr": "Чиноз тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Quyichirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қуйичирчиқ туманлараро суди"
+    },
+    {
+     "name": "Nurafshon shahri",
+     "kind": "shahar",
+     "cyr": "Нурафшон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘rtachirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўртачирчиқ туманлараро суди"
+    },
+    {
+     "name": "Bo‘ka tumani",
+     "kind": "tuman",
+     "cyr": "Бўка тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘rtachirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўртачирчиқ туманлараро суди"
+    },
+    {
+     "name": "Piskent tumani",
+     "kind": "tuman",
+     "cyr": "Пискент тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘rtachirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўртачирчиқ туманлараро суди"
+    },
+    {
+     "name": "O‘rtachirchiq tumani",
+     "kind": "tuman",
+     "cyr": "Ўртачирчиқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘rtachirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўртачирчиқ туманлараро суди"
+    },
+    {
+     "name": "Chirchiq tumani",
+     "kind": "tuman",
+     "cyr": "Чирчиқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чирчиқ туманлараро суди"
+    },
+    {
+     "name": "Bo‘stonliq tumani",
+     "kind": "tuman",
+     "cyr": "Бўстонлиқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чирчиқ туманлараро суди"
+    },
+    {
+     "name": "Qibray tumani",
+     "kind": "tuman",
+     "cyr": "Қибрай тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Chirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Чирчиқ туманлараро суди"
+    },
+    {
+     "name": "Parkent tumani",
+     "kind": "tuman",
+     "cyr": "Паркент тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yuqorichirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Юқоричирчиқ туманлараро суди"
+    },
+    {
+     "name": "Yuqorichirchiq tumani",
+     "kind": "tuman",
+     "cyr": "Юқоричирчиқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yuqorichirchiq tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Юқоричирчиқ туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Toshkent shahri",
+   "cyr": "Тошкент шаҳри",
+   "center": "Toshkent",
+   "admin": "Toshkent tumanlararo ma’muriy sudi",
+   "adminCyr": "Тошкент туманлараро маъмурий суди",
+   "hokimlik": "Toshkent shahar hokimligi",
+   "prokuratura": "Toshkent shahar prokuraturasi",
+   "by": "Toshkent shahri bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият города Ташкента",
+    "prokuratura": "Прокуратура города Ташкента",
+    "by": "по городу Ташкенту"
+   },
+   "districts": [
+    {
+     "name": "Bektemir tumani",
+     "kind": "tuman",
+     "cyr": "Бектемир тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Миробод туманлараро суди"
+    },
+    {
+     "name": "Mirobod tumani",
+     "kind": "tuman",
+     "cyr": "Миробод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Миробод туманлараро суди"
+    },
+    {
+     "name": "Yashnobod tumani",
+     "kind": "tuman",
+     "cyr": "Яшнобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Миробод туманлараро суди"
+    },
+    {
+     "name": "Mirzo-Ulug‘bek tumani",
+     "kind": "tuman",
+     "cyr": "Мирзо-Улуғбек тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Mirzo-Ulug‘bek tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Мирзо-Улуғбек туманлараро суди"
+    },
+    {
+     "name": "Yunusobod tumani",
+     "kind": "tuman",
+     "cyr": "Юнусобод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Mirzo-Ulug‘bek tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Мирзо-Улуғбек туманлараро суди"
+    },
+    {
+     "name": "Uchtepa tumani",
+     "kind": "tuman",
+     "cyr": "Учтепа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Uchtepa tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Учтепа туманлараро суди"
+    },
+    {
+     "name": "Chilonzor tumani",
+     "kind": "tuman",
+     "cyr": "Чилонзор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Uchtepa tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Учтепа туманлараро суди"
+    },
+    {
+     "name": "Olmazor tumani",
+     "kind": "tuman",
+     "cyr": "Олмазор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shayxontohur tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шайхонтоҳур туманлараро суди"
+    },
+    {
+     "name": "Shayxontohur tumani",
+     "kind": "tuman",
+     "cyr": "Шайхонтоҳур тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shayxontohur tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шайхонтоҳур туманлараро суди"
+    },
+    {
+     "name": "Sirg‘ali tumani",
+     "kind": "tuman",
+     "cyr": "Сирғали тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yakkasaroy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Яккасарой туманлараро суди"
+    },
+    {
+     "name": "Yangihayot tumani",
+     "kind": "tuman",
+     "cyr": "Янгиҳаёт тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yakkasaroy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Яккасарой туманлараро суди"
+    },
+    {
+     "name": "Yakkasaroy tumani",
+     "kind": "tuman",
+     "cyr": "Яккасарой тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Yakkasaroy tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Яккасарой туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Farg‘ona viloyati",
+   "cyr": "Фарғона вилояти",
+   "center": "Farg‘ona",
+   "admin": "Farg‘ona tumanlararo ma’muriy sudi",
+   "adminCyr": "Фарғона туманлараро маъмурий суди",
+   "hokimlik": "Farg‘ona viloyati hokimligi",
+   "prokuratura": "Farg‘ona viloyati prokuraturasi",
+   "by": "Farg‘ona viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Ферганской области",
+    "prokuratura": "Прокуратура Ферганской области",
+    "by": "по Ферганской области"
+   },
+   "districts": [
+    {
+     "name": "Qo‘qon shahri",
+     "kind": "shahar",
+     "cyr": "Қўқон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘qon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўқон туманлараро суди"
+    },
+    {
+     "name": "Buvayda tumani",
+     "kind": "tuman",
+     "cyr": "Бувайда тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘qon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўқон туманлараро суди"
+    },
+    {
+     "name": "Dang‘ara tumani",
+     "kind": "tuman",
+     "cyr": "Данғара тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘qon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўқон туманлараро суди"
+    },
+    {
+     "name": "Uchko‘prik tumani",
+     "kind": "tuman",
+     "cyr": "Учкўприк тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Qo‘qon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Қўқон туманлараро суди"
+    },
+    {
+     "name": "Marg‘ilon shahri",
+     "kind": "shahar",
+     "cyr": "Марғилон шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Marg‘ilon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Марғилон туманлараро суди"
+    },
+    {
+     "name": "Yozyovon tumani",
+     "kind": "tuman",
+     "cyr": "Ёзёвон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Marg‘ilon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Марғилон туманлараро суди"
+    },
+    {
+     "name": "Qo‘shtepa tumani",
+     "kind": "tuman",
+     "cyr": "Қўштепа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Marg‘ilon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Марғилон туманлараро суди"
+    },
+    {
+     "name": "Toshloq tumani",
+     "kind": "tuman",
+     "cyr": "Тошлоқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Marg‘ilon tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Марғилон туманлараро суди"
+    },
+    {
+     "name": "Oltiariq tumani",
+     "kind": "tuman",
+     "cyr": "Олтиариқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Rishton tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Риштон туманлараро суди"
+    },
+    {
+     "name": "Bag‘dod tumani",
+     "kind": "tuman",
+     "cyr": "Бағдод тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Rishton tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Риштон туманлараро суди"
+    },
+    {
+     "name": "Rishton tumani",
+     "kind": "tuman",
+     "cyr": "Риштон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Rishton tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Риштон туманлараро суди"
+    },
+    {
+     "name": "So‘x tumani",
+     "kind": "tuman",
+     "cyr": "Сўх тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha So‘x tuman sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Сўх туман суди"
+    },
+    {
+     "name": "Beshariq tumani",
+     "kind": "tuman",
+     "cyr": "Бешариқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘zbekiston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўзбекистон туманлараро суди"
+    },
+    {
+     "name": "O‘zbekiston tumani",
+     "kind": "tuman",
+     "cyr": "Ўзбекистон тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘zbekiston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўзбекистон туманлараро суди"
+    },
+    {
+     "name": "Furqat tumani",
+     "kind": "tuman",
+     "cyr": "Фурқат тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha O‘zbekiston tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Ўзбекистон туманлараро суди"
+    },
+    {
+     "name": "Farg‘ona shahri",
+     "kind": "shahar",
+     "cyr": "Фарғона шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Farg‘ona tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Фарғона туманлараро суди"
+    },
+    {
+     "name": "Quvasoy shahri",
+     "kind": "shahar",
+     "cyr": "Қувасой шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Farg‘ona tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Фарғона туманлараро суди"
+    },
+    {
+     "name": "Quva tumani",
+     "kind": "tuman",
+     "cyr": "Қува тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Farg‘ona tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Фарғона туманлараро суди"
+    },
+    {
+     "name": "Farg‘ona tumani",
+     "kind": "tuman",
+     "cyr": "Фарғона тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Farg‘ona tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Фарғона туманлараро суди"
+    }
+   ]
+  },
+  {
+   "name": "Xorazm viloyati",
+   "cyr": "Хоразм вилояти",
+   "center": "Urganch",
+   "admin": "Urganch tumanlararo ma’muriy sudi",
+   "adminCyr": "Урганч туманлараро маъмурий суди",
+   "hokimlik": "Xorazm viloyati hokimligi",
+   "prokuratura": "Xorazm viloyati prokuraturasi",
+   "by": "Xorazm viloyati bo‘yicha",
+   "ru": {
+    "hokimlik": "Хокимият Хорезмской области",
+    "prokuratura": "Прокуратура Хорезмской области",
+    "by": "по Хорезмской области"
+   },
+   "districts": [
+    {
+     "name": "Xiva shahri",
+     "kind": "shahar",
+     "cyr": "Хива шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Bog‘ot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боғот туманлараро суди"
+    },
+    {
+     "name": "Bog‘ot tumani",
+     "kind": "tuman",
+     "cyr": "Боғот тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bog‘ot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боғот туманлараро суди"
+    },
+    {
+     "name": "Hazorasp tumani",
+     "kind": "tuman",
+     "cyr": "Ҳазорасп тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bog‘ot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боғот туманлараро суди"
+    },
+    {
+     "name": "Xiva tumani",
+     "kind": "tuman",
+     "cyr": "Хива тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bog‘ot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боғот туманлараро суди"
+    },
+    {
+     "name": "Yangiariq tumani",
+     "kind": "tuman",
+     "cyr": "Янгиариқ тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bog‘ot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боғот туманлараро суди"
+    },
+    {
+     "name": "Tuproqqal’a tumani",
+     "kind": "tuman",
+     "cyr": "Тупроққалъа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Bog‘ot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Боғот туманлараро суди"
+    },
+    {
+     "name": "Urganch shahri",
+     "kind": "shahar",
+     "cyr": "Урганч шаҳри",
+     "civil": "Fuqarolik ishlari bo‘yicha Urganch tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Урганч туманлараро суди"
+    },
+    {
+     "name": "Urganch tumani",
+     "kind": "tuman",
+     "cyr": "Урганч тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Urganch tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Урганч туманлараро суди"
+    },
+    {
+     "name": "Xonqa tumani",
+     "kind": "tuman",
+     "cyr": "Хонқа тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Urganch tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Урганч туманлараро суди"
+    },
+    {
+     "name": "Yangibozor tumani",
+     "kind": "tuman",
+     "cyr": "Янгибозор тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Urganch tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Урганч туманлараро суди"
+    },
+    {
+     "name": "Gurlan tumani",
+     "kind": "tuman",
+     "cyr": "Гурлан тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shovot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шовот туманлараро суди"
+    },
+    {
+     "name": "Qo‘shko‘pir tumani",
+     "kind": "tuman",
+     "cyr": "Қўшкўпир тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shovot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шовот туманлараро суди"
+    },
+    {
+     "name": "Shovot tumani",
+     "kind": "tuman",
+     "cyr": "Шовот тумани",
+     "civil": "Fuqarolik ishlari bo‘yicha Shovot tumanlararo sudi",
+     "civilCyr": "Фуқаролик ишлари бўйича Шовот туманлараро суди"
+    }
+   ]
+  }
+ ]
+}

@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 115 unit + 12 brauzer |
+| 12 / 24 | 67 (60 tasi modda raqami bilan) | 71 × 3 til = 213 | 123 | 14 | 5 | 115 unit + 12 brauzer |
 
 ## Ko‘rinishlar
 
@@ -47,7 +47,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 ```mermaid
 flowchart LR
   U[Fuqaro: matn / ovoz / soha] --> A["/api/analyze"]
-  A --> R[BM25 qidiruv + kalit so‘zlar<br/>62 norma, 24 holat]
+  A --> R[BM25 qidiruv + kalit so‘zlar<br/>67 norma, 24 holat]
   R --> C{Claude bormi?}
   C -- ha --> AI[Claude: tasniflash va faktlar<br/>faqat bazadagi normalar]
   C -- yo‘q --> RU[Qoidalar bo‘yicha tasniflash]

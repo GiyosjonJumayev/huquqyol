@@ -2,7 +2,8 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer, PageNumber
 import PDFDocument from "pdfkit";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { kbFor } from "./kb.js";
+import { kbFor, COURTS } from "./kb.js";
+import { courtFromForm } from "../public/courts.js";
 import { deadlineFrom, parseISO, startOfDay, addMonths } from "./dates.js";
 import { alimonyShare } from "./plan.js";
 import { fmtDate, fmtMoney, termText } from "../public/i18n.js";
@@ -32,6 +33,8 @@ function makeContext(s, form, trigger, deadline, now, kb){
     else if (f.type === "select"){ const o = f.options.find(o => o.v === raw); if (o){ vals[k] = o.doc; if (o.court) vals[k + "Court"] = o.court; } }
     else vals[k] = raw;
   }
+  // Sud nomi yozilmagan bo‘lsa — tuman yoki manzildan (sayt bilan bir xil mantiq; bot ham shundan foydalanadi)
+  if (!vals.court && s.court){ const c = courtFromForm(COURTS, s.court, form, { cyr: lang === "ru" }); if (c?.name) vals.court = c.name; }
   vals.trigger = fmtDate(trigger, lang);
   if (deadline) vals.deadline = fmtDate(deadline, lang);
   vals.deadlineTerm = termText(s.deadline, lang);

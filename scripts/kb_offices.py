@@ -201,7 +201,7 @@ EXTRA_OFFICES = {"osgo": ["napp"], "organ_qarori": ["pm"], "murojaat_umumiy": ["
 STEP_OVERRIDE = {("pensiya", "Yuqori organ"): "pension", ("ijtimoiy_nafaqa", "Yuqori organ"): "social"}
 
 # Ariza qabul qiluvchisi → idora («Qanday topshiriladi» ostida aloqa ma’lumoti)
-DOC_OFFICE = {"mediatsiya": "mediators", "inspection": "dmi", "agency": "raqobat", "cbu": "cbu", "migration": "migration", "consul": "mfa", "court": "courts"}
+DOC_OFFICE = {"mediatsiya": "mediators", "boji": "courts", "inspection": "dmi", "agency": "raqobat", "cbu": "cbu", "migration": "migration", "consul": "mfa", "court": "courts"}
 DOC_OVERRIDE = {("pensiya", "higher"): "pension", ("ijtimoiy_nafaqa", "higher"): "social"}
 
 def attach(S):

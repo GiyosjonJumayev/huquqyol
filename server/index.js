@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
-import { SCENARIOS, NORMS, LEX_URL, kbFor } from "./kb.js";
+import { SCENARIOS, NORMS, LEX_URL, kbFor, COURTS } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, toDocx, toPdf } from "./documents.js";
@@ -58,6 +58,13 @@ app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 const safeName = s => String(s).replace(/[^A-Za-z0-9._-]/g, "_").slice(0, 120);
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 
+// Sudlar ro‘yxati (tuman → sud): ariza bo‘limi ochilganda bir marta yuklanadi; o‘zgarmas ma’lumot
+const COURTS_JSON = JSON.stringify(COURTS), COURTS_ETAG = `"${createHash("sha1").update(COURTS_JSON).digest("base64url").slice(0, 16)}"`;
+app.get("/api/courts", (req, res) => {
+  res.set({ "Cache-Control": "public, max-age=86400", ETag: COURTS_ETAG });
+  if (req.get("If-None-Match") === COURTS_ETAG) return res.status(304).end();
+  res.type("json").send(COURTS_JSON);
+});
 app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
 // Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
@@ -68,7 +75,8 @@ function metaOf(lang){
     laws: Object.fromEntries(Object.entries(LAWS).map(([k, l]) => [k, { name:l.name, url:l.url }])),
     scenarios: SCENARIOS.map(s => ({
       id:s.id, domain:s.domain, title:s.title, card:s.card, short:s.short, trigger:s.trigger,
-      docs: s.docs.map(d => ({ id:d.id, label:d.label, howto:d.howto, office:d.office || null })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline
+      docs: s.docs.map(d => ({ id:d.id, label:d.label, howto:d.howto, office:d.office || null })), fields: s.fields, calc: s.calc?.type || null, deadline: s.deadline,
+      court: s.court || null, whereTo: s.whereTo || null
     }))
   });
 }
@@ -113,8 +121,8 @@ app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFo
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
-const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js"];
+const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 // Service worker keshi har yangi relizda avtomatik almashadi: versiya — barcha resurslar xeshidan
 const BUILD = createHash("sha256").update(Object.values(VER).join("") + hashOf("index.html")).digest("hex").slice(0, 12);
