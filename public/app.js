@@ -264,6 +264,7 @@ function renderPlan(){
   $("#ttsPlan").addEventListener("click", () => readAloud(planItems()));
   $("#route").addEventListener("click", e => { const b = e.target.closest("[data-of]"); if (b) jumpToOffice(b.dataset.of); });
   renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
+  dateWords($("#calcCard"));
   $("#evid").addEventListener("change", e => {
     const i = Number(e.target.dataset.i); if (Number.isNaN(i)) return;
     state.evidence = e.target.checked ? [...new Set([...state.evidence, i])] : state.evidence.filter(x => x !== i);
@@ -303,6 +304,22 @@ function altsHTML(a){
   return `<div class="alts"><span class="small muted">${t("altTitle")}</span>${alts.map(m => `<button class="chipbtn" type="button" data-alt="${m.id}">${esc(m.title)}</button>`).join("")}</div>`;
 }
 
+// Har bir sana maydoni yonida tanlangan sana so‘z bilan: «= 19-avgust 2026-yil» / «= 19 августа 2026 г.»
+function dateWord(input){
+  const id = "dw_" + input.id;
+  let s = document.getElementById(id);
+  if (!s){
+    s = Object.assign(document.createElement("span"), { id, className: "dateword" });
+    input.after(s);
+    input.setAttribute("aria-describedby", `${input.getAttribute("aria-describedby") || ""} ${id}`.trim());
+  }
+  const d = input.value ? new Date(input.value + "T00:00:00") : null;
+  s.textContent = d && !isNaN(d) ? "= " + fmtDate(d, LANG) : "";
+}
+const dateWords = root => root?.querySelectorAll('input[type="date"]').forEach(dateWord);
+document.addEventListener("input", e => { if (e.target.matches?.('input[type="date"]')) dateWord(e.target); });
+document.addEventListener("change", e => { if (e.target.matches?.('input[type="date"]')) dateWord(e.target); });
+
 function renderDeadline(){
   const p = state.plan, cls = { low:"lv-ok", medium:"lv-warn", high:"lv-bad", expired:"lv-bad", info:"lv-ok" }[p.risk.level];
   const head = `<div class="cardhead"><div class="kicker">${esc(p.deadlineLabel)}</div><span class="pill ${cls}">${esc(p.risk.label)}</span></div>`;
@@ -317,6 +334,7 @@ function renderDeadline(){
     ${p.deadlineNote ? `<div class="small muted dnote">${esc(p.deadlineNote)}</div>` : ""}${date}
     ${p.daysLeft >= 0 ? `<button class="btn ghost sm calbtn" id="calBtn" type="button">${t("calendar")}</button>` : ""}`;
   applyWidths($("#deadlineCard"));
+  dateWords($("#deadlineCard"));
   $("#calBtn")?.addEventListener("click", downloadIcs);
   $("#trigger").addEventListener("change", e => {
     if (!e.target.value) return;
@@ -531,6 +549,7 @@ function renderDocView(){
     ${[...groups].map(([g, fs]) => `<fieldset><legend>${esc(g)}</legend>${fs.map(fieldHTML).join("")}</fieldset>`).join("")}
     <details class="more" ${extra ? "open" : ""}><summary>${t("extraSummary")}</summary>
       <div class="field"><label for="f_extra">${t("extraLabel")}</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
+  dateWords($("#docForm"));
   renderHowto();
   previewDoc();
 }
