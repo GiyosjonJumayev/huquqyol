@@ -1,5 +1,14 @@
 # O‘zgarishlar tarixi
 
+## 3.15.0 — 2026-11-20 · Yangi dizayn: header, footer, yorug‘ va qorong‘i mavzu
+- Yorug‘ va qorong‘i mavzu: headerdagi tugma (oy/quyosh) va «Qulaylik» panelida «Avtomatik · Yorug‘ · Qorong‘i». Tanlov `hy_theme` cookie’da; server sahifani shu mavzuda chizadi — miltillash yo‘q. Cookie bo‘lmasa tizim sozlamasi.
+- Yangi rang tizimi (tokenlar): ikkala mavzu uchun alohida palitra, soyalar, burchaklar; matn/fon juftliklari WCAG 2.2 AA (axe 0 xato, ikkala mavzuda).
+- Yopishqoq, shaffof-xira header: logo va shior, menyu (Sohalar · Qanday ishlaydi · Statistika), reja va ariza sahifalarida menyu o‘rnida qadamlar; telefonda ixcham, yopishqoq emas.
+- Footer: loyiha haqida, xizmat havolalari, rasmiy manbalar (lex.uz, my.sud.uz, my.gov.uz), maxfiylik va «Ma’lumotlarimni o‘chirish», manba kodi, ogohlantirish va mualliflik.
+- Bosh sahifa: gradientli bosh blok, «Bepul · 3 tilda · 12 soha» belgisi, ishonch belgilari, «Qanday ishlaydi» bo‘limi kartalarda; soha kartalarida hover/fokus holatlari.
+- Statistika va 404 sahifalari ham shu header/footer va mavzuda.
+- Testlar: 84 unit + 13 brauzer testi (mavzu almashishi, cookie, ikkala mavzuda axe).
+
 ## 3.14.0 — 2026-11-20 · PDF yuklash
 - Jarima qarori, chek yoki buyruqni **PDF** sifatida ham yuklash mumkin (panel, sudrab tashlash, Ctrl+V).
 - PDF brauzerning o‘zida pdf.js bilan ochiladi (o‘z serverimizdan, CDN yo‘q); PDF fayl serverga yuborilmaydi.

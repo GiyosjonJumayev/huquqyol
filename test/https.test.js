@@ -9,7 +9,7 @@ before(async () => {
   const { app } = await import("../server/index.js");
   await new Promise(r => { server = app.listen(0, () => { base = `http://127.0.0.1:${server.address().port}`; r(); }); });
 });
-after(() => server.close());
+after(() => { server.closeAllConnections?.(); server.close(); });
 
 test("FORCE_HTTPS: http → https (308), health check ochiq", async () => {
   const r = await fetch(base + "/?lang=ru", { redirect:"manual" });

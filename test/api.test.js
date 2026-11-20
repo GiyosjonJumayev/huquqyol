@@ -4,7 +4,7 @@ import { app } from "../server/index.js";
 
 let server, base;
 before(() => new Promise(r => { server = app.listen(0, () => { base = `http://127.0.0.1:${server.address().port}`; r(); }); }));
-after(() => server.close());
+after(() => { server.closeAllConnections?.(); server.close(); });
 const post = (p, b) => fetch(base + p, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(b) });
 
 test("GET /api/meta", async () => {
@@ -43,4 +43,17 @@ test("DOCX va PDF fayllar", async () => {
 
 test("Noma’lum holat — 400", async () => {
   assert.equal((await post("/api/plan", { scenario:"xyz" })).status, 400);
+});
+
+test("Mavzu: hy_theme cookie bo‘yicha sahifa shu mavzuda chiziladi (miltillashsiz); noto‘g‘ri qiymat e’tiborsiz", async () => {
+  const dark = await (await fetch(base + "/", { headers:{ cookie:"hy_theme=dark" } })).text();
+  assert.match(dark, /<html data-theme="dark" /);
+  assert.match(dark, /data-theme-toggle/);
+  assert.match(dark, /class="site-head"/);
+  assert.match(dark, /class="site-foot"/);
+  assert.doesNotMatch(await (await fetch(base + "/", { headers:{ cookie:"hy_theme=evil\"" } })).text(), /data-theme="/);
+  assert.match(await (await fetch(base + "/statistika", { headers:{ cookie:"hy_theme=light" } })).text(), /data-theme="light"/);
+  assert.match(await (await fetch(base + "/yoq-sahifa", { headers:{ cookie:"hy_theme=dark" } })).text(), /data-theme="dark"/);
+  const js = await fetch(base + (/src="(\/theme\.js\?v=[^"]+)"/.exec(dark)[1]));
+  assert.equal(js.status, 200);
 });

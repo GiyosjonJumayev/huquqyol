@@ -12,7 +12,7 @@ import { toCyrillic } from "../public/translit.js";
 
 let server, base;
 before(() => new Promise(r => { server = app.listen(0, () => { base = `http://127.0.0.1:${server.address().port}`; r(); }); }));
-after(() => server.close());
+after(() => { server.closeAllConnections?.(); server.close(); });
 const post = (p, b, h = {}) => fetch(base + p, { method:"POST", headers:{ "Content-Type":"application/json", ...h }, body: JSON.stringify(b) });
 const LATIN = /[A-Za-z]{4,}/;
 const text = m => m.blocks.map(b => b.text || [...(b.parts || []), ...(b.lines || []).flat(), ...(b.items || []).flat(), ...(b.right || [])].map(p => p.v ?? p.ph).join("")).join("\n");

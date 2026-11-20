@@ -126,7 +126,7 @@ test("readPhoto: AI xatosi yoki «o‘qib bo‘lmadi» — OCR ga o‘tadi; bo�
 
 let server, base;
 before(() => new Promise(r => { server = app.listen(0, () => { base = `http://127.0.0.1:${server.address().port}`; r(); }); }));
-after(async () => { server.close(); await ocrShutdown(); });
+after(async () => { server.closeAllConnections?.(); server.close(); await ocrShutdown(); });
 const post = (b, h = {}) => fetch(base + "/api/photo", { method:"POST", headers:{ "Content-Type":"application/json", ...h }, body: JSON.stringify(b) });
 
 test("POST /api/photo: AI kalitisiz ishlaydi; bo‘sh rasm — 422, noto‘g‘ri rasm — 400, boshqa sayt — 403", async () => {
@@ -215,5 +215,8 @@ test("POST /api/photo: PDF matni; pdf.js fayllari o‘z serverimizdan", async ()
   assert.equal(js.status, 200);
   assert.match(js.headers.get("content-type"), /javascript/);
   assert.match(js.headers.get("cache-control"), /immutable/);
-  assert.equal((await fetch(base + pdfBase + "/pdf.worker.min.mjs")).status, 200);
+  await js.arrayBuffer();                                            // javob tanasi o‘qiladi — ulanish ochiq qolmaydi
+  const worker = await fetch(base + pdfBase + "/pdf.worker.min.mjs");
+  assert.equal(worker.status, 200);
+  await worker.arrayBuffer();
 });

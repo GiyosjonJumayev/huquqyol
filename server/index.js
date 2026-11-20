@@ -113,7 +113,7 @@ app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFo
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const ASSETS = ["app.css", "theme.js", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
 const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 // Service worker keshi har yangi relizda avtomatik almashadi: versiya — barcha resurslar xeshidan
@@ -130,6 +130,9 @@ const TEMPLATE = versioned(readFileSync(join(PUBLIC, "index.html"), "utf8"), ASS
 // Ijtimoiy tarmoqlar (Telegram, Facebook) uchun to‘liq URL: PUBLIC_HOST berilgan bo‘lsa
 const OG_BASE = /^[a-z0-9.-]+(?::\d+)?$/i.test(process.env.PUBLIC_HOST || "") ? `https://${process.env.PUBLIC_HOST}` : "";
 const OG_LOCALE = { uz:"uz_UZ", cyr:"uz_UZ", ru:"ru_RU" };
+// Foydalanuvchi tanlagan mavzu (cookie) sahifa chizilishidan oldin qo‘llanadi — «miltillash» bo‘lmaydi
+const themeOf = req => /(?:^|;\s*)hy_theme=(light|dark)(?:;|$)/.exec(req.headers.cookie || "")?.[1] || null;
+const withTheme = (html, req) => { const th = themeOf(req); return th ? html.replace("<html ", `<html data-theme="${th}" `) : html; };
 function renderIndex(lang){
   const t = makeT(lang), meta = { ai: aiEnabled(), ...META[lang] };
   return TEMPLATE
@@ -151,6 +154,7 @@ app.get(["/", "/index.html"], (req, res) => {
   let html = fs ? INDEX[req.lang].replace("<html ", `<html data-fs="${fs}" `) : INDEX[req.lang];
   // Foydalanuvchi rasm panelini yopgan bo‘lsa (cookie), sahifa shu holatda chiziladi — panel «miltillamaydi»
   if (/(?:^|;\s*)hy_photo=0(?:;|$)/.test(req.headers.cookie || "")) html = html.replace('id="photoPanel"', 'id="photoPanel" hidden');
+  html = withTheme(html, req);
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(html);
 });
 app.get("/statistika", (req, res) => {
@@ -158,7 +162,7 @@ app.get("/statistika", (req, res) => {
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
-    .send(statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs }));
+    .send(statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, themeHref: `/theme.js?v=${VER["theme.js"]}`, fs, theme: themeOf(req) }));
 });
 // JS modullari ichidagi importlar ham versiyalanadi
 const rewriteImports = src => MODULES.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`).replaceAll(`"./${f}"`, `"/${f}?v=${VER[f]}"`), src);
@@ -191,7 +195,7 @@ app.use(express.static(PUBLIC, {
 // Noma’lum sahifa: til bo‘yicha qisqa 404 sahifasi
 const NOT_FOUND = Object.fromEntries(LANGS.map(l => { const t = makeT(l);
   return [l, `<!doctype html><html lang="${HTML_LANG[l]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${t("notFoundPage")} — HuquqYo‘l</title><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/app.css?v=${VER["app.css"]}"></head><body><main class="wrap nf"><h1>404</h1><p>${t("notFoundPage")}</p><a class="btn primary" href="/">${t("toHome")}</a></main></body></html>`]; }));
-app.use((req, res, next) => req.method === "GET" || req.method === "HEAD" ? res.status(404).type("html").send(NOT_FOUND[req.lang]) : next());
+app.use((req, res, next) => req.method === "GET" || req.method === "HEAD" ? res.status(404).type("html").send(withTheme(NOT_FOUND[req.lang], req)) : next());
 
 app.use((err, req, res, next) => {
   const lang = req.lang || resolveLang(req);

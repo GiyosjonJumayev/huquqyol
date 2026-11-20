@@ -24,6 +24,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 - **Qonunni AI o‘ylab topmaydi.** 60 ta norma va 13 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
 - **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri, dam olish kuni → keyingi ish kuni).
+- **Yorug‘ va qorong‘i mavzu:** headerdagi tugma yoki «Qulaylik» panelida «Avtomatik · Yorug‘ · Qorong‘i»; tanlov eslab qolinadi.
 - **Keksalar uchun:** 4 darajali katta shrift va matnlarni ovozli o‘qish.
 - **Maxfiylik:** ariza ma’lumotlari faqat qurilmada; anonim statistika faqat sanoq — matn, IP, cookie saqlanmaydi.
 - **Internetsiz ishlaydi** (PWA): shriftlar, bilim bazasi va hujjat generatori loyiha ichida.
@@ -32,7 +33,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 23 | 60 (53 tasi modda raqami bilan) | 53 × 3 til = 159 | 120 | 13 | 5 | 83 unit + 12 brauzer |
+| 12 / 23 | 60 (53 tasi modda raqami bilan) | 53 × 3 til = 159 | 120 | 13 | 5 | 84 unit + 13 brauzer |
 
 ## Ko‘rinishlar
 
@@ -114,8 +115,8 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 83 ta unit/API test (jumladan ruscha, kirillcha, rasmdan OCR va PDF)
-npm run test:e2e          # 12 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
+npm test                  # 84 ta unit/API test (jumladan ruscha, kirillcha, rasmdan OCR va PDF)
+npm run test:e2e          # 13 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.

@@ -7,7 +7,7 @@ Bu fayl sahnaga chiqishdan oldin o‘qiladi. Uch qism: **pitch (3 daqiqa)**, **j
 ## Sahnadan 30 daqiqa oldin — nazorat ro‘yxati
 
 - [ ] `npm ci && npm start` → http://localhost:3000 ochiladi. Internetsiz ham ishlaydi: shriftlar, bilim bazasi va hujjat generatori loyiha ichida.
-- [ ] `npm test` (83 test) va `npm run test:e2e` (12 brauzer testi) yashil.
+- [ ] `npm test` (84 test) va `npm run test:e2e` (13 brauzer testi) yashil.
 - [ ] AI rejimi kerak bo‘lsa, `.env` da `ANTHROPIC_API_KEY`; `/api/health` → `"ai":true`. Kalit bo‘lmasa ham hammasi ishlaydi (qidiruv + qoidalar rejimi) — buni ataylab ko‘rsatish mumkin.
 - [ ] Brauzer: **Edge** (o‘zbekcha tabiiy ovoz bor — ovozli o‘qishni shunda ko‘rsating). Masshtab 110–125%, qorong‘i mavzu o‘chiq.
 - [ ] Oldindan ochilgan tablar: `/?lang=uz`, `/?lang=ru`, `/statistika`.
@@ -100,6 +100,6 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 | Idoralar (rasmiy manba bilan) | 13 |
 | Kalkulyatorlar | 5 — MK 333 kompensatsiya, iste’molchi penyasi, aliment, jarima chegirmasi, mikroqarz chegarasi |
 | Tillar | o‘zbek (lotin, kirill), rus |
-| Testlar | 83 unit/API + 12 brauzer (axe bilan) |
+| Testlar | 84 unit/API + 13 brauzer (axe bilan) |
 
 Lighthouse ballarini ko‘rsatmoqchi bo‘lsangiz, sahnadan oldin o‘zingiz o‘lchang: Chrome yoki Edge → DevTools → **Lighthouse** → Mobile va Desktop. Natijani slaydga faqat o‘lchangan qiymat bilan yozing.

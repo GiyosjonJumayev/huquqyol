@@ -9,7 +9,7 @@ import { app } from "../server/index.js";
 
 let server, base;
 before(() => new Promise(r => { server = app.listen(0, () => { base = `http://127.0.0.1:${server.address().port}`; r(); }); }));
-after(() => server.close());
+after(() => { server.closeAllConnections?.(); server.close(); });
 const post = (p, b) => fetch(base + p, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(b) });
 
 test("Sanash: bir kishi bir kunda bir holat — bir marta; ertasi kuni yana sanaladi", () => {
@@ -75,13 +75,13 @@ test("API: reja faqat birinchi ochilishda sanaladi, kalkulyator yangilanishi san
   assert.equal(s.series.at(-1).day, dayOf());
 });
 
-test("Statistika sahifasi: uch tilda, inline style va skript yo‘q, sohalar ro‘yxati to‘liq", async () => {
+test("Statistika sahifasi: uch tilda, inline style va inline skript yo‘q, sohalar ro‘yxati to‘liq", async () => {
   for (const [lang, word] of [["uz", "Anonim statistika"], ["cyr", "Аноним статистика"], ["ru", "Анонимная статистика"]]){
     const r = await fetch(base + "/statistika?lang=" + lang);
     assert.equal(r.status, 200);
     const html = await r.text();
     assert.ok(html.includes(word), lang);
-    assert.ok(!/\sstyle=|<script/.test(html), lang);
+    assert.ok(!/\sstyle=|<script(?![^>]*\ssrc="\/theme\.js\?v=)/.test(html), lang);   // inline yo‘q; faqat mavzu tugmasi skripti (o‘z serverimizdan)
     assert.ok((html.match(/<td class="barcell" role="cell">/g) || []).length >= 12, lang);
   }
   assert.match(await (await fetch(base + "/statistika", { headers:{ cookie:"hy_fs=2" } })).text(), /<html data-fs="2"/);

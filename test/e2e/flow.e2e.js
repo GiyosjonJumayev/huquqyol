@@ -405,3 +405,43 @@ test("PDF: matnli PDF (OCR’siz) va skanerlangan PDF (OCR) — tur, holat, mudd
   assert.match(await p.innerText("#askErr"), /PDF/);
   assert.deepEqual(p.errors.filter(e => !/Invalid PDF|InvalidPDFException|Failed to load resource/i.test(e)), []);
 });
+
+test("Dizayn: header menyusi, yorug‘/qorong‘i mavzu (tugma, panel, cookie), footer; ikkala mavzuda axe 0 xato", { skip }, async () => {
+  const p = await page({ colorScheme:"light" });
+  await p.goto(base);
+  assert.ok(await p.isVisible(".site-head .hnav"));
+  assert.equal(await p.getAttribute("[data-theme-toggle]", "aria-pressed"), "false");
+  assert.deepEqual(await audit(p), []);
+  // Header tugmasi: qorong‘i mavzu, cookie saqlanadi, qayta yuklanganda server shu mavzuda chizadi
+  await p.click("[data-theme-toggle]");
+  assert.equal(await p.getAttribute("html", "data-theme"), "dark");
+  assert.equal(await p.getAttribute("[data-theme-toggle]", "aria-pressed"), "true");
+  assert.equal(await p.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(11, 17, 28)");
+  assert.deepEqual(await audit(p), []);
+  await p.reload();
+  assert.equal(await p.getAttribute("html", "data-theme"), "dark");
+  // Qulaylik paneli: «Avtomatik» — tizim sozlamasiga qaytadi (bu yerda yorug‘)
+  await p.click("#a11yBtn");
+  await p.click("[data-theme-set='auto']");
+  assert.equal(await p.getAttribute("html", "data-theme"), null);
+  assert.equal(await p.getAttribute("[data-theme-set='auto']", "aria-pressed"), "true");
+  assert.equal(await p.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(245, 246, 242)");
+  // Menyu: «Qanday ishlaydi» bo‘limiga o‘tadi; footer havolalari
+  await p.click("#a11yBtn");
+  await p.click(".hnav [data-to='howH']");
+  await p.waitForFunction(() => { const r = document.getElementById("howH").getBoundingClientRect(); return r.top >= 0 && r.top < innerHeight; });
+  assert.equal(await p.locator("footer a[href='/statistika']").count(), 1);
+  assert.ok(await p.isVisible("footer #wipe"));
+  // Plan sahifasida menyu o‘rnida qadamlar ko‘rinadi
+  await p.click("[data-domain='istemol']");
+  await p.click("[data-case='nuqsonli_tovar']");
+  await p.waitForSelector("#calcValue");
+  assert.ok(await p.isVisible("#stepsNav"));
+  assert.ok(await p.isHidden(".site-head .hnav"));
+  // Tizim qorong‘i bo‘lsa (cookie yo‘q) — sahifa avtomatik qorong‘i
+  const d = await page({ colorScheme:"dark" });
+  await d.goto(base + "statistika");
+  assert.equal(await d.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(11, 17, 28)");
+  assert.deepEqual(await audit(d), []);
+  assert.deepEqual([...p.errors, ...d.errors], []);
+});

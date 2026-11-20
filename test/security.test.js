@@ -4,7 +4,7 @@ import { app } from "../server/index.js";
 
 let server, base;
 before(() => new Promise(r => { server = app.listen(0, () => { base = `http://127.0.0.1:${server.address().port}`; r(); }); }));
-after(() => server.close());
+after(() => { server.closeAllConnections?.(); server.close(); });
 const post = (p, b, type = "application/json") => fetch(base + p, { method:"POST", headers:{ "Content-Type": type }, body: typeof b === "string" ? b : JSON.stringify(b) });
 
 test("Xavfsizlik headerlari", async () => {
