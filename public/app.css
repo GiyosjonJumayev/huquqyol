@@ -635,3 +635,18 @@ nav.langsw a[aria-current]{background:var(--surface);color:var(--ink)}
 @media (max-width:520px){.trust{grid-template-columns:minmax(0,1fr)}}
 @media (min-width:521px){html[data-fs="2"] .trust{grid-template-columns:repeat(2,minmax(0,1fr))}}
 html[data-fs="3"] .trust{grid-template-columns:minmax(0,1fr)}
+
+/* Davlat portallari bilan birga: 1 Tayyorlash → 2 Yuborish; + Boshqa hujjatlar */
+.pflow{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.pflow > li:not(.arr){display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.pflow > li > span:last-child{display:grid;gap:2px;min-width:0;overflow-wrap:anywhere}
+.pflow .pn{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:calc(17px * var(--fs));font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.pflow .pval{font-weight:600}
+.pflow a{color:var(--accent);text-underline-offset:3px;display:inline-block;padding:10px 0;margin:-10px 0}
+.pflow .pnote{color:var(--muted);font-size:calc(14px * var(--fs))}
+.pflow .arr{align-self:center;font-size:calc(24px * var(--fs));color:var(--accent);line-height:1}
+.pflow .pother{border-style:dashed!important;background:transparent!important}
+.pnoteall{margin:12px 0 0;color:var(--ink);font-size:calc(15px * var(--fs))}
+@media (max-width:900px){.pflow{grid-template-columns:minmax(0,1fr)}.pflow .arr{justify-self:center;transform:rotate(90deg)}}
+html[data-fs="2"] .pflow,html[data-fs="3"] .pflow{grid-template-columns:minmax(0,1fr)}
+html[data-fs="2"] .pflow .arr,html[data-fs="3"] .pflow .arr{justify-self:center;transform:rotate(90deg)}

@@ -213,7 +213,15 @@ const M = {
   tr1b:{ uz:"Bepul", ru:"Бесплатно" }, tr1:{ uz:"hech qanday to‘lov yo‘q", ru:"никаких платежей" },
   tr2b:{ uz:"Ro‘yxatdan o‘tish shart emas", ru:"Без регистрации" }, tr2:{ uz:"darhol foydalaning", ru:"пользуйтесь сразу" },
   tr3b:{ uz:"Ma’lumotingiz saqlanmaydi", ru:"Ваши данные не хранятся у нас" }, tr3:{ uz:"faqat sizning qurilmangizda", ru:"только на вашем устройстве" },
-  tr4b:{ uz:"Qonunlar lex.uz bo‘yicha", ru:"Законы по lex.uz" }, tr4:{ uz:"har bir modda manbasi bilan", ru:"у каждой статьи есть источник" }
+  tr4b:{ uz:"Qonunlar lex.uz bo‘yicha", ru:"Законы по lex.uz" }, tr4:{ uz:"har bir modda manbasi bilan", ru:"у каждой статьи есть источник" },
+  // Davlat portallari bilan birga
+  portalsH:{ uz:"Davlat portallari bilan birga", ru:"Вместе с государственными порталами" },
+  pPrep:{ uz:"Tayyorlash", ru:"Подготовка" },
+  pSend:{ uz:"Yuborish", ru:"Отправка" },
+  pOther:{ uz:"Boshqa hujjatlar", ru:"Другие документы" },
+  pOtherNote:{ uz:"Adliya vazirligi «Adolat» markazi: tayyor shablonlar", ru:"центр «Адолат» Министерства юстиции: готовые шаблоны" },
+  portalsNote:{ uz:"HuquqYo‘l davlat xizmatlarining o‘rnini bosmaydi: murojaatingizni to‘g‘ri tayyorlab, ularga yo‘l ko‘rsatadi.", ru:"HuquqYo‘l не заменяет государственные сервисы: помогает правильно подготовить обращение и показывает, куда его направить." },
+  newTab:{ uz:"(yangi oynada ochiladi)", ru:"(откроется в новом окне)" }
 };
 
 const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
