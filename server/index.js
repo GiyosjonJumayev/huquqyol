@@ -8,7 +8,8 @@ import { createRequire } from "node:module";
 import { SCENARIOS, NORMS, LEX_URL, kbFor, COURTS } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
-import { documentModel, toDocx, toPdf } from "./documents.js";
+import { documentModel, customModel, toDocx, toPdf } from "./documents.js";
+import { plansPage, lawyersPage, lawyerPage, cabinetPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
 import { securityHeaders, requireJson, rateLimit, sameOrigin, httpsRedirect } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
@@ -111,6 +112,26 @@ app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(asyn
   }).send(buf);
 }));
 
+// Yurist Pro: o‘z shabloni (erkin matn) blankada — DOCX/PDF. Matn saqlanmaydi va sanalmaydi.
+app.post("/api/custom/:format", rateLimit({ max: 30, name:"custom" }), wrap(async (req, res) => {
+  const fmt = req.params.format;
+  if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error: msg(req.lang, "format") });
+  const v = vCustom(req.body), l = base(parseLang(req.body?.lang) || req.lang);
+  const model = customModel({ ...v, lang: l });
+  const out = parseLang(req.body?.lang) === "cyr" ? cyrillicModel(model) : model;
+  const buf = fmt === "docx" ? await toDocx(out) : await toPdf(out);
+  res.set({
+    "Content-Type": fmt === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf",
+    "Content-Disposition": `attachment; filename="${safeName(`HuquqYol-shablon.${fmt}`)}"`
+  }).send(buf);
+}));
+
+// Yuristning katalogga qo‘shilish arizasi: moderatsiya uchun faylga yoziladi (litsenziya tekshirilgach e’lon qilinadi)
+app.post("/api/lawyers/apply", rateLimit({ max: 5, name:"apply" }), (req, res) => {
+  saveApplication(vLawyerApply(req.body));
+  res.status(201).json({ ok: true });
+});
+
 // Anonim statistika: faqat yig‘ma sanoqlar (holat → soha)
 const SCEN_DOMAIN = Object.fromEntries(SCENARIOS.map(s => [s.id, s.domain]));
 app.get("/api/stats", (req, res) => res.json(stats.summary({ scenarioDomain: SCEN_DOMAIN })));
@@ -121,8 +142,8 @@ app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFo
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
-const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js"];
+const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js", "kabinet.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js", "kabinet.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 // Service worker keshi har yangi relizda avtomatik almashadi: versiya — barcha resurslar xeshidan
 const BUILD = createHash("sha256").update(Object.values(VER).join("") + hashOf("index.html")).digest("hex").slice(0, 12);
@@ -168,6 +189,23 @@ app.get("/statistika", (req, res) => {
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
     .send(statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs }));
 });
+// ---------- Biznes: tariflar, yuristlar katalogi, Yurist Pro kabineti ----------
+function bizPage(render){
+  return (req, res, next) => {
+    const forced = parseLang(req.query.lang);
+    if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
+    const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
+    const query = Object.fromEntries(Object.entries(req.query).filter(([k, v]) => k !== "lang" && typeof v === "string" && v.length < 100));
+    const html = render({ lang: forced || req.lang, cssHref: `/app.css?v=${VER["app.css"]}`, jsHref: `/kabinet.js?v=${VER["kabinet.js"]}`, fs, query, id: req.params.id });
+    if (!html) return next();
+    res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[forced || req.lang] }).type("html").send(html);
+  };
+}
+app.get("/tariflar", bizPage(plansPage));
+app.get("/yuristlar", bizPage(lawyersPage));
+app.get("/yuristlar/:id", bizPage(lawyerPage));
+app.get("/kabinet", bizPage(cabinetPage));
+
 // JS modullari ichidagi importlar ham versiyalanadi
 const rewriteImports = src => MODULES.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`).replaceAll(`"./${f}"`, `"/${f}?v=${VER[f]}"`), src);
 for (const f of MODULES){

@@ -260,6 +260,7 @@ function renderPlan(){
     <div class="laws">${p.norms.slice(0, 3).map(law).join("")}</div>
     ${p.norms.length > 3 ? `<details class="more"><summary>${t("moreNorms", { n: p.norms.length - 3 })}</summary><div class="laws">${p.norms.slice(3).map(law).join("")}</div></details>` : ""}
     <div class="sources">${laws.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)} — lex.uz ↗</a>`).join("")}</div>
+    <aside class="card lawcta" aria-labelledby="lawCtaP"><h2 id="lawCtaP">${t("lawTitle")}</h2><p>${t("lawTextPlan")}</p><a class="btn ghost" href="${esc(lawyersHref())}">${t("lawBtn")}</a></aside>
     <div class="planextra"><button class="linkbtn" type="button" id="printPlan">${t("printPlan")}</button></div>
     <div class="cta"><span class="small muted ctahint">${t("nextHint")}</span><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
   $("#printPlan").addEventListener("click", printPlan);
@@ -610,6 +611,8 @@ function renderDocView(){
     <details class="more" ${extra ? "open" : ""}><summary>${t("extraSummary")}</summary>
       <div class="field"><label for="f_extra">${t("extraLabel")}</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
   dateWords($("#docForm"));
+  $("#lawLink").href = lawyersHref();
+  $("#lhNote").hidden = !letterhead().length;
   renderHowto();
   if (COURTS) syncCourt(null); else renderCourt();
   renderWhere();
@@ -779,7 +782,10 @@ function cleanForm(){
   for (const [k, v] of Object.entries(form())){ const f = fieldSpec(k); if (f && v !== "" && v != null && !validateField(f, String(v))) out[k] = v; }
   return out;
 }
-const docRequest = () => ({ scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form: cleanForm(), evidence: state.evidence });
+// Yurist Pro: kabinetda yoqilgan blanka barcha hujjatlarga qo‘shiladi (ma’lumot shu brauzerda)
+const letterhead = () => { try { const lh = JSON.parse(localStorage.getItem("huquqyol:pro"))?.letterhead; return lh?.on ? lh.lines.map(s => String(s).trim()).filter(Boolean).slice(0, 4) : []; } catch { return []; } };
+const docRequest = () => ({ scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form: cleanForm(), evidence: state.evidence, letterhead: letterhead() });
+const lawyersHref = () => `/yuristlar?holat=${encodeURIComponent(state.scn || "")}`;
 
 let previewSeq = 0;
 async function previewDoc(){
@@ -812,6 +818,7 @@ const partsHTML = ps => ps.map(p => p.v != null ? esc(p.v) : `<span class="ph">$
 const partsText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
 function blockHTML(b){
   switch (b.t){
+    case "head": return `<div class="lhead">${b.lines.map((l, i) => `<div${i ? "" : ` class="b"`}>${partsHTML(l)}</div>`).join("")}</div>`;
     case "addr": return `<div class="addr">${b.lines.map(l => `<div>${partsHTML(l)}</div>`).join("")}</div>`;
     case "title": return `<div class="ttl">${esc(b.text)}</div>`;
     case "sub": return `<div class="sub">${esc(b.text)}</div>`;
@@ -824,6 +831,7 @@ function blockHTML(b){
 }
 function docText(){
   return state.blocks.map(b => {
+    if (b.t === "head") return b.lines.map(partsText).join("\n") + "\n";
     if (b.t === "addr") return b.lines.map(l => "\t\t\t\t" + partsText(l)).join("\n") + "\n";
     if (b.t === "title") return "\n" + b.text;
     if (b.t === "sub" || b.t === "lbl") return b.text;

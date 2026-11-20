@@ -157,6 +157,14 @@ const M = {
   choose:{ uz:"— tanlang —", ru:"— выберите —" },
   aboutYou:{ uz:"Siz haqingizda", ru:"О вас" },
   groupDefault:{ uz:"Ma’lumotlar", ru:"Данные" },
+  // Yuristlar katalogi va Pro
+  navLabel:{ uz:"Bo‘limlar", ru:"Разделы" }, navLawyers:{ uz:"Yuristlar", ru:"Юристы" }, navPlans:{ uz:"Tariflar", ru:"Тарифы" },
+  noDomain:{ uz:"Holatingizga mos soha topilmadimi? Yurist yoki advokat bilan maslahatlashing →", ru:"Не нашли свою ситуацию? Проконсультируйтесь с юристом или адвокатом →" },
+  lawTitle:{ uz:"Yurist yoki advokat bilan maslahat", ru:"Консультация юриста или адвоката" },
+  lawTextPlan:{ uz:"Holat murakkab bo‘lsa yoki sudda vakil kerak bo‘lsa — shu soha bo‘yicha yurist va advokatlar: narxlar, onlayn yoki ofisda, aloqa ma’lumotlari.", ru:"Если ситуация сложная или нужен представитель в суде — юристы и адвокаты по этой сфере: цены, онлайн или в офисе, контакты." },
+  lawTextDoc:{ uz:"Arizani yuklab olib, yuristga ko‘rsating: u matnni tekshiradi, sudda yoki idorada vakillik qiladi. Narxlar va aloqa ma’lumotlari profilda.", ru:"Скачайте заявление и покажите юристу: он проверит текст и представит вас в суде или органе. Цены и контакты — в профиле." },
+  lawBtn:{ uz:"Yurist tanlash", ru:"Выбрать юриста" },
+  lhOn:{ uz:"Hujjat Yurist kabinetidagi blankangiz bilan chiqadi.", ru:"Документ выходит на вашем бланке из кабинета юриста." },
   // Sud — tuman bo‘yicha avtomatik; «Qayerga yozish kerak?»
   courtAuto:{ uz:"Avtomatik: {place} → {court}.", ru:"Автоматически: {place} → {court}." },
   courtAutoRegion:{ uz:"Avtomatik: {place} → {court}.", ru:"Автоматически: {place} → {court}." },
