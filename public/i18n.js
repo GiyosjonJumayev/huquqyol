@@ -238,7 +238,10 @@ const M = {
   fxSrc:{ uz:"Manbalar:", ru:"Источники:" },
   fxSrc333:{ uz:"Mehnat kodeksi, 333-modda — lex.uz", ru:"Трудовой кодекс, ст. 333 — lex.uz" },
   fxSrcAlt:{ uz:"Hisobchilar talqini — buxgalter.uz", ru:"Толкование бухгалтеров — buxgalter.uz" },
-  fxSrcLaw:{ uz:"{law} — lex.uz", ru:"{law} — lex.uz" }
+  fxSrcLaw:{ uz:"{law} — lex.uz", ru:"{law} — lex.uz" },
+  // Mediatsiya qadami
+  medRegistry:{ uz:"Mediatorlar reyestri", ru:"Реестр медиаторов" },
+  medDoc:{ uz:"«Mediatsiya taklifi» xatini tayyorlash", ru:"Подготовить письмо «Предложение о медиации»" }
 };
 
 const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");

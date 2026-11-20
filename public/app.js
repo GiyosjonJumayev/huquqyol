@@ -263,7 +263,10 @@ function renderPlan(){
     <div class="cta"><span class="small muted ctahint">${t("nextHint")}</span><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
   $("#printPlan").addEventListener("click", printPlan);
   $("#ttsPlan").addEventListener("click", () => readAloud(planItems()));
-  $("#route").addEventListener("click", e => { const b = e.target.closest("[data-of]"); if (b) jumpToOffice(b.dataset.of); });
+  $("#route").addEventListener("click", e => {
+    const b = e.target.closest("[data-of]"); if (b) return jumpToOffice(b.dataset.of);
+    const d = e.target.closest("[data-doc]"); if (d){ selectRecipient(d.dataset.doc); go(3); }
+  });
   renderDeadline(); renderRoute(); renderCalc(); renderEvCount();
   dateWords($("#calcCard"));
   $("#evid").addEventListener("change", e => {
@@ -346,12 +349,18 @@ function renderDeadline(){
 
 function renderRoute(){
   const has = new Set((state.plan.offices || []).map(o => o.id));
-  $("#route").innerHTML = state.plan.steps.map((st, i) => `
-    <li><span class="num" aria-hidden="true">${i + 1}</span><div class="body">
+  const docs = new Set((scenarioMeta(state.scn)?.docs || []).map(d => d.id));
+  // Mediatsiya qadami: mediatorlar reyestri kartasiga va «Mediatsiya taklifi» xatiga havola
+  const links = st => [
+    ...(has.has(st.office) ? [`<button class="linkbtn ofjump" type="button" data-of="${esc(st.office)}">${t(st.office === "mediators" ? "medRegistry" : "ofContact")} ↓</button>`] : []),
+    ...(st.office === "mediators" && docs.has("mediatsiya") ? [`<button class="linkbtn ofjump" type="button" data-doc="mediatsiya">${t("medDoc")} →</button>`] : [])
+  ];
+  $("#route").innerHTML = state.plan.steps.map((st, i) => { const l = links(st); return `
+    <li${st.office === "mediators" ? ` class="medstep"` : ""}><span class="num" aria-hidden="true">${i + 1}</span><div class="body">
       <div class="row"><div><div class="org">${esc(st.org)}</div><h3>${esc(st.t)}</h3></div>
       <span class="when ${st.hot ? "hot" : ""}">${esc(st.when)}</span></div>
       <p>${esc(st.body)}</p>
-      ${has.has(st.office) ? `<button class="linkbtn ofjump" type="button" data-of="${esc(st.office)}">${t("ofContact")} ↓</button>` : ""}</div></li>`).join("");
+      ${l.length ? `<div class="steplinks">${l.join("")}</div>` : ""}</div></li>`; }).join("");
 }
 
 /* ---------- Idoralar: manzil va aloqa (rasmiy saytlardan) ---------- */
@@ -762,14 +771,17 @@ document.addEventListener("click", e => {
   const lb = e.target.closest(".langsw [data-lang]");
   if (lb){ setLang(lb.dataset.lang); return; }
   const r = e.target.closest("#seg button");
-  if (r){
-    state.recipient = r.dataset.r; persist();
-    document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b === r)));
-    syncVisibility();
-    renderHowto();
-    previewDoc();
-  }
+  if (r) selectRecipient(r.dataset.r);
 });
+// Ariza oluvchisini tanlash (3-sahifadagi tugmalar va rejadagi havolalar uchun bitta yo‘l)
+function selectRecipient(id){
+  if (!scenarioMeta(state.scn)?.docs.some(d => d.id === id)) return;
+  state.recipient = id; persist();
+  document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.r === id)));
+  syncVisibility();
+  renderHowto();
+  previewDoc();
+}
 const onForm = debounce(previewDoc, 220);
 const onDocCalc = debounce(() => refreshPlan(false).catch(() => {}), 300);
 function onDocInput(e){
