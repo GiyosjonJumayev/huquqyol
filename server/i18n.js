@@ -45,8 +45,10 @@ const M = {
   origin:{ uz:"So‘rov boshqa saytdan yuborilgan.", ru:"Запрос отправлен с другого сайта." },
   photoFormat:{ uz:"Rasm JPG, PNG yoki WEBP formatida bo‘lishi kerak.", ru:"Фото должно быть в формате JPG, PNG или WEBP." },
   photoBig:{ uz:"Rasm juda katta. Kichikroq rasm yuboring.", ru:"Фото слишком большое. Отправьте фото поменьше." },
-  photoNoAi:{ uz:"Rasmdan o‘qish uchun AI kerak — u hozir o‘chiq. Vaziyatni matn bilan yozing.", ru:"Для чтения фото нужен ИИ — сейчас он выключен. Опишите ситуацию текстом." },
-  photoAi:{ uz:"Rasmni hozir o‘qib bo‘lmadi. Birozdan keyin urinib ko‘ring yoki vaziyatni matn bilan yozing.", ru:"Сейчас не удалось прочитать фото. Попробуйте позже или опишите ситуацию текстом." },
+  pdfLong:{ uz:"PDF matni juda uzun. Hujjatning faqat kerakli sahifasini yuklang.", ru:"Текст PDF слишком длинный. Загрузите только нужную страницу документа." },
+  photoNoOcr:{ uz:"Rasmdan o‘qish bu serverda o‘chirilgan. Vaziyatni matn bilan yozing.", ru:"Чтение фото на этом сервере отключено. Опишите ситуацию текстом." },
+  photoBusy:{ uz:"Hozir ko‘p rasm o‘qilmoqda. Bir necha soniyadan keyin qayta urinib ko‘ring.", ru:"Сейчас читается много фото. Попробуйте через несколько секунд." },
+  photoSlow:{ uz:"Rasmni o‘qish juda uzoq davom etdi. Kichikroq yoki aniqroq rasm bilan qayta urinib ko‘ring.", ru:"Чтение фото заняло слишком много времени. Попробуйте фото поменьше или чётче." },
   photoUnread:{ uz:"Rasmda hujjatni o‘qib bo‘lmadi. Hujjatni yorug‘ joyda, to‘liq va tekis suratga oling.", ru:"Не удалось прочитать документ на фото. Сфотографируйте его целиком, ровно и при хорошем свете." }
 };
 export function msg(lang, key, vars = {}){

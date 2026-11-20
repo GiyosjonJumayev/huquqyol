@@ -7,7 +7,7 @@ Bu fayl sahnaga chiqishdan oldin o‘qiladi. Uch qism: **pitch (3 daqiqa)**, **j
 ## Sahnadan 30 daqiqa oldin — nazorat ro‘yxati
 
 - [ ] `npm ci && npm start` → http://localhost:3000 ochiladi. Internetsiz ham ishlaydi: shriftlar, bilim bazasi va hujjat generatori loyiha ichida.
-- [ ] `npm test` (69 test) va `npm run test:e2e` (10 brauzer testi) yashil.
+- [ ] `npm test` (83 test) va `npm run test:e2e` (12 brauzer testi) yashil.
 - [ ] AI rejimi kerak bo‘lsa, `.env` da `ANTHROPIC_API_KEY`; `/api/health` → `"ai":true`. Kalit bo‘lmasa ham hammasi ishlaydi (qidiruv + qoidalar rejimi) — buni ataylab ko‘rsatish mumkin.
 - [ ] Brauzer: **Edge** (o‘zbekcha tabiiy ovoz bor — ovozli o‘qishni shunda ko‘rsating). Masshtab 110–125%, qorong‘i mavzu o‘chiq.
 - [ ] Oldindan ochilgan tablar: `/?lang=uz`, `/?lang=ru`, `/statistika`.
@@ -47,7 +47,7 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 2. **Qayerga borish va dalillar (40 s).** Qadam ostidagi «Manzil va aloqa ↓» → Davlat mehnat inspeksiyasi kartasi: manzil, ishonch telefoni (bosilsa qo‘ng‘iroq), manba va tekshirilgan sana. Pastda dalillar: «MUHIM» belgilari va har biri qayerdan olinishi.
 3. **Ariza (50 s).** **Ariza tayyorlash** → **Namuna bilan to‘ldirish** — hujjat ko‘z oldida to‘ladi. «Kimga»: ish beruvchi → inspeksiya → sud — matn o‘zgaradi. **PDF** yuklab oling va oching.
 4. **Til (20 s).** **Рус** — o‘sha ariza ruscha rasmiy uslubda («ТРЕБОВАНИЕ», «Требую:»), kiritilgan ma’lumotlar saqlanadi. **Ўзб** — kirill.
-5. **Rasmdan (40 s) — AI kaliti kerak.** Bosh sahifa → **Rasmdan** → YHXX jarima qarori rasmini tanlang (oldindan telefonda yoki noutbukda tayyorlab qo‘ying). «Hujjatdan o‘qildi» kartasi: organ, qaror raqami, sana, summa, avtomobil raqami. Muddat kartasi: «Shikoyat berish uchun N kun qoldi» — hujjat sanasidan. **Ariza** → maydonlar o‘zi to‘lgan. Ayting: «AI faqat rasmdagi faktni o‘qidi, muddatni kod hisobladi — va siz uni tekshirasiz».
+5. **Hujjat rasmi (40 s) — AI kalitisiz ham.** Bosh sahifa → «Hujjat rasmi bormi?» → **Rasm yuklash** → YHXX jarima qarori rasmini tanlang (namuna: `test/fixtures/yhxx-qaror-foto.jpg`; oldindan telefonda ham tayyorlab qo‘ying). Internetsiz, 1–2 soniyada o‘qiladi. PDF ham bo‘ladi: `test/fixtures/buyruq-matnli.pdf` — ishdan bo‘shatish buyrug‘i (matni OCR’siz olinadi), `qaror-skan.pdf` — skanerlangan qaror. «Hujjatdan o‘qildi» kartasi: organ, qaror raqami, sana, summa, avtomobil raqami. Muddat kartasi: «Shikoyat berish uchun N kun qoldi» — hujjat sanasidan. **Ariza** → maydonlar o‘zi to‘lgan. Ayting: «Bepul OCR rasmdagi faktni o‘qidi, muddatni kod hisobladi — va siz uni tekshirasiz. AI kaliti bo‘lsa, Claude o‘qiydi».
 6. **Yangi soha (40 s).** Bosh sahifa → «Kartamdan bilmagan holda 2 million so‘m yechib olishdi». Qadamlar: kartani bloklash → politsiya (102) → Markaziy bank (71) 200-00-44 → sud. Yoki migrant: «Rossiyada ishlayapman, ish beruvchi pasportimni olib qo‘ydi» → Migratsiya agentligining Moskva, Seul, Istanbul raqamlari.
 7. **Keksalar uchun (40 s).** **Aa Qulaylik** → «Eng katta» shrift — butun sayt kattalashadi. **Tinglash** — reja ovozda o‘qiladi, o‘qilayotgan qadam belgilanadi. Esc — to‘xtatish.
 8. **Statistika (20 s).** `/statistika`: namoyish davomida ochilgan holatlar shu yerda — sohalar bo‘yicha. «Matn, IP, cookie saqlanmaydi — faqat sanoq.»
@@ -100,6 +100,6 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 | Idoralar (rasmiy manba bilan) | 14 |
 | Kalkulyatorlar | 5 — MK 333 kompensatsiya, iste’molchi penyasi, aliment, jarima chegirmasi, mikroqarz chegarasi |
 | Tillar | o‘zbek (lotin, kirill), rus |
-| Testlar | 69 unit/API + 10 brauzer (axe bilan) |
+| Testlar | 83 unit/API + 12 brauzer (axe bilan) |
 
 Lighthouse ballarini ko‘rsatmoqchi bo‘lsangiz, sahnadan oldin o‘zingiz o‘lchang: Chrome yoki Edge → DevTools → **Lighthouse** → Mobile va Desktop. Natijani slaydga faqat o‘lchangan qiymat bilan yozing.

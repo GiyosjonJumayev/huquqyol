@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 101 unit + 10 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 115 unit + 12 brauzer |
 
 ## Ko‘rinishlar
 
@@ -84,7 +84,7 @@ Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahli
 
 **Uch tilda ishlaydi:** o‘zbek (lotin), o‘zbek (kirill) va rus. Til interfeys, normalar matni, qadamlar, kalkulyatorlar, xato xabarlari va tayyor arizaga birdek tatbiq etiladi. Rus tilidagi ariza ruscha rasmiy uslubda yoziladi («ИСКОВОЕ ЗАЯВЛЕНИЕ», «На основании изложенного прошу:»). Vaziyatni istalgan tilda yozish mumkin, jumladan o‘zbekcha kirillda.
 
-**Hujjat rasmidan o‘qish (AI yoqilganda).** «Rasmdan» tugmasi bilan jarima qarori, chek, ish beruvchi buyrug‘i, bank xabarnomasi yoki kommunal hisob rasmini tanlash mumkin. Claude rasmda ko‘rinib turgan faktlarni ajratadi: hujjat turi, kim chiqargani, raqami, sanasi, summasi, avtomobil raqami. So‘ng holat odatdagi tahlil orqali aniqlanadi, muddat hujjat sanasidan **kodda** hisoblanadi («Shikoyat berish uchun 7 kun qoldi»), ariza maydonlari o‘zi to‘ladi. Rejada «Hujjatdan o‘qildi» kartasi chiqadi — fuqaro uni asl hujjat bilan solishtiradi. Rasm brauzerda 1600 px gacha kichraytiriladi, serverda saqlanmaydi va logga yozilmaydi.
+**Hujjat rasmi yoki PDF’dan o‘qish — bepul, AI kalitisiz ham.** Bosh sahifadagi «Hujjat rasmi bormi?» panelida (yoki faylni sudrab tashlab, Ctrl+V bilan) jarima qarori, chek, ish beruvchi buyrug‘i, bank xabarnomasi yoki kommunal hisob rasmini yoki PDF faylini yuklash mumkin. Matnli PDF’dan matn brauzerda pdf.js bilan to‘g‘ridan-to‘g‘ri olinadi (OCR’siz, aniq); skanerlangan PDF’ning birinchi 3 sahifasi rasmga aylantirilib o‘qiladi. Rasmni serverning o‘zidagi bepul OCR (Tesseract: rus, o‘zbek lotin va kirill) o‘qiydi va qoidalar bilan faktlarni ajratadi; AI kaliti bo‘lsa — Claude o‘qiydi, xato bersa OCR ga o‘tadi. Ajratiladigan faktlar: hujjat turi, kim chiqargani, raqami, sanasi, summasi, avtomobil raqami. So‘ng holat odatdagi tahlil orqali aniqlanadi, muddat hujjat sanasidan **kodda** hisoblanadi («Shikoyat berish uchun 7 kun qoldi»), ariza maydonlari o‘zi to‘ladi. Rejada «Hujjatdan o‘qildi» kartasi chiqadi — fuqaro uni asl hujjat bilan solishtiradi. Rasm brauzerda 2000 px gacha kichraytiriladi, serverda saqlanmaydi va logga yozilmaydi. Panel kerak bo‘lmasa × bilan yopiladi, kamera tugmasi uni qayta ochadi.
 
 Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa, ilova yaqin holatlarni taklif qiladi va bir bosishda almashtiradi. Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
 
@@ -114,8 +114,8 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 101 ta unit/API test (jumladan ruscha, kirillcha, rasmdan o‘qish va Telegram bot)
-npm run test:e2e          # 10 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
+npm test                  # 115 ta unit/API test (jumladan ruscha, kirillcha, rasmdan OCR, PDF va Telegram bot)
+npm run test:e2e          # 12 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.
@@ -186,7 +186,7 @@ test/              node:test — sana, reja, RAG, API, xavfsizlik, kirill, DOCX/
 |---|---|
 | `GET /api/meta` | holatlar ro‘yxati, AI holati |
 | `POST /api/analyze` `{text}` | holat, ishonch darajasi, faktlar, topilgan normalar |
-| `POST /api/photo` `{image: data:image/jpeg;base64,…, note?}` | hujjat rasmidan faktlar (`photo`) + holat, muddat sanasi va ariza maydonlari; AI kerak |
+| `POST /api/photo` `{image}` · `{images:[…], kind:"pdf"}` · `{kind:"pdf", text}` (+ `note?`) | hujjat rasmidan faktlar (`photo`, `engine: ocr|ai`) + holat, muddat sanasi va ariza maydonlari; AI kalitisiz ham ishlaydi |
 | `POST /api/plan` `{scenario, triggerDate, amount, months}` | muddat, xavf, qadamlar, kompensatsiya |
 | `POST /api/document/preview` | hujjat bloklari (jonli ko‘rinish uchun) |
 | `POST /api/document/docx` / `pdf` | tayyor fayl |

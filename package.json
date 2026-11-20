@@ -1,6 +1,6 @@
 {
   "name": "huquqyol",
-  "version": "3.12.0",
+  "version": "3.14.0",
   "description": "HuquqYo‘l — fuqarolar uchun AI huquqiy yo‘l xaritasi (mehnat, iste’molchi, oila, davlat idoralari, jarimalar, qarz — O‘zbekiston)",
   "type": "module",
   "main": "app.cjs",
@@ -23,12 +23,17 @@
     "@fontsource/jetbrains-mono": "5.3.0",
     "@fontsource/onest": "5.3.1",
     "@fontsource/spectral": "5.3.0",
+    "@tesseract.js-data/rus": "1.0.0",
+    "@tesseract.js-data/uzb": "1.0.0",
+    "@tesseract.js-data/uzb_cyrl": "1.0.0",
     "compression": "1.8.2",
     "dejavu-fonts-ttf": "2.37.3",
     "docx": "9.15.2",
     "express": "5.3.0",
     "grammy": "1.46.0",
-    "pdfkit": "0.20.2"
+    "pdfjs-dist": "4.10.38",
+    "pdfkit": "0.20.2",
+    "tesseract.js": "7.0.0"
   },
   "devDependencies": {
     "axe-core": "4.10.3"
