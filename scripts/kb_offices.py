@@ -189,7 +189,7 @@ ORG_OFFICE = {
   "Yuqori organ yoki sud": "courts", "YHXX yoki sud": "courts", "Politsiya": "iiv", "Elektron": "egov", "Xalq qabulxonasi": "pm", "Konsullik": "mfa"
 }
 # Holatga xos qo‘shimchalar: qadamda tilga olinmagan, lekin foydali idora; yoki umumiy «Yuqori organ» ning aniq ma’nosi
-EXTRA_OFFICES = {"osgo": ["napp"], "organ_qarori": ["pm"]}
+EXTRA_OFFICES = {"osgo": ["napp"], "organ_qarori": ["pm"], "murojaat_umumiy": ["pm"]}
 STEP_OVERRIDE = {("pensiya", "Yuqori organ"): "pension", ("ijtimoiy_nafaqa", "Yuqori organ"): "social"}
 
 # Ariza qabul qiluvchisi → idora («Qanday topshiriladi» ostida aloqa ma’lumoti)

@@ -2203,6 +2203,7 @@
    "sanitariya",
    "obodonlashtirish",
    "jarima soldi",
+   "jarimaga",
    "штраф",
    "протокол",
    "постановлени",
@@ -3407,6 +3408,10 @@
    "radiator",
    "avariya",
    "kommunal xizmat",
+   "svet yo‘qligi",
+   "gaz yo‘qligi",
+   "suv yo‘qligi",
+   "tok yo‘qligi",
    "нет света",
    "нет газа",
    "нет воды",
@@ -5796,6 +5801,247 @@
    "mfa",
    "migration",
    "courts"
+  ]
+ },
+ {
+  "id": "murojaat_umumiy",
+  "domain": "davlat",
+  "title": "Davlat idorasiga ariza, taklif yoki shikoyat yozish",
+  "card": "Hokimlik yoki boshqa idoraga rasmiy murojaat tayyorlash",
+  "short": "Ariza, taklif, shikoyat",
+  "lead": "Davlat idorasiga ariza, taklif yoki shikoyatni yozma, elektron yoki og‘zaki shaklda yuborish mumkin. Yozma murojaatda F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart. Idora 15 kunda, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob beradi.",
+  "keywords": [
+   "ariza yozmoqchiman",
+   "hokimlikka murojaat",
+   "taklif bermoqchiman",
+   "shikoyat qilmoqchiman",
+   "davlat idorasiga",
+   "заявление в госорган",
+   "жалоба",
+   "предложение"
+  ],
+  "norms": [
+   "mq5",
+   "mq6",
+   "mq28",
+   "mq36",
+   "mq38"
+  ],
+  "deadline": {
+   "none": true,
+   "label": "Murojaat muddati",
+   "note": "Murojaatni topshirganingizdan keyin idora 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob berishi shart (28-modda). Javob bo‘lmasa, «Javobsiz murojaat» holatidan foydalaning."
+  },
+  "trigger": "Murojaat topshirilgan sana",
+  "calc": null,
+  "partyField": "body",
+  "steps": [
+   {
+    "org": "Siz",
+    "t": "Murojaat turini tanlang va yozing",
+    "when": "Bugun",
+    "body": "Ariza — huquqingizni amalga oshirishda yordam so‘rash; taklif — idora ishini yaxshilash bo‘yicha fikr; shikoyat — buzilgan huquqingizni tiklashni talab qilish. F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart (6-modda)."
+   },
+   {
+    "org": "Mas’ul idora",
+    "t": "Mas’ul idoraga topshiring",
+    "when": "Tayyor bo‘lgach",
+    "body": "murojaat.gov.uz, idoraning virtual qabulxonasi, shaxsan yoki pochta orqali: barcha shakllar teng kuchga ega (5-modda)."
+   },
+   {
+    "org": "Mas’ul idora",
+    "t": "Kiruvchi raqamni saqlang",
+    "when": "Topshirgan kuni",
+    "body": "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring. Elektron murojaatda uning raqamini yozib oling."
+   },
+   {
+    "org": "Mas’ul idora",
+    "t": "Javobni kuting",
+    "when": "{t+15} gacha",
+    "body": "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak (28-modda). Muddat uzaytirilsa, sizga xabar berilishi shart."
+   },
+   {
+    "org": "Yuqori organ",
+    "t": "Javob bo‘lmasa — shikoyat",
+    "when": "Muddat o‘tgach",
+    "body": "Yuqori turuvchi organga yoki Prezidentning virtual qabulxonasiga (pm.gov.uz). Shikoyat matni «Javobsiz murojaat» holatida tayyor."
+   },
+   {
+    "org": "Ma’muriy sud",
+    "t": "Harakatsizlik ustidan sudga",
+    "when": "Kerak bo‘lsa",
+    "body": "Murojaat ko‘rib chiqilmasa, idoraning harakatsizligi ustidan ma’muriy sudga murojaat qilish mumkin (36-modda). Ariza «Javobsiz murojaat» holatida tayyorlanadi.",
+    "office": "courts"
+   }
+  ],
+  "evidence": [
+   "Holatni tasdiqlovchi hujjatlar nusxalari",
+   "Idoradan ilgari olingan javoblar (bo‘lsa)",
+   "Fotosuratlar (bo‘lsa)"
+  ],
+  "fields": [
+   {
+    "k": "body",
+    "label": "Qaysi idoraga",
+    "ph": "idora nomi",
+    "type": "text",
+    "group": "Murojaat",
+    "hint": "Chilonzor tumani hokimligi"
+   },
+   {
+    "k": "subject",
+    "label": "Qisqacha mavzu",
+    "ph": "mavzu",
+    "type": "text",
+    "group": "Murojaat",
+    "hint": "Mahalladagi yo‘lni ta’mirlash"
+   },
+   {
+    "k": "facts",
+    "label": "Nima bo‘ldi",
+    "ph": "holat bayoni",
+    "type": "textarea",
+    "group": "Murojaat",
+    "hint": "Ko‘chamizdagi yo‘l 2 yildan beri ta’mirlanmagan, yomg‘irdan keyin suv to‘planib qoladi."
+   },
+   {
+    "k": "request",
+    "label": "Nimani so‘raysiz",
+    "ph": "so‘rov yoki taklif",
+    "type": "textarea",
+    "group": "Murojaat",
+    "hint": "yo‘lni 2027-yil ta’mirlash rejasiga kiritishni"
+   }
+  ],
+  "docs": [
+   {
+    "id": "ariza",
+    "label": "Ariza",
+    "to": [
+     "{{body}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "ARIZA",
+    "body": [
+     "Murojaat mavzusi: {{subject}}.",
+     "{{facts}}",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "{{request}}",
+     "murojaatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."
+    ],
+    "attach": [
+     "Holatni tasdiqlovchi hujjatlar nusxalari"
+    ],
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
+   },
+   {
+    "id": "taklif",
+    "label": "Taklif",
+    "to": [
+     "{{body}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "TAKLIF",
+    "body": [
+     "Murojaat mavzusi: {{subject}}.",
+     "{{facts}}",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+    ],
+    "askLabel": "Taklif qilaman:",
+    "asks": [
+     "{{request}}"
+    ],
+    "attach": [
+     "Holatni tasdiqlovchi hujjatlar nusxalari"
+    ],
+    "closing": "Taklifim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishingizni so‘rayman.",
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
+   },
+   {
+    "id": "shikoyat",
+    "label": "Shikoyat",
+    "to": [
+     "{{body}}ga",
+     "fuqaro {{applicant}} dan"
+    ],
+    "title": "SHIKOYAT",
+    "body": [
+     "Murojaat mavzusi: {{subject}}.",
+     "{{facts}}",
+     "Ushbu holat bilan huquq va qonuniy manfaatlarim buzilgan deb hisoblayman.",
+     "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "{{request}}",
+     "shikoyatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."
+    ],
+    "attach": [
+     "Holatni tasdiqlovchi hujjatlar nusxalari",
+     "Avvalgi murojaat va olingan javob nusxalari (bo‘lsa)"
+    ],
+    "howto": {
+     "steps": [
+      "Shaxsan, pochta orqali yoki elektron shaklda yuboring: barcha shakllar teng kuchga ega (Murojaatlar to‘g‘risidagi qonun, 5-modda).",
+      "Elektron yo‘l: idoraning rasmiy saytidagi virtual qabulxona yoki Prezidentning virtual qabulxonasi.",
+      "Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring.",
+      "Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak."
+     ],
+     "links": [
+      {
+       "label": "Prezidentning virtual qabulxonasi — pm.gov.uz",
+       "url": "https://pm.gov.uz/"
+      }
+     ]
+    }
+   }
+  ],
+  "evidenceInfo": [
+   {
+    "need": "m",
+    "how": "Shartnoma, ma’lumotnoma, qaror yoki boshqa hujjat — murojaatdagi faktlarni tasdiqlaydigan har qanday hujjat nusxasi."
+   },
+   {
+    "need": "f",
+    "how": "Shu masala bo‘yicha avval murojaat qilgan bo‘lsangiz, javob nusxasi: masala ilgari ko‘tarilganini ko‘rsatadi."
+   },
+   {
+    "need": "f",
+    "how": "Muammo ko‘rinadigan suratlar, olingan sanasi bilan."
+   }
+  ],
+  "offices": [
+   "courts",
+   "pm"
   ]
  }
 ]

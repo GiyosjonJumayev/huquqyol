@@ -18,7 +18,7 @@ test("Bilim bazasi yaxlit: har bir norma, maydon va shablon kaliti mavjud", () =
   }
 });
 
-test("23 holat matndan to‘g‘ri tasniflanadi", () => {
+test("24 holat matndan to‘g‘ri tasniflanadi", () => {
   const cases = {
     "Ish beruvchim 3 oydan beri maosh bermayapti": "ish_haqi",
     "Meni ogohlantirmasdan ishdan bo‘shatishdi": "ishdan_boshatish",
@@ -42,7 +42,8 @@ test("23 holat matndan to‘g‘ri tasniflanadi", () => {
     "Kam ta’minlangan oila sifatida bolalar nafaqasini rad etishdi": "ijtimoiy_nafaqa",
     "Koreyaga ishga yuboramiz deb agentlik pul olib, aldadi": "migrant_agentlik",
     "Rossiyada ishlayapman, ish beruvchi pasportimni olib qo‘ydi va maosh bermayapti": "migrant_xorij",
-    "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor": "qarz"
+    "Do‘stimga qarzga bergan 20 million so‘mni qaytarmayapti, tilxat bor": "qarz",
+    "Hokimlikka ariza yozmoqchiman, mahallamizdagi yo‘l buzilgan": "murojaat_umumiy"
   };
   for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
 });
@@ -62,7 +63,16 @@ test("Regressiya: umumiy murojaat mavjud holatlarni egallab olmaydi", () => {
     "Меня уволили без предупреждения": "ishdan_boshatish",
     "Подал жалобу в хокимият, нет ответа уже 2 месяца": "murojaat_javobsiz",
     "Не согласен со штрафом, хочу подать жалобу": "jarima",
-    "Купил телевизор, сломался, магазин не меняет": "nuqsonli_tovar"
+    "Купил телевизор, сломался, магазин не меняет": "nuqsonli_tovar",
+    // umumiy kalit so‘zlar («shikoyat qilmoqchiman», «жалоба») aniq holatni bosib ketmasligi
+    "Jarimaga shikoyat qilmoqchiman": "jarima",
+    "Жалоба на штраф": "jarima",
+    "YHXB jarimasi ustidan shikoyat qilmoqchiman": "yhxx_jarima",
+    "Хочу подать жалобу на штраф ГАИ по радару": "yhxx_jarima",
+    "Svet yo‘qligi bo‘yicha shikoyat qilmoqchiman": "kommunal_sifat",
+    "Pensiya jamg‘armasi ustidan shikoyat qilmoqchiman": "pensiya",
+    "Bank ustidan shikoyat qilmoqchiman, kartamdan pul yechildi": "bank_karta",
+    "Жалоба на хокима, незаконное решение о сносе": "organ_qarori"
   };
   for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
 });

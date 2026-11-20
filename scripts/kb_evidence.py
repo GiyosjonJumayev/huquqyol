@@ -63,6 +63,11 @@ EVID = {
     (F, "Rasmiy javob kelgan bo‘lsa, uning nusxasi.", "Копия официального ответа, если он пришёл."),
     (F, "Qo‘ng‘iroqlar, xatlar va qabulga borgan sanalaringiz.", "Звонки, письма и даты ваших визитов на приём."),
   ],
+  "murojaat_umumiy": [
+    (M, "Shartnoma, ma’lumotnoma, qaror yoki boshqa hujjat — murojaatdagi faktlarni tasdiqlaydigan har qanday hujjat nusxasi.", "Договор, справка, решение или другой документ — копия любого документа, подтверждающего факты из обращения."),
+    (F, "Shu masala bo‘yicha avval murojaat qilgan bo‘lsangiz, javob nusxasi: masala ilgari ko‘tarilganini ko‘rsatadi.", "Если вы уже обращались по этому вопросу, копия ответа: она показывает, что вопрос поднимался раньше."),
+    (F, "Muammo ko‘rinadigan suratlar, olingan sanasi bilan.", "Фотографии, на которых видна проблема, с датой съёмки."),
+  ],
   "organ_qarori": [
     (M, "Qaror nusxasini organdan yozma so‘rang.", "Запросите копию решения в органе письменно."),
     (M, "Qaror topshirilgan xat, konvert yoki elektron xabar: 6 oylik muddat shundan hisoblanadi.", "Письмо, конверт или электронное сообщение с решением: от него считается 6-месячный срок."),

@@ -31,7 +31,7 @@ DOMAINS = [
   {"id":"bank",      "title":"Bank va mikroqarz",   "desc":"Kartadan pul yechildi, ortiqcha foiz"},
   {"id":"transport", "title":"Yo‘l-transport",      "desc":"YHXX jarimasi, OSGO sug‘urtasi"},
   {"id":"nafaqa",    "title":"Pensiya va nafaqa",   "desc":"Pensiya yoki nafaqa rad etildi"},
-  {"id":"davlat",    "title":"Davlat idoralari",    "desc":"Javobsiz murojaat, noqonuniy qaror"},
+  {"id":"davlat",    "title":"Davlat idoralari",    "desc":"Ariza va shikoyat, javobsiz murojaat, noqonuniy qaror"},
   {"id":"jarima",    "title":"Boshqa jarimalar",    "desc":"Inspeksiya va boshqa organlar jarimasi"},
   {"id":"migrant",   "title":"Mehnat migrantlari",  "desc":"Agentlik aldovi, xorijdagi muammo"},
   {"id":"fuqarolik", "title":"Qarz",                "desc":"Qarzga bergan pulni undirish"}
@@ -429,7 +429,7 @@ FINE_P2 = "Men ushbu qarorga quyidagi asoslarga ko‘ra rozi emasman: {{reason}}
 FINE_P3 = "Ma’muriy huquqbuzarlik to‘g‘risidagi ish bo‘yicha qarorga qaror nusxasi olingan kundan e’tiboran o‘n kun ichida shikoyat qilinishi mumkin. Shikoyat muddati o‘tkazib yuborilmagan."
 scen(id="jarima", domain="jarima", title="Jarimaga rozi emasman", card="Inspeksiya, hokimlik yoki boshqa organ noto‘g‘ri jarima soldi", short="Jarima",
   lead="Jarima to‘g‘risidagi qaror ustidan qaror nusxasini olgan kundan 10 kun ichida shikoyat qilish mumkin. Diqqat: shikoyat qilsangiz, tez to‘lash chegirmasi (50 yoki 70 foiz) qo‘llanmaydi.",
-  keywords=["jarima","shtraf","bayonnoma","protokol","ma’muriy javobgarlik","inspeksiya","soliq inspeksiyasi","sanitariya","obodonlashtirish","jarima soldi"],
+  keywords=["jarima","shtraf","bayonnoma","protokol","ma’muriy javobgarlik","inspeksiya","soliq inspeksiyasi","sanitariya","obodonlashtirish","jarima soldi","jarimaga"],
   norms=["mjtk_shik","mjtk332","yhxx_el"],
   deadline={"days":10, "label":"Shikoyat berish uchun qoldi"}, trigger="Jarima qarorini olgan sana",
   calc={"type":"fineDiscount"}, partyField="organ", amountField="fine",
@@ -598,7 +598,7 @@ QUAL_P1 = UT_INTRO + " va to‘lovlarni o‘z vaqtida amalga oshiraman. {{trigge
 QUAL_P2 = "Iste’molchilarning huquqlarini himoya qilish to‘g‘risidagi qonunning 19-moddasiga ko‘ra ijrochi xizmatni shartnomada belgilangan muddatda, hajmda va sifatda ko‘rsatishi shart. Xizmatda nuqson bo‘lsa, iste’molchi uni bartaraf etishni va narxni mutanosib kamaytirishni talab qilishga haqli; nuqson talabdan keyin 20 kun ichida bartaraf etilmasa, har bir kechikkan kun uchun xizmat narxining 1 foizi miqdorida penya to‘lanadi."
 scen(id="kommunal_sifat", domain="kommunal", title="Kommunal xizmat uzildi yoki sifatsiz", card="Svet, gaz yoki suv uzoq vaqt yo‘q, bosim past yoki ogohlantirmasdan uzib qo‘yishdi", short="Sifatsiz xizmat",
   lead="Xizmat ko‘rsatuvchi xizmatni shartnomadagi hajm va sifatda ko‘rsatishi shart. Ko‘rsatilmagan xizmat uchun to‘lov qayta hisoblanadi; nuqson 20 kunda tuzatilmasa, har kun uchun xizmat narxining 1 foizi penya to‘lanadi.",
-  keywords=["svet yo‘q","gaz yo‘q","suv yo‘q","tok yo‘q","uzib qo‘y","o‘chirib qo‘y","bosim past","kuchlanish","issiq suv","isitish","otopleniya","radiator","avariya","kommunal xizmat"],
+  keywords=["svet yo‘q","gaz yo‘q","suv yo‘q","tok yo‘q","uzib qo‘y","o‘chirib qo‘y","bosim past","kuchlanish","issiq suv","isitish","otopleniya","radiator","avariya","kommunal xizmat","svet yo‘qligi","gaz yo‘qligi","suv yo‘qligi","tok yo‘qligi"],
   norms=["ihq19","ihq22","ihq23","ihq29"],
   deadline={"months":6, "label":"Talab qo‘yish uchun qoldi", "note":"Xizmatdagi nuqson bo‘yicha talab, kafolat bo‘lmasa, 6 oy ichida qo‘yiladi (19-modda). Kechiktirmang."},
   trigger="Xizmat uzilgan yoki sifatsiz bo‘lgan sana",
@@ -899,6 +899,43 @@ scen(id="migrant_xorij", domain="migrant", title="Xorijda maosh berilmadi yoki p
         ["xorijiy ish beruvchidan to‘lanmagan ish haqini undirish uchun zudlik bilan choralar ko‘rishni;","shartnomada va’da qilingan sharoitlar ta’minlanmagani sababli meni boshqa ish beruvchiga joylashtirishni yoki O‘zbekistonga qaytarishni."],
         ["Agentlik bilan shartnoma nusxasi"], sub="xorijda ishlayotgan fuqaroning huquqlarini himoya qilish to‘g‘risida", askLabel="Talab qilaman:",
         closing="Talabim bajarilmagan taqdirda Migratsiya agentligiga va sudga murojaat qilishimni ma’lum qilaman.")
+  ])
+
+# ===== UMUMIY MUROJAAT (oxirida: teng ballda aniq holat ustun bo‘lishi uchun) =====
+# Umumiy murojaat: ariza, taklif, shikoyat (Murojaatlar to‘g‘risidagi qonun; 6-modda talablari — F.I.Sh., manzil, idora, mohiyat, imzo)
+GEN_TO = ["{{body}}ga", "fuqaro {{applicant}} dan"]
+GEN_SUBJ = "Murojaat mavzusi: {{subject}}."
+GEN_LAW = "«Jismoniy va yuridik shaxslarning murojaatlari to‘g‘risida»gi Qonunning 28-moddasiga ko‘ra murojaat kelib tushgan kundan e’tiboran 15 kun ichida, qo‘shimcha o‘rganish talab etilganda esa bir oygacha muddatda ko‘rib chiqilishi kerak."
+GEN_ATT = ["Holatni tasdiqlovchi hujjatlar nusxalari"]
+scen(id="murojaat_umumiy", domain="davlat", title="Davlat idorasiga ariza, taklif yoki shikoyat yozish", card="Hokimlik yoki boshqa idoraga rasmiy murojaat tayyorlash", short="Ariza, taklif, shikoyat",
+  lead="Davlat idorasiga ariza, taklif yoki shikoyatni yozma, elektron yoki og‘zaki shaklda yuborish mumkin. Yozma murojaatda F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart. Idora 15 kunda, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob beradi.",
+  keywords=["ariza yozmoqchiman","hokimlikka murojaat","taklif bermoqchiman","shikoyat qilmoqchiman","davlat idorasiga"],
+  norms=["mq5","mq6","mq28","mq36","mq38"],
+  deadline={"none":True, "label":"Murojaat muddati", "note":"Murojaatni topshirganingizdan keyin idora 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha javob berishi shart (28-modda). Javob bo‘lmasa, «Javobsiz murojaat» holatidan foydalaning."},
+  trigger="Murojaat topshirilgan sana",
+  calc=None, partyField="body",
+  steps=[{"org":"Siz","t":"Murojaat turini tanlang va yozing","when":"Bugun","body":"Ariza — huquqingizni amalga oshirishda yordam so‘rash; taklif — idora ishini yaxshilash bo‘yicha fikr; shikoyat — buzilgan huquqingizni tiklashni talab qilish. F.I.Sh., yashash manzili, idora nomi, masala mohiyati va imzo bo‘lishi shart (6-modda)."},
+         {"org":"Mas’ul idora","t":"Mas’ul idoraga topshiring","when":"Tayyor bo‘lgach","body":"murojaat.gov.uz, idoraning virtual qabulxonasi, shaxsan yoki pochta orqali: barcha shakllar teng kuchga ega (5-modda)."},
+         {"org":"Mas’ul idora","t":"Kiruvchi raqamni saqlang","when":"Topshirgan kuni","body":"Qog‘ozda topshirsangiz, ikkinchi nusxaga kiruvchi raqam va sanani qo‘ydiring. Elektron murojaatda uning raqamini yozib oling."},
+         {"org":"Mas’ul idora","t":"Javobni kuting","when":"{t+15} gacha","body":"Javob 15 kun ichida, qo‘shimcha o‘rganish kerak bo‘lsa 1 oygacha berilishi kerak (28-modda). Muddat uzaytirilsa, sizga xabar berilishi shart."},
+         {"org":"Yuqori organ","t":"Javob bo‘lmasa — shikoyat","when":"Muddat o‘tgach","body":"Yuqori turuvchi organga yoki Prezidentning virtual qabulxonasiga (pm.gov.uz). Shikoyat matni «Javobsiz murojaat» holatida tayyor."},
+         {"org":"Ma’muriy sud","t":"Harakatsizlik ustidan sudga","when":"Kerak bo‘lsa","body":"Murojaat ko‘rib chiqilmasa, idoraning harakatsizligi ustidan ma’muriy sudga murojaat qilish mumkin (36-modda). Ariza «Javobsiz murojaat» holatida tayyorlanadi."}],
+  evidence=["Holatni tasdiqlovchi hujjatlar nusxalari","Idoradan ilgari olingan javoblar (bo‘lsa)","Fotosuratlar (bo‘lsa)"],
+  fields=[
+    F("body","Qaysi idoraga","idora nomi", group=GOV, hint="Chilonzor tumani hokimligi"),
+    F("subject","Qisqacha mavzu","mavzu", group=GOV, hint="Mahalladagi yo‘lni ta’mirlash"),
+    F("facts","Nima bo‘ldi","holat bayoni","textarea", group=GOV, hint="Ko‘chamizdagi yo‘l 2 yildan beri ta’mirlanmagan, yomg‘irdan keyin suv to‘planib qoladi."),
+    F("request","Nimani so‘raysiz","so‘rov yoki taklif","textarea", group=GOV, hint="yo‘lni 2027-yil ta’mirlash rejasiga kiritishni")
+  ],
+  docs=[
+    doc("ariza","Ariza", GEN_TO, "ARIZA", [GEN_SUBJ, "{{facts}}", GEN_LAW],
+        ["{{request}}","murojaatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."], GEN_ATT),
+    doc("taklif","Taklif", GEN_TO, "TAKLIF", [GEN_SUBJ, "{{facts}}", GEN_LAW],
+        ["{{request}}"], GEN_ATT, askLabel="Taklif qilaman:",
+        closing="Taklifim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishingizni so‘rayman."),
+    doc("shikoyat","Shikoyat", GEN_TO, "SHIKOYAT", [GEN_SUBJ, "{{facts}}", "Ushbu holat bilan huquq va qonuniy manfaatlarim buzilgan deb hisoblayman.", GEN_LAW],
+        ["{{request}}","shikoyatim ko‘rib chiqilishi natijasi to‘g‘risida menga qonunda belgilangan muddatda yozma javob berishni."],
+        GEN_ATT + ["Avvalgi murojaat va olingan javob nusxalari (bo‘lsa)"])
   ])
 
 

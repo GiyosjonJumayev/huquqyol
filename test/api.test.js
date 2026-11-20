@@ -9,7 +9,7 @@ const post = (p, b) => fetch(base + p, { method:"POST", headers:{ "Content-Type"
 
 test("GET /api/meta", async () => {
   const m = await (await fetch(base + "/api/meta")).json();
-  assert.equal(m.scenarios.length, 23);
+  assert.equal(m.scenarios.length, 24);
   assert.equal(m.domains.length, 12);
   assert.ok(!JSON.stringify(m).includes("keywords"));  // ichki ma’lumot chiqmaydi
 });
