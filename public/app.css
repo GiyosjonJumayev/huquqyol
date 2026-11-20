@@ -307,9 +307,15 @@ details.more{margin-top:10px}
 .nf p{color:var(--muted);margin:6px 0 22px}
 
 /* Qanday ishlaydi, ovoz, belgi hisoblagichi, muqobil holatlar */
-.how{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;padding:0;margin:-12px 0 26px;font-size:calc(14.5px * var(--fs));color:var(--ink)}
-.how li{display:flex;align-items:center;gap:8px}
-.how .hn{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:calc(12px * var(--fs));font-weight:700;background:var(--chip);color:var(--accent)}
+/* Qanday ishlaydi: 3 ta raqamli karta */
+.how{list-style:none;padding:0;margin:0 0 8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:none}
+.how li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);min-width:0}
+.how li > span:last-child{display:grid;gap:2px;min-width:0;overflow-wrap:anywhere}
+.how b{font-size:calc(16px * var(--fs))}
+.how li > span:last-child > span{color:var(--muted);font-size:calc(14px * var(--fs))}
+.how .hn{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:calc(17px * var(--fs));font-weight:700;background:var(--accent);color:var(--accent-ink)}
+@media (max-width:720px){.how{grid-template-columns:minmax(0,1fr)}}
+html[data-fs="2"] .how,html[data-fs="3"] .how{grid-template-columns:minmax(0,1fr)}
 .askact{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
 .kbd{font-size:calc(12.5px * var(--fs))}
 .kbd.count{font-variant-numeric:tabular-nums}
@@ -321,7 +327,7 @@ details.more{margin-top:10px}
 @media (prefers-reduced-motion:reduce){.btn.icon[aria-pressed="true"]{animation:none}}
 .alts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
 .alts .small{margin-right:2px}
-@media (max-width:560px){.kbd:not(.count){display:none}.how{flex-direction:column;gap:8px}}
+@media (max-width:560px){.kbd:not(.count){display:none}}
 
 /* ---- v3.4: bosh sahifa va oqim soddaligi ---- */
 .view{padding-top:8px}

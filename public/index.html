@@ -109,7 +109,14 @@
       <div class="pickhead" id="pickHead" hidden></div>
       <div class="domains" id="cases"><!--DOMAINS--></div>
     </div>
-    <ol class="how" aria-label="{{howLabel}}"><li><span class="hn">1</span>{{how1}}</li><li><span class="hn">2</span>{{how2}}</li><li><span class="hn">3</span>{{how3}}</li></ol>
+    <section class="howsec" aria-labelledby="howH">
+      <h2 class="sec" id="howH">{{howLabel}}</h2>
+      <ol class="how">
+        <li><span class="hn" aria-hidden="true">1</span><span><b>{{how1}}</b><span>{{howd1}}</span></span></li>
+        <li><span class="hn" aria-hidden="true">2</span><span><b>{{how2}}</b><span>{{howd2}}</span></span></li>
+        <li><span class="hn" aria-hidden="true">3</span><span><b>{{how3}}</b><span>{{howd3}}</span></span></li>
+      </ol>
+    </section>
   </section>
 
   <!-- 2. Reja -->
