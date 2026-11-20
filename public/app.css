@@ -650,3 +650,9 @@ html[data-fs="3"] .trust{grid-template-columns:minmax(0,1fr)}
 @media (max-width:900px){.pflow{grid-template-columns:minmax(0,1fr)}.pflow .arr{justify-self:center;transform:rotate(90deg)}}
 html[data-fs="2"] .pflow,html[data-fs="3"] .pflow{grid-template-columns:minmax(0,1fr)}
 html[data-fs="2"] .pflow .arr,html[data-fs="3"] .pflow .arr{justify-self:center;transform:rotate(90deg)}
+
+/* Footer: ko‘rinadigan ogohlantirish bloki */
+footer .disclaim{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;color:var(--ink);font-size:calc(14.5px * var(--fs))}
+footer .disclaim svg{flex:none;width:20px;height:20px;color:var(--warn);margin-top:2px}
+footer .disclaim p{margin:0}
+footer .checked{color:var(--ink)}
