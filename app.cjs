@@ -21,6 +21,8 @@ function loadEnv(file){
   }
 }
 loadEnv(path.join(__dirname, ".env"));
+// Sanalar Toshkent vaqti bo‘yicha hisoblanadi (hosting serveri UTC bo‘lsa ham). Aniq TZ berilgan bo‘lsa — o‘sha ustun.
+if (!process.env.TZ) process.env.TZ = "Asia/Tashkent";
 
 const [major, minor] = process.versions.node.split(".").map(Number);
 if (major < 18 || (major === 18 && minor < 18)){

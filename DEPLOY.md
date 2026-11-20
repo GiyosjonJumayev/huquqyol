@@ -39,7 +39,8 @@ Arxivni o‘zingiz yangidan yasash uchun: `npm run package`. Natija `dist/huquqy
 
 3. **Environment variables.** Shu sahifada qo‘shing:
    - `TRUST_PROXY` = `1` (shart: aks holda barcha foydalanuvchilar bitta IP bo‘lib ko‘rinadi);
-   - `ANTHROPIC_API_KEY` = kalitingiz (ixtiyoriy).
+   - `ANTHROPIC_API_KEY` = kalitingiz (ixtiyoriy);
+   - `TZ` = `Asia/Tashkent` (berilmasa ham `app.cjs` shuni o‘rnatadi; server UTC da bo‘lsa, tunda sanalar bir kun farq qilmasligi uchun).
 
    Yoki `~/huquqyol/.env` faylini `.env.example` asosida yarating.
 4. **Ishga tushirish.** **Create**, so‘ng **Restart** tugmasini bosing.
