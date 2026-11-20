@@ -32,6 +32,12 @@ test("Ruscha baza o‘zbekchaga to‘liq mos: tuzilma, kalitlar, matnlar", () =>
   for (const n of ru.NORMS) assert.ok(/[а-я]/i.test(n.title) && /[а-я]/i.test(n.text), n.id);
   assert.equal(ru.NORM_BY_ID.m333.article, "Статья 333");
   assert.equal(ru.NORM_BY_ID.muddat.article, "Статья 560");      // sudga murojaat muddatlari — MK 560-modda
+  assert.equal(ru.NORM_BY_ID.sud.article, "Статья 558");         // bevosita sudda ko‘riladigan nizolar — MK 558-modda
+  assert.equal(ru.NORM_BY_ID.m562.article, "Статья 562");        // sud xarajatlaridan ozod qilish — MK 562-modda
+  assert.match(ru.NORM_BY_ID.m562.text, /судебных расходов/);
+  assert.doesNotMatch(ru.NORM_BY_ID.muddat.text, /судебных расходов/);
+  assert.match(uz.NORM_BY_ID.m562.text, /sud xarajatlari/);
+  assert.doesNotMatch(uz.NORM_BY_ID.m562.text, /davlat boj/i);
 });
 
 test("Til aniqlash: tana → ?lang → cookie → Accept-Language", () => {

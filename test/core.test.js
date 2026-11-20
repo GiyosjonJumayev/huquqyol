@@ -59,7 +59,9 @@ test("333-modda: demo holati (9 mln, 3 oy, 2026-08-20 → 2026-11-20)", () => {
   assert.equal(p.calc.rows.length, 2);
   assert.match(p.calc.rows[1][1], /21\s173/);
   assert.match(p.calc.note, /1,4%/);
-  assert.match(p.calc.note, /lex\.uz\/acts\/-6257288/);
+  assert.match(p.calc.note, /Asosiy manba: https:\/\/lex\.uz\/acts\/-6257288/);
+  assert.match(p.calc.note, /Hisobchilar talqini \(buxgalter\.uz\)/);
+  assert.match(p.calc.rows[1][0], /^Hisobchilar talqini/);
   assert.doesNotMatch(JSON.stringify(p.calc), /211\s?726/);
 });
 

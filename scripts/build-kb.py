@@ -52,8 +52,9 @@ norm("m217","mk","217-modda","Har yilgi asosiy ta’til","Har bir xodim har yili
 norm("m218","mk","218-modda","Uzaytirilgan asosiy ta’til","18 yoshgacha bo‘lganlar va I–II guruh nogironligi bo‘lgan xodimlarga 30 kalendar kun, davlat hokimiyati va boshqaruvi organlari xodimlariga 27 kalendar kun.")
 norm("m220","mk","220-modda","Ish staji uchun qo‘shimcha ta’til","Bitta tashkilot yoki tarmoqda ishlangan har 5 yil uchun 2 kalendar kun, jami 8 kundan oshmaydigan qo‘shimcha ta’til beriladi.")
 norm("m231","mk","231-modda","Ta’tilni qismlarga bo‘lish","Ta’tilni qismlarga bo‘lish mumkin, lekin qismlardan biri kamida 14 kalendar kun bo‘lishi kerak.")
-norm("muddat","mk","560-modda","Sudga murojaat qilish muddatlari","Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi. Xodimlar sud xarajatlaridan ozod.")
-norm("sud","mk","34-bob","Bevosita sudda ko‘riladigan nizolar","Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi.")
+norm("muddat","mk","560-modda","Sudga murojaat qilish muddatlari","Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi.")
+norm("m562","mk","562-modda","Xodimlarni sud xarajatlaridan ozod qilish","Xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi.")
+norm("sud","mk","558-modda","Bevosita sudda ko‘riladigan nizolar","Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi.")
 norm("m9","mk","9-modda","Muddatlarni hisoblash","Muddat boshlanish sanasidan keyingi kundan hisoblanadi. Oylar bilan hisoblanadigan muddat oxirgi oyning tegishli sanasida tugaydi. Oxirgi kun ishlanmaydigan kunga to‘g‘ri kelsa, keyingi birinchi ish kuni muddat tugaydi.")
 
 # ---- Iste’molchi ----
@@ -151,7 +152,7 @@ def COURT_TO(extra=None):
 INTRO_NOW = "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman."
 INTRO_PAST = "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman."
 EMP_CLOSE = "Talabim qondirilmagan taqdirda Davlat mehnat inspeksiyasi va sudga murojaat qilishimni ma’lum qilaman."
-COURT_FEE = "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+COURT_FEE = "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
 def INSP_ASKS(mid): return ["ish beruvchi {{employer}} faoliyatida mehnat qonunchiligiga rioya etilishini tekshirishni;", mid, "aybdor mansabdor shaxslarni qonunda belgilangan javobgarlikka tortish masalasini ko‘rib chiqishni."]
 INSP_ATT = ["Ish beruvchiga berilgan talabnoma nusxasi", "Mehnat shartnomasi nusxasi"]
 COURT_ATT = ["Da’vo arizasining javobgar uchun nusxasi", "Pasport nusxasi", "Mehnat shartnomasi nusxasi"]
@@ -171,7 +172,7 @@ WAGE_P2 = "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga k
 scen(id="ish_haqi", domain="mehnat", title="Ish haqi to‘lanmayapti", card="Maosh kechikyapti yoki umuman berilmayapti", short="Ish haqi",
   lead="Ish beruvchi ish haqini oyiga kamida ikki marta to‘lashi shart. Kechiktirilgan har bir kun uchun sizga qo‘shimcha kompensatsiya tegadi.",
   keywords=["maosh","oylik","ish haqi","ish haqqi","zarplata","avans","bo‘nak","ish beruvchi"],
-  norms=["m253","m333","m25","muddat","m9"],
+  norms=["m253","m333","m25","muddat","m562","m9"],
   deadline={"months":6, "label":"Sudga murojaat uchun qoldi"}, trigger="Birinchi to‘lanmagan maosh sanasi",
   calc={"type":"labor333"}, partyField="employer", amountField="amount",
   steps=[{"org":"Ish beruvchi","t":"Yozma talabnoma bering","when":"Bugun","body":"2 nusxada; ikkinchisiga qabul belgisi va sana qo‘ydiring."},
@@ -195,7 +196,7 @@ DISM_P = "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat 
 scen(id="ishdan_boshatish", domain="mehnat", title="Noqonuniy ishdan bo‘shatishdi", card="Ogohlantirmasdan yoki asossiz bo‘shatishdi", short="Ishdan bo‘shatish",
   lead="Ish beruvchi sizni faqat qonunda sanalgan asos bilan va tartibga rioya qilib bo‘shatishi mumkin. Aks holda sud sizni ishga tiklaydi.",
   keywords=["bo‘shat","haydash","haydab","ishdan chiqar","uvol","ozod qil","qisqart","shtat","ishga tikla","ogohlantir"],
-  norms=["m161","m165","sud","muddat","m171","m9"],
+  norms=["m161","m165","sud","muddat","m562","m171","m9"],
   deadline={"months":3, "label":"Sudga murojaat uchun qoldi"}, trigger="Bo‘shatish buyrug‘i qo‘lingizga tekkan sana",
   calc=None, partyField="employer",
   steps=[{"org":"Ish beruvchi","t":"Buyruq va daftarchani so‘rang","when":"Darhol","body":"Buyruq nusxasini olgan sanani yozib qo‘ying: muddat shu kundan boshlanadi."},
@@ -217,7 +218,7 @@ LEAVE_INSP = "Mehnat kodeksining 217-moddasiga ko‘ra har bir xodim har yili ka
 scen(id="tatil", domain="mehnat", title="Ta’tilga chiqarishmayapti", card="Yillik ta’til berilmayapti yoki qisqartirildi", short="Ta’til",
   lead="Har bir xodim har yili kamida 21 kalendar kunlik haq to‘lanadigan ta’tilga haqli. Ish beruvchi uni bermasligi mumkin emas.",
   keywords=["ta’til","tatil","otpusk","dam ol"],
-  norms=["m217","m218","m220","m231","muddat"],
+  norms=["m217","m218","m220","m231","muddat","m562"],
   deadline={"months":6, "label":"Sudga murojaat uchun qoldi"}, trigger="Ta’til rad etilgan sana",
   calc=None, partyField="employer",
   steps=[{"org":"Ish beruvchi","t":"Ta’til so‘rab ariza yozing","when":"Bugun","body":"Kunlar soni va sanani ko‘rsating, ta’tillar grafigini so‘rang."},
@@ -238,7 +239,7 @@ CALC_P = "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish b
 scen(id="hisob_kitob", domain="mehnat", title="Bo‘shatganda hisob-kitob qilinmadi", card="Oxirgi pul yoki mehnat daftarcha berilmadi", short="Hisob-kitob",
   lead="Ishdan ketgan kuningiz barcha pul va mehnat daftarchasi berilishi shart. Kechiktirilgan har bir kun uchun kompensatsiya tegadi.",
   keywords=["hisob-kitob","hisob kitob","raschyot","rasschet","daftarcha","trudovoy","ishdan ketdim","ishdan ketganman","bo‘shab ketdim"],
-  norms=["hisob","m171","m333","muddat"],
+  norms=["hisob","m171","m333","muddat","m562"],
   deadline={"months":6, "label":"Sudga murojaat uchun qoldi"}, trigger="Oxirgi ish kuningiz",
   calc={"type":"labor333"}, partyField="employer", amountField="amount",
   steps=[{"org":"Ish beruvchi","t":"Hisob-kitobni yozma talab qiling","when":"Bugun","body":"Qonun bo‘yicha pul talabdan keyin 3 kun ichida to‘lanishi kerak."},

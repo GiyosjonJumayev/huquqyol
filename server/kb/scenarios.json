@@ -29,6 +29,7 @@
    "m333",
    "m25",
    "muddat",
+   "m562",
    "m9"
   ],
   "deadline": {
@@ -230,7 +231,7 @@
      "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlayman.",
      "{{trigger}}dan boshlab [?months]{{months}} oy davomida [/]menga ish haqi to‘lanmagan. Ish haqi bo‘yicha qarz miqdori {{amount}}ni tashkil etadi.",
      "O‘zbekiston Respublikasi Mehnat kodeksining 25 va 253-moddalariga ko‘ra ish beruvchi ish haqini har yarim oyda kamida bir marta, belgilangan muddatlarda to‘liq hajmda to‘lashi shart. Kodeksning 333-moddasiga muvofiq to‘lov kechiktirilgan har bir kun uchun ish beruvchi, aybi bor-yo‘qligidan qat’i nazar, pulli kompensatsiya to‘laydi.",
-     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+     "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
     "asks": [
@@ -322,6 +323,7 @@
    "m165",
    "sud",
    "muddat",
+   "m562",
    "m171",
    "m9"
   ],
@@ -427,7 +429,7 @@
     "body": [
      "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
      "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat shartnomasi bekor qilindi. Bo‘shatish qonuniy asossiz va belgilangan tartib buzilgan holda amalga oshirildi: Mehnat kodeksining 161-moddasiga ko‘ra ish beruvchi tashabbusi bilan bekor qilish asoslangan bo‘lishi, 165-moddaga ko‘ra esa xodim oldindan yozma ogohlantirilishi shart.",
-     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+     "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
     "asks": [
@@ -548,7 +550,8 @@
    "m218",
    "m220",
    "m231",
-   "muddat"
+   "muddat",
+   "m562"
   ],
   "deadline": {
    "months": 6,
@@ -766,7 +769,8 @@
    "hisob",
    "m171",
    "m333",
-   "muddat"
+   "muddat",
+   "m562"
   ],
   "deadline": {
    "months": 6,
@@ -963,7 +967,7 @@
     "body": [
      "Men, {{fio}}, {{employer}}da {{position}} lavozimida ishlaganman.",
      "{{trigger}}da men bilan mehnat shartnomasi bekor qilingan. Biroq ish beruvchi hozirgacha men bilan to‘liq hisob-kitob qilmagan[?amount] (qarz: {{amount}})[/] va mehnat daftarchasini (elektron ko‘chirmasini) bermagan. Mehnat kodeksiga ko‘ra barcha summalar shartnoma bekor qilingan kuni, xodim ishlamagan bo‘lsa, talabdan keyin 3 kun ichida to‘lanishi, 171-moddaga ko‘ra esa daftarcha va buyruq ko‘chirmasi o‘sha kuni berilishi shart.",
-     "Mehnat kodeksiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
+     "Mehnat kodeksining 562-moddasiga ko‘ra xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi. Sudga murojaat muddati ({{deadlineTerm}}) {{deadline}}da tugaydi."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
     "asks": [

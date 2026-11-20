@@ -27,8 +27,9 @@ export function riskLevel(daysLeft, total, lang = "uz"){
 // MK 333-modda (lex.uz/acts/-6257288): kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi.
 // Har oy qarzi o‘z to‘lov kunidan hisoblanadi.
 //   literal     — modda matni bo‘yicha (asosiy): qarz × stavka × 10% × kunlar (14% → kuniga 1,4%).
-//   alternative — muqobil talqin: stavka yillik deb olinib, kunlik ulushi: qarz × stavka × 10% ÷ 365 × kunlar.
+//   alternative — hisobchilar talqini (buxgalter.uz): stavka yillik deb olinib: qarz × stavka × 10% ÷ 365 × kunlar.
 export const MK333_URL = "https://lex.uz/acts/-6257288";
+export const MK333_ALT_SRC = "buxgalter.uz";
 export function compensation({ amount, months = 1, trigger, today = new Date(), rate = CB_RATE }){
   amount = num(amount);
   months = Math.max(1, Math.min(60, Math.round(Number(months) || 1)));
@@ -40,7 +41,7 @@ export function compensation({ amount, months = 1, trigger, today = new Date(), 
   }
   const perDay = rate / 100 * 0.10;                                          // stavkaning 10 foizi
   return { rate, maxDelayDays: maxDays, dailyPct: Math.round(rate * 10) / 100,
-    literal: Math.round(units * perDay), alternative: Math.round(units * perDay / 365), source: MK333_URL };
+    literal: Math.round(units * perDay), alternative: Math.round(units * perDay / 365), source: MK333_URL, altSource: MK333_ALT_SRC };
 }
 const dec = x => String(x).replace(".", ",");                                // uz va ru: o‘nlik vergul
 
@@ -51,8 +52,8 @@ export const alimonyShare = children => children > 0 ? SHARES[Math.min(3, childr
 const CT = {
   uz:{
     l333:"Sizga qo‘shimcha to‘lanishi kerak", l333in:"Qarzni kiriting", l333n0:"Kechiktirilgan har bir kun uchun kompensatsiya (MK 333-modda).",
-    l333lit:"MK 333-modda matni bo‘yicha", l333alt:"Muqobil talqin (stavka ÷ 365)",
-    l333n:(r, d) => `Qarz ustiga. MK 333-modda: kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi (${r}% × 10% = qarzning kuniga ${d}%). Ayrim hisobchilar stavkani yillik deb, 365 kunga bo‘lib hisoblaydi — shu sababli summa ancha kam chiqadi. Yakuniy summani sud belgilaydi. Manba: ${MK333_URL}`,
+    l333lit:"MK 333-modda matni bo‘yicha", l333alt:"Hisobchilar talqini (stavka ÷ 365)",
+    l333n:(r, d) => `Qarz ustiga. MK 333-modda: kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi (${r}% × 10% = qarzning kuniga ${d}%). Hisobchilar talqini (${MK333_ALT_SRC}): stavka yillik deb olinib, 365 kunga bo‘linadi — shu sababli summa ancha kam chiqadi. Yakuniy summani sud belgilaydi. Asosiy manba: ${MK333_URL}`,
     cp:"Sotuvchi to‘laydigan penya", cpIn:"Tovar narxini kiriting", cpN0:"Talab muddatida bajarilmasa, har kun uchun narxning 1 foizi (14–15-moddalar).",
     cpDay:m => `kuniga ${m}`, cpN1:"Sotuvchiga talab qo‘ygan sanani kiritsangiz, jami penya hisoblanadi. Almashtirish muddati — 7 kun.",
     cpNone:"Hali penya yo‘q", cpN2:(d, n, m) => `Sotuvchi ${d}gacha talabni bajarishi kerak (${n} kun qoldi). Keyin har kun uchun ${m}.`,
@@ -70,8 +71,8 @@ const CT = {
   },
   ru:{
     l333:"Вам дополнительно положено", l333in:"Введите сумму долга", l333n0:"Компенсация за каждый день задержки (ст. 333 ТК).",
-    l333lit:"По тексту ст. 333 ТК", l333alt:"Иное толкование (ставка ÷ 365)",
-    l333n:(r, d) => `Сверх долга. Ст. 333 ТК: за каждый день задержки — 10% ставки рефинансирования ЦБ (${r}% × 10% = ${d}% долга в день). Некоторые бухгалтеры считают ставку годовой и делят на 365 — тогда сумма значительно меньше. Окончательную сумму определяет суд. Источник: ${MK333_URL}`,
+    l333lit:"По тексту ст. 333 ТК", l333alt:"Толкование бухгалтеров (ставка ÷ 365)",
+    l333n:(r, d) => `Сверх долга. Ст. 333 ТК: за каждый день задержки — 10% ставки рефинансирования ЦБ (${r}% × 10% = ${d}% долга в день). Толкование бухгалтеров (${MK333_ALT_SRC}): ставка считается годовой и делится на 365 — тогда сумма значительно меньше. Окончательную сумму определяет суд. Основной источник: ${MK333_URL}`,
     cp:"Пеня, которую платит продавец", cpIn:"Введите цену товара", cpN0:"Если требование не исполнено в срок — 1% цены за каждый день (ст. 14–15).",
     cpDay:m => `${m} в день`, cpN1:"Укажите дату предъявления требования продавцу — посчитаем общую пеню. Срок замены — 7 дней.",
     cpNone:"Пени пока нет", cpN2:(d, n, m) => `Продавец должен исполнить требование до ${d} (осталось дней: ${n}). Затем — ${m} за каждый день.`,

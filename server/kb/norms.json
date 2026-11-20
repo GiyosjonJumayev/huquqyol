@@ -81,12 +81,19 @@
   "law": "mk",
   "article": "560-modda",
   "title": "Sudga murojaat qilish muddatlari",
-  "text": "Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi. Xodimlar sud xarajatlaridan ozod."
+  "text": "Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi."
+ },
+ {
+  "id": "m562",
+  "law": "mk",
+  "article": "562-modda",
+  "title": "Xodimlarni sud xarajatlaridan ozod qilish",
+  "text": "Xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi."
  },
  {
   "id": "sud",
   "law": "mk",
-  "article": "34-bob",
+  "article": "558-modda",
   "title": "Bevosita sudda ko‘riladigan nizolar",
   "text": "Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi."
  },

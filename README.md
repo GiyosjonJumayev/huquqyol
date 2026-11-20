@@ -22,7 +22,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 **Nimasi bilan ajralib turadi**
 
-- **Qonunni AI o‘ylab topmaydi.** 60 ta norma va 13 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
+- **Qonunni AI o‘ylab topmaydi.** 61 ta norma va 13 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
 - **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri; yakshanba yoki bayram kuni → keyingi ish kuni). Bayramlar ro‘yxati — `server/holidays.js`; Ramazon va Qurbon hayiti sanalari har yili rasmiy e’londan keyin qo‘shiladi (yoki `HOLIDAYS_EXTRA`).
 - **Keksalar uchun:** 4 darajali katta shrift va matnlarni ovozli o‘qish.
 - **Maxfiylik:** ariza ma’lumotlari faqat qurilmada; anonim statistika faqat sanoq — matn, IP, cookie saqlanmaydi.
@@ -47,7 +47,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 ```mermaid
 flowchart LR
   U[Fuqaro: matn / ovoz / soha] --> A["/api/analyze"]
-  A --> R[BM25 qidiruv + kalit so‘zlar<br/>60 norma, 23 holat]
+  A --> R[BM25 qidiruv + kalit so‘zlar<br/>61 norma, 23 holat]
   R --> C{Claude bormi?}
   C -- ha --> AI[Claude: tasniflash va faktlar<br/>faqat bazadagi normalar]
   C -- yo‘q --> RU[Qoidalar bo‘yicha tasniflash]
@@ -247,7 +247,7 @@ Shablon sintaksisi:
   - O‘RQ-501 (xususiy bandlik agentliklari), 15, 15¹, 17, 20-moddalar;
   - Markaziy bankning iste’molchilar huquqlarini himoya qilish xizmati: (71) 200-00-44 (cbu.uz).
 - Modda raqamisiz berilgan normalar (banklar to‘g‘risidagi qonundagi javobgarlik va bank siri; Markaziy bankka shikoyat) mazmuni bo‘yicha tekshirilgan, lekin amaldagi tahrirdagi modda raqami tasdiqlanmagan. Ijtimoiy nafaqa bo‘yicha alohida qonun normasi keltirilmagan: holat Murojaatlar to‘g‘risidagi qonun va ma’muriy sud tartibiga tayanadi.
-- 333-modda kompensatsiyasi: asosiy summa — modda matni bo‘yicha (kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi; 14% da qarzning kuniga 1,4%). Ikkinchi qatorda muqobil talqin (stavka yillik deb olinib, 365 ga bo‘linadi) ko‘rsatiladi. Yakuniy summani sud belgilaydi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
+- 333-modda kompensatsiyasi: asosiy summa — modda matni bo‘yicha (kechiktirilgan har bir kun uchun MB qayta moliyalash stavkasining 10 foizi; 14% da qarzning kuniga 1,4%). Ikkinchi qatorda hisobchilar talqini (buxgalter.uz: stavka yillik deb olinib, 365 ga bo‘linadi) ko‘rsatiladi. Yakuniy summani sud belgilaydi. Markaziy bank stavkasi `CB_RATE` (default 14%) orqali o‘rnatiladi.
 - **Bu huquqiy maslahat emas.** Ilova ma’lumot beradi va hujjat loyihasini tayyorlaydi.
 
 ## Ko‘p tillilik
