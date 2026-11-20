@@ -81,7 +81,7 @@ test("Kalkulyatorlar", () => {
 test("Yangi holatlar: muddatlar va OSGO qaror sanasi", () => {
   const p = (scenario, triggerDate) => buildPlan({ scenario, triggerDate, today });
   assert.equal(p("yhxx_jarima", "2026-11-01").deadline, "2026-11-11");
-  assert.equal(p("ijara_depozit", "2026-10-01").deadline, "2029-10-01");
+  assert.equal(p("ijara_depozit", "2026-10-01").deadline, "2029-10-02");   // 1-oktabr bayram → keyingi ish kuni
   assert.equal(p("pensiya", "2026-10-01").deadline, "2027-04-01");
   assert.equal(p("ijara_chiqarish", "2026-10-01").deadline, null);
   assert.ok(p("osgo", "2026-10-01").steps[1].when.includes("16-oktabr 2026-yil"));   // ariza + 15 kun

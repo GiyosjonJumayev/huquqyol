@@ -23,7 +23,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 **Nimasi bilan ajralib turadi**
 
 - **Qonunni AI o‘ylab topmaydi.** 60 ta norma va 13 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
-- **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri, dam olish kuni → keyingi ish kuni).
+- **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri; yakshanba yoki bayram kuni → keyingi ish kuni). Bayramlar ro‘yxati — `server/holidays.js`; Ramazon va Qurbon hayiti sanalari har yili rasmiy e’londan keyin qo‘shiladi (yoki `HOLIDAYS_EXTRA`).
 - **Keksalar uchun:** 4 darajali katta shrift va matnlarni ovozli o‘qish.
 - **Maxfiylik:** ariza ma’lumotlari faqat qurilmada; anonim statistika faqat sanoq — matn, IP, cookie saqlanmaydi.
 - **Internetsiz ishlaydi** (PWA): shriftlar, bilim bazasi va hujjat generatori loyiha ichida.

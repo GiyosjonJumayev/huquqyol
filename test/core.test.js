@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { addMonths, deadlineFrom, toISO } from "../server/dates.js";
+import { isHoliday } from "../server/holidays.js";
 import { buildPlan, compensation } from "../server/plan.js";
 import { rankScenarios, retrieve } from "../server/rag.js";
 import { extractFacts } from "../server/facts.js";
@@ -10,6 +11,23 @@ test("MK 9-modda: oy oxiri va yakshanba", () => {
   assert.equal(toISO(addMonths(new Date(2026, 0, 31), 1)), "2026-02-28");
   assert.equal(toISO(deadlineFrom(new Date(2026, 7, 31), 6)), "2027-03-01"); // 28-fev yakshanba → dushanba
   assert.equal(toISO(deadlineFrom(new Date(2026, 7, 4), 6)), "2027-02-04");
+});
+
+test("MK 9-modda: bayram kunlari — keyingi ish kuni", () => {
+  assert.equal(toISO(deadlineFrom(new Date(2026, 5, 8), 6)), "2026-12-09");     // 8-dek (Konstitutsiya kuni, seshanba) → 9-dek
+  assert.equal(toISO(deadlineFrom(new Date(2025, 8, 21), 6)), "2026-03-23");    // 21-mart (Navro‘z, shanba) + yakshanba → dushanba
+  assert.equal(toISO(deadlineFrom(new Date(2025, 8, 20), 6)), "2026-03-23");    // 20-mart Ramazon hayiti → 21 → 22 → 23
+  assert.equal(toISO(deadlineFrom(new Date(2025, 10, 27), 6)), "2026-05-28");   // Qurbon hayiti 2026-05-27
+  assert.equal(toISO(deadlineFrom(new Date(2026, 6, 1), { days:92 })), "2026-10-02"); // 1-oktabr → 2-oktabr
+  assert.ok(!isHoliday(new Date(2027, 2, 10)), "2027 ko‘chma bayramlari taxmin qilinmaydi");
+  const prev = process.env.HOLIDAYS_EXTRA;
+  try {
+    process.env.HOLIDAYS_EXTRA = "2027-03-10, 2027-05-16";
+    assert.ok(isHoliday(new Date(2027, 2, 10)) && isHoliday(new Date(2027, 4, 16)));
+    assert.equal(toISO(deadlineFrom(new Date(2026, 8, 10), 6)), "2027-03-11");
+  } finally {
+    if (prev === undefined) delete process.env.HOLIDAYS_EXTRA; else process.env.HOLIDAYS_EXTRA = prev;
+  }
 });
 
 test("Reja: muddat, xavf va qadamlar", () => {
