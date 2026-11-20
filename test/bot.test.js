@@ -122,7 +122,8 @@ test("Bot «boshqa»: bazada yo‘q — murojaat.gov.uz, yurxizmat.uz va sohalar
   await h.text("Соседская собака укусила меня");
   const p = h.last();
   assert.match(p.text, /murojaat\.gov\.uz/);
-  assert.match(p.text, /yurxizmat\.uz/);
+  assert.match(p.text, /Tayyor hujjat shablonlari: yurxizmat\.uz \(Adliya vazirligi «Adolat» markazi\)/);
+  assert.doesNotMatch(p.text, /Bepul yuridik yordam/);
   const areas = h.buttons(p).filter(b => b.startsWith("area:"));
   assert.equal(areas.length, 12);
   await h.press("area:mehnat");
@@ -164,8 +165,95 @@ test("Bot kirillcha: matn kirillda, buyruqlar va havolalar o‘zgarmaydi", async
   const p = h.last();
   assert.match(p.text, /<b>Ҳолат:<\/b> /);
   assert.match(p.text, /<b>Муддат: 92 кун қолди<\/b>/);
-  assert.match(p.text, /\/sana YYYY-MM-DD/);
+  assert.match(p.text, /Муддат тахминий/);
   assert.ok(!/<б>|<\/б>/.test(p.text));
+  await h.text("/help");
+  assert.match(h.last().text, /\/sana — /);
+  assert.match(h.last().text, /\/delete — /);
+  h.stop();
+});
+
+const WAGES = "Ish beruvchim 3 oydan beri maosh bermayapti, qarz 9 mln so‘m";
+
+test("Bot: sana kiritilmagan — «Muddat taxminiy», holatning sana ma’nosi va [Sanani kiritish]; tugmalar doim bor", async () => {
+  const h = harness();
+  await h.text(WAGES);
+  const p = h.last();
+  assert.match(p.text, /⚠️ Muddat taxminiy: sana kiritilmagan\./);
+  assert.match(p.text, /«Birinchi to‘lanmagan maosh sanasi» ni kiriting/);
+  assert.deepEqual(h.buttons(p).slice(0, 4), ["plan", "doc", "cal", "date"]);
+  await h.press("cal");
+  assert.match(h.docs().at(-1).payload.caption, /muddat taxminiy/);
+  await h.press("date");
+  assert.match(h.last().text, /«Birinchi to‘lanmagan maosh sanasi» ni yozing, masalan: 22\.08\.2026/);
+  h.stop();
+});
+
+test("Bot: /sana, keyin «22.08.2026» — sana sifatida o‘qiladi, holat saqlanadi", async () => {
+  const h = harness();
+  await h.text(WAGES);
+  await h.text("/sana");
+  assert.equal(h.sessions.get(42).awaiting, "date");
+  assert.match(h.last().text, /masalan: 22\.08\.2026/);
+  await h.text("22.08.2026");
+  const s = h.sessions.get(42);
+  assert.equal(s.scenario, "ish_haqi");
+  assert.equal(s.triggerDate, "2026-08-22");
+  assert.equal(s.form.amount, "9000000");                                // forma o‘chmagan
+  const p = h.last();
+  assert.match(p.text, /<b>Muddat: 94 kun qoldi<\/b>/);                   // 22.08.2026 + 6 oy = 22.02.2027 (dushanba)
+  assert.match(p.text, /Birinchi to‘lanmagan maosh sanasi: 22-avgust 2026-yil/);
+  assert.doesNotMatch(p.text, /taxminiy/);
+  assert.deepEqual(h.buttons(p), ["plan", "doc", "cal"]);
+  // D.M.YYYY ham
+  await h.text("/sana 2.9.2026");
+  assert.equal(h.sessions.get(42).triggerDate, "2026-09-02");
+  h.stop();
+});
+
+test("Bot: faol holatda oddiy «2026-08-22» — sana; noto‘g‘ri/kelajak sana va qisqa javob holatni o‘chirmaydi", async () => {
+  const h = harness();
+  await h.text(WAGES);
+  await h.text("2026-08-22");
+  assert.equal(h.sessions.get(42).triggerDate, "2026-08-22");
+  assert.match(h.last().text, /Muddat: 94 kun qoldi/);
+
+  await h.text("/sana");
+  await h.text("31.02.2026");                                             // mavjud bo‘lmagan sana
+  assert.match(h.last().text, /Sanani tushunmadim\. Shunday yozing: 22\.08\.2026/);
+  assert.equal(h.sessions.get(42).awaiting, "date");
+  await h.text("01.01.2099");
+  assert.match(h.last().text, /kelajakda bo‘lishi mumkin emas/);
+  assert.equal(h.sessions.get(42).triggerDate, "2026-08-22");
+  assert.equal(h.sessions.get(42).scenario, "ish_haqi");
+
+  await h.text("ha");                                                     // hali sana kutilmoqda → yana so‘raladi
+  assert.match(h.last().text, /Sanani tushunmadim/);
+  await h.press("plan");                                                  // boshqa tugma — sana kutish tugaydi
+  assert.equal(h.sessions.get(42).awaiting, undefined);
+  await h.text("ha");                                                     // qisqa javob — qayta tasniflanmaydi
+  assert.equal(h.sessions.get(42).scenario, "ish_haqi");
+  assert.match(h.sent().at(-2).payload.text, /Yangi holat bo‘lsa/);
+  assert.deepEqual(h.buttons(h.last()).slice(0, 3), ["plan", "doc", "cal"]);
+  h.stop();
+});
+
+test("Bot: ishonch past («qarzdorlik bor») — bitta aniqlashtiruvchi savol va 2–3 holat tugmasi", async () => {
+  const h = harness();
+  await h.text("qarzdorlik bor");
+  const p = h.last();
+  assert.match(p.text, /Aniqlashtiring: qaysi biri sizning holatingizga mos\?/);
+  const scn = h.buttons(p).filter(b => b.startsWith("scn:"));
+  assert.ok(scn.length >= 2 && scn.length <= 3, scn.join(","));
+  assert.ok(scn.includes("scn:qarz") && scn.includes("scn:kommunal_hisob"));
+  assert.ok(h.buttons(p).includes("other"));
+  assert.equal(h.sessions.get(42).scenario, undefined);                    // hali tanlanmagan
+  await h.press("scn:qarz");
+  assert.equal(h.sessions.get(42).scenario, "qarz");
+  assert.deepEqual(h.buttons(h.last()).slice(0, 3), ["plan", "doc", "cal"]);
+  // aniq matn — savolsiz
+  await h.text(WAGES);
+  assert.equal(h.sessions.get(42).scenario, "ish_haqi");
   h.stop();
 });
 

@@ -1,9 +1,8 @@
 // Telegram bot (grammY). Sessiya faqat xotirada, 1 soat; foydalanuvchi matni logga yozilmaydi.
 import { Bot, InlineKeyboard, InputFile } from "grammy";
 import { analyzeText, chooseScenario, summaryScreen, planScreen, recipientsScreen, makeDocuments, calendarFile,
-  startScreen, areaScreen, splitMessage, esc, base } from "./core.js";
+  startScreen, otherScreen, areaScreen, splitMessage, esc, parseDate, isShortReply, setDate, askDateScreen } from "./core.js";
 import { botT } from "./i18n.js";
-import { vPlan } from "../server/validate.js";
 import { msg } from "../server/i18n.js";
 import { LANGS } from "../public/i18n.js";
 
@@ -60,6 +59,9 @@ export function createBot(token, { botInfo, now = () => Date.now(), today = () =
   // Har bir ishlovchi: xato bo‘lsa — foydalanuvchiga qisqa xabar, logga faqat xato turi
   const safe = fn => async ctx => {
     const s = session(ctx.chat.id);
+    // «sana kutilmoqda» holatidan chiqish: boshqa tugma yoki /sana dan boshqa buyruq
+    const data = ctx.callbackQuery?.data, txt = ctx.message?.text || "";
+    if (s.awaiting === "date" && ((data && data !== "date") || (txt.startsWith("/") && !/^\/sana\b/.test(txt)))) delete s.awaiting;
     try { await fn(ctx, s); }
     catch (e) {
       if (e?.key) return void await ctx.reply(msg(s.lang, e.key, e.vars)).catch(() => {});   // foydalanuvchi xatosi (sana va h.k.)
@@ -86,14 +88,22 @@ export function createBot(token, { botInfo, now = () => Date.now(), today = () =
   bot.command("lang", safe(async (ctx, s) => { const sc = startScreen(s.lang); return send(ctx, { text: esc(botT(s.lang)("chooseLang")), keyboard: sc.keyboard }); }));
   bot.command("delete", safe(async (ctx, s) => { const lang = s.lang; sessions.delete(ctx.chat.id); return ctx.reply(botT(lang)("deleted")); }));
   bot.command("skip", needCase(async (ctx, s) => s.awaiting === "fio" ? generate(ctx, s) : send(ctx, summaryScreen(s, opts()))));
-  bot.command("sana", needCase(async (ctx, s) => {
-    const d = String(ctx.match || "").trim();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return ctx.reply(botT(s.lang)("dateUsage"));
-    vPlan({ scenario: s.scenario, triggerDate: d, lang: base(s.lang) });       // noto‘g‘ri yoki kelajakdagi sana — ValidationError
-    s.triggerDate = d;
+  // Sana: /sana 22.08.2026 — darhol; /sana — keyingi xabar sana sifatida o‘qiladi
+  const applyDate = async (ctx, s, iso) => {
+    setDate(s, iso);                                         // noto‘g‘ri/kelajakdagi sana — ValidationError, sessiya saqlanadi
     await ctx.reply(botT(s.lang)("dateSet"));
     return send(ctx, summaryScreen(s, opts()));
+  };
+  const askDate = (ctx, s) => { s.awaiting = "date"; return send(ctx, askDateScreen(s)); };
+  bot.command("sana", needCase(async (ctx, s) => {
+    const arg = String(ctx.match || "").trim();
+    if (!arg) return askDate(ctx, s);
+    const d = parseDate(arg);
+    if (!d){ s.awaiting = "date"; return ctx.reply(botT(s.lang)("badDate")); }
+    return applyDate(ctx, s, d);
   }));
+  bot.callbackQuery("date", needCase(async (ctx, s) => { await ctx.answerCallbackQuery(); return askDate(ctx, s); }));
+  bot.callbackQuery("other", safe(async (ctx, s) => { await ctx.answerCallbackQuery(); delete s.pending; return send(ctx, otherScreen(s.lang)); }));
 
   bot.callbackQuery(/^lang:(\w+)$/, safe(async (ctx, s) => {
     await ctx.answerCallbackQuery();
@@ -125,6 +135,12 @@ export function createBot(token, { botInfo, now = () => Date.now(), today = () =
     const text = ctx.message.text;
     if (text.startsWith("/")) return send(ctx, { text: botT(s.lang)("help") });        // noma’lum buyruq
     if (s.awaiting === "fio" && s.scenario){ s.form.fio = text.trim().slice(0, 200); return generate(ctx, s); }
+    if (s.scenario){                                          // faol holat: sana yoki qisqa javob holatni o‘chirmaydi
+      const d = parseDate(text);
+      if (d) return applyDate(ctx, s, d);
+      if (s.awaiting === "date") return ctx.reply(botT(s.lang)("badDate"));
+      if (isShortReply(text)){ await ctx.reply(botT(s.lang)("shortReply")); return send(ctx, summaryScreen(s, opts())); }
+    }
     await ctx.replyWithChatAction("typing").catch(() => {});
     return send(ctx, await analyzeText(s, text, opts()));
   }));

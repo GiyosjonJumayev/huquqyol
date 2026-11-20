@@ -34,6 +34,32 @@ export function alternatives(a, chosen){
   return ranked.filter(r => r.id !== chosen && r.keywordHits > 0 && r.score >= top * (a.confidence < 0.5 ? 0.4 : 0.5)).slice(0, 2).map(r => r.id);
 }
 
+// Sana: 22.08.2026, 2.8.2026, 22/08/2026, 2026-08-22 → "2026-08-22"; aks holda null (31.02 kabi mavjud bo‘lmagan sana ham)
+export function parseDate(text){
+  const t = String(text ?? "").trim();
+  let y, m, d, r;
+  if ((r = /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/.exec(t))) [d, m, y] = [r[1], r[2], r[3]].map(Number);
+  else if ((r = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(t))) [y, m, d] = [r[1], r[2], r[3]].map(Number);
+  else return null;
+  const x = new Date(y, m - 1, d);
+  return x.getFullYear() === y && x.getMonth() === m - 1 && x.getDate() === d ? iso(x) : null;
+}
+// Juda qisqa javob («ha», «ok», «3») — yangi holat deb tasniflanmaydi
+export const isShortReply = text => { const t = String(text ?? "").trim(); return t.length < 8 || t.split(/\s+/).length < 2; };
+
+// Ishonch past: kam ishonch yoki faqat bitta kalit so‘z bilan zaif moslik («qarzdorlik bor» — kim kimga qarzdor?)
+export const needsClarify = a => {
+  if (!a.source || a.source === "choice") return false;
+  const top = (a.retrieval?.scenarios || []).find(r => r.id === a.scenario);
+  return a.confidence < 0.5 || (!!top && top.keywordHits <= 1 && top.score < 8);
+};
+export function clarifyScreen(sess, a){
+  const T = botT(sess.lang), ranked = a.retrieval?.scenarios || [], top = ranked[0]?.score || 0;
+  const ids = ranked.filter(r => r.score > 0 && (r.keywordHits > 0 || r.score >= top * 0.4)).slice(0, 3).map(r => r.id);
+  if (!ids.includes(a.scenario)) ids.unshift(a.scenario);
+  return { text: esc(T("clarify")), keyboard: [...ids.slice(0, 3).map(id => [btn(title(id, sess.lang), `scn:${id}`)]), [btn(T("bOther"), "other")]] };
+}
+
 // Telegram xabari 4096 belgigacha — qatorlar bo‘yicha bo‘lamiz
 export function splitMessage(text, max = 4000){
   const parts = []; let cur = "";
@@ -61,22 +87,41 @@ export async function analyzeText(sess, text, { today = new Date() } = {}){
   catch (e) { if (e.key) return { text: msg(sess.lang, e.key, e.vars) }; throw e; }
   const a = await analyze(v.text, base(sess.lang));
   if (a.scenario === "boshqa"){ resetCase(sess); return otherScreen(sess.lang); }
+  if (needsClarify(a)){                                   // bittasini taxmin qilmaymiz — so‘raymiz
+    resetCase(sess);
+    sess.pending = { facts: a.facts || { form:{} } };
+    return clarifyScreen(sess, a);
+  }
   return chooseScenario(sess, a.scenario, a, { today });
 }
 
 export function resetCase(sess){
-  delete sess.scenario; delete sess.triggerDate; delete sess.recipient; delete sess.awaiting; delete sess.alts;
+  for (const k of ["scenario", "triggerDate", "dateGiven", "recipient", "awaiting", "alts", "pending"]) delete sess[k];
   sess.form = {};
 }
 
-export function chooseScenario(sess, id, a = { source:"choice", facts:{ form:{} } }, { today = new Date() } = {}){
+export function chooseScenario(sess, id, a, { today = new Date() } = {}){
   const s = scenarioOf(id, sess.lang); if (!s) return otherScreen(sess.lang);
+  a ||= { source:"choice", facts: sess.pending?.facts || { form:{} } };     // aniqlashtirishdan keyin — matndan olingan faktlar saqlanadi
   resetCase(sess);
   sess.scenario = s.id;
   sess.form = { ...(a.facts?.form || {}) };
   sess.triggerDate = defaultTrigger(s, a.facts, today);
+  sess.dateGiven = !!a.facts?.eventDate;
   sess.alts = alternatives(a, s.id);
   return summaryScreen(sess, { today });
+}
+
+// Sana kiritildi: dvigatel tekshiruvi (noto‘g‘ri, kelajakdagi yoki juda eski sana — ValidationError, sessiya saqlanadi)
+export function setDate(sess, isoDate){
+  vPlan({ scenario: sess.scenario, triggerDate: isoDate, lang: base(sess.lang) });
+  sess.triggerDate = isoDate;
+  sess.dateGiven = true;
+  delete sess.awaiting;
+}
+export function askDateScreen(sess){
+  const s = scenarioOf(sess.scenario, sess.lang);
+  return { text: esc(botT(sess.lang)("askDate", { label: sess.lang === "cyr" ? cyr(s.trigger) : s.trigger })) };
 }
 
 export function summaryScreen(sess, { today = new Date() } = {}){
@@ -87,11 +132,13 @@ export function summaryScreen(sess, { today = new Date() } = {}){
   if (sess.form.months) facts.push(T("months", { n: sess.form.months }));
   if (facts.length) lines.push(`${esc(T("fromText"))}: ${esc(facts.join(", "))}`);
   lines.push("", deadlineLine(p, sess.lang));
-  lines.push(esc(T("counted", { date: fmtDate(new Date(p.trigger + "T00:00:00"), sess.lang), label: p.info.trigger })));
+  const tDate = fmtDate(new Date(p.trigger + "T00:00:00"), sess.lang);
+  lines.push(esc(sess.dateGiven ? T("counted", { date: tDate, label: p.info.trigger }) : T("estimated", { date: tDate, label: p.info.trigger })));
   const c = p.calc;
   if (c && (c.raw || c.rows)) lines.push("", `${esc(c.title)}: <b>${esc(c.value)}</b>`, ...(c.rows ? c.rows.map(([k, val]) => `• ${esc(k)}: ${esc(val)}`) : []));
   lines.push("", `<i>${esc(T("disclaimer"))}</i>`);
-  const keyboard = [[btn(T("bPlan"), "plan"), btn(T("bDoc"), "doc"), btn(T("bCal"), "cal")]];
+  const keyboard = [[btn(T("bPlan"), "plan"), btn(T("bDoc"), "doc"), btn(T("bCal"), "cal")]];   // har doim
+  if (!sess.dateGiven) keyboard.push([btn(T("bDate"), "date")]);
   if (sess.alts?.length){ lines.push("", esc(T("alts"))); keyboard.push(sess.alts.map(id => btn(title(id, sess.lang), `scn:${id}`))); }
   return { text: lines.join("\n"), keyboard };
 }
@@ -146,8 +193,10 @@ export async function makeDocuments(sess, { today = new Date() } = {}){
 // 5-ekran: kalendar (.ics) — saytdagi eksport bilan bir xil tarkib
 export function calendarFile(sess, { today = new Date(), siteUrl = "" } = {}){
   const p = planFor(sess, today);
-  if (!p.deadline) return { text: esc(botT(sess.lang)("calNone")) };
-  return { file: { name: `HuquqYol-${p.scenario}-${p.deadline}.ics`, data: Buffer.from(buildIcs(p, makeT(sess.lang), { today, siteUrl }), "utf8") }, caption: botT(sess.lang)("calCaption") };
+  const T = botT(sess.lang);
+  if (!p.deadline) return { text: esc(T("calNone")) };
+  return { file: { name: `HuquqYol-${p.scenario}-${p.deadline}.ics`, data: Buffer.from(buildIcs(p, makeT(sess.lang), { today, siteUrl }), "utf8") },
+    caption: T("calCaption") + (sess.dateGiven ? "" : "\n" + T("calEstimated")) };
 }
 
 // «boshqa»: bazada yo‘q holat — sohalar

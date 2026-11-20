@@ -16,8 +16,8 @@ const M = {
   langSet:{ uz:"Til: O‘zbek (lotin). Endi muammoingizni yozing.", ru:"Язык: русский. Теперь опишите вашу проблему." },
   langSetCyr:{ uz:"Til: O‘zbek (kirill). Endi muammoingizni yozing.", ru:"Til: O‘zbek (kirill)." },
   help:{
-    uz:"Muammoingizni bir-ikki gap bilan yozing, masalan: <i>«Ish beruvchi 3 oydan beri 9 mln so‘m maosh bermayapti»</i>.\n\n/start — boshlash\n/lang — tilni almashtirish\n/sana YYYY-MM-DD — hisob boshlanadigan sanani o‘zgartirish\n/delete — bot xotirasidagi ma’lumotlarni o‘chirish\n/help — yordam",
-    ru:"Опишите проблему в одном-двух предложениях, например: <i>«Работодатель 3 месяца не платит зарплату, долг 9 млн сум»</i>.\n\n/start — начать\n/lang — сменить язык\n/sana ГГГГ-ММ-ДД — изменить дату, от которой считается срок\n/delete — удалить данные из памяти бота\n/help — помощь" },
+    uz:"Muammoingizni bir-ikki gap bilan yozing, masalan: <i>«Ish beruvchi 3 oydan beri 9 mln so‘m maosh bermayapti»</i>.\n\n/start — boshlash\n/lang — tilni almashtirish\n/sana — muddat hisoblanadigan sanani kiritish (masalan 22.08.2026)\n/delete — bot xotirasidagi ma’lumotlarni o‘chirish\n/help — yordam",
+    ru:"Опишите проблему в одном-двух предложениях, например: <i>«Работодатель 3 месяца не платит зарплату, долг 9 млн сум»</i>.\n\n/start — начать\n/lang — сменить язык\n/sana — указать дату, от которой считается срок (например 22.08.2026)\n/delete — удалить данные из памяти бота\n/help — помощь" },
   deleted:{ uz:"Ma’lumotlaringiz bot xotirasidan o‘chirildi.", ru:"Ваши данные удалены из памяти бота." },
   rate:{ uz:"Juda ko‘p xabar. Bir daqiqadan keyin qayta yozing.", ru:"Слишком много сообщений. Напишите через минуту." },
   expired:{ uz:"Avvalgi holat eskirgan yoki o‘chirilgan. Muammoingizni qayta yozing.", ru:"Предыдущая ситуация устарела или удалена. Опишите проблему заново." },
@@ -32,7 +32,15 @@ const M = {
   lastDay:{ uz:"oxirgi kun — {date}", ru:"последний день — {date}" },
   expiredDays:{ uz:"Muddat o‘tgan ({n} kun oldin)", ru:"Срок истёк ({n} дн. назад)" },
   noDeadline:{ uz:"Qat’iy muddat yo‘q", ru:"Жёсткого срока нет" },
-  counted:{ uz:"Hisob sanasi: {date} ({label}). Boshqa sana bo‘lsa: /sana YYYY-MM-DD", ru:"Дата отсчёта: {date} ({label}). Если другая: /sana ГГГГ-ММ-ДД" },
+  counted:{ uz:"{label}: {date}. O‘zgartirish: /sana", ru:"{label}: {date}. Изменить: /sana" },
+  estimated:{ uz:"⚠️ Muddat taxminiy: sana kiritilmagan. Hisob {date} dan olindi. To‘g‘ri hisob uchun «{label}» ni kiriting.", ru:"⚠️ Срок примерный: дата не указана. Расчёт от {date}. Для точного расчёта укажите: «{label}»." },
+  bDate:{ uz:"📅 Sanani kiritish", ru:"📅 Указать дату" },
+  askDate:{ uz:"«{label}» ni yozing, masalan: 22.08.2026", ru:"Напишите: «{label}», например: 22.08.2026" },
+  badDate:{ uz:"Sanani tushunmadim. Shunday yozing: 22.08.2026 (yoki 2026-08-22).", ru:"Не понял дату. Напишите так: 22.08.2026 (или 2026-08-22)." },
+  shortReply:{ uz:"Yangi holat bo‘lsa, uni bir-ikki gap bilan yozing. Joriy holat:", ru:"Если это новая ситуация, опишите её в одном-двух предложениях. Текущая ситуация:" },
+  clarify:{ uz:"Aniqlashtiring: qaysi biri sizning holatingizga mos?", ru:"Уточните: какая ситуация ваша?" },
+  bOther:{ uz:"Boshqa", ru:"Другое" },
+  calEstimated:{ uz:"Diqqat: sana kiritilmagan, muddat taxminiy.", ru:"Внимание: дата не указана, срок примерный." },
   disclaimer:{ uz:"Bu yo‘l xaritasi, yuridik maslahat emas.", ru:"Это дорожная карта, а не юридическая консультация." },
   alts:{ uz:"Boshqa holat bo‘lishi mumkin:", ru:"Возможно, другая ситуация:" },
 
@@ -60,10 +68,9 @@ const M = {
   calCaption:{ uz:"Faylni oching — telefon kalendariga oxirgi kun va 3 kun oldingi eslatma qo‘shiladi.", ru:"Откройте файл — в календарь добавится последний день и напоминание за 3 дня." },
 
   dateSet:{ uz:"Sana o‘zgartirildi.", ru:"Дата изменена." },
-  dateUsage:{ uz:"Format: /sana 2026-08-20", ru:"Формат: /sana 2026-08-20" },
 
   other:{ uz:"Bu holat hozircha bot bazasida yo‘q.", ru:"Этой ситуации пока нет в базе бота." },
-  otherWhere:{ uz:"Davlat idorasiga murojaat: murojaat.gov.uz\nBepul yuridik yordam: yurxizmat.uz\n\nYoki sohani tanlang:", ru:"Обращение в госорган: murojaat.gov.uz\nБесплатная юридическая помощь: yurxizmat.uz\n\nИли выберите сферу:" },
+  otherWhere:{ uz:"Davlat idorasiga murojaat: murojaat.gov.uz\nTayyor hujjat shablonlari: yurxizmat.uz (Adliya vazirligi «Adolat» markazi)\n\nYoki sohani tanlang:", ru:"Обращение в госорган: murojaat.gov.uz\nГотовые шаблоны документов: yurxizmat.uz (центр «Адолат» Министерства юстиции)\n\nИли выберите сферу:" },
   pickScenario:{ uz:"Holatni tanlang:", ru:"Выберите ситуацию:" }
 };
 
@@ -75,7 +82,7 @@ export function botT(lang){
   const l = lang === "ru" ? "ru" : "uz";
   return (key, vars = {}) => {
     const m = M[key]; if (!m) return key;
-    const s = m[l].replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
+    const s = m[l].replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "").replace(/г\.\./g, "г.");   // «2026 г.» + «.»
     return lang === "cyr" ? cyr(s) : s;
   };
 }
