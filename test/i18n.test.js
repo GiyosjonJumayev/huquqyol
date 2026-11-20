@@ -31,6 +31,7 @@ test("Ruscha baza o‘zbekchaga to‘liq mos: tuzilma, kalitlar, matnlar", () =>
   }
   for (const n of ru.NORMS) assert.ok(/[а-я]/i.test(n.title) && /[а-я]/i.test(n.text), n.id);
   assert.equal(ru.NORM_BY_ID.m333.article, "Статья 333");
+  assert.equal(ru.NORM_BY_ID.muddat.article, "Статья 560");      // sudga murojaat muddatlari — MK 560-modda
 });
 
 test("Til aniqlash: tana → ?lang → cookie → Accept-Language", () => {
