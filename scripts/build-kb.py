@@ -19,6 +19,7 @@ LAWS = {
   "mfo":  {"name":"Mikromoliya faoliyati to‘g‘risidagi qonun", "full":"«Nobank kredit tashkilotlari va mikromoliya faoliyati to‘g‘risida»gi Qonun (O‘RQ-765, 20.04.2022)", "url":"https://lex.uz/acts/5972413"},
   "osgo": {"name":"OSGO to‘g‘risidagi qonun", "full":"«Transport vositalari egalarining fuqarolik javobgarligini majburiy sug‘urta qilish to‘g‘risida»gi Qonun (O‘RQ-155, 21.04.2008)", "url":"https://lex.uz/acts/1342476"},
   "pens": {"name":"Pensiya ta’minoti to‘g‘risidagi qonun", "full":"«Fuqarolarning davlat pensiya ta’minoti to‘g‘risida»gi Qonun (938-XII, 03.09.1993)", "url":"https://lex.uz/acts/112312"},
+  "med":  {"name":"Mediatsiya to‘g‘risidagi qonun", "full":"«Mediatsiya to‘g‘risida»gi Qonun (O‘RQ-482, 03.07.2018)", "url":"https://lex.uz/docs/3805229"},
   "xab":  {"name":"Xususiy bandlik agentliklari to‘g‘risidagi qonun", "full":"«Xususiy bandlik agentliklari to‘g‘risida»gi Qonun (O‘RQ-501, 16.10.2018)", "url":"https://lex.uz/docs/3992894"}
 }
 
@@ -55,6 +56,7 @@ norm("m231","mk","231-modda","Ta’tilni qismlarga bo‘lish","Ta’tilni qismla
 norm("muddat","mk","560-modda","Sudga murojaat qilish muddatlari","Ishga tiklash bo‘yicha: bo‘shatish buyrug‘i ko‘chirmasi berilgan kundan 3 oy. Boshqa mehnat nizolari bo‘yicha: huquq buzilganini bilgan kundan 6 oy. Nizo mediatsiyada ko‘rilayotgan davrda muddat to‘xtab turadi.")
 norm("m562","mk","562-modda","Xodimlarni sud xarajatlaridan ozod qilish","Xodimlar yakka tartibdagi mehnat nizolari bo‘yicha sudga murojaat qilganda sud xarajatlaridan ozod qilinadi.")
 norm("sud","mk","558-modda","Bevosita sudda ko‘riladigan nizolar","Ishga tiklash, bo‘shatish sanasi yoki asosini o‘zgartirish, majburiy progul haqi bo‘yicha nizolar, shuningdek ish joyida mehnat nizolari komissiyasi bo‘lmasa, nizo to‘g‘ridan-to‘g‘ri sudda ko‘riladi.")
+norm("med7","med","7-modda","Mediatsiyaning ixtiyoriyligi","Mediatsiya tomonlarning o‘zaro ixtiyoriy roziligi bilan qo‘llaniladi. Tomonlar mediatsiyadan uning istalgan bosqichida voz kechishi mumkin. Mediatsiya jarayonida yarashishga majburlash taqiqlanadi.")
 norm("m9","mk","9-modda","Muddatlarni hisoblash","Muddat boshlanish sanasidan keyingi kundan hisoblanadi. Oylar bilan hisoblanadigan muddat oxirgi oyning tegishli sanasida tugaydi. Oxirgi kun ishlanmaydigan kunga to‘g‘ri kelsa, keyingi birinchi ish kuni muddat tugaydi.")
 
 # ---- Iste’molchi ----
@@ -939,6 +941,48 @@ scen(id="murojaat_umumiy", domain="davlat", title="Davlat idorasiga ariza, takli
   ])
 
 
+# ===== MEDIATSIYA (ixtiyoriy qadam + mediatsiya taklifi xati) =====
+# «Mediatsiya to‘g‘risida»gi Qonun (ZRU-482): 7-modda — ixtiyoriylik; 22-modda — mediatorni tomonlar birgalikda tanlaydi.
+# Sud muddati to‘xtashi faqat mehnat nizolari uchun aytiladi (MK 560-modda). Boshqa holatlarda bu da’vo qilinmaydi.
+MED_LABOR = {"ish_haqi", "hisob_kitob", "tatil"}
+MED_DISPUTE = {
+  "ish_haqi": "ish haqi to‘lanmagani[?amount] (qarz: {{amount}})[/]",
+  "hisob_kitob": "bo‘shatishdagi hisob-kitob[?amount] (qarz: {{amount}})[/]",
+  "tatil": "mehnat ta’tili berilmagani",
+  "nuqsonli_tovar": "sotib olingan {{product}}dagi nuqson[?price] (narxi: {{price}})[/]",
+  "ijara_depozit": "ijara garov puli[?deposit] ({{deposit}})[/] qaytarilmagani",
+  "qarz": "qarz[?amount] ({{amount}})[/] qaytarilmagani",
+  "kommunal_hisob": "{{service}} xizmati uchun hisob[?overcharge] (ortiqcha hisoblangan summa: {{overcharge}})[/]",
+}
+MED_VOLUNTARY = "Mediatsiya ixtiyoriy: tomonlar undan istalgan bosqichda voz kechishi mumkin (Mediatsiya to‘g‘risidagi qonun, 7-modda)."
+MED_PAUSE = "Nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi (MK 560-modda)."
+def med_step(labor):
+    body = "Ikkala tomon rozi bo‘lsa, nizoni ular birgalikda tanlagan mediator yordamida sudsiz hal qilish mumkin. " + MED_VOLUNTARY + " "
+    body += (MED_PAUSE + " Ish beruvchiga «Mediatsiya taklifi» xatini yuboring.") if labor else \
+            "Sudga murojaat muddatini kuzatib boring: kelishuvga erishilmasa, sudga o‘z vaqtida murojaat qiling. Qarshi tomonga «Mediatsiya taklifi» xatini yuboring."
+    return {"org":"Mediator", "t":"Mediator orqali kelishib ko‘ring (ixtiyoriy)", "when":"Sudga murojaat qilishdan oldin", "body": body}
+def med_doc(sc):
+    labor = sc["id"] in MED_LABOR
+    body = ["O‘rtamizda " + MED_DISPUTE[sc["id"]] + " bo‘yicha kelishmovchilik mavjud.",
+            "Nizoni sudga murojaat qilmasdan, tinch yo‘l bilan hal qilish maqsadida uni mediatsiya orqali — ikkala tomon birgalikda tanlaydigan mustaqil mediator ishtirokida ko‘rib chiqishni taklif qilaman. Mediatsiya ixtiyoriy bo‘lib, tomonlar undan istalgan bosqichda voz kechishi mumkin («Mediatsiya to‘g‘risida»gi Qonun, 7-modda)."]
+    if labor: body.append("Mehnat kodeksining 560-moddasiga ko‘ra nizo mediatsiyada ko‘rilayotgan davrda sudga murojaat qilish muddati to‘xtab turadi.")
+    body.append("Taklifimga ushbu xatni olgan kundan boshlab 10 kun ichida yozma javob berishingizni so‘rayman. Bu muddat qonunda belgilangan emas — u taklif sifatida ko‘rsatilmoqda.")
+    return doc("mediatsiya", "Mediatsiya taklifi", list(sc["docs"][0]["to"]), "TAKLIF", body,
+               ["nizoni mediatsiya orqali hal qilishga roziligingizni yozma ravishda bildirishni;",
+                "mediator nomzodi, uchrashuv vaqti va joyini birgalikda kelishib olishni."],
+               ["Nizoga oid hujjatlar nusxalari (bo‘lsa)"], sub="nizoni mediatsiya orqali hal qilish to‘g‘risida", askLabel="Taklif qilaman:",
+               closing="Kelishuvga erishilmasa, huquqlarimni qonunda belgilangan boshqa yo‘llar bilan himoya qilishimni ma’lum qilaman.")
+for sc in S:
+    if sc["id"] not in MED_DISPUTE: continue
+    ci = next(i for i, st in enumerate(sc["steps"]) if st["org"] == "Sud")
+    sc["steps"].insert(ci, med_step(sc["id"] in MED_LABOR))
+    di = next((i for i, d in enumerate(sc["docs"]) if d["id"] == "court"), len(sc["docs"]))
+    first = sc["docs"][0]["id"]
+    sc["docs"].insert(di, med_doc(sc))
+    for f in sc["fields"]:                       # xat manzilidagi maydonlar (masalan, rahbar F.I.Sh.) shu xatda ham ko‘rinsin
+        if f.get("docs") and first in f["docs"]: f["docs"] = f["docs"] + ["mediatsiya"]
+    sc["norms"] = sc["norms"] + ["med7"]
+
 # ---------- «Qanday topshiriladi» ----------
 L_SUD = {"label":"Sudlarning interaktiv xizmatlari — my.sud.uz", "url":"https://my.sud.uz/"}
 L_PM = {"label":"Prezidentning virtual qabulxonasi — pm.gov.uz", "url":"https://pm.gov.uz/"}
@@ -978,7 +1022,7 @@ FEE = {
 }
 # Hujjat turi va sud boji turi (ruscha baza ham shu funksiyalardan foydalanadi)
 FINE_IDS = {"jarima", "yhxx_jarima"}
-PRIVATE_DOCS = {"employer","seller","debtor","landlord","provider","bank","lender","insurer","recruiter"}
+PRIVATE_DOCS = {"mediatsiya","employer","seller","debtor","landlord","provider","bank","lender","insurer","recruiter"}
 def howto_kind(sc, d):
     if sc["id"] in FINE_IDS: return "fine"
     if d["id"] in PRIVATE_DOCS: return "private"

@@ -22,7 +22,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 **Nimasi bilan ajralib turadi**
 
-- **Qonunni AI o‘ylab topmaydi.** 61 ta norma va 13 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
+- **Qonunni AI o‘ylab topmaydi.** 62 ta norma va 14 ta idora ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat tasniflaydi; muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa ham ilova to‘liq ishlaydi.
 - **Muddat qonun bo‘yicha hisoblanadi** (MK 9-modda: oy oxiri; yakshanba yoki bayram kuni → keyingi ish kuni). Bayramlar ro‘yxati — `server/holidays.js`; Ramazon va Qurbon hayiti sanalari har yili rasmiy e’londan keyin qo‘shiladi (yoki `HOLIDAYS_EXTRA`).
 - **Keksalar uchun:** 4 darajali katta shrift va matnlarni ovozli o‘qish.
 - **Maxfiylik:** ariza ma’lumotlari faqat qurilmada; anonim statistika faqat sanoq — matn, IP, cookie saqlanmaydi.
@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 61 (54 tasi modda raqami bilan) | 56 × 3 til = 168 | 123 | 13 | 5 | 72 unit + 10 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 76 unit + 10 brauzer |
 
 ## Ko‘rinishlar
 
@@ -47,7 +47,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 ```mermaid
 flowchart LR
   U[Fuqaro: matn / ovoz / soha] --> A["/api/analyze"]
-  A --> R[BM25 qidiruv + kalit so‘zlar<br/>61 norma, 24 holat]
+  A --> R[BM25 qidiruv + kalit so‘zlar<br/>62 norma, 24 holat]
   R --> C{Claude bormi?}
   C -- ha --> AI[Claude: tasniflash va faktlar<br/>faqat bazadagi normalar]
   C -- yo‘q --> RU[Qoidalar bo‘yicha tasniflash]

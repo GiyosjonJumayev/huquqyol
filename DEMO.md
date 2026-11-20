@@ -30,7 +30,7 @@ Bu fayl sahnaga chiqishdan oldin o‘qiladi. Uch qism: **pitch (3 daqiqa)**, **j
 4. **tayyor arizani** Word yoki PDF qilib beradi — ish beruvchiga, inspeksiyaga yoki sudga.»
 
 **Nega ishonchli (40 soniya).**
-«Qonun matnini AI o‘ylab topmaydi. 61 ta norma va 13 ta idoraning aloqa ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat vaziyatni tasniflaydi; muddat, summa va ariza matni tekshirilgan formula va shablonlardan chiqadi. AI ishlamasa ham ilova to‘liq ishlaydi.»
+«Qonun matnini AI o‘ylab topmaydi. 62 ta norma va 14 ta idoraning aloqa ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat vaziyatni tasniflaydi; muddat, summa va ariza matni tekshirilgan formula va shablonlardan chiqadi. AI ishlamasa ham ilova to‘liq ishlaydi.»
 
 **Kimlar uchun va natija (40 soniya).**
 «12 soha, 24 hayotiy holat: mehnat, iste’molchi, aliment, ijara, kommunal, bank va mikroqarz, yo‘l-transport, pensiya, migrantlar va boshqalar. Uch tilda. Keksalar uchun katta shrift va ovozli o‘qish. Anonim statistika qaysi muammolar eng ko‘p uchrashini ko‘rsatadi — bu davlat organlari va yuridik klinikalar uchun ham qimmatli ma’lumot, lekin hech kimning matni saqlanmaydi.»
@@ -72,7 +72,7 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 | Savol | Javob |
 |---|---|
 | AI noto‘g‘ri modda aytsa-chi? | AI faqat holatni tasniflaydi va faktlarni ajratadi. Bazada yo‘q norma javobdan avtomatik olib tashlanadi. Muddat, summa va ariza matni — tekshirilgan formula va shablonlar. AI ishlamasa, qidiruv rejimi avtomatik yoqiladi. |
-| Normalar qanchalik ishonchli? | 61 ta norma lex.uz’dagi asl matn bo‘yicha tekshirilgan, 54 tasida modda raqami bor. Raqami tasdiqlanmaganlari «faqat qonun» belgisi bilan chiqadi — taxmin yozilmaydi. Manbalar README’da. |
+| Normalar qanchalik ishonchli? | 62 ta norma lex.uz’dagi asl matn bo‘yicha tekshirilgan, 55 tasida modda raqami bor. Raqami tasdiqlanmaganlari «faqat qonun» belgisi bilan chiqadi — taxmin yozilmaydi. Manbalar README’da. |
 | Idoralar manzili eskirsa? | Har bir karta rasmiy sahifadan olingan va unda manba havolasi hamda tekshirilgan sana bor. Yangilash — `scripts/kb_offices.py` va `npm run kb`; test manbalar faqat rasmiy domenlarda ekanini tekshiradi. |
 | Maxfiylik? | Ariza ma’lumotlari faqat qurilmada (localStorage). Serverga faqat hujjat yasash uchun yuboriladi va saqlanmaydi, matn logga yozilmaydi. Statistika faqat sanoq: matn, IP, cookie yo‘q; takroriy sanashning oldini olish izi faqat xotirada va kunlik o‘chiriladi. Batafsil — SECURITY.md. |
 | Xavfsizlik? | Qat’iy CSP (inline skript va stil yo‘q), boshqa saytdan so‘rov rad etiladi (Origin + Fetch Metadata), rate limit, kiruvchi ma’lumot holat spetsifikatsiyasi bo‘yicha tekshiriladi, AI’ga prompt-in’ektsiyadan himoya. `npm audit`: 0 zaiflik. |
@@ -96,7 +96,7 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 | Qonun va kodekslar | 14 |
 | Hujjat shablonlari | 53 (uch tilda — 159) |
 | Dalillar (qayerdan olinishi bilan) | 120 |
-| Idoralar (rasmiy manba bilan) | 13 |
+| Idoralar (rasmiy manba bilan) | 14 |
 | Kalkulyatorlar | 5 — MK 333 kompensatsiya, iste’molchi penyasi, aliment, jarima chegirmasi, mikroqarz chegarasi |
 | Tillar | o‘zbek (lotin, kirill), rus |
 | Testlar | 61 unit/API + 10 brauzer (axe bilan) |

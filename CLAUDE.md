@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (72 tests)
+npm test                 # node:test, must stay green (76 tests)
 npm run test:e2e         # optional: npm i --no-save playwright && npx playwright install chromium
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
 ```
