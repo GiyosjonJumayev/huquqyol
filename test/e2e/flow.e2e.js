@@ -5,6 +5,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { app } from "../../server/index.js";
+import { shutdown as ocrShutdown } from "../../server/ocr.js";
+import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 let pw = null;
@@ -19,7 +21,7 @@ before(async () => {
   await new Promise(r => { server = app.listen(0, "127.0.0.1", () => { base = `http://127.0.0.1:${server.address().port}/`; r(); }); });
   browser = await pw.chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
 });
-after(async () => { await browser?.close(); server?.close(); });
+after(async () => { await browser?.close(); server?.close(); await ocrShutdown(); });
 
 async function page(opts = {}){
   const ctx = await browser.newContext({ viewport:{ width:1280, height:900 }, acceptDownloads:true, bypassCSP:true, ...opts });
@@ -335,4 +337,39 @@ test("Anonim statistika: holat ochilganda sanaladi, sahifa footer’dan ochiladi
   await m.goto(base + "statistika?lang=ru");
   assert.equal(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   assert.deepEqual([...p.errors, ...m.errors], []);
+});
+
+test("Hujjat rasmi: panel doim ko‘rinadi, AI kalitisiz OCR o‘qiydi, muddat va ariza to‘ladi; panel yopiladi va qayta ochiladi", { skip }, async () => {
+  const p = await page();
+  await p.goto(base);
+  assert.ok(await p.isVisible("#photoPanel"));
+  assert.deepEqual(await audit(p), []);
+  await p.setInputFiles("#photoIn", fileURLToPath(new URL("../fixtures/yhxx-qaror-foto.jpg", import.meta.url)));
+  await p.waitForSelector("#photoCard", { timeout: 30_000 });
+  const card = await p.innerText("#photoCard");
+  assert.match(card, /AB 1234567/);
+  assert.match(card, /375\s000/);
+  assert.match(card, /IIBB Yo.l harakati/);
+  assert.match(card, /01 A 123 BC/);
+  assert.match(card, /bepul OCR/);
+  assert.match(await p.innerText("#deadlineCard"), /Shikoyat berish uchun qoldi/i);
+  assert.equal(await p.inputValue("#trigger"), "2026-11-14");
+  assert.deepEqual(await audit(p), []);
+  await p.click(".cta [data-go='3']");
+  await p.waitForSelector("#paper .ttl");
+  assert.equal(await p.inputValue("#f_decisionNumber"), "AB 1234567");
+  assert.equal(await p.inputValue("#f_plate"), "01 A 123 BC");
+  // Panelni yopish: qayta yuklanganda ham yopiq (server cookie bo‘yicha chizadi), kamera tugmasi qayta ochadi
+  await p.goto(base + "#vaziyat");
+  await p.click("#photoClose");
+  assert.ok(await p.isHidden("#photoPanel"));
+  await p.reload();
+  assert.ok(await p.isHidden("#photoPanel"));
+  await p.evaluate(() => { document.getElementById("photoIn").click = () => {}; });
+  await p.click("#photoBtn");
+  assert.ok(await p.isVisible("#photoPanel"));
+  // Rasm bo‘lmagan fayl — tushunarli xato
+  await p.setInputFiles("#photoIn", { name:"x.txt", mimeType:"text/plain", buffer: Buffer.from("salom") });
+  await p.waitForSelector("#askErr:not([hidden])");
+  assert.deepEqual(p.errors, []);
 });

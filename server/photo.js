@@ -1,11 +1,14 @@
 // Hujjat rasmidan o‘qish: jarima qarori, chek, buyruq, bank xabarnomasi va h.k.
-// Tamoyil o‘zgarmaydi: AI faqat rasmda KO‘RINIB TURGAN faktlarni ajratadi (kim, qachon, qancha, raqam).
+// Ikki yo‘l: AI kaliti bo‘lsa — Claude vision; bo‘lmasa (yoki AI xato bersa) — bepul OCR (Tesseract) + qoidalar.
+// Tamoyil o‘zgarmaydi: AI/OCR faqat rasmda KO‘RINIB TURGAN faktlarni ajratadi (kim, qachon, qancha, raqam).
 // Holatni tasniflash — mavjud analyze() orqali (bazadagi normalar bilan), muddat va summa — kodda (plan.js).
 // Rasm serverda saqlanmaydi va logga yozilmaydi: faqat xotirada, so‘rov davomida.
 import { analyze, aiClient, MODEL } from "./analyze.js";
 import { SCENARIO_BY_ID } from "./kb.js";
 import { parseISO, startOfDay } from "./dates.js";
 import { vForm, clean, ValidationError } from "./validate.js";
+import { recognize } from "./ocr.js";
+import { parseDocText } from "./docparse.js";
 
 export const MAX_PHOTO_BYTES = 3_500_000;
 export const DOC_TYPES = ["jarima_qarori", "yhxx_qarori", "organ_qarori", "ish_buyrugi", "chek", "bank_xabarnoma",
@@ -78,29 +81,53 @@ export class PhotoError extends Error {
   constructor(key, status){ super(key); this.key = key; this.status = status; }
 }
 
+async function visionRead(client, { mediaType, data, note }){
+  const res = await client.messages.create({ model: MODEL, max_tokens: 600, system: SYSTEM, messages: [{ role:"user", content: [
+    { type:"image", source:{ type:"base64", media_type: mediaType, data } },
+    { type:"text", text: PROMPT(note) }
+  ] }] });
+  const out = res.content.filter(c => c.type === "text").map(c => c.text).join("");
+  return JSON.parse(out.slice(out.indexOf("{"), out.lastIndexOf("}") + 1));
+}
+
+// Hujjat turi aniq bo‘lsa — holat to‘g‘ridan-to‘g‘ri (fuqaro izoh yozmagan bo‘lsa)
+export function scenarioForDoc(docType, text = ""){
+  const t = String(text).toLowerCase().replace(/[ʻʼ'`’‘´]/g, "‘");
+  if (docType === "ish_buyrugi") return /(bo‘shat|ishdan ozod|увольн|расторж|бўшат)/.test(t) ? "ishdan_boshatish" : /(ta’til|tatil|отпуск|таътил)/.test(t) ? "tatil" : null;
+  return { yhxx_qarori:"yhxx_jarima", jarima_qarori:"jarima", chek:"nuqsonli_tovar", bank_xabarnoma:"bank_karta",
+           kommunal_hisob:"kommunal_hisob", organ_qarori:"organ_qarori", murojaat_javobi:"organ_qarori" }[docType] || null;
+}
+
+const hasFacts = d => d.readable && !!(d.issuer || d.amount || d.number || d.date || d.docType !== "boshqa");
+
 export async function readPhoto({ mediaType, data, note }, lang = "uz"){
   const client = aiClient();
-  if (!client) throw new PhotoError("photoNoAi", 503);
-  let r;
-  try {
-    const res = await client.messages.create({ model: MODEL, max_tokens: 600, system: SYSTEM, messages: [{ role:"user", content: [
-      { type:"image", source:{ type:"base64", media_type: mediaType, data } },
-      { type:"text", text: PROMPT(note) }
-    ] }] });
-    const out = res.content.filter(c => c.type === "text").map(c => c.text).join("");
-    r = JSON.parse(out.slice(out.indexOf("{"), out.lastIndexOf("}") + 1));
-  } catch (e) {
-    console.warn("[photo] AI xatosi:", e?.status || e?.name || "error");     // rasm va matn logga yozilmaydi
-    throw new PhotoError("photoAi", 502);
+  let doc = null, engine = "ai", ocr = null;
+  if (client){
+    try { doc = cleanDoc(await visionRead(client, { mediaType, data, note })); if (!hasFacts(doc)) doc = null; }
+    catch (e) { console.warn("[photo] AI xatosi, OCR ga o‘tildi:", e?.status || e?.name || "error"); doc = null; }   // rasm va matn logga yozilmaydi
   }
-  const doc = cleanDoc(r);
-  if (!doc.readable || !(doc.situation || doc.issuer || doc.amount)) throw new PhotoError("photoUnread", 422);
+  if (!doc){
+    engine = "ocr";
+    ocr = await recognize(Buffer.from(data, "base64"));
+    const parsed = parseDocText(ocr.text);
+    ocr.text = parsed.text;                                        // ko‘rsatiladigan matn ham tuzatilgan holda
+    doc = cleanDoc(parsed);
+    if (!hasFacts(doc)) throw new PhotoError("photoUnread", 422);
+  }
 
-  // Tasniflash: o‘qilgan faktlardan tuzilgan matn mavjud analyze() ga beriladi (bazadagi normalar, qoidalar zaxirasi bilan)
-  const text = [note, doc.situation, doc.title, doc.issuer && `Hujjatni chiqargan: ${doc.issuer}.`, doc.reason, doc.amount && `${doc.amount} so‘m`]
+  // Tasniflash: o‘qilgan faktlar va fuqaro izohidan tuzilgan matn mavjud analyze() ga beriladi (bazadagi normalar bilan)
+  // Izoh bo‘lsa — fuqaroning o‘z so‘zi; hujjat turidan tuzilgan umumiy tavsif uni chalg‘itmasin
+  const text = [note || doc.situation, doc.title, doc.issuer && `Hujjatni chiqargan: ${doc.issuer}.`, doc.reason, doc.amount && `${doc.amount} so‘m`]
     .filter(Boolean).join(" ").slice(0, 4000);
-  const a = await analyze(text.length >= 8 ? text : "hujjat bo‘yicha murojaat", lang);
-  const photo = { docType: doc.docType, title: doc.title, issuer: doc.issuer, number: doc.number, date: doc.date, amount: doc.amount, plate: doc.plate, reason: doc.reason };
+  let a = await analyze(text.length >= 8 ? text : "hujjat bo‘yicha murojaat", lang);
+  const mapped = scenarioForDoc(doc.docType, ocr?.text || [doc.title, doc.reason, doc.situation].join(" "));
+  // Izoh bo‘lmasa hujjat turi hal qiladi; izoh bo‘lsa — fuqaro so‘zi ustun, faqat tahlil topolmasa hujjat turi
+  if (mapped && a.scenario !== mapped && (!note || a.scenario === "boshqa"))
+    a = { ...a, scenario: mapped, confidence: Math.max(0.7, a.confidence || 0), summary: "", missing: [], normIds: [], facts:{ form:{} } };
+
+  const photo = { docType: doc.docType, title: doc.title, issuer: doc.issuer, number: doc.number, date: doc.date, amount: doc.amount, plate: doc.plate, reason: doc.reason, engine,
+    ...(ocr ? { confidence: ocr.confidence, lowQuality: ocr.confidence < 55, text: ocr.text.trim().slice(0, 3000) } : {}) };
   if (a.scenario === "boshqa" || !SCENARIO_BY_ID[a.scenario]) return { ...a, photo, source:"photo", analysisSource: a.source };
 
   // Hujjatdan o‘qilgan aniq faktlar matndan taxmin qilinganidan ustun; muddat hujjat sanasidan hisoblanadi

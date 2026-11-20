@@ -5,7 +5,7 @@
 | Ma’lumot | Qayerda | Serverda saqlanadimi |
 |---|---|---|
 | Vaziyat matni (tahlil uchun) | Brauzer → `/api/analyze` | Yo‘q. Javobdan keyin unutiladi, logga yozilmaydi. AI yoqilgan bo‘lsa, matn tahlil uchun Anthropic API’ga yuboriladi. |
-| Hujjat rasmi («Rasmdan») | Brauzer → `/api/photo` | Yo‘q. Brauzerda 1600 px gacha kichraytiriladi, faqat so‘rov davomida xotirada turadi, logga yozilmaydi; o‘qish uchun Anthropic API’ga yuboriladi. |
+| Hujjat rasmi («Rasmdan») | Brauzer → `/api/photo` | Yo‘q. Brauzerda 1600 px gacha kichraytiriladi, faqat so‘rov davomida xotirada turadi, logga yozilmaydi; serverning o‘zida bepul OCR (Tesseract) bilan o‘qiladi; AI kaliti bo‘lsa — Anthropic API’ga yuboriladi. |
 | Ariza maydonlari (F.I.Sh., manzil, telefon…) | Faqat qurilmaning `localStorage` ida | Yo‘q. Hujjat yasash uchun yuboriladi va darhol unutiladi. Footer’dagi «Ma’lumotlarimni o‘chirish» hammasini o‘chiradi. |
 | Til va shrift tanlovi | Cookie `hy_lang`, `hy_fs` | Yo‘q (faqat sahifani to‘g‘ri chizish uchun o‘qiladi). |
 | Anonim statistika | `data/stats.json` | Faqat sanoqlar: holat nomi, kun, son. Matn, IP, cookie, brauzer ma’lumoti yo‘q. Takroriy sanashning oldini olish izi (HMAC, kunlik tasodifiy kalit) faqat xotirada va har kuni o‘chiriladi. `STATS=0` — o‘chirish. |

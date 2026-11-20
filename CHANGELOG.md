@@ -1,5 +1,15 @@
 # O‘zgarishlar tarixi
 
+## 3.13.0 — 2026-11-20 · Bepul OCR: rasmdan o‘qish AI kalitisiz
+- Hujjat rasmi AI kalitisiz ham o‘qiladi: serverning o‘zida Tesseract OCR (WebAssembly) — rus, o‘zbek lotin va o‘zbek kirill. Internet, tashqi xizmat va pul kerak emas; til fayllari npm paketlaridan.
+- `server/docparse.js`: OCR matnidan qoidalar bilan hujjat turi, tashkilot, raqam, sana, summa, avtomobil raqami va sabab ajratiladi. OCR xatolariga chidamli: «№» → «Ne/WN:», «so‘m» → «5071.», «01 A» → «OLA», «S» → «$», lotin qatordagi adashgan kirill harflar («ПВВ» → «IIBB»).
+- Hujjat turi aniq bo‘lsa holat to‘g‘ridan-to‘g‘ri tanlanadi (YHXX qarori → YHXX jarimasi, chek → sifatsiz tovar, bank xabari → karta…); fuqaro izoh yozsa — uning so‘zi ustun.
+- AI kaliti bo‘lsa avval Claude o‘qiydi; AI xato bersa yoki o‘qiy olmasa — avtomatik OCR.
+- Bosh sahifada doim ko‘rinadigan «Hujjat rasmi bormi?» paneli: rasm tanlash, sudrab tashlash, Ctrl+V; × bilan yopiladi (cookie — qayta yuklanganda ham yopiq), kamera tugmasi qayta ochadi.
+- «Hujjatdan o‘qildi» kartasida o‘qish usuli (bepul OCR / Claude), past sifat ogohlantirishi va o‘qilgan matn.
+- OCR bitta worker’da navbat bilan, 25 soniya chegarasi, osilsa qayta yaratiladi; `OCR=0` — o‘chirish.
+- Testlar: 78 unit (OCR haqiqiy rasm namunalari bilan: telefon surati, rus tilidagi qaror, chek) + 11 brauzer testi.
+
 ## 3.12.0 — 2026-11-20 · Hujjat rasmidan o‘qish
 - Bosh sahifada «Rasmdan» tugmasi: jarima qarori, chek, buyruq, bank xabarnomasi yoki kommunal hisob rasmi tanlanadi.
 - `POST /api/photo`: Claude vision rasmda ko‘rinib turgan faktlarni ajratadi — hujjat turi, kim chiqargani, raqami, sanasi, summasi, avtomobil raqami. Holat mavjud tahlil orqali tasniflanadi; muddat hujjat sanasidan kodda hisoblanadi, ariza maydonlari avtomatik to‘ladi.

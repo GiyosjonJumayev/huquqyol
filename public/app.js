@@ -289,9 +289,12 @@ function photoCardHTML(ph){
     ["pdType", ph.title || t("dt_" + (ph.docType || "boshqa"))], ["pdIssuer", ph.issuer], ["pdNumber", ph.number],
     ["pdDate", d && !isNaN(d) ? fmtDate(d, LANG) : null], ["pdAmount", ph.amount ? fmtMoney(ph.amount, LANG) : null], ["pdPlate", ph.plate]
   ].filter(([, v]) => v);
-  return `<div class="card photocard" id="photoCard"><div class="kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>${t("photoH")}</div>
+  const eng = ph.engine ? `<span class="engine">${t(ph.engine === "ocr" ? "photoEngOcr" : "photoEngAi")}</span>` : "";
+  return `<div class="card photocard" id="photoCard"><div class="kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>${t("photoH")}${eng}</div>
     <dl>${rows.map(([k, v]) => `<div><dt>${t(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}${ph.reason ? `<div class="reason"><dt>${t("pdReason")}</dt><dd>${esc(ph.reason)}</dd></div>` : ""}</dl>
-    <p class="small muted">${t("photoCheck")}</p></div>`;
+    ${ph.lowQuality ? `<p class="small warnline">${t("photoLow")}</p>` : ""}
+    <p class="small muted">${t("photoCheck")}</p>
+    ${ph.text ? `<details><summary class="small">${t("photoText")}</summary><pre>${esc(ph.text)}</pre></details>` : ""}</div>`;
 }
 
 // Tahlil ishonchi past bo‘lsa yoki boshqa holat ham yaqin chiqsa — bir bosishda almashtirish
@@ -733,37 +736,71 @@ $("#moreEx").addEventListener("click", e => {
 $("#demoFill").addEventListener("click", demoFill);
 $("#analyzeBtn").addEventListener("click", analyze);
 
-// Hujjat rasmidan o‘qish: rasm brauzerda 1600 px gacha kichraytiriladi (JPEG), serverga faqat o‘qish uchun yuboriladi
+// Hujjat rasmidan o‘qish (AI kalitisiz ham — serverda bepul OCR). Rasm brauzerda 2000 px gacha kichraytiriladi (JPEG),
+// serverga faqat o‘qish uchun yuboriladi va saqlanmaydi. Panel doim ko‘rinadi; × bilan yopiladi (cookie — sahifa shu holatda chiziladi).
 const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
 const readAsDataURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
 async function shrinkPhoto(file){
   const img = await loadImg(await readAsDataURL(file));
-  const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+  const k = Math.min(1, 2000 / Math.max(img.naturalWidth, img.naturalHeight));
   const c = document.createElement("canvas");
   c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
   const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
-  let q = 0.85, url = c.toDataURL("image/jpeg", q);
-  while (url.length > 4_400_000 && q > 0.4){ q -= 0.15; url = c.toDataURL("image/jpeg", q); }
+  let q = 0.88, url = c.toDataURL("image/jpeg", q);
+  while (url.length > 4_400_000 && q > 0.4){ q -= 0.12; url = c.toDataURL("image/jpeg", q); }
   return url;
 }
+const PHOTO_ICON = $("#photoThumb").innerHTML;
+function setPhotoPanel(open, { remember = true } = {}){
+  $("#photoPanel").hidden = !open;
+  $("#photoBtn").setAttribute("aria-expanded", String(open));
+  if (remember) document.cookie = `hy_photo=${open ? 1 : 0}; path=/; max-age=31536000; samesite=lax`;
+}
+let photoBusy = false;
 async function readPhotoFile(file){
-  const btn = $("#photoBtn"), err = $("#askErr"), label = btn.innerHTML;
+  if (photoBusy) return;
+  if (!file || !/^image\//.test(file.type || "image/")){ setAskErr(t("photoNotImg")); return; }
   setAskErr("");
   let image;
   try { image = await shrinkPhoto(file); }
   catch { setAskErr(t("photoBadFile")); return; }
-  btn.disabled = true; $("#analyzeBtn").disabled = true;
-  btn.innerHTML = `<span class="spin" aria-hidden="true"></span> ${t("photoReading")}`;
+  setPhotoPanel(true, { remember:false });
+  const panel = $("#photoPanel"), pick = $("#photoPick"), pickLabel = pick.innerHTML, err = $("#askErr");
+  photoBusy = true; panel.classList.add("busy"); panel.setAttribute("aria-busy", "true");
+  $("#photoThumb").innerHTML = `<img src="${image}" alt="">`;
+  pick.disabled = true; $("#analyzeBtn").disabled = true; $("#photoBtn").disabled = true;
+  pick.innerHTML = `<span class="spin" aria-hidden="true"></span> ${t("photoReading")}`;
   announce(t("photoReading"));
   try { await choose(await getJSON("/api/photo", { image, note: $("#problem").value.trim().slice(0, 1000) })); }
   catch (e){ setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }
-  finally { btn.disabled = false; $("#analyzeBtn").disabled = false; btn.innerHTML = label; }
+  finally {
+    photoBusy = false; panel.classList.remove("busy"); panel.removeAttribute("aria-busy");
+    pick.disabled = false; $("#analyzeBtn").disabled = false; $("#photoBtn").disabled = false;
+    pick.innerHTML = pickLabel; $("#photoThumb").innerHTML = PHOTO_ICON;
+  }
 }
-$("#photoBtn").addEventListener("click", () => $("#photoIn").click());
+$("#photoPick").addEventListener("click", () => $("#photoIn").click());
+$("#photoBtn").addEventListener("click", () => { setPhotoPanel(true); $("#photoIn").click(); });
+$("#photoClose").addEventListener("click", () => { setPhotoPanel(false); toast(t("photoClosed")); $("#photoBtn").focus(); });
 $("#photoIn").addEventListener("change", e => {
   const f = e.target.files?.[0]; e.target.value = "";
   if (f) readPhotoFile(f);
 });
+// Rasmni panelga yoki matn maydoniga sudrab tashlash va Ctrl+V bilan qo‘yish
+for (const el of [$("#photoPanel"), $(".ask")]){
+  el.addEventListener("dragover", e => { if ([...(e.dataTransfer?.items || [])].some(i => i.kind === "file")){ e.preventDefault(); $("#photoPanel").classList.add("drag"); } });
+  el.addEventListener("dragleave", () => $("#photoPanel").classList.remove("drag"));
+  el.addEventListener("drop", e => {
+    const f = [...(e.dataTransfer?.files || [])][0];
+    $("#photoPanel").classList.remove("drag");
+    if (f){ e.preventDefault(); readPhotoFile(f); }
+  });
+}
+$("#problem").addEventListener("paste", e => {
+  const f = [...(e.clipboardData?.files || [])].find(x => /^image\//.test(x.type));
+  if (f){ e.preventDefault(); readPhotoFile(f); }
+});
+$("#photoBtn").setAttribute("aria-expanded", String(!$("#photoPanel").hidden));
 
 // Belgi hisoblagichi: chegara yaqinlashganda ko‘rsatiladi
 $("#problem").addEventListener("input", e => {
@@ -821,7 +858,6 @@ window.addEventListener("online", () => toast(t("online")));
 try {
   const embedded = document.getElementById("meta-data");
   state.meta = embedded ? JSON.parse(embedded.textContent) : await getJSON("/api/meta?lang=" + LANG);
-  $("#photoBtn").hidden = !state.meta.ai;                       // rasmdan o‘qish faqat AI yoqilganda ishlaydi
   renderStart();
   const saved = store.load();
   if (saved){ state.applicant = saved.applicant || {}; state.formByScn = saved.formByScn || {}; }
