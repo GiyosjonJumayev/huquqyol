@@ -679,3 +679,6 @@ footer .checked{color:var(--ink)}
 .online a,.onnext a{color:var(--accent);display:inline-block;padding:10px 0;margin:-10px 0}
 .onnext{margin:10px 0 0}
 @media print{.online{display:none!important}}
+
+/* Yuklab olish tugmalari ostidagi eslatma */
+.dldisc{margin:10px 0 0;font-size:calc(13.5px * var(--fs));color:var(--muted)}

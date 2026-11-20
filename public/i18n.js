@@ -256,7 +256,8 @@ const M = {
   onlineMissT:{ uz:"Ba’zi joylar to‘ldirilmagan", ru:"Не все поля заполнены" },
   onlineMissP:{ uz:"Matnda {n} ta bo‘sh joy [ ] bilan qoladi: {list}. Baribir nusxalaysizmi?", ru:"В тексте останутся пустые места [ ] ({n}): {list}. Всё равно скопировать?" },
   copyAnyway:{ uz:"Baribir nusxalash", ru:"Всё равно скопировать" },
-  onlineOrgFallback:{ uz:"arizadagi idora", ru:"орган, указанный в заявлении" }
+  onlineOrgFallback:{ uz:"arizadagi idora", ru:"орган, указанный в заявлении" },
+  dlDisclaimer:{ uz:"Bu yuridik maslahat emas — hujjat loyihasi.", ru:"Это не юридическая консультация — проект документа." }
 };
 
 const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
