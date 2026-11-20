@@ -47,6 +47,26 @@ test("23 holat matndan to‘g‘ri tasniflanadi", () => {
   for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
 });
 
+// Umumiy murojaat (ariza/taklif/shikoyat) qo‘shilganda mavjud holatlar o‘z o‘rnida qolishi kerak
+test("Regressiya: umumiy murojaat mavjud holatlarni egallab olmaydi", () => {
+  const cases = {
+    "Ish beruvchim 3 oydan beri maosh bermayapti": "ish_haqi",
+    "Meni ogohlantirmasdan ishdan bo‘shatishdi": "ishdan_boshatish",
+    "hokimlikka ariza yozdim 2 oy javob yo'q": "murojaat_javobsiz",
+    "hokimlikka ariza yozdim 2 oy javob yo‘q": "murojaat_javobsiz",
+    "Hokimlikka murojaat qildim, bir oydan beri javob bermayapti": "murojaat_javobsiz",
+    "Menga noto‘g‘ri jarima solishdi, shikoyat qilmoqchiman": "jarima",
+    "YHXB radar bo‘yicha noto‘g‘ri jarima soldi": "yhxx_jarima",
+    "Do‘kondan telefon oldim, buzilib qoldi, almashtirib berishmayapti": "nuqsonli_tovar",
+    "Работодатель 3 месяца не платит зарплату": "ish_haqi",
+    "Меня уволили без предупреждения": "ishdan_boshatish",
+    "Подал жалобу в хокимият, нет ответа уже 2 месяца": "murojaat_javobsiz",
+    "Не согласен со штрафом, хочу подать жалобу": "jarima",
+    "Купил телевизор, сломался, магазин не меняет": "nuqsonli_tovar"
+  };
+  for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
+});
+
 test("Muddatlar: kun, oy, yil, offset va muddatsiz", () => {
   const p = (scenario, triggerDate, form = {}) => buildPlan({ scenario, triggerDate, form, today });
   assert.equal(p("tovar_qaytarish", "2026-11-01").deadline, "2026-11-11");
