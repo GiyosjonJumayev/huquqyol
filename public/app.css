@@ -655,3 +655,10 @@ footer .checked{color:var(--ink)}
 /* Sana so‘z bilan (sana maydoni yonida) */
 .dateword{display:block;margin-top:4px;font-size:calc(14px * var(--fs));font-weight:600;color:var(--ink)}
 .dateword:empty{display:none}
+
+/* Kalkulyator formulasi */
+.fx{margin-top:12px}
+.fx summary{min-height:44px;display:flex;align-items:center}
+.fxsteps{margin:6px 0 8px;padding-left:22px;display:grid;gap:4px;font-size:calc(14.5px * var(--fs))}
+.fxsrc{margin:0;font-size:calc(13.5px * var(--fs));color:var(--muted);overflow-wrap:anywhere}
+.fxsrc a{color:var(--accent);display:inline-block;padding:10px 0;margin:-10px 0}

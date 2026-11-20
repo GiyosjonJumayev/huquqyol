@@ -240,7 +240,8 @@ function renderPlan(){
         <div class="money" id="calcValue">—</div>
         <div class="small muted" id="calcNote"></div>
         <div class="calcrows" id="calcRows" hidden></div>
-        <div class="inline">${calcFields.map(calcInput).join("")}</div></div>`
+        <div class="inline">${calcFields.map(calcInput).join("")}</div>
+        <details class="more fx" id="calcFx" hidden><summary>${t("fxSummary")}</summary><div id="fxBody"></div></details></div>`
       : `<div class="card"><div class="kicker">${t("mainRight")}</div>
         <div class="money right">${esc(n0.title)}</div>
         <p class="small muted">${esc(n0.text)}</p>
@@ -397,6 +398,49 @@ function renderCalc(){
   const rows = $("#calcRows");
   rows.hidden = !c.rows;
   rows.innerHTML = (c.rows || []).map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("");
+  renderFormula();
+}
+
+// «Bu summa qanday hisoblandi?» — server natijasi (calc.raw) va foydalanuvchi raqamlari bilan oddiy so‘zda.
+// Oyma-oy kunlar brauzerda MK 9-modda qoidasi bilan qayta hisoblanadi va FAQAT server summasi bilan aynan mos kelsa ko‘rsatiladi.
+const BUXGALTER_URL = "https://buxgalter.uz/";
+const dec = x => String(x).replace(".", ",");
+const addMonthsC = (d, n) => { const y = d.getFullYear(), m = d.getMonth() + n, last = new Date(y, m + 1, 0).getDate(); return new Date(y, m, Math.min(d.getDate(), last)); };
+const dayDiffC = (a, b) => Math.round((new Date(b.getFullYear(), b.getMonth(), b.getDate()) - new Date(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+const srcLink = (url, label) => `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)} ↗<span class="sr"> ${t("newTab")}</span></a>`;
+function formulaHTML(){
+  const p = state.plan, c = p.calc, r = c?.raw, type = scenarioMeta(state.scn)?.calc, f = cleanForm(), M = n => fmtMoney(n, LANG);
+  if (!r) return "";
+  const mainLaw = p.norms.find(n => n?.lawUrl);
+  const lawSrc = mainLaw ? srcLink(mainLaw.lawUrl, t("fxSrcLaw", { law: mainLaw.lawName })) : "";
+  let steps = [], srcs = [lawSrc];
+  if (type === "labor333"){
+    const amount = Number(f.amount) || 0, months = Math.max(1, Math.min(60, Math.round(Number(f.months) || 1))), share = amount / months;
+    const per = r.rate / 100 * 0.10, trig = new Date(p.trigger + "T00:00:00"), today = new Date();
+    const days = Array.from({ length: months }, (_, i) => dayDiffC(addMonthsC(trig, i), today)).filter(d => d > 0);
+    const sum = days.reduce((a, b) => a + b, 0), exact = sum > 0 && Math.round(share * sum * per) === r.literal;
+    steps = [t("fx333a", { amount: M(amount), months, share: M(share) }), t("fx333b", { rate: dec(r.rate), daily: dec(r.dailyPct) }),
+      exact ? t("fx333c", { list: days.map((d, i) => t("fxMonth", { i: i + 1, d })).join(", "), sum }) : t("fx333cShort", { max: r.maxDelayDays }),
+      ...(exact ? [t("fx333d", { share: M(share), sum, daily: dec(r.dailyPct), total: M(r.literal) })] : []),
+      t("fx333alt", { alt: M(r.alternative) })];
+    srcs = [srcLink(r.source, t("fxSrc333")), srcLink(BUXGALTER_URL, t("fxSrcAlt"))];
+  } else if (type === "consumerPenalty" && r.late){
+    steps = [t("fxPen", { price: M(Number(f.price) || 0), late: r.late, total: c.value })];
+  } else if (type === "loanCap"){
+    steps = [t("fxLoan", { loan: M(Number(f.loan) || 0), cap: M(r.cap) }), ...(r.excess ? [t("fxLoanEx", { charged: M(Number(f.charged) || 0), cap: M(r.cap), excess: M(r.excess) })] : [])];
+  } else if (type === "alimony"){
+    const frac = { 0.25:"1/4", [1/3]:"1/3", 0.5:"1/2" }[r.share] || "";
+    steps = [t("fxAl", { income: M(Number(f.income) || 0), frac, byIncome: M(r.byIncome), min: M(r.min) })];
+  }
+  if (!steps.length) return "";
+  return `<ol class="fxsteps">${steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+    <p class="fxsrc"><span>${t("fxSrc")}</span> ${srcs.filter(Boolean).join(" · ")}</p>`;
+}
+function renderFormula(){
+  const box = $("#calcFx"); if (!box) return;
+  const html = formulaHTML();
+  box.hidden = !html;
+  $("#fxBody").innerHTML = html;
 }
 function renderEvCount(){
   const inf = state.plan.evidenceInfo || [], must = inf.map((x, i) => x.need === "m" ? i : -1).filter(i => i >= 0);

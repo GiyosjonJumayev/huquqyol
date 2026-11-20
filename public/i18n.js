@@ -221,7 +221,24 @@ const M = {
   pOther:{ uz:"Boshqa hujjatlar", ru:"Другие документы" },
   pOtherNote:{ uz:"Adliya vazirligi «Adolat» markazi: tayyor shablonlar", ru:"центр «Адолат» Министерства юстиции: готовые шаблоны" },
   portalsNote:{ uz:"HuquqYo‘l davlat xizmatlarining o‘rnini bosmaydi: murojaatingizni to‘g‘ri tayyorlab, ularga yo‘l ko‘rsatadi.", ru:"HuquqYo‘l не заменяет государственные сервисы: помогает правильно подготовить обращение и показывает, куда его направить." },
-  newTab:{ uz:"(yangi oynada ochiladi)", ru:"(откроется в новом окне)" }
+  newTab:{ uz:"(yangi oynada ochiladi)", ru:"(откроется в новом окне)" },
+  // Kalkulyator: «Bu summa qanday hisoblandi?»
+  fxSummary:{ uz:"Bu summa qanday hisoblandi?", ru:"Как рассчитана эта сумма?" },
+  fx333a:{ uz:"Bir oylik qarz: {amount} ÷ {months} oy = {share}.", ru:"Долг за один месяц: {amount} ÷ {months} мес. = {share}." },
+  fx333b:{ uz:"Har bir kechikkan kun uchun: Markaziy bank stavkasi {rate}% × 10% = qarzning {daily}%.", ru:"За каждый день задержки: ставка ЦБ {rate}% × 10% = {daily}% долга." },
+  fx333c:{ uz:"Har oy qarzi o‘z to‘lov kunidan hisoblanadi: {list}. Jami {sum} kun.", ru:"Долг каждого месяца считается со своего дня выплаты: {list}; всего {sum} дн." },
+  fxMonth:{ uz:"{i}-oy — {d} kun", ru:"{i}-й месяц — {d} дн." },
+  fx333cShort:{ uz:"Har oy qarzi o‘z to‘lov kunidan hisoblanadi; eng uzoq kechikish — {max} kun.", ru:"Долг каждого месяца считается со своего дня выплаты; самая долгая задержка — {max} дн." },
+  fx333d:{ uz:"{share} × {sum} kun × {daily}% = {total}.", ru:"{share} × {sum} дн. × {daily}% = {total}." },
+  fx333alt:{ uz:"Hisobchilar talqini: stavka yillik deb olinadi va natija 365 ga bo‘linadi — {alt}.", ru:"Толкование бухгалтеров: ставка считается годовой, результат делится на 365 — {alt}." },
+  fxPen:{ uz:"Narx {price} × 1% × {late} kun kechikish = {total}.", ru:"Цена {price} × 1% × {late} дн. просрочки = {total}." },
+  fxLoan:{ uz:"Yillik chegara: qarz {loan} × 50% = {cap}.", ru:"Годовой предел: заём {loan} × 50% = {cap}." },
+  fxLoanEx:{ uz:"Ortiqcha: undirilgan {charged} − chegara {cap} = {excess}.", ru:"Сверх предела: взыскано {charged} − предел {cap} = {excess}." },
+  fxAl:{ uz:"Daromad {income} × {frac} = {byIncome}. Eng kam miqdor: {min}. Ikkalasidan kattasi olinadi.", ru:"Доход {income} × {frac} = {byIncome}. Минимум: {min}. Берётся большее из двух." },
+  fxSrc:{ uz:"Manbalar:", ru:"Источники:" },
+  fxSrc333:{ uz:"Mehnat kodeksi, 333-modda — lex.uz", ru:"Трудовой кодекс, ст. 333 — lex.uz" },
+  fxSrcAlt:{ uz:"Hisobchilar talqini — buxgalter.uz", ru:"Толкование бухгалтеров — buxgalter.uz" },
+  fxSrcLaw:{ uz:"{law} — lex.uz", ru:"{law} — lex.uz" }
 };
 
 const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
