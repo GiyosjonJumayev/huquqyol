@@ -4,7 +4,7 @@ Context for Claude working in this repo. Read fully before changing code.
 
 ## What this is
 Citizen legal-help web app for Uzbekistan, entered in a government LexHackathon.
-User describes a problem (text/voice, uz-Latin / uz-Cyrillic / ru) → app classifies it into one of 23 scenarios →
+User describes a problem (text/voice, uz-Latin / uz-Cyrillic / ru) → app classifies it into one of 24 scenarios →
 builds a plan (law articles with lex.uz links, deadline per Labour Code art. 9, steps, offices, evidence, calculator) →
 generates a ready application/complaint/claim (DOCX/PDF).
 
@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (66 tests)
+npm test                 # node:test, must stay green (72 tests)
 npm run test:e2e         # optional: npm i --no-save playwright && npx playwright install chromium
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
 ```

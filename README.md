@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 23 | 60 (53 tasi modda raqami bilan) | 53 × 3 til = 159 | 120 | 13 | 5 | 61 unit + 10 brauzer |
+| 12 / 24 | 61 (54 tasi modda raqami bilan) | 56 × 3 til = 168 | 123 | 13 | 5 | 72 unit + 10 brauzer |
 
 ## Ko‘rinishlar
 
@@ -47,7 +47,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 ```mermaid
 flowchart LR
   U[Fuqaro: matn / ovoz / soha] --> A["/api/analyze"]
-  A --> R[BM25 qidiruv + kalit so‘zlar<br/>61 norma, 23 holat]
+  A --> R[BM25 qidiruv + kalit so‘zlar<br/>61 norma, 24 holat]
   R --> C{Claude bormi?}
   C -- ha --> AI[Claude: tasniflash va faktlar<br/>faqat bazadagi normalar]
   C -- yo‘q --> RU[Qoidalar bo‘yicha tasniflash]
@@ -87,7 +87,7 @@ Fuqaro muammosini oddiy tilda yozadi yoki sohani tanlaydi. Tizim vaziyatni tahli
 Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa, ilova yaqin holatlarni taklif qiladi va bir bosishda almashtiradi. Rejadagi muddatni bir tugma bilan telefon kalendariga eslatma (.ics, 3 kun oldin va oxirgi kun) qilib qo‘shish, rejani alohida chop etish mumkin.
 
 
-## Qamrab olingan sohalar (12 soha, 23 holat)
+## Qamrab olingan sohalar (12 soha, 24 holat)
 
 | Soha | Holatlar | Asosiy manba | Muddat | Kalkulyator | Arizalar |
 |---|---|---|---|---|---|
@@ -100,7 +100,7 @@ Vaziyatni ovoz bilan aytish mumkin (brauzer qo‘llasa). Tahlil noaniq bo‘lsa,
 | Yo‘l-transport | YHXX jarimasiga shikoyat; OSGO bo‘yicha sug‘urta to‘lovi | MJtK; O‘RQ-155, 19, 23, 25-moddalar | 10 kun; 3 yil | 50% / 70% chegirma | Yuqori organ, sud, sug‘urtachi |
 | Pensiya va nafaqa | Pensiya rad etildi yoki kam hisoblandi; ijtimoiy nafaqa rad etildi | Pensiya ta’minoti to‘g‘risidagi qonun, 45, 47–49-moddalar; ma’muriy sud | 6 oy | — | Yuqori organ, ma’muriy sud |
 | Mehnat migrantlari | Bandlik agentligi aldovi; xorijda maosh berilmasligi yoki pasport olib qo‘yilishi | Xususiy bandlik agentliklari to‘g‘risidagi qonun (O‘RQ-501), 15, 15¹, 17, 20-moddalar | 3 yil; muddatsiz | — | Agentlik, Migratsiya agentligi, konsullik, sud |
-| Davlat idoralari | Javobsiz murojaat; noqonuniy qaror | Murojaatlar to‘g‘risidagi qonun (6, 28, 36-moddalar); ma’muriy sud | 15 kun + 6 oy; 6 oy | — | Yuqori organ, ma’muriy sud |
+| Davlat idoralari | Ariza, taklif yoki shikoyat yozish; javobsiz murojaat; noqonuniy qaror | Murojaatlar to‘g‘risidagi qonun (5, 6, 28, 36, 38-moddalar); ma’muriy sud | javob 15 kun (muddatsiz); 15 kun + 6 oy; 6 oy | — | Istalgan idora (ariza, taklif, shikoyat), yuqori organ, ma’muriy sud |
 | Boshqa jarimalar | Ma’muriy jarimaga shikoyat (inspeksiyalar va boshqa organlar) | MJtK (10 kunlik shikoyat muddati, 332¹-modda chegirmasi) | 10 kun | 50% / 70% chegirma sanalari bilan | Yuqori organ, sud |
 | Qarz | Qarzni undirish | Fuqarolik kodeksi, 150, 732-moddalar | 3 yil | — | Qarzdor, sud |
 

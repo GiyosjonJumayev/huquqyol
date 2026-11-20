@@ -33,7 +33,7 @@ Bu fayl sahnaga chiqishdan oldin o‘qiladi. Uch qism: **pitch (3 daqiqa)**, **j
 «Qonun matnini AI o‘ylab topmaydi. 61 ta norma va 13 ta idoraning aloqa ma’lumoti rasmiy manbalardan qo‘lda tekshirilgan, har birida manba bor. AI faqat vaziyatni tasniflaydi; muddat, summa va ariza matni tekshirilgan formula va shablonlardan chiqadi. AI ishlamasa ham ilova to‘liq ishlaydi.»
 
 **Kimlar uchun va natija (40 soniya).**
-«12 soha, 23 hayotiy holat: mehnat, iste’molchi, aliment, ijara, kommunal, bank va mikroqarz, yo‘l-transport, pensiya, migrantlar va boshqalar. Uch tilda. Keksalar uchun katta shrift va ovozli o‘qish. Anonim statistika qaysi muammolar eng ko‘p uchrashini ko‘rsatadi — bu davlat organlari va yuridik klinikalar uchun ham qimmatli ma’lumot, lekin hech kimning matni saqlanmaydi.»
+«12 soha, 24 hayotiy holat: mehnat, iste’molchi, aliment, ijara, kommunal, bank va mikroqarz, yo‘l-transport, pensiya, migrantlar va boshqalar. Uch tilda. Keksalar uchun katta shrift va ovozli o‘qish. Anonim statistika qaysi muammolar eng ko‘p uchrashini ko‘rsatadi — bu davlat organlari va yuridik klinikalar uchun ham qimmatli ma’lumot, lekin hech kimning matni saqlanmaydi.»
 
 ---
 
@@ -91,7 +91,7 @@ Har bir qadamda **bitta narsani** ayting. Tugmani bosishdan oldin nima bo‘lish
 
 | | |
 |---|---|
-| Sohalar / holatlar | 12 / 23 |
+| Sohalar / holatlar | 12 / 24 |
 | Normalar (modda raqami bilan) | 60 (53) |
 | Qonun va kodekslar | 14 |
 | Hujjat shablonlari | 53 (uch tilda — 159) |
