@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 76 unit + 10 brauzer |
+| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 89 unit + 10 brauzer |
 
 ## Ko‘rinishlar
 
@@ -112,7 +112,7 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 61 ta unit/API test (jumladan ruscha va kirillcha)
+npm test                  # 89 ta unit/API test (jumladan ruscha, kirillcha va Telegram bot)
 npm run test:e2e          # 10 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
@@ -127,10 +127,39 @@ docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-ant-... huquqyol
 
 Bepul joylashtirish: Render’da repo ulanadi, `render.yaml` hamma narsani o‘zi sozlaydi (faqat `ANTHROPIC_API_KEY` ni kiriting). Railway va boshqa platformalarda start buyrug‘i `npm start`.
 
+## Telegram bot
+
+«Telegramda ham — odam turgan joyda»: xuddi saytdagi tahlil, reja, ariza (PDF + Word) va kalendar eslatmasi Telegram chatida. Bot sayt bilan bir xil dvigateldan foydalanadi (`server/analyze.js`, `plan.js`, `documents.js`) — muddat, summa va hujjat matni bir xil.
+
+Mahalliy ishga tushirish:
+
+1. Telegram’da [@BotFather](https://t.me/BotFather) ga `/newbot` yozing, nom bering va tokenni oling.
+2. `.env` fayliga qo‘shing: `TELEGRAM_BOT_TOKEN=123456789:AA...` (token maxfiy — repoga qo‘shmang).
+3. Ishga tushiring (alohida jarayon, sayt bilan parallel ishlashi mumkin):
+
+```bash
+npm install
+npm run bot               # «HuquqYo‘l bot ishga tushdi: @sizning_botingiz»
+```
+
+4. Telegram’da botingizni oching → `/start` → tilni tanlang → muammoni yozing.
+
+| Buyruq | Vazifa |
+|---|---|
+| `/start` | salom, maxfiylik, til tanlash |
+| `/help` | yordam |
+| `/lang` | tilni almashtirish (o‘zbek lotin / kirill, rus) |
+| `/sana YYYY-MM-DD` | muddat hisoblanadigan sanani o‘zgartirish |
+| `/skip` | F.I.Sh. so‘ralganda — o‘tkazib yuborish |
+| `/delete` | bot xotirasidagi ma’lumotni darhol o‘chirish |
+
+Ishlash tartibi: long polling (webhook va ochiq port kerak emas). Sessiya faqat xotirada, 1 soat; foydalanuvchi matni logga yozilmaydi; har bir chat uchun daqiqasiga 20 ta xabar. Server o‘chsa, sessiyalar yo‘qoladi. Bot uchun HTTPS yoki domen kerak emas, lekin u doimiy ishlab turadigan jarayon: VPS’da `pm2 start bot/index.js --name huquqyol-bot` yoki systemd xizmati sifatida ishga tushiring.
+
 ## Fayllar tuzilishi
 
 ```
 public/            Frontend: 3 ekran (Vaziyat → Reja → Ariza), freymvorksiz JS
+bot/               Telegram bot (grammY): shu dvigatel ustida — tahlil, reja, ariza, .ics
 server/
   index.js         Express API, rate limit, statik fayllar
   analyze.js       Tahlil: RAG konteksti → Claude (JSON) → validatsiya; xato bo‘lsa qoidalar
