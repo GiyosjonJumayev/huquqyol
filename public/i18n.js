@@ -204,7 +204,13 @@ const M = {
   notFoundPage:{ uz:"Sahifa topilmadi", ru:"Страница не найдена" },
   toHome:{ uz:"Bosh sahifaga", ru:"На главную" },
   docLang:{ uz:"Ariza tili: o‘zbekcha", ru:"Язык заявления: русский" },
-  docLangNote:{ uz:"", ru:"Обращения можно подавать на государственном или другом языке. В суде делопроизводство ведётся на узбекском языке; при необходимости суд обеспечивает переводчика." }
+  docLangNote:{ uz:"", ru:"Обращения можно подавать на государственном или другом языке. В суде делопроизводство ведётся на узбекском языке; при необходимости суд обеспечивает переводчика." },
+  // Ishonch qatori (bosh sahifa)
+  trustLabel:{ uz:"HuquqYo‘l haqida qisqacha", ru:"Коротко о HuquqYo‘l" },
+  tr1b:{ uz:"Bepul", ru:"Бесплатно" }, tr1:{ uz:"hech qanday to‘lov yo‘q", ru:"никаких платежей" },
+  tr2b:{ uz:"Ro‘yxatdan o‘tish shart emas", ru:"Без регистрации" }, tr2:{ uz:"darhol foydalaning", ru:"пользуйтесь сразу" },
+  tr3b:{ uz:"Ma’lumotingiz saqlanmaydi", ru:"Ваши данные не хранятся у нас" }, tr3:{ uz:"faqat sizning qurilmangizda", ru:"только на вашем устройстве" },
+  tr4b:{ uz:"Qonunlar lex.uz bo‘yicha", ru:"Законы по lex.uz" }, tr4:{ uz:"har bir modda manbasi bilan", ru:"у каждой статьи есть источник" }
 };
 
 const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
