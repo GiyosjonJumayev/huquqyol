@@ -17,6 +17,7 @@ const store = {
   save(v){ try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} },
   clear(){ try { localStorage.removeItem(KEY); } catch {} }
 };
+const providerName = p => p === "gemini" ? "Gemini" : "Claude";          // AI tahlil belgisi: «AI tahlil (Gemini)» / «(Claude)»
 function announce(msg){ const l = $("#live"); l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 30); }
 function toast(msg){ document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; ($("#main") || document.body).append(t); announce(msg); setTimeout(() => t.remove(), Math.max(2800, msg.length * 70)); }
 
@@ -104,7 +105,7 @@ function renderStart(){
   renderDomains();
   $("#examples").innerHTML = examplesHTML(LANG);
   $("#aiDot").classList.toggle("on", state.meta.ai);
-  $("#aiText").textContent = t(state.meta.ai ? "aiOn" : "aiOff");
+  $("#aiText").textContent = t(state.meta.ai ? "aiOn" : "aiOff", { p: providerName(state.meta.aiProvider) });
 }
 function renderDomains(){
   state.domain = null;
@@ -219,7 +220,7 @@ function renderPlan(){
   const a0 = state.analysis || {}, a = a0.lang && a0.lang !== LANG ? { ...a0, summary:"", missing:[] } : a0;
   const focus = new Set(a.normIds || []);
   const law = n => `<div class="law">${badge(n)}<div><b>${esc(n.title)}${focus.has(n.id) ? ` <span class="tag">${t("forYou")}</span>` : ""}</b><p>${esc(n.text)}</p><span class="lawsrc">${esc(n.lawName)}</span></div></div>`;
-  const source = t(a.source === "photo" ? "srcPhoto" : a.source === "ai" ? "srcAI" : a.source === "rules" ? "srcRules" : "srcChoice");
+  const source = t(a.source === "photo" ? "srcPhoto" : a.source === "ai" ? "srcAI" : a.source === "rules" ? "srcRules" : "srcChoice", { p: providerName(a.provider || state.meta?.aiProvider) });
   const n0 = p.norms[0];
   const laws = [...new Map(p.norms.map(n => [n.law, { name:n.lawName, url:n.lawUrl }])).values()];
   const calcFields = m.fields.filter(f => f.calc);

@@ -13,7 +13,7 @@ if (!token){
 }
 
 const { createBot } = await import("./bot.js");
-const { aiEnabled } = await import("../server/analyze.js");
+const { aiEnabled, aiProvider } = await import("../server/analyze.js");
 const site = process.env.PUBLIC_HOST ? `https://${process.env.PUBLIC_HOST}` : "";
 const { bot, stop } = createBot(token, { siteUrl: site });
 
@@ -26,4 +26,4 @@ await bot.api.setMyCommands([
 
 for (const sig of ["SIGINT", "SIGTERM"]) process.once(sig, () => { stop(); });
 await bot.start({ drop_pending_updates: true,
-  onStart: me => console.log(`HuquqYo‘l bot ishga tushdi: @${me.username}  (AI: ${aiEnabled() ? "yoqilgan" : "o‘chiq — qidiruv rejimi"})`) });
+  onStart: me => console.log(`HuquqYo‘l bot ishga tushdi: @${me.username}  (AI: ${aiEnabled() ? aiProvider() : "o‘chiq — qidiruv rejimi"})`) });

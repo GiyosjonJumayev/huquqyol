@@ -1,6 +1,6 @@
 // Bot ekranlari: dvigateldan (server/*) olingan natijani Telegram xabariga aylantirish.
 // Bu yerda huquqiy mantiq YO‘Q: muddat, summa, normalar va hujjat matni — analyze/buildPlan/documentModel dan.
-import { analyze, aiEnabled } from "../server/analyze.js";
+import { analyze, aiEnabled, aiProvider } from "../server/analyze.js";
 import { buildPlan } from "../server/plan.js";
 import { documentModel, toDocx, toPdf } from "../server/documents.js";
 import { kbFor } from "../server/kb.js";
@@ -73,7 +73,7 @@ export function splitMessage(text, max = 4000){
 
 export function startScreen(lang){
   const T = botT(lang);
-  const text = [T("start"), "", T("privacy") + (aiEnabled() ? " " + T("privacyAi") : ""), "", T("chooseLang")].join("\n");
+  const text = [T("start"), "", T("privacy") + (aiEnabled() ? " " + T(aiProvider() === "gemini" ? "privacyAiG" : "privacyAi") : ""), "", T("chooseLang")].join("\n");
   return { text, keyboard: [[btn("O‘zb", "lang:uz"), btn("Ўзб", "lang:cyr"), btn("Рус", "lang:ru")]] };
 }
 

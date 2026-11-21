@@ -338,6 +338,7 @@ const PV = {
   h2: ["Tahlil va hujjat", "Анализ и документ"],
   p2: ["Holat matni tahlil uchun serverga yuboriladi va saqlanmaydi. Ariza ma’lumotlari faqat DOCX yoki PDF fayl yasash uchun ishlatiladi.", "Текст ситуации отправляется на сервер для анализа и не сохраняется. Данные заявления используются только для создания файла DOCX или PDF."],
   pAi: ["Hozir AI rejimi yoqilgan: tahlil uchun matn Anthropic (Claude, AQSH) ga uzatiladi.", "Сейчас включён режим AI: для анализа текст передаётся в Anthropic (Claude, США)."],
+  pAiG: ["Hozir AI rejimi yoqilgan: tahlil uchun matn Google (Gemini) ga yuboriladi; HuquqYo‘l uni saqlamaydi. Gemini’ning bepul tarifida Google so‘rovlardan o‘z xizmatlarini yaxshilash uchun foydalanishi mumkin, shuning uchun pilotda u faqat namoyish uchun ishlatiladi.", "Сейчас включён режим AI: для анализа текст отправляется в Google (Gemini); HuquqYo‘l его не сохраняет. На бесплатном тарифе Gemini Google может использовать запросы для улучшения своих сервисов, поэтому в пилоте он используется только для демонстрации."],
   pNoAi: ["Hozir AI rejimi o‘chirilgan: tahlil faqat shu serverda, qoidalar bilan bajariladi.", "Сейчас режим AI выключен: анализ выполняется только на этом сервере, по правилам."],
   h3: ["Hujjat rasmi va PDF", "Фото документа и PDF"],
   p3: ["Rasm o‘qish uchun serverga yuboriladi: faqat so‘rov davomida xotirada turadi, saqlanmaydi va logga yozilmaydi. PDF faylning o‘zi serverga yuborilmaydi — brauzer undan matn yoki sahifa rasmlarini oladi.", "Фото отправляется на сервер для распознавания: находится в памяти только во время запроса, не сохраняется и не пишется в журнал. Сам PDF-файл на сервер не отправляется — браузер извлекает из него текст или изображения страниц."],
@@ -352,16 +353,16 @@ const PV = {
   botSoon: ["Bot havolasi tez orada shu yerda bo‘ladi.", "Ссылка на бота скоро появится здесь."],
   botOpen: ["Botni ochish", "Открыть бота"]
 };
-export function privacyPage({ lang, cssHref, fs, user, accHref, ai = false, botUrl = "" }){
+export function privacyPage({ lang, cssHref, fs, user, accHref, ai = false, provider = null, botUrl = "" }){
   // Texnik nomlar (cookie nomlari, buyruqlar, fayl turlari) kirillga o‘girilmaydi
-  const keep = /(hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|DOCX|PDF|AI|Telegram)/;
+  const keep = /(hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|Google|Gemini|DOCX|PDF|AI|Telegram)/;
   const p = k => { const s = PV[k][idx(lang)]; return lang === "cyr" ? s.split(keep).map((x, i) => i % 2 ? x : toCyrillic(x)).join("") : s; };
   const mt = makeT(lang);
   const bot = botUrlOf(botUrl) || botUrlOf(TELEGRAM_BOT_URL);
   const sec = (h, ...ps) => `<section class="pvsec"><h2 class="sec">${esc(p(h))}</h2>${ps.map(x => `<p>${esc(p(x))}</p>`).join("")}</section>`;
   return page({ lang, cssHref, fs, user, accHref, path: "/maxfiylik", title: p("title"), desc: p("lead"), body: `
     <h1>${esc(p("title"))}</h1><p class="lead">${esc(p("lead"))}</p>
-    ${sec("h1", "p1")}${sec("h2", "p2", ai ? "pAi" : "pNoAi")}${sec("h3", "p3")}${sec("h4", "p4")}${sec("h5", "p5")}${sec("h6", "p6")}
+    ${sec("h1", "p1")}${sec("h2", "p2", !ai ? "pNoAi" : provider === "gemini" ? "pAiG" : "pAi")}${sec("h3", "p3")}${sec("h4", "p4")}${sec("h5", "p5")}${sec("h6", "p6")}
     <section class="pvsec" id="bot"><h2 class="sec">${esc(p("h7"))}</h2><p>${esc(p("p7"))}</p>
       <p>${bot ? `<a class="btn ghost" href="${esc(bot)}" target="_blank" rel="noopener noreferrer">${esc(p("botOpen"))}<span class="sr"> ${esc(mt("newTab"))}</span></a>` : esc(p("botSoon"))}</p></section>` });
 }
