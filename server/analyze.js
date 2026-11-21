@@ -13,8 +13,10 @@ const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5";
 const GEMINI_MODEL = /^[\w.-]{1,80}$/.test(process.env.GEMINI_MODEL || "") ? process.env.GEMINI_MODEL : "gemini-4-hydrogen";
 const GEMINI_URL = m => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`;
 export const AI_TIMEOUT_MS = 10_000;          // tahlil: 10 soniyada javob bo‘lmasa — qoidalar rejimi
+let aiTimeout = AI_TIMEOUT_MS;
+export const _setAiTimeout = ms => { aiTimeout = ms || AI_TIMEOUT_MS; };   // testlar uchun
 
-function pickProvider(env = process.env){
+export function pickProvider(env = process.env){
   const want = String(env.AI_PROVIDER || "").trim().toLowerCase();
   const has = { anthropic: !!env.ANTHROPIC_API_KEY, gemini: !!env.GEMINI_API_KEY };
   if (want === "anthropic" || want === "gemini"){
@@ -36,7 +38,7 @@ export const aiClient = () => client;          // eski moslik (Anthropic mijozi)
 export const MODEL = ANTHROPIC_MODEL;
 // Testlar uchun: _setClient(c) — Anthropic soxta mijozi; _setGemini(key) — Gemini (fetch soxtalanadi)
 export const _setClient = c => { client = c; provider = c ? "anthropic" : null; geminiKey = null; };
-export const _setGemini = key => { geminiKey = key || null; provider = key ? "gemini" : null; client = null; };
+export const _setGemini = key => { geminiKey = key || null; provider = key ? "gemini" : null; client = null; thinkIdx = 0; };
 
 // Gemini fikrlash darajasi: tezlik kerak (tasniflash + faktlar), shuning uchun eng past daraja.
 // GEMINI_THINKING: minimal | low | medium | high | son (thinkingBudget) | off. Model darajani qabul qilmasa — keyingisi.
@@ -78,7 +80,7 @@ async function geminiCall({ system, text, images = [], maxTokens, timeoutMs }){
 }
 
 // Yagona provayder funksiyasi: tizim ko‘rsatmasi + foydalanuvchi matni (+ rasmlar) → model javobi (matn)
-export async function aiComplete({ system, text, images = [], maxTokens = 700, timeoutMs = AI_TIMEOUT_MS }){
+export async function aiComplete({ system, text, images = [], maxTokens = 700, timeoutMs = aiTimeout }){
   if (provider === "gemini" && geminiKey) return geminiCall({ system, text, images, maxTokens, timeoutMs });
   if (provider === "anthropic" && client){
     const content = images.length ? [...images.map(i => ({ type:"image", source:{ type:"base64", media_type: i.mediaType, data: i.data } })), { type:"text", text }] : text;
