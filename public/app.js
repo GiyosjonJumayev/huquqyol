@@ -1,5 +1,6 @@
 // HuquqYo‘l — frontend. Huquqiy mantiq serverda (/api/*); bu fayl ko‘rsatadi, saqlaydi va yo‘naltiradi.
-import { esc, ICONS, examples, domainCardsHTML, examplesHTML, acctHTML } from "/shared.js";
+import { esc, ICONS, examples, domainCardsHTML, examplesHTML, applyNavState } from "/shared.js";
+import "/session.js";
 import { makeT, normLang, fmtDate, fmtMoney } from "/i18n.js";
 import { toCyrillic as toCyr } from "/translit.js";
 import { ttsSupported, stop as ttsStop, isSpeaking, mountA11y } from "/a11y.js";
@@ -938,11 +939,7 @@ $("#missing").addEventListener("click", () => {
 });
 $("#home").addEventListener("click", () => go(1));
 // Navbar: hisob holati (bosh sahifa keshlanadi, shuning uchun alohida so‘rov) va ochiladigan menyular
-fetch("/api/me", { credentials:"same-origin" }).then(r => r.ok ? r.json() : null).then(d => {
-  if (!d?.user) return;
-  document.querySelectorAll("[data-acct]").forEach(el => { el.innerHTML = acctHTML(d.user, t); });
-  document.querySelectorAll("[data-acct-full]").forEach(el => { el.innerHTML = acctHTML(d.user, t, { full: true }); });
-}).catch(() => {});
+fetch("/api/me", { credentials:"same-origin" }).then(r => r.ok ? r.json() : null).then(d => applyNavState(d, t)).catch(() => {});
 document.addEventListener("click", e => { document.querySelectorAll("details.navdd[open]").forEach(d => { if (!d.contains(e.target) || e.target.closest(".ddpanel a, .ddpanel button")) d.removeAttribute("open"); }); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll("details.navdd[open]").forEach(d => { d.removeAttribute("open"); d.querySelector("summary")?.focus(); }); });
 $("#moreEx").addEventListener("click", e => {

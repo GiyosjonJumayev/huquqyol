@@ -14,6 +14,7 @@ export function setFs(level){
   const v = Math.max(0, Math.min(FS_LEVELS - 1, Number(level) || 0));
   if (v) document.documentElement.dataset.fs = String(v); else delete document.documentElement.dataset.fs;
   document.cookie = `${FS_COOKIE}=${v}; Max-Age=${365 * 86400}; Path=/; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+  dispatchEvent(new Event("hy:layout"));             // navbar sig‘ishi qayta tekshiriladi (public/session.js)
   return v;
 }
 

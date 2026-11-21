@@ -1101,3 +1101,47 @@ html[data-fs="3"] .a11ydlg .fsopts,html[data-fs="3"] .thopts{grid-template-colum
 .tag.demo{text-transform:none;letter-spacing:.02em;border:1px solid var(--warn)}
 .prof h1 .tag,.lawyer h2 .tag{font-family:var(--f-body);vertical-align:middle}
 .tscroll:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* ---------- Hisob menyusi (avatar tugmasi) va «Chiqish» ---------- */
+.acctdd>summary.navuser{padding:4px 10px 4px 4px;gap:8px;border-radius:999px;max-width:240px}
+.acctdd>summary .un{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.acctpanel{min-width:260px;display:grid;gap:2px;padding:8px}
+.acctbox{display:flex;align-items:center;gap:10px;padding:6px 8px 10px;min-width:0}
+.acctbox .av{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:calc(13px * var(--fs))}
+.accwho2{display:grid;min-width:0;line-height:1.25}
+.accwho2 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.accwho2 small{color:var(--muted);font-size:calc(12.5px * var(--fs))}
+.ddlink{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 10px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:600}
+.ddlink:hover{background:var(--chip)}
+.ddlink .ni{color:var(--accent)}
+.ddlink[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.ddsep{height:1px;background:var(--line);margin:6px 2px}
+.btn.danger.logoutbtn{min-height:44px;padding:9px 16px;gap:8px;font-size:calc(14.5px * var(--fs))}
+.btn.danger.logoutbtn svg,.btn.danger.logoutbtn .ni{width:18px;height:18px;flex:none;color:currentColor}
+.btn.danger:focus-visible{outline:3px solid var(--stamp);outline-offset:3px}
+.acctpanel .logoutbtn,.acct.full .logoutbtn{width:100%;justify-content:center}
+.acct.full .acctbox{grid-column:1/-1;padding:4px 2px}
+.acct.full .acctlinks{grid-column:1/-1;display:grid;gap:2px}
+.acct.full .logoutbtn{grid-column:1/-1}
+/* «Hisobim» va admin sarlavhasi: «Chiqish» o‘ng yuqorida */
+.acchead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px}
+.acchead .accwho{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.acchead .accwho h1{margin:0}
+.acchead .logoutbtn{margin-left:auto}
+/* Kirgan foydalanuvchi: 1280px gacha bo‘limlar, til va hisob ☰ menyuga yig‘iladi (ustma-ust tushmaydi) */
+@media (max-width:1280px){
+  .navbar[data-auth] .navlinks,.navbar[data-auth] .langdd,.navbar[data-auth] .navright>.acct{display:none}
+  .navbar[data-auth] .navmenu{display:block}
+  .navbar[data-auth] .navright{margin-left:auto}
+  .navbar[data-auth] .navmenu .menupanel{position:fixed;left:auto;right:max(12px, env(safe-area-inset-right,0px));top:76px;width:min(360px, calc(100vw - 24px));min-width:0;max-height:calc(100dvh - 92px);overflow:auto}
+}
+.navlink[hidden]{display:none!important}
+/* 403 */
+.card.fb{max-width:640px;margin:24px auto 0}
+.card.fb h1{margin:0 0 8px}
+.photoq li{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+/* Sig‘masa (public/session.js o‘lchaydi): har qanday kenglik, til va shrift darajasida ☰ menyuga */
+.navbar.compact .navlinks,.navbar.compact .langdd,.navbar.compact .navright>.acct{display:none}
+.navbar.compact .navmenu{display:block}
+.navbar.compact .navright{margin-left:auto}
+.navbar.compact .navmenu .menupanel{position:fixed;left:auto;right:max(12px, env(safe-area-inset-right,0px));top:76px;width:min(360px, calc(100vw - 24px));min-width:0;max-height:calc(100dvh - 92px);overflow:auto}

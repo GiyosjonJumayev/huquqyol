@@ -20,7 +20,7 @@ export async function proStatus(userId){
 export const requirePro = async (req, res, next) => {
   if (!req.user) return res.status(401).json({ error: "auth", key: "auth" });
   try { req.pro = await proStatus(req.user.id); } catch (e){ return next(e); }
-  return req.pro.tools || req.user.role === "admin" ? next() : next(err("needPro", 402));
+  return req.pro.tools ? next() : next(err("needPro", 402));     // admin uchun istisno yo‘q (server/access.js)
 };
 
 // ---------- Profil ----------

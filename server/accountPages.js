@@ -1,6 +1,7 @@
 // Hisob sahifalari: kirish, ro‘yxatdan o‘tish, «Hisobim» (fuqaro / yurist / tashkilot), admin paneli.
 // Serverda chiziladi; formalar public/account.js orqali JSON API ga yuboriladi (inline skript yo‘q — qat’iy CSP).
-import { page, tr as btr, pick } from "./business.js";
+import { page, tr as btr, pick, areaList } from "./business.js";
+import { ADMIN_SECTIONS } from "./access.js";
 import { fmtSum, fmtDate } from "../public/i18n.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
@@ -61,7 +62,28 @@ const T = {
   consBy: ["Kelishuvlar holati bo‘yicha", "Договорённости по статусу"], consDomain: ["Kelishuvlar sohalar bo‘yicha", "Договорённости по сферам"],
   roles: ["Rollar bo‘yicha", "По ролям"], newUsers: ["Yangi foydalanuvchilar (oylar)", "Новые пользователи (по месяцам)"], recent: ["So‘nggi foydalanuvchilar", "Последние пользователи"],
   role: ["Rol", "Роль"], created: ["Ro‘yxatdan o‘tgan", "Зарегистрирован"], lastLogin: ["Oxirgi kirish", "Последний вход"], save: ["Saqlash", "Сохранить"],
-  ro_citizen: ["Fuqaro", "Гражданин"], ro_lawyer: ["Yurist", "Юрист"], ro_org: ["Tashkilot", "Организация"], ro_admin: ["Admin", "Админ"],
+  ro_citizen: ["Fuqaro", "Гражданин"], ro_lawyer: ["Yurist", "Юрист"], ro_org: ["Tashkilot", "Организация"], ro_admin: ["Admin", "Админ"], ro_moderator: ["Moderator", "Модератор"], ro_guest: ["Mehmon", "Гость"],
+  ad_rasm: ["Rasmlar", "Фото"], ad_parol: ["Parol", "Пароль"],
+  photoQueue: ["Tekshirilmagan rasmlar", "Непроверенные фото"], photoLead: ["Yuristlar katalog uchun yuklagan rasmlar. Rasmda odamning yuzi bo‘lishi kerak; reklama va nomaqbul tasvir bo‘lmasligi kerak.", "Фото, загруженные юристами для каталога. На фото должно быть лицо человека, без рекламы и недопустимых изображений."],
+  photoOk: ["Tasdiqlash", "Одобрить"], photoDel: ["Rasmni o‘chirish", "Удалить фото"], photoOf: ["{n} rasmi", "Фото: {n}"], uploaded: ["Yuklangan", "Загружено"],
+  modLead: ["Moderator paneli: yurist arizalari va rasmlar.", "Панель модератора: заявки юристов и фото."],
+  apTitle: ["Yurist bo‘lish", "Стать юристом"],
+  apLead: ["Ariza moderatorga yuboriladi. Litsenziya yoki guvohnoma tekshirilgach, hisobingiz yurist hisobiga aylanadi va profilingizni to‘ldirishingiz mumkin.", "Заявка уходит модератору. После проверки лицензии или удостоверения ваш аккаунт станет аккаунтом юриста, и вы сможете заполнить профиль."],
+  apKind: ["Kim sifatida", "В качестве кого"], k_advokat: ["Advokat", "Адвокат"], k_yurist: ["Yurist", "Юрист"], k_firma: ["Yuridik firma", "Юридическая фирма"], k_mediator: ["Mediator", "Медиатор"],
+  apFirm: ["Firma yoki byuro (ixtiyoriy)", "Фирма или бюро (необязательно)"], apLicense: ["Litsenziya yoki guvohnoma raqami", "Номер лицензии или удостоверения"],
+  apRegion: ["Hudud", "Регион"], apDistrict: ["Tuman yoki shahar", "Район или город"], apExp: ["Tajriba (yil)", "Опыт (лет)"], apPhone: ["Telefon", "Телефон"],
+  apAreas: ["Faoliyat sohalari", "Сферы практики"], apFormats: ["Xizmat shakli", "Формат"], online: ["Onlayn", "Онлайн"], office: ["Ofisda", "В офисе"],
+  apLangs: ["Tillar", "Языки"], l_uz: ["O‘zbek", "Узбекский"], l_ru: ["Rus", "Русский"], l_en: ["Ingliz", "Английский"],
+  apHeadline: ["Qisqa tavsif", "Краткое описание"], apAbout: ["O‘zingiz haqida", "О себе"],
+  apConsent: ["Ma’lumotlarim to‘g‘ri; litsenziya tekshirilishiga roziman.", "Мои данные верны; согласен на проверку лицензии."],
+  apSend: ["Arizani yuborish", "Отправить заявку"],
+  apStatus: ["Arizangiz holati", "Статус заявки"], ap_pending: ["Ko‘rib chiqilmoqda", "На рассмотрении"], ap_rejected: ["Rad etildi", "Отклонена"], ap_approved: ["Tasdiqlandi", "Одобрена"],
+  apAgain: ["Arizani yangilab qayta yuborish mumkin.", "Можно обновить заявку и отправить снова."],
+  apCta: ["Siz yuristmisiz? Katalogga qo‘shilish uchun ariza bering.", "Вы юрист? Подайте заявку на включение в каталог."], apGo: ["Yurist bo‘lish →", "Стать юристом →"],
+  fbTitle: ["Bu bo‘lim sizning hisobingiz uchun emas", "Этот раздел не для вашего аккаунта"],
+  fbRole: ["Siz «{r}» sifatida kirgansiz. Bu sahifani boshqa turdagi hisob ochadi.", "Вы вошли как «{r}». Эту страницу открывает аккаунт другого типа."],
+  fbSection: ["Bu bo‘lim sizning rolingiz uchun yopiq.", "Этот раздел закрыт для вашей роли."],
+  fbHome: ["Mening sahifamga", "На мою страницу"], fbStart: ["Bosh sahifaga", "На главную"], fbOther: ["Boshqa hisob bilan kirish", "Войти в другой аккаунт"],
   none: ["Ma’lumot yo‘q.", "Нет данных."], statsOff: ["Anonim statistika o‘chirilgan (STATS=0).", "Анонимная статистика отключена (STATS=0)."]
 };
 const L = lang => (k, v = {}) => { const s = (T[k] || [k, k])[lang === "ru" ? 1 : 0].replace(/\{(\w+)\}/g, (_, x) => v[x] ?? ""); return lang === "cyr" ? toCyrillic(s) : s; };
@@ -69,6 +91,9 @@ const money = (n, lang) => `${fmtSum(Number(n) || 0)} ${lang === "ru" ? "сум"
 const date = (d, lang) => d ? (s => lang === "cyr" ? toCyrillic(s) : s)(fmtDate(new Date(d), lang === "ru" ? "ru" : "uz")) : "—";
 const field = (id, label, input, hint = "") => `<div class="field"><label for="${id}">${esc(label)}</label>${input}${hint ? `<span class="hint">${esc(hint)}</span>` : ""}</div>`;
 const err = `<p class="err" data-err role="alert" hidden></p>`;
+// «Chiqish» — qizil tugma (matn + belgi), klaviatura bilan ishlaydi; public/session.js boshqaradi
+const LOGOUT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>';
+export const logoutButton = t => `<button class="btn danger logoutbtn" type="button" data-logout>${LOGOUT_ICON}<span>${esc(t("logout"))}</span></button>`;
 const safeNext = n => typeof n === "string" && /^\/[a-z0-9/_-]*(\?[a-z0-9=&_%-]*)?$/i.test(n) && !n.startsWith("//") ? n : "";
 
 export function loginPage({ lang, cssHref, fs, user, accHref, query, db }){
@@ -128,34 +153,84 @@ const consRow = (c, lang, side) => {
     <div class="rowbtn">${actions}</div>${err}</li>`;
 };
 
-export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons, panel = "" }){
+export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons, panel = "", application = null }){
   const t = L(lang);
   const subRows = subs.length ? `<ul class="klist">${subs.map(s => `<li><div><b>${esc(t("pl_" + s.plan))}</b> · <span class="tag">${esc(t("st_" + s.status))}</span>
       ${s.ends_at ? ` · ${esc(t("until", { d: date(s.ends_at, lang) }))}` : ""}<br><span class="muted">${esc(t("price"))}: ${s.plan === "org" && !Number(s.price) ? "—" : esc(money(s.price, lang))}</span></div></li>`).join("")}</ul>` : `<p class="empty">${esc(t("noSubs"))}</p>`;
   const lawyer = cons.lawyer;
   return page({ lang, cssHref, fs, user, accHref, path: "/hisob", title: t("hello", { n: user.name }), desc: "", body: `
-    <div class="acchead"><h1>${esc(t("hello", { n: user.name }))}</h1><span class="tag">${esc(t("ro_" + user.role))}</span>
-      <button class="btn ghost" type="button" data-post="/api/auth/logout">${esc(t("logout"))}</button></div>
+    <div class="acchead"><div class="accwho"><h1>${esc(t("hello", { n: user.name }))}</h1><span class="tag">${esc(t("ro_" + user.role))}</span></div>${logoutButton(t)}</div>
     <p class="muted">${esc(user.email)}${user.org_name ? ` · ${esc(t("org"))}: ${esc(user.org_name)}` : ""}</p>
     ${panel}
-    ${user.role !== "citizen" ? `<h2 class="sec">${esc(t("subs"))}</h2>${subRows}<p class="small muted">${esc(t("payNote"))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("subscribe"))}</a> <a class="btn ghost" href="/kabinet">${esc(t("toCabinet"))}</a></p>` : ""}
+    ${user.role === "citizen" ? applyBox(application, lang) : ""}
+    ${["lawyer", "org"].includes(user.role) ? `<h2 class="sec">${esc(t("subs"))}</h2>${subRows}<p class="small muted">${esc(t("payNote"))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("subscribe"))}</a> <a class="btn ghost" href="/kabinet">${esc(t("toCabinet"))}</a></p>` : ""}
     ${user.role === "lawyer" ? `<h2 class="sec">${esc(t("inCons"))}</h2>${cons.asLawyer.length ? `<ul class="klist">${cons.asLawyer.map(c => consRow(c, lang, "lawyer")).join("")}</ul>` : `<p class="empty">${esc(t("noIn"))}</p>`}` : ""}
     <h2 class="sec">${esc(t("myCons"))}</h2>${cons.asCitizen.length ? `<ul class="klist">${cons.asCitizen.map(c => consRow(c, lang, "citizen")).join("")}</ul>` : `<p class="empty">${esc(t("noCons"))} <a href="/yuristlar">${esc(btr(lang)("navLawyers"))}</a></p>`}
     <h2 class="sec">${esc(t("security"))}</h2>
-    <form class="card kform narrow" data-api="/api/auth/password" data-ok="${esc(t("pwChanged"))}">
+    ${passwordForm(t)}` });
+}
+const passwordForm = t => `<form class="card kform narrow" data-api="/api/auth/password" data-ok="${esc(t("pwChanged"))}">
       ${field("a_cur", t("curPw"), `<input id="a_cur" name="current" type="password" required autocomplete="current-password">`)}
       ${field("a_new", t("newPw"), `<input id="a_new" name="password" type="password" required minlength="8" autocomplete="new-password">`, t("pwHint"))}
-      <button class="btn primary" type="submit">${esc(t("changePw"))}</button>${err}<p class="ok" data-ok-msg hidden></p></form>` });
+      <button class="btn primary" type="submit">${esc(t("changePw"))}</button>${err}<p class="ok" data-ok-msg hidden></p></form>`;
+
+// Fuqaro «Hisobim»: «Yurist bo‘lish» arizasi holati yoki taklif
+function applyBox(app, lang){
+  const t = L(lang);
+  if (!app) return `<aside class="card join"><p>${esc(t("apCta"))}</p><a class="btn ghost" href="/yurist-bolish">${esc(t("apGo"))}</a></aside>`;
+  return `<aside class="card join"><h2>${esc(t("apStatus"))}: <span class="tag">${esc(t("ap_" + app.status))}</span></h2>
+    ${app.status === "rejected" ? `<p>${app.review_note ? esc(app.review_note) + " " : ""}${esc(t("apAgain"))}</p><a class="btn ghost" href="/yurist-bolish">${esc(t("apGo"))}</a>` : ""}</aside>`;
 }
 
+// «Yurist bo‘lish» — fuqaro arizasi (yurist profil muharriridan alohida). Moderator tasdiqlagach rol «lawyer» bo‘ladi.
+export function applyPage({ lang, cssHref, fs, user, accHref, application }){
+  const t = L(lang), a = application && application.status === "rejected" ? application : null;
+  const pending = application?.status === "pending";
+  const regionOpts = [["", "—"], ...COURTS.regions.map(r => [r.name, lang === "ru" ? r.cyr : lang === "cyr" ? toCyrillic(r.name) : r.name])];
+  const sel = (id, name, opts, cur) => `<select id="${id}" name="${name}">${opts.map(([v, l]) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+  const checks = (name, opts, cur = []) => `<div class="checks">${opts.map(([v, l]) => `<label class="check"><input type="checkbox" name="${name}[]" value="${esc(v)}"${cur.includes(v) ? " checked" : ""}> ${esc(l)}</label>`).join("")}</div>`;
+  const group = (legend, inner) => `<fieldset class="kab"><legend>${esc(legend)}</legend>${inner}</fieldset>`;
+  return page({ lang, cssHref, fs, user, accHref, path: "/yurist-bolish", title: t("apTitle"), desc: t("apLead"), body: `
+    <h1>${esc(t("apTitle"))}</h1><p class="lead">${esc(t("apLead"))}</p>
+    ${application ? `<p class="note${pending ? " warn" : ""}" role="status">${esc(t("apStatus"))}: <b>${esc(t("ap_" + application.status))}</b>${application.status === "rejected" && application.review_note ? ` — ${esc(application.review_note)}` : ""}</p>` : ""}
+    ${pending ? "" : `<form class="card kform" data-api="/api/lawyers/apply" data-next="/hisob">
+      ${field("ap_kind", t("apKind"), sel("ap_kind", "kind", ["advokat", "yurist", "firma", "mediator"].map(k => [k, t("k_" + k)]), a?.kind || "yurist"))}
+      ${field("ap_name", t("name"), `<input id="ap_name" name="name" required minlength="2" maxlength="120" autocomplete="name" value="${esc(a?.name || user.name)}">`)}
+      ${field("ap_firm", t("apFirm"), `<input id="ap_firm" name="firm" maxlength="160" value="${esc(a?.firm || "")}">`)}
+      ${field("ap_lic", t("apLicense"), `<input id="ap_lic" name="license" maxlength="60" value="${esc(a?.license || "")}">`)}
+      <div class="grid2">${field("ap_region", t("apRegion"), sel("ap_region", "region", regionOpts, a?.region || ""))}
+        ${field("ap_district", t("apDistrict"), `<input id="ap_district" name="district" maxlength="80" value="${esc(a?.district || "")}">`)}</div>
+      <div class="grid2">${field("ap_phone", t("apPhone"), `<input id="ap_phone" name="phone" type="tel" required autocomplete="tel" maxlength="40" value="${esc(a?.phone || user.phone || "")}">`)}
+        ${field("ap_email", t("email"), `<input id="ap_email" name="email" type="email" maxlength="120" autocomplete="email" value="${esc(a?.email || user.email || "")}">`)}</div>
+      ${field("ap_exp", t("apExp"), `<input id="ap_exp" name="experience" inputmode="numeric" maxlength="2" value="${esc(a?.experience ?? "")}">`)}
+      ${group(t("apAreas"), checks("areas", areaList(lang).map(x => [x.id, x.title]), a?.areas))}
+      ${group(t("apFormats"), checks("formats", [["online", t("online")], ["office", t("office")]], a?.formats || ["online"]))}
+      ${group(t("apLangs"), checks("langs", [["uz", t("l_uz")], ["ru", t("l_ru")], ["en", t("l_en")]], a?.langs || ["uz"]))}
+      ${field("ap_head", t("apHeadline"), `<input id="ap_head" name="headline" maxlength="200" value="${esc(a?.headline || "")}">`)}
+      ${field("ap_about", t("apAbout"), `<textarea id="ap_about" name="about" rows="5" maxlength="1500">${esc(a?.about || "")}</textarea>`)}
+      <label class="check"><input type="checkbox" name="consent" required> ${esc(t("apConsent"))}</label>
+      <button class="btn primary" type="submit">${esc(t("apSend"))}</button>${err}</form>`}` });
+}
+
+// 403: do‘stona xabar va rolning o‘z sahifasiga havola
+export function forbiddenPage({ lang, cssHref, fs, user, accHref, reason, home }){
+  const t = L(lang), role = user?.role || "guest";
+  return page({ lang, cssHref, fs, user, accHref, path: "/403", title: t("fbTitle"), desc: "", body: `
+    <section class="card fb" aria-labelledby="fbH"><h1 id="fbH">${esc(t("fbTitle"))}</h1>
+      <p>${esc(reason === "role" ? t("fbRole", { r: t("ro_" + role) }) : t("fbSection"))}</p>
+      <p class="rowbtn"><a class="btn primary" href="${esc(home)}">${esc(t("fbHome"))}</a><a class="btn ghost" href="/">${esc(t("fbStart"))}</a></p>
+      <p class="small"><button class="linkbtn" type="button" data-logout data-next="/kirish">${esc(t("fbOther"))}</button></p></section>` });
+}
+
+
 // ---------- Admin ----------
-const SECTIONS = ["umumiy", "murojaat", "daromad", "obuna", "yurist", "kelishuv", "users"];
 const bar = (n, max) => `<svg class="hbar" width="100%" height="12" aria-hidden="true" focusable="false"><rect class="track" width="100%" height="12" rx="4"/>${n ? `<rect class="fill" width="${Math.max(1, n / max * 100).toFixed(2)}%" height="12" rx="4"/>` : ""}</svg>`;
 const table = (head, rows, cls = "") => rows.length ? `<div class="tscroll" tabindex="0"><table class="${cls}"><thead><tr>${head.map(h => /^@/.test(h) ? `<th scope="col"><span class="sr">${esc(h.slice(1))}</span></th>` : `<th scope="col"${/^#/.test(h) ? ` class="numc"` : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : "";
 const tile = (v, label) => `<div class="stattile"><div class="stv">${v}</div><div class="stl">${esc(label)}</div></div>`;
 
-export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
-  const t = L(lang), b = SECTIONS.includes(query.b) ? query.b : "umumiy";
+export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s, photos = [] }){
+  const allowed = ADMIN_SECTIONS[user.role] || [];                 // moderator: faqat yurist arizalari va rasmlar (server/access.js)
+  const t = L(lang), b = allowed.includes(query.b) ? query.b : allowed[0];
   const kb = kbFor(lang === "ru" ? "ru" : "uz"), cy = x => lang === "cyr" ? toCyrillic(x) : x;
   const ym = new Date().toISOString().slice(0, 7);
   const revMonths = [...new Set(a.revenue.map(r => r.m))];
@@ -169,7 +244,7 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
     `<tr><th scope="row">${esc(d.title)}</th><td class="barcell">${bar(d.n, maxD)}</td><td class="numc">${fmtSum(d.n)}</td><td class="numc">${s.total ? Math.round(d.n / s.total * 100) : 0}%</td><td class="numc">${fmtSum(d.docs)}</td></tr>`), "stt bars");
   const revTable = table([t("month"), "#" + t("fromSubs"), "#" + t("fromComm"), "#" + t("total")], revMonths.map(m =>
     `<tr><th scope="row">${esc(m)}</th><td class="numc">${esc(money(revBy(m, "subscription"), lang))}</td><td class="numc">${esc(money(revBy(m, "commission"), lang))}</td><td class="numc"><b>${esc(money(revBy(m, "subscription") + revBy(m, "commission"), lang))}</b></td></tr>`));
-  const nav = `<nav class="kabtabs" aria-label="${esc(t("adTitle"))}">${SECTIONS.map(x => `<a href="/admin?b=${x}"${x === b ? ` aria-current="page"` : ""}>${esc(t("ad_" + x))}</a>`).join("")}</nav>`;
+  const nav = `<nav class="kabtabs" aria-label="${esc(t("adTitle"))}">${allowed.map(x => `<a href="/admin?b=${x}"${x === b ? ` aria-current="page"` : ""}>${esc(t("ad_" + x))}</a>`).join("")}</nav>`;
   const evRef = ref => a.events.find(e => e.lawyer_ref === ref) || { views: 0, requests: 0 };
   let body = "";
   if (b === "umumiy") body = `<div class="kabstats">
@@ -211,15 +286,22 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
     body = `<h2 class="sec">${esc(t("consBy"))}</h2>${table([t("status"), "@" + t("bar"), "#" + t("count"), "#" + t("value")], a.cons.map(c => `<tr><th scope="row">${esc(t("c_" + c.status))}</th><td class="barcell">${bar(c.n, maxC)}</td><td class="numc">${c.n}</td><td class="numc">${esc(money(c.value, lang))}</td></tr>`), "stt bars") || `<p class="empty">${esc(t("none"))}</p>`}
       <h2 class="sec">${esc(t("consDomain"))}</h2>${table([t("domain"), "#" + t("count")], a.consDomain.map(d => `<tr><th scope="row">${esc(cy(kb.DOMAINS.find(x => x.id === d.domain)?.title || d.domain))}</th><td class="numc">${d.n}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}`;
   }
+  else if (b === "rasm") body = `<h2 class="sec">${esc(t("photoQueue"))}</h2><p class="muted">${esc(t("photoLead"))}</p>
+    ${photos.length ? `<ul class="klist photoq">${photos.map(p => `<li><img class="ava big photo" src="/yuristlar/rasm/${p.id}?v=${new Date(p.photo_at).getTime()}" alt="${esc(t("photoOf", { n: p.name }))}" width="96" height="96" loading="lazy">
+        <div><b>${esc(p.name)}</b> · ${esc(p.kind)} · ${esc(t("prof_" + p.status))}<br><span class="small muted">${esc(t("uploaded"))}: ${esc(date(p.photo_at, lang))}</span></div>
+        <div class="rowbtn"><button class="btn primary" type="button" data-post="/api/admin/photo/${p.id}/approve">${esc(t("photoOk"))}</button><button class="btn ghost" type="button" data-post="/api/admin/photo/${p.id}/remove">${esc(t("photoDel"))}</button></div>${err}</li>`).join("")}</ul>`
+      : `<p class="empty">${esc(t("none"))}</p>`}`;
+  else if (b === "parol") body = `<h2 class="sec">${esc(t("security"))}</h2>${passwordForm(t)}`;
   else if (b === "users"){
-    const roles = ["citizen", "lawyer", "org", "admin"];
+    const roles = ["citizen", "lawyer", "org", "moderator", "admin"];
     body = `<div class="kabstats">${roles.map(r => tile(fmtSum(a.roles.find(x => x.role === r)?.n || 0), t("ro_" + r))).join("")}</div>
       <h2 class="sec">${esc(t("newUsers"))}</h2>${table([t("month"), "#" + t("count")], a.newUsers.map(r => `<tr><th scope="row">${esc(r.m)}</th><td class="numc">${r.n}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}
       <h2 class="sec">${esc(t("recent"))}</h2>${table([t("name"), t("email"), t("role"), t("created"), t("lastLogin")], a.recentUsers.map(u => `<tr><th scope="row">${esc(u.name)}</th><td>${esc(u.email)}</td>
         <td><form class="inline" data-api="/api/admin/user/${u.id}/role"><select name="role" aria-label="${esc(t("role"))}">${roles.map(r => `<option value="${r}"${r === u.role ? " selected" : ""}>${esc(t("ro_" + r))}</option>`).join("")}</select><button class="btn ghost" type="submit">${esc(t("save"))}</button></form>${err}</td>
         <td>${esc(date(u.created_at, lang))}</td><td>${esc(date(u.last_login_at, lang))}</td></tr>`))}`;
   }
-  return page({ lang, cssHref, fs, user, accHref, path: `/admin?b=${b}`, title: t("adTitle"), desc: "", body: `<h1>${esc(t("adTitle"))}</h1>${nav}${body}` });
+  return page({ lang, cssHref, fs, user, accHref, path: `/admin?b=${b}`, title: t("adTitle"), desc: "", body: `<div class="acchead"><div class="accwho"><h1>${esc(t("adTitle"))}</h1><span class="tag">${esc(t("ro_" + user.role))}</span></div>${logoutButton(t)}</div>
+    ${user.role === "moderator" ? `<p class="muted">${esc(t("modLead"))}</p>` : ""}${nav}${body}` });
 }
 export const pricesFor = () => PRICES;
 export { consRow, field, L, esc, money, date };

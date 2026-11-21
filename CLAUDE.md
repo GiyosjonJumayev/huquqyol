@@ -23,8 +23,8 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (145 tests; 3 DB tests skip without TEST_DATABASE_URL)
-npm run test:e2e         # 13 browser tests incl. axe; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
+npm test                 # node:test, must stay green (151 tests; 4 DB tests skip without TEST_DATABASE_URL)
+npm run test:e2e         # 14 browser tests incl. axe and navbar overlap per role; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
 ```
@@ -45,10 +45,15 @@ become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, 
   `public/a11y.js` `mountA11y()` drives the modal: 4 font sizes (`hy_fs` cookie), read aloud, light/dark (`hy_theme` cookie).
   One type scale: server pages reuse the home classes/sizes — don't reuse home-only classes like `.big`/`.how` for other things.
 - Server-rendered pages use `page()` in `server/business.js` (+ `statsPage.js`): `/yuristlar`, `/yuristlar/:id`,
-  `/tariflar`, `/kabinet`, `/kirish`, `/royxat`, `/hisob`, `/hisob/profil`, `/hisob/statistika`, `/admin`, `/statistika`, `/maxfiylik`.
+  `/tariflar`, `/kabinet`, `/kirish`, `/royxat`, `/hisob`, `/yurist-bolish` (citizen's lawyer application), `/hisob/profil`, `/hisob/statistika`, `/admin`, `/statistika`, `/maxfiylik`.
   Client scripts for them: `public/account.js` (forms → JSON API), `public/kabinet.js` (Pro cabinet).
 - Accounts: PostgreSQL (`server/db.js` pool + migrations, `server/auth.js` scrypt passwords, HttpOnly session cookie,
-  roles citizen / lawyer / org / admin). `server/accountPages.js` — login, register, «Hisobim», admin dashboard.
+  roles citizen / lawyer / org / moderator / admin).
+- **Access control — single source of truth: `server/access.js`** (route → roles, `need: "pro"`, `ADMIN_SECTIONS`,
+  `ADMIN_ACTS`, `HOME`). One middleware enforces it on every page and /api route: guest → `/kirish?next=…` (pages) / 401 (API),
+  wrong role → friendly 403 page (link to the role's home), missing Pro → `/tariflar` / 402. Admin has no bypass: no
+  `/kabinet`, no lawyer editor, no citizen cabinet. Moderator: `/admin` only «yurist» and «rasm». Every new route must be
+  added to the matrix — `test/access.test.js` fails otherwise. The navbar only hides links (`navFor(role)`, `/api/me.nav`). `server/accountPages.js` — login, register, «Hisobim», admin dashboard.
 - Lawyers: `server/market.js` (catalog, consultations → agreement model, commission), `server/lawyer.js` (profile, photo,
   stats), `server/lawyerPages.js` (profile editor, lawyer stats). Catalog lists Pro lawyers + `demo:true` sample profiles.
 - Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Tashkilot). No payment gateway: admin confirms payment manually in `/admin`.

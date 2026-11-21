@@ -450,3 +450,68 @@ test("«Aa Qulaylik» modal oynasi har bir sahifada: Esc, fon, ×, fokus qaytadi
   assert.deepEqual(await audit(d), []);
   await d.context().close();
 });
+
+test("Navbar har bir rol uchun: 1024 / 1280 / 1440 da hech narsa ustma-ust emas; «Chiqish» klaviatura bilan ishlaydi", { skip }, async () => {
+  const { plansPage } = await import("../../server/business.js");
+  const { navFor } = await import("../../server/access.js");
+  const css = (await (await fetch(base)).text()).match(/href="(\/app\.css\?v=[^"]+)"/)[1];
+  const USERS = { guest: null, citizen: "citizen", lawyer: "lawyer", org: "org", moderator: "moderator", admin: "admin" };
+  const check = p => p.evaluate(() => {
+    const nb = document.querySelector(".navbar"), vis = e => e && getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0;
+    const items = [nb.querySelector(".brand"), ...nb.querySelectorAll(".navlinks > .navlink"), ...nb.querySelectorAll(".navright > a, .navright > button, .navright > details > summary, .navright > .acct > *")].filter(vis);
+    const R = items.map(e => e.getBoundingClientRect()), bad = [];
+    for (let i = 0; i < R.length; i++){
+      if (R[i].left < 0 || R[i].right > innerWidth + .5) bad.push("out");
+      for (let j = i + 1; j < R.length; j++) if (R[i].left < R[j].right - .5 && R[j].left < R[i].right - .5 && R[i].top < R[j].bottom - .5 && R[j].top < R[i].bottom - .5) bad.push("overlap");
+    }
+    if (document.documentElement.scrollWidth > innerWidth) bad.push("hscroll");
+    return { bad, kabinet: [...document.querySelectorAll('[data-nav="/kabinet"]')].some(a => !a.hidden) };
+  });
+  for (const [role, r] of Object.entries(USERS)){
+    const user = r && { id: 1, name: "Dilnoza Abdullayeva", role: r };
+    for (const lang of ["uz", "ru"]){
+      const html = plansPage({ lang, cssHref: css, user, accHref: "/account.js" });
+      for (const width of [1024, 1280, 1440]){
+        // Server sahifasi (rolga qarab chizilgan navbar)
+        const p = await page({ viewport: { width, height: 800 } });
+        await p.route(base + "__nav", x => x.fulfill({ contentType: "text/html", body: html }));
+        await p.goto(base + "__nav");
+        await p.waitForLoadState("networkidle");
+        const s = await check(p);
+        assert.deepEqual(s.bad, [], `${role} ${lang} ${width} (server)`);
+        assert.equal(s.kabinet, ["lawyer", "org"].includes(role), `${role}: Kabinet havolasi`);
+        // Bosh sahifa (navbar /api/me dan yangilanadi)
+        await p.route(base + "api/me", x => x.fulfill({ contentType: "application/json", body: JSON.stringify({ user, nav: navFor(role) }) }));
+        await p.context().addCookies([{ name: "hy_lang", value: lang, url: base }]);
+        await p.goto(base);
+        await p.waitForSelector(".domain");
+        await p.waitForTimeout(100);
+        assert.deepEqual((await check(p)).bad, [], `${role} ${lang} ${width} (bosh sahifa)`);
+        assert.deepEqual(p.errors, [], `${role} ${width}`);
+        await p.context().close();
+      }
+    }
+  }
+  // «Chiqish»: hisob menyusida, klaviatura bilan, ko‘rinadigan fokus halqasi; bosilganda sessiya yopiladi
+  const k = await page({ viewport: { width: 1600, height: 900 } });
+  let loggedOut = false;
+  await k.route(base + "api/me", x => x.fulfill({ contentType: "application/json", body: JSON.stringify({ user: { name: "Aziza Karimova", role: "admin" }, nav: navFor("admin") }) }));
+  await k.route(base + "api/auth/logout", x => { loggedOut = true; return x.fulfill({ contentType: "application/json", body: '{"ok":true,"next":"/"}' }); });
+  await k.goto(base);
+  await k.waitForSelector(".acctdd > summary");
+  await k.focus(".acctdd > summary");
+  await k.keyboard.press("Enter");
+  assert.ok(await k.isVisible(".acctpanel"));
+  assert.equal(await k.locator(".acctpanel a[href='/admin']").count(), 1);
+  assert.equal(await k.locator(".acctpanel a[href='/hisob']").count(), 0);                        // admin: fuqaro kabineti yo‘q
+  const out = k.getByRole("button", { name: "Chiqish" }).first();
+  for (let i = 0; i < 6 && !(await out.evaluate(e => e === document.activeElement)); i++) await k.keyboard.press("Tab");
+  assert.ok(await out.evaluate(e => e === document.activeElement), "Chiqish tugmasiga Tab bilan yetib boriladi");
+  const ring = await out.evaluate(e => getComputedStyle(e).outlineStyle !== "none" && parseFloat(getComputedStyle(e).outlineWidth) >= 2);
+  assert.ok(ring, "fokus halqasi");
+  assert.match(await out.evaluate(e => getComputedStyle(e).backgroundColor), /rgb\((1[5-9]\d|2\d\d), \d{1,2}, \d{1,2}\)|rgb\(168, 50, 42\)/);   // qizil (danger)
+  assert.deepEqual(await audit(k), []);
+  await Promise.all([k.waitForURL(base), k.keyboard.press("Enter")]);
+  assert.ok(loggedOut);
+  await k.context().close();
+});

@@ -66,29 +66,48 @@ const NI = {
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   chev: '<path d="m7 10 5 5 5-5"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
-  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>',
+  profile: '<rect x="4" y="3.5" width="16" height="17" rx="2.5"/><circle cx="12" cy="10" r="2.6"/><path d="M8 16.5c.6-1.7 2.1-2.6 4-2.6s3.4.9 4 2.6"/>',
+  shield: '<path d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  logout: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>'
 };
 const ni = (k, cls = "") => `<svg class="ni ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${NI[k]}</svg>`;
 const LOGO = '<svg class="logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>';
 const LANG_LABEL = { uz:["O‘zb", "O‘zbekcha (lotin)"], cyr:["Ўзб", "Ўзбекча (кирилл)"], ru:["Рус", "Русский"] };
 const initialsOf = n => String(n || "").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "•";
 
-/** Hisob bloki: kirmagan — «Kirish» (+ panelda «Ro‘yxatdan o‘tish»); kirgan — avatar va ism (+ admin uchun «Admin»). */
-export function acctHTML(user, t, { full = false } = {}){
+// Kirmagan foydalanuvchi ko‘radigan bo‘limlar. Har bir rol uchun ro‘yxat serverda: server/access.js navFor()
+export const GUEST_NAV = ["/", "/yuristlar", "/tariflar"];
+const ROLE_KEY = { citizen: "roleCitizen", lawyer: "roleLawyer", org: "roleOrg", moderator: "roleModerator", admin: "roleAdmin" };
+// Hisob menyusidagi bandlar (faqat rol ocha oladiganlari ko‘rinadi)
+const ACCT_LINKS = [["/hisob", "user", "navAccount"], ["/hisob/profil", "profile", "navProfile"], ["/admin", "shield", "navAdmin"]];
+export const logoutHTML = t => `<button class="btn danger logoutbtn" type="button" data-logout>${ni("logout")}<span>${esc(t("navLogout"))}</span></button>`;
+
+/** Hisob bloki: kirmagan — «Kirish» (+ panelda «Ro‘yxatdan o‘tish»); kirgan — avatar tugmasi va ochiladigan menyu
+ *  (Hisobim / Profil / Admin panel / Chiqish). full — ☰ menyu ichidagi ko‘rinish. */
+export function acctHTML(user, t, { full = false, nav = GUEST_NAV, path = "" } = {}){
   if (!user) return full
     ? `<a class="navlink" href="/kirish">${esc(t("navLogin"))}</a><a class="btn primary navcta" href="/royxat">${esc(t("navRegister"))}</a>`
     : `<a class="btn primary navcta" href="/kirish">${esc(t("navLogin"))}</a>`;
-  return (user.role === "admin" ? `<a class="navlink" href="/admin">${esc(t("navAdmin"))}</a>` : "")
-    + `<a class="navuser" href="/hisob" title="${esc(t("navAccount"))}"><span class="av" aria-hidden="true">${esc(initialsOf(user.name))}</span><span class="un">${esc(user.name)}</span><span class="sr"> — ${esc(t("navAccount"))}</span></a>`;
+  const av = `<span class="av" aria-hidden="true">${esc(initialsOf(user.name))}</span>`;
+  const who = `<span class="accwho2"><b>${esc(user.name)}</b><small>${esc(t(ROLE_KEY[user.role] || "roleCitizen"))}</small></span>`;
+  const links = ACCT_LINKS.filter(([href]) => nav.includes(href))
+    .map(([href, ic, k]) => `<a class="ddlink" href="${href}"${path.split("?")[0] === href ? ` aria-current="page"` : ""}>${ni(ic)}<span>${esc(t(k))}</span></a>`).join("");
+  if (full) return `<div class="acctbox">${av}${who}</div><nav class="acctlinks" aria-label="${esc(t("navAcctMenu"))}">${links}</nav>${logoutHTML(t)}`;
+  return `<details class="navdd acctdd"><summary class="navuser" aria-label="${esc(t("navAcctMenu"))}: ${esc(user.name)}">${av}<span class="un" aria-hidden="true">${esc(user.name)}</span>${ni("chev", "chev")}</summary>
+    <div class="ddpanel acctpanel"><div class="acctbox">${av}${who}</div>${links}<div class="ddsep" role="presentation"></div>${logoutHTML(t)}</div></details>`;
 }
 
-export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null, langHref = l => `?lang=${l}`, a11y = false }){
+/** Navbar: barcha sahifalarda bitta. nav — rol ocha oladigan sahifalar (server/access.js navFor); qolganlari yashiriladi.
+ *  Kirgan foydalanuvchida (data-auth) 1280px gacha hamma narsa ☰ menyuga yig‘iladi — hech narsa ustma-ust tushmaydi. */
+export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null, langHref = l => `?lang=${l}`, a11y = false, nav = GUEST_NAV }){
   const cur = p => (path.split("?")[0] === p ? ` aria-current="page"` : "");
   const links = [["/yuristlar", "lawyers", "navLawyers"], ["/tariflar", "plans", "navPlans"], ["/kabinet", "cabinet", "navCabinet"]];
   const applyLink = mode === "app"
     ? `<button type="button" class="navlink" data-go="1">${ni("apply")}<span>${esc(t("navApply"))}</span></button>`
     : `<a class="navlink" href="/"${cur("/")}>${ni("apply")}<span>${esc(t("navApply"))}</span></a>`;
-  const linksHTML = applyLink + links.map(([href, ic, k]) => `<a class="navlink" href="${href}"${cur(href)}>${ni(ic)}<span>${esc(t(k))}</span></a>`).join("");
+  const linksHTML = applyLink + links.map(([href, ic, k]) => `<a class="navlink" href="${href}" data-nav="${href}"${cur(href)}${nav.includes(href) ? "" : " hidden"}>${ni(ic)}<span>${esc(t(k))}</span></a>`).join("");
   const langs = ["uz", "cyr", "ru"].map(l => mode === "app"
     ? `<button type="button" data-lang="${l}" aria-pressed="${l === lang}" lang="${l === "cyr" ? "uz-Cyrl" : l}" title="${LANG_LABEL[l][1]}">${LANG_LABEL[l][0]}</button>`
     : `<a href="${esc(langHref(l))}"${l === lang ? ` aria-current="page"` : ""} lang="${l === "cyr" ? "uz-Cyrl" : l}" title="${LANG_LABEL[l][1]}">${LANG_LABEL[l][0]}</a>`).join("");
@@ -97,22 +116,34 @@ export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null
     ? `<button class="brand" id="home" type="button" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l<small>${esc(t("navTagline"))}</small></span></button>`
     : `<a class="brand" href="/" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l<small>${esc(t("navTagline"))}</small></span></a>`;
   const a11yBtn = a11y ? `<button class="btn ghost a11ybtn" id="a11yBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="a11yDlg" title="${esc(t("a11y"))}"><span class="aa" aria-hidden="true">Aa</span><span class="a11ylbl sr">${esc(t("a11y"))}</span></button>` : "";
-  return `<div class="navbar">
+  return `<div class="navbar"${user ? " data-auth" : ""}>
     ${brand}
     <nav class="navlinks" aria-label="${esc(t("navLabel"))}">${linksHTML}</nav>
     <div class="navright">
       <a class="navbtn themebtn" href="/mavzu?to=toggle&amp;back=${encodeURIComponent(path)}" data-theme-toggle title="${esc(t("themeToggle"))}">${ni("moon", "moon")}${ni("sun", "sun")}<span class="sr">${esc(t("themeToggle"))}</span></a>
       ${a11yBtn}
       <details class="navdd langdd"><summary title="${esc(t("langGroup"))}">${ni("globe")}<span>${LANG_LABEL[lang][0]}</span>${ni("chev", "chev")}<span class="sr"> — ${esc(t("langGroup"))}</span></summary><div class="ddpanel">${langGroup}</div></details>
-      <div class="acct" data-acct>${acctHTML(user, t)}</div>
+      <div class="acct" data-acct>${acctHTML(user, t, { nav, path })}</div>
       <details class="navdd navmenu"><summary aria-label="${esc(t("navMenu"))}">${ni("menu")}</summary>
         <div class="ddpanel menupanel">
           <nav class="menulinks" aria-label="${esc(t("navLabel"))}">${linksHTML}</nav>
           ${langGroup}
-          <div class="acct full" data-acct-full>${acctHTML(user, t, { full: true })}</div>
+          <div class="acct full" data-acct-full>${acctHTML(user, t, { full: true, nav, path })}</div>
         </div></details>
     </div>
   </div>`;
+}
+
+/** Bosh sahifa keshlanadi: hisob holati /api/me dan keladi — navbar shu bilan yangilanadi. */
+export function applyNavState(d, t){
+  const nav = d?.nav || GUEST_NAV, user = d?.user || null;
+  document.querySelectorAll("[data-nav]").forEach(a => { a.hidden = !nav.includes(a.dataset.nav); });
+  document.querySelectorAll(".navbar").forEach(n => n.toggleAttribute("data-auth", !!user));
+  if (user){
+    document.querySelectorAll("[data-acct]").forEach(el => { el.innerHTML = acctHTML(user, t, { nav }); });
+    document.querySelectorAll("[data-acct-full]").forEach(el => { el.innerHTML = acctHTML(user, t, { full: true, nav }); });
+  }
+  dispatchEvent(new Event("hy:layout"));             // navbar sig‘ishi — yangi tarkib bilan qayta o‘lchanadi (public/session.js)
 }
 
 export const examplesHTML = lang => examples(lang).map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");
