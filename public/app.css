@@ -1230,7 +1230,6 @@ h1,h2,h3{color:var(--ink)}
 .hand{font-family:var(--f-hand);font-weight:600;letter-spacing:0}
 .hero3{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;padding:24px 0 8px}
 .hero3main{flex:1 1 560px;min-width:0}
-.hello{margin:0 0 6px;font-size:calc(30px * var(--fs));line-height:1.1;color:var(--terra)}
 #v1 .hero{font-family:var(--f-display);font-weight:700;font-size:calc(clamp(34px,5.2vw,56px) * var(--fs));line-height:1.05;letter-spacing:-.01em;margin:0 0 18px;max-width:none;color:var(--ink)}
 #v1 .hero em{font-style:italic;font-weight:600;color:var(--accent)}
 #v1 .lead{font-size:calc(19px * var(--fs));line-height:1.6;color:var(--muted);max-width:540px;margin:0 0 26px}
@@ -1389,6 +1388,8 @@ html{background:var(--bg)}
 @keyframes hy-dot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
 .mestatus{display:flex;align-items:center;gap:8px;margin-top:6px !important;font-size:calc(13.5px * var(--fs));font-weight:600}
 .dots{display:inline-flex;gap:4px}
+/* nuqtalar bir seansda bir marta (boot.js → html.typed) */
+.typed .typing{display:none}.typed .bubtext{animation:none}
 @media (prefers-reduced-motion:reduce){.typing{display:none}.bubtext{animation:none}.dots i{animation:none;opacity:.8}}
 /* Kiritish maydoni: yumaloq, bo‘sh ekani aniq; yuborish tugmasi ichida o‘ngda */
 .chatin{position:relative;margin:6px 18px 0}
@@ -1418,3 +1419,11 @@ html{background:var(--bg)}
   .chat .asktools .btn.pillbtn{flex:1 1 auto;justify-content:center}
   .bubble{max-width:92%}
 }
+
+/* «Bu qanday ishlaydi» ostidagi ixcham yo‘l chizig‘i */
+.flowstrip{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:4px 10px;margin:28px 0 0;padding:12px 18px;border:1px dashed var(--line2);border-radius:999px;
+  font-size:calc(14.5px * var(--fs));color:var(--muted);text-align:center}
+.flowstrip span:first-child{font-weight:600;color:var(--ink)}
+.flowstrip a{color:var(--accent);font-weight:600}
+.flowstrip .arr{color:var(--terra)}
+@media (max-width:640px){.flowstrip{border-radius:18px}}

@@ -19,6 +19,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="/app.css">
+<script src="/boot.js"></script>
 <script type="module" src="/app.js"></script>
 </head>
 <body>
@@ -40,7 +41,6 @@
   <section class="view" id="v1">
     <div class="hero3">
       <div class="hero3main">
-        <p class="hello hand" lang="{{htmlLang}}">{{hello}}</p>
         <h1 class="hero" tabindex="-1">{{heroA}} <em>{{heroB}}</em></h1>
         <p class="lead">{{lead}}</p>
         <div class="chat" id="chat">
@@ -146,6 +146,7 @@
         <li><span class="stop s2" aria-hidden="true">2</span><h3>{{r2}}</h3><p>{{r2d}}</p></li>
         <li><span class="stop s3" aria-hidden="true">3</span><h3>{{r3}}</h3><p>{{r3d}}</p></li>
       </ol>
+      <p class="flowstrip"><span>{{stripMake}}</span> <span class="arr" aria-hidden="true">→</span> <span><a href="https://murojaat.gov.uz" target="_blank" rel="noopener noreferrer">murojaat.gov.uz<span class="sr"> {{newTab}}</span></a> · <a href="https://pm.gov.uz" target="_blank" rel="noopener noreferrer">pm.gov.uz<span class="sr"> {{newTab}}</span></a> {{stripSend}}</span> <span class="sep" aria-hidden="true">·</span> <span><a href="https://yurxizmat.uz" target="_blank" rel="noopener noreferrer">yurxizmat.uz<span class="sr"> {{newTab}}</span></a> — {{stripMore}}</span></p>
     </section>
 
     <section class="helpbox" aria-labelledby="helpH">

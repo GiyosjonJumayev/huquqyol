@@ -204,6 +204,8 @@ const M = {
   offline:{ uz:"Internet uzildi. Ma’lumotlaringiz saqlanadi, aloqa tiklanganda davom eting.", ru:"Нет интернета. Данные сохранены — продолжите, когда связь восстановится." },
   online:{ uz:"Aloqa tiklandi", ru:"Связь восстановлена" },
   howLabel:{ uz:"Bu qanday ishlaydi", ru:"Как это работает" },
+  stripMake:{ uz:"HuquqYo‘l arizani tayyorlaydi", ru:"HuquqYo‘l готовит заявление" }, stripSend:{ uz:"yuboradi", ru:"отправляют" }, stripMore:{ uz:"boshqa shablonlar", ru:"другие шаблоны" },
+  footCopy:{ uz:"© 2026 HuquqYo‘l · Mizon jamoasi, Toshkent", ru:"© 2026 HuquqYo‘l · команда Mizon, Ташкент" },
   how1:{ uz:"Vaziyatni yozing", ru:"Опишите ситуацию" },
   howd1:{ uz:"O‘z so‘zlaringiz bilan yoki sohani tanlang", ru:"Своими словами или выберите сферу" },
   how2:{ uz:"Huquqingizni biling", ru:"Узнайте свои права" },
@@ -310,7 +312,6 @@ const M = {
   footHelp:{ uz:"Yordam", ru:"Помощь" }, footOfficial:{ uz:"Rasmiy manbalar", ru:"Официальные источники" }, footMediators:{ uz:"Mediatorlar", ru:"Медиаторы" },
   footPrivacy:{ uz:"Maxfiylik", ru:"Конфиденциальность" }, footBot:{ uz:"Telegram bot", ru:"Telegram-бот" },
   // ---- Bosh sahifa v3 («iliq, insoniy») ----
-  hello:{ uz:"Assalomu alaykum!", ru:"Здравствуйте!" },
   heroA:{ uz:"Qanday muammo bo‘ldi?", ru:"Что случилось?" }, heroB:{ uz:"Birga yo‘lini topamiz.", ru:"Вместе найдём выход." },
   chatHello:{ uz:"Assalomu alaykum! Muammongizni oddiy so‘z bilan yozing — men qonun, muddat va arizani topib beraman.", ru:"Здравствуйте! Опишите проблему простыми словами — я найду закон, срок и составлю заявление." },
   chatYou:{ uz:"Siz", ru:"Вы" }, chatSend:{ uz:"Yuborish", ru:"Отправить" }, chatThinking:{ uz:"Tahlil qilinmoqda…", ru:"Анализирую…" },

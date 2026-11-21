@@ -188,7 +188,7 @@ app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFo
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const ASSETS = ["app.css", "boot.js", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
 const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 // Service worker keshi har yangi relizda avtomatik almashadi: versiya — barcha resurslar xeshidan

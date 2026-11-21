@@ -236,7 +236,7 @@ export function siteFooter(t, { mode = "page", path = "/", botUrl = TELEGRAM_BOT
         </ul></div>
       </nav>
     </div>
-    <div class="footbottom"><span>© 2026 HuquqYo‘l</span>
+    <div class="footbottom"><span>${esc(t("footCopy"))}</span>
       <ul class="footmini" aria-label="${esc(t("footNav"))}">
         <li><a href="/maxfiylik"${cur("/maxfiylik")}>${esc(t("footPrivacy"))}</a></li>
         <li><a href="/statistika"${cur("/statistika")}>${esc(t("footStats"))}</a></li>

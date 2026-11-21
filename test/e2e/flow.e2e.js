@@ -530,6 +530,9 @@ test("Suhbat kiritish: yordamchi xabari, Shift+Enter — yangi qator, tez tanlas
   assert.ok(await p.isVisible(".msg.bot .typing"));                                         // avval «yozmoqda…» nuqtalari
   await p.waitForFunction(() => /Muammongizni/.test(document.querySelector(".msg.bot .bubtext").innerText), null, { timeout: 3000 });
   assert.ok(await p.isHidden(".msg.bot .typing"));
+  await p.reload(); await p.waitForSelector(".domain");                                       // shu seansda qayta: nuqtalarsiz, matn darhol
+  assert.ok(await p.isHidden(".msg.bot .typing"));
+  assert.match(await p.innerText(".msg.bot .bubtext"), /Muammongizni/);
   assert.equal(await p.evaluate(() => document.activeElement.id), "problem");                // kompyuterda darhol yozish mumkin
   await p.type("#problem", "Birinchi qator");
   await p.keyboard.press("Shift+Enter");
