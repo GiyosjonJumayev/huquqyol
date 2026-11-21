@@ -57,7 +57,7 @@ const T = {
   f_requested: ["Javob kutmoqda", "Ждут ответа"], f_offered: ["Narx taklif qilingan", "Предложена цена"], f_agreed: ["Kelishuv (jami)", "Договорённости (всего)"], f_completed: ["Bajarilgan", "Выполнено"], f_lost: ["Rad / bekor", "Отклонено / отменено"],
   stMonth: ["Oylar bo‘yicha", "По месяцам"], month: ["Oy", "Месяц"], requests: ["So‘rovlar", "Запросы"], agreed: ["Kelishuvlar", "Договорённости"], value: ["Summa", "Сумма"],
   stDomain: ["Sohalar bo‘yicha so‘rovlar", "Запросы по сферам"], domain: ["Soha", "Сфера"], count: ["Soni", "Кол-во"],
-  stRecent: ["So‘nggi so‘rovlar", "Последние запросы"], none: ["Hali ma’lumot yo‘q.", "Пока нет данных."],
+  stRecent: ["So‘nggi so‘rovlar", "Последние запросы"], none: ["Hozircha bu yerda hech narsa yo‘q.", "Пока здесь ничего нет."],
   noProfile: ["Statistika uchun avval profilni to‘ldiring.", "Для статистики сначала заполните профиль."]
 };
 const L = lang => (k, v = {}) => { const s = (T[k] || [k, k])[lang === "ru" ? 1 : 0].replace(/\{(\w+)\}/g, (_, x) => v[x] ?? ""); return lang === "cyr" ? toCyrillic(s) : s; };

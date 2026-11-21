@@ -81,7 +81,7 @@ const T = {
   cabNoJs: ["Kabinet ishlashi uchun brauzerda JavaScript yoqilgan bo‘lishi kerak.", "Для работы кабинета нужен включённый JavaScript."],
   cabLead: ["Yurist va advokatlar uchun ish joyi. Kirish yoki ro‘yxatdan o‘tish kerak; 14 kun bepul sinov.", "Рабочее место юриста и адвоката. Нужно войти или зарегистрироваться; 14 дней бесплатно."],
   cabNeedPro: ["Kabinet Yurist Pro obunachilari uchun. Obuna bo‘ling — barcha vositalar ochiladi.", "Кабинет — для подписчиков «Юрист Pro». Оформите подписку, и все инструменты откроются."],
-  cabRegister: ["Yurist sifatida ro‘yxatdan o‘tish", "Зарегистрироваться как юрист"], cabNoDb: ["Hisoblar hali ulanmagan.", "Аккаунты пока не подключены."]
+  cabRegister: ["Yurist sifatida ro‘yxatdan o‘tish", "Зарегистрироваться как юрист"], cabNoDb: ["Hisobga kirish hozircha ishlamayapti.", "Вход в аккаунт сейчас недоступен."]
 };
 const FEAT = {
   free: [["Vaziyat tahlili va huquqiy reja", "Анализ ситуации и правовой план"], ["{docs} ta hujjat shabloni: talabnoma, shikoyat, da’vo arizasi", "{docs} шаблонов: претензии, жалобы, иски"],

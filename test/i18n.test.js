@@ -76,9 +76,9 @@ test("API ruscha va kirillcha javob beradi, xatolar ham shu tilda", async () => 
   assert.equal(m.domains[0].title, "Труд");
   assert.equal(m.scenarios[0].fields[0].k, "employer");
   const e1 = await (await post("/api/plan", { scenario:"yo‘q", lang:"ru" })).json();
-  assert.equal(e1.error, "Неизвестная ситуация.");
+  assert.equal(e1.error, "Такой ситуации нет. Выберите её заново на главной.");
   const e2 = await (await post("/api/document/preview", { scenario:"ish_haqi", form:{ phone:"abc" }, lang:"ru" })).json();
-  assert.equal(e2.error, "Неверный номер телефона.");
+  assert.equal(e2.error, "Проверьте номер телефона. Например: +998 90 123 45 67");
   const e3 = await fetch(base + "/api/plan", { method:"POST", body:"x", headers:{ "accept-language":"ru" } });
   assert.equal(e3.status, 415);
   assert.equal((await e3.json()).error, "Запрос должен быть в формате JSON.");

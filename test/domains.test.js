@@ -148,8 +148,8 @@ test("Shablon: shartli bo‘laklar va select qiymati", () => {
 
 test("Holatga xos validatsiya", () => {
   const s = SCENARIOS.find(x => x.id === "nuqsonli_tovar");
-  assert.throws(() => vForm(s, { demand:"hack" }), /variant/);
-  assert.throws(() => vForm(s, { demandDate:"2099-01-01" }), /kelajakda/);
+  assert.throws(() => vForm(s, { demand:"hack" }), /ro‘yxatdan birini tanlang/);
+  assert.throws(() => vForm(s, { demandDate:"2099-01-01" }), /hali kelmagan/);
   assert.deepEqual(vForm(s, { price:"5 000 000", unknown:"x", employer:"y" }), { price:"5000000" });   // boshqa holat maydoni tashlanadi
   const a = SCENARIOS.find(x => x.id === "aliment");
   assert.throws(() => vForm(a, { children:"0" }), /Bolalar soni/);

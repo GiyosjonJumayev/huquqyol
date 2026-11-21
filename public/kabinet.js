@@ -84,7 +84,7 @@ function download(blob, file){ const a = document.createElement("a"); a.href = U
 const letterhead = () => S.letterhead.on ? S.letterhead.lines.map(s => s.trim()).filter(Boolean) : [];
 async function customDoc(title, text, fmt){
   const r = await fetch(`/api/custom/${fmt}`, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ title, text, letterhead: letterhead(), lang: LANG }) });
-  if (!r.ok){ let m = L("Xatolik yuz berdi.", "Произошла ошибка."); try { m = (await r.json()).error || m; } catch {} throw new Error(m); }
+  if (!r.ok){ let m = L("Nimadir ishlamadi. Qayta urinib ko‘ring.", "Что-то пошло не так. Попробуйте ещё раз."); try { m = (await r.json()).error || m; } catch {} throw new Error(m); }
   download(await r.blob(), `${(title || "hujjat").replace(/[^\p{L}\p{N}]+/gu, "-").slice(0, 60)}.${fmt}`);
 }
 const field = (id, label, input, hint = "") => `<div class="field"><label for="${id}">${esc(label)}</label>${input}${hint ? `<span class="hint">${esc(hint)}</span>` : ""}</div>`;

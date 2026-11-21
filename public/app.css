@@ -1357,3 +1357,7 @@ body{margin:0}
 .sitefoot .footlinks a,.sitefoot .footlinks li:first-child a{padding:0}
 .sitefoot .linkbtn{padding:0;border:0;background:none;font:inherit;font-weight:400;text-decoration:none;cursor:pointer;color:var(--foot-ink)}
 .footmini li{display:flex;align-items:center}
+/* Qisqa sahifalarda ham footer ekran pastida */
+html{background:var(--bg)}
+.wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.wrap>main{flex:1 0 auto}

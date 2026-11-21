@@ -223,7 +223,7 @@ test("Bot: faol holatda oddiy «2026-08-22» — sana; noto‘g‘ri/kelajak san
   assert.match(h.last().text, /Sanani tushunmadim\. Shunday yozing: 22\.08\.2026/);
   assert.equal(h.sessions.get(42).awaiting, "date");
   await h.text("01.01.2099");
-  assert.match(h.last().text, /kelajakda bo‘lishi mumkin emas/);
+  assert.match(h.last().text, /bu kun hali kelmagan/);
   assert.equal(h.sessions.get(42).triggerDate, "2026-08-22");
   assert.equal(h.sessions.get(42).scenario, "ish_haqi");
 
@@ -263,7 +263,7 @@ test("Bot /sana: hisob sanasini o‘zgartiradi; kelajakdagi sana rad etiladi", a
   await h.text("/sana 2026-10-20");
   assert.match(h.last().text, /Muddat: 151 kun qoldi/);                 // 2026-10-20 + 6 oy = 2027-04-20; 2026-11-20 dan 151 kun
   await h.text("/sana 2099-01-01");
-  assert.match(h.last().text, /kelajakda bo‘lishi mumkin emas/);
+  assert.match(h.last().text, /bu kun hali kelmagan/);
   assert.equal(h.sessions.get(42).triggerDate, "2026-10-20");
   h.stop();
 });
