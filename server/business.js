@@ -27,7 +27,9 @@ const nm = (v, lang) => Array.isArray(v) ? pick(v, lang) : lang === "uz" ? v : t
 const T = {
   navHome: ["Bosh sahifa", "Главная"], navLogin: ["Kirish", "Войти"], navAccount: ["Hisobim", "Мой аккаунт"], navAdmin: ["Admin", "Админ"], navLawyers: ["Yuristlar", "Юристы"], navPlans: ["Tariflar", "Тарифы"], navCabinet: ["Yurist kabineti", "Кабинет юриста"],
   skip: ["Asosiy qismga o‘tish", "Перейти к основному"],
-  demo: ["Namuna", "Пример"],
+  demo: ["namuna profil", "образец профиля"],
+  fakeContact: ["namuna — ishlamaydi", "образец — не работает"],
+  demoNoReq: ["Namuna profilga so‘rov yuborib bo‘lmaydi: bu haqiqiy yurist emas.", "Образцу профиля нельзя отправить запрос: это не настоящий юрист."],
   demoNote: ["Bu namuna profil: haqiqiy yurist emas, aloqa ma’lumotlari ishlamaydi. Katalog ishga tushganda faqat litsenziyasi tekshirilgan yuristlar ko‘rsatiladi.", "Это пример профиля: не настоящий юрист, контакты не работают. После запуска каталога будут показаны только юристы с проверенной лицензией."],
   demoList: ["Katalog sinov rejimida: quyidagi profillar namuna, haqiqiy yuristlar emas.", "Каталог в тестовом режиме: профили ниже — примеры, а не настоящие юристы."],
   advokat: ["Advokat", "Адвокат"], yurist: ["Yurist", "Юрист"], firma: ["Yuridik firma", "Юридическая фирма"], mediator: ["Mediator", "Медиатор"],
@@ -168,6 +170,8 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
 }
 
 // ---------- Katalog ----------
+// Namuna (demo:true) profillar: aniq «DEMO» belgisi — katalog kartasida ham, profil sahifasida ham. Haqiqiy profillarda yo‘q.
+const demoBadge = (l, lang) => l.demo === true ? ` <span class="tag demo">DEMO — ${esc(tr(lang)("demo"))}</span>` : "";
 const initials = n => n.replace(/[«»"()]/g, "").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 // Avatar: yurist yuklagan rasm yoki bosh harflar
 const avatar = (l, big = false) => l.photo
@@ -179,7 +183,7 @@ function lawyerCard(l, lang, qs){
   return `<article class="lawyer" aria-labelledby="lw_${l.id}">
     ${avatar(l)}
     <div class="lwbody">
-      <h2 id="lw_${l.id}"><a href="/yuristlar/${l.id}${qs}">${esc(nm(l.name, lang))}</a>${l.demo ? ` <span class="tag demo">${esc(t("demo"))}</span>` : ""}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h2>
+      <h2 id="lw_${l.id}"><a href="/yuristlar/${l.id}${qs}">${esc(nm(l.name, lang))}</a>${demoBadge(l, lang)}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h2>
       <p class="meta">${esc(t(l.kind))} · ${esc(t("years", { n: l.experience }))} · ${esc(regionName(l.region, lang))}, ${esc(districtName(l.district, l.region, lang))}</p>
       <p class="head">${esc(pick(l.headline, lang))}</p>
       <ul class="chips">${l.areas.map(a => `<li>${esc(areas.find(x => x.id === a)?.title || a)}</li>`).join("")}</ul>
@@ -221,16 +225,20 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
   const t = tr(lang), areas = areaList(lang);
   const qs = new URLSearchParams(Object.entries(query).filter(([k, v]) => ["soha", "hudud", "shakl", "kim"].includes(k) && typeof v === "string" && v.length < 80)).toString();
   const svc = l.services.map(s => `<tr><th scope="row">${esc(pick(s.name, lang))}</th><td>${s.min ? esc(t("min", { n: s.min })) : "—"}</td><td>${esc(t(s.format))}</td><td class="numc">${s.price === 0 ? esc(t("free")) : esc(s.from ? t("from", { p: money(s.price, lang) }) : money(s.price, lang))}</td></tr>`).join("");
-  const tel = l.contacts.phone ? `<li><span>${esc(t("phone"))}:</span> ${l.demo ? `<span class="mono">${esc(l.contacts.phone)}</span>` : `<a href="tel:${esc(l.contacts.phone.replace(/\s/g, ""))}">${esc(l.contacts.phone)}</a>`}</li>` : "";
-  const tg = l.contacts.telegram ? `<li><span>Telegram:</span> <a href="https://t.me/${esc(l.contacts.telegram)}" target="_blank" rel="noopener noreferrer">@${esc(l.contacts.telegram)}</a></li>` : "";
-  const web = l.contacts.website ? `<li><span>${esc(t("website"))}:</span> <a href="${esc(l.contacts.website)}" target="_blank" rel="noopener noreferrer nofollow">${esc(l.contacts.website.replace(/^https:\/\//, ""))}</a></li>` : "";
-  const mail = l.contacts.email ? `<li><span>${esc(t("email"))}:</span> ${l.demo ? `<span class="mono">${esc(l.contacts.email)}</span>` : `<a href="mailto:${esc(l.contacts.email)}">${esc(l.contacts.email)}</a>`}</li>` : "";
+  // Namuna profilda aloqa ma’lumotlari havola emas va «namuna — ishlamaydi» deb belgilanadi
+  const fake = `<span class="fakec">${esc(t("fakeContact"))}</span>`;
+  const row = (label, value, link) => `<li><span>${esc(label)}:</span> ${l.demo ? `<span class="mono">${esc(value)}</span> ${fake}` : link}</li>`;
+  const c = l.contacts;
+  const tel = c.phone ? row(t("phone"), c.phone, `<a href="tel:${esc(c.phone.replace(/\s/g, ""))}">${esc(c.phone)}</a>`) : "";
+  const tg = c.telegram ? row("Telegram", `@${c.telegram}`, `<a href="https://t.me/${esc(c.telegram)}" target="_blank" rel="noopener noreferrer">@${esc(c.telegram)}</a>`) : "";
+  const web = c.website ? row(t("website"), c.website.replace(/^https:\/\//, ""), `<a href="${esc(c.website)}" target="_blank" rel="noopener noreferrer nofollow">${esc(c.website.replace(/^https:\/\//, ""))}</a>`) : "";
+  const mail = c.email ? row(t("email"), c.email, `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`) : "";
   return page({ lang, cssHref, fs, user, accHref, path:`/yuristlar/${l.id}`, title:nm(l.name, lang), desc:pick(l.headline, lang), body:`
     <p><a href="/yuristlar${qs ? `?${esc(qs)}` : ""}">${esc(t("back"))}</a></p>
     ${l.demo ? `<p class="note warn" role="note">${esc(t("demoNote"))}</p>` : ""}
     <section class="card prof">
       ${avatar(l, true)}
-      <div><h1>${esc(nm(l.name, lang))}${l.demo ? ` <span class="tag demo">${esc(t("demo"))}</span>` : ""}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h1>
+      <div><h1>${esc(nm(l.name, lang))}${demoBadge(l, lang)}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h1>
         ${l.firm ? `<p class="meta">${esc(nm(l.firm, lang))}</p>` : ""}
         <p class="meta">${esc(t(l.kind))} · ${esc(t("years", { n: l.experience }))} · ${esc(l.langs.map(x => x.toUpperCase()).join(" / "))} · ${esc(l.license.verified ? t("verified") : t("notVerified"))}</p>
         <p class="head">${esc(pick(l.headline, lang))}</p></div>
@@ -251,7 +259,7 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
         <h2>${esc(t("contacts"))}</h2><ul class="contact">${tel}${tg}${mail}${web}</ul>
         <h2>${esc(t("where"))}</h2><p>${esc(regionName(l.region, lang))}, ${esc(pick(l.address, lang))}</p><p class="muted">${esc(pick(l.hours, lang))}</p>
         <p class="meta">${l.formats.map(f => esc(t(f))).join(" · ")}</p>
-        ${l.demo ? "" : requestBox(l, lang, user, query)}
+        ${l.demo ? `<p class="note warn" role="note">${esc(t("demoNoReq"))}</p>` : requestBox(l, lang, user, query)}
       </aside>
     </div>` });
 }

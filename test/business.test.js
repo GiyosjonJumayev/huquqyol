@@ -43,11 +43,11 @@ test("Sahifalar uch tilda: tariflar, katalog, profil, kabinet; inline skript va 
       assert.equal(r.status, 200, `${lang} ${p}`);
       assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>/i.test(html), `${p}: inline skript`);
       assert.ok(!/\sstyle=/i.test(html), `${p}: style atributi`);
-      if (lang === "ru") assert.ok(!/[a-z]{4,}/i.test(html.replace(/<[^>]+>/g, " ").replace(/HuquqYo‘l|Pro|example\.com|namuna\d|lex\.uz|UZ|RU|EN|my\.sud\.uz|O‘zb|Ўзб|DOCX|PDF|JSON|JavaScript|Telegram/g, "")), `${p}: ruscha sahifada lotin matn`);
+      if (lang === "ru") assert.ok(!/[a-z]{4,}/i.test(html.replace(/<[^>]+>/g, " ").replace(/HuquqYo‘l|Pro|example\.com|namuna\d|lex\.uz|UZ|RU|EN|my\.sud\.uz|O‘zb|Ўзб|DOCX|PDF|JSON|JavaScript|Telegram|DEMO/g, "")), `${p}: ruscha sahifada lotin matn`);
     }
   }
   const t = await (await get("/yuristlar")).text();
-  assert.match(t, /Namuna/);
+  assert.equal((t.match(/<span class="tag demo">DEMO — namuna profil<\/span>/g) || []).length, LAWYERS.filter(l => l.demo).length);
   assert.match(t, /profillar namuna, haqiqiy yuristlar emas/);
   const prof = await (await get("/yuristlar/namuna-1")).text();
   assert.match(prof, /haqiqiy yurist emas/);
@@ -137,4 +137,26 @@ test("Shrift shkalasi: server sahifalari bosh sahifa klasslari (.big, .how) bila
   const css = readFileSync(new URL("../public/app.css", import.meta.url), "utf8");
   assert.match(css, /\.biz h1,\.stats h1\{font-size:calc\(clamp\(26px,4\.5vw,36px\) \* var\(--fs\)\)/);
   assert.match(css, /\.case-head h1,\.case-head h2\{font-family:var\(--f-display\);font-size:calc\(clamp\(26px,4\.5vw,36px\) \* var\(--fs\)\)/);
+});
+
+test("DEMO belgisi: namuna profil — katalog kartasida va profilda, aloqa «namuna — ishlamaydi»; haqiqiy profilda yo‘q", async () => {
+  const { lawyersPage, lawyerPage } = await import("../server/business.js");
+  const prof = await (await get("/yuristlar/namuna-1")).text();
+  assert.match(prof, /<h1>[^<]+<span class="tag demo">DEMO — namuna profil<\/span>/);
+  assert.equal((prof.match(/<span class="fakec">namuna — ishlamaydi<\/span>/g) || []).length, 2);     // telefon va e-pochta
+  assert.ok(!/href="(tel:|mailto:|https:\/\/t\.me\/)/.test(prof));
+  assert.match(prof, /Namuna profilga so‘rov yuborib bo‘lmaydi/);
+  const ru = await (await get("/yuristlar/namuna-1", "ru")).text();
+  assert.match(ru, /DEMO — образец профиля/);
+  assert.match(ru, /образец — не работает/);
+  // Haqiqiy (bazadan tasdiqlangan) profil: belgi yo‘q, aloqa — havola
+  const real = { ...LAWYERS[0], id: "y77", dbId: 77, demo: false, userId: 5, contacts: { phone: "+998 90 123 45 67", email: "yurist@misol.uz", telegram: "yurist_test" } };
+  const args = { lang: "uz", cssHref: "/app.css", accHref: "", extra: [real] };
+  const cat = lawyersPage({ ...args, query: {} });
+  assert.match(cat, /<article class="lawyer" aria-labelledby="lw_y77">/);
+  assert.ok(!/lw_y77"><a[^>]*>[^<]*<\/a> <span class="tag demo">/.test(cat));
+  const rp = lawyerPage({ ...args, id: "y77", user: null });
+  assert.ok(!/DEMO|fakec|tag demo/.test(rp));
+  assert.match(rp, /href="tel:\+998901234567"/);
+  assert.match(rp, /href="mailto:yurist@misol\.uz"/);
 });
