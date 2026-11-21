@@ -1040,9 +1040,9 @@ html[data-fs="3"] .tools{grid-template-columns:minmax(0,1fr)}
 
 /* Kabinet: obunasiz holat */
 .cabgate{max-width:720px}
-.feat.big{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}
-.feat.big li{position:relative;padding:12px 14px 12px 44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600}
-.feat.big li::before{content:"✓";position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:13px}
+.feat.featlist{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}
+.feat.featlist li{position:relative;padding:12px 14px 12px 44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600}
+.feat.featlist li::before{content:"✓";position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:13px}
 .syncstate{font-weight:600;color:var(--ok)}
 
 /* ---------- «Aa Qulaylik» modal oynasi (barcha sahifalar) ---------- */
@@ -1086,4 +1086,14 @@ html[data-fs="3"] .a11ydlg .fsopts,html[data-fs="3"] .thopts{grid-template-colum
   .nav .a11ybtn{padding-inline:10px}
   .nav .a11ybtn .aa{font-size:min(calc(17px * var(--fs)), 20px)}
 }
+.lwhow{margin:0 0 8px;padding-left:1.4em;display:grid;gap:6px}
 
+/* ---------- Yagona shrift shkalasi: server sahifalari bosh sahifa (reja/ariza) bilan bir xil ---------- */
+/* Sahifa sarlavhasi = .case-head h1; kirish matni = .case-head p; tor ekranda katta shriftda — bir xil yuqori chegara */
+.biz h1,.stats h1{font-size:calc(clamp(26px,4.5vw,36px) * var(--fs));line-height:1.2}
+.prof h1{font-size:calc(clamp(24px,4vw,28px) * var(--fs))}
+.biz .lead,.stats .lead{font-size:calc(16.5px * var(--fs));max-width:62ch}
+@media (max-width:560px){
+  html[data-fs] .biz h1,html[data-fs] .stats h1{font-size:min(calc(clamp(26px,4.5vw,36px) * var(--fs)), 8.6vw)}
+  html[data-fs] .prof h1{font-size:min(calc(clamp(24px,4vw,28px) * var(--fs)), 8vw)}
+}

@@ -244,7 +244,7 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
         <h2 class="sec">${esc(t("areas"))}</h2><ul class="chips">${l.areas.map(a => `<li><a href="/yuristlar?soha=${a}">${esc(areas.find(x => x.id === a)?.title || a)}</a></li>`).join("")}</ul>
         <h2 class="sec">${esc(t("services"))}</h2>
         <div class="tscroll"><table class="svc"><thead><tr><th scope="col">${esc(t("svc"))}</th><th scope="col">${esc(t("dur"))}</th><th scope="col">${esc(t("fmt"))}</th><th scope="col" class="numc">${esc(t("price"))}</th></tr></thead><tbody>${svc}</tbody></table></div>
-        <h2 class="sec">${esc(t("howTitle"))}</h2><ol class="how"><li>${esc(t("how1"))}</li><li>${esc(t("how2"))}</li><li>${esc(t("how3"))}</li></ol>
+        <h2 class="sec">${esc(t("howTitle"))}</h2><ol class="lwhow"><li>${esc(t("how1"))}</li><li>${esc(t("how2"))}</li><li>${esc(t("how3"))}</li></ol>
         <p class="small muted">${esc(t("privacy"))}</p>
       </div>
       <aside class="card side">
@@ -279,7 +279,7 @@ export function cabinetPage({ lang, cssHref, fs, jsHref, user, accHref, pro, db 
       : `<p class="rowbtn"><button class="btn primary" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: "pro" }))}'>${esc(t("plSubscribe"))}</button><a class="btn ghost" href="/tariflar">${esc(t("navPlans"))}</a></p><p class="err" data-err hidden></p>`;
     return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"), body:`
       <section class="cabgate"><h1>${esc(t("cabTitle"))}</h1><p class="lead">${esc(user ? t("cabNeedPro") : t("cabLead"))}</p>
-      <ul class="feat big">${list}</ul>${cta}</section>` });
+      <ul class="feat featlist">${list}</ul>${cta}</section>` });
   }
   return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"),
     body:`<div id="kab" class="kab" data-lang="${lang}" data-sync="1"><h1>${esc(t("cabTitle"))}</h1><noscript><p class="card">${esc(t("cabNoJs"))}</p></noscript></div>`,

@@ -128,3 +128,13 @@ test("Navbar: barcha sahifalarda bir xil; faol bo‘lim, til, hisob; mobil menyu
   assert.match(a, /<span class="av" aria-hidden="true">GJ<\/span>/);
   assert.match(siteNav({ lang: "cyr", t: makeT("cyr"), path: "/tariflar" }), /Тарифлар/);
 });
+
+test("Shrift shkalasi: server sahifalari bosh sahifa klasslari (.big, .how) bilan to‘qnashmaydi; sarlavha — reja sahifasidagi kabi", async () => {
+  for (const p of ["/kabinet", "/yuristlar/namuna-1", "/tariflar", "/kirish"]){
+    const html = await (await get(p)).text();
+    assert.ok(!/class="[^"]*\b(big|how)\b[^"]*"/.test(html.replace(/class="ava big[^"]*"/g, "")), p);   // .big — 54px raqam, .how — bosh sahifa kartalari
+  }
+  const css = readFileSync(new URL("../public/app.css", import.meta.url), "utf8");
+  assert.match(css, /\.biz h1,\.stats h1\{font-size:calc\(clamp\(26px,4\.5vw,36px\) \* var\(--fs\)\)/);
+  assert.match(css, /\.case-head h1,\.case-head h2\{font-family:var\(--f-display\);font-size:calc\(clamp\(26px,4\.5vw,36px\) \* var\(--fs\)\)/);
+});
