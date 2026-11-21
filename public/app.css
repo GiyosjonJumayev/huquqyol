@@ -1199,3 +1199,27 @@ h1,h2,h3{color:var(--ink)}
 /* Ikat chizig‘i (yashil / za’faron / terrakota) — kiritish kartasi va footer tepasida */
 .ikat{display:block;height:8px;background:var(--ikat)}
 @media (max-width:430px){.btn{min-height:48px}}
+
+/* ---------- v3 sarlavha (navbar): logotip, matnli havolalar, Aa, bayroqli til tugmasi, to‘q «Kirish» ---------- */
+.wrap{max-width:1160px}
+.navbar{min-height:84px;gap:16px}
+.nav .brand{font-size:calc(24px * var(--fs));gap:10px}
+.nav .brand .logo{width:38px;height:38px}
+.nav .brand:hover .logo{transform:rotate(-8deg)}
+.navlinks{gap:4px 22px}
+.navlinks .navlink{padding:8px 2px;border-radius:0;background:none;color:var(--muted);font-weight:500;font-size:calc(16px * var(--fs))}
+.navlinks .navlink:first-child{color:var(--ink);font-weight:600}
+.navlinks .navlink:hover{background:none;color:var(--ink);text-decoration:underline;text-underline-offset:6px}
+.navlinks .navlink[aria-current="page"]{background:none;color:var(--ink);font-weight:600}
+.navlinks .navlink[aria-current="page"]::after{left:2px;right:2px;width:auto;margin:0;bottom:2px;height:2px;background:var(--saffron)}
+.navlinks .navlink .ni{display:none}
+.nav .a11ybtn,.navdd>summary{border-radius:999px;border-color:var(--line2);background:transparent}
+.nav .a11ybtn .aa{font-family:var(--f-display);font-weight:700}
+.langdd>summary{gap:8px;padding:0 14px}
+.langdd .flag{flex:none;border-radius:2px;box-shadow:0 0 0 1px var(--line)}
+.navcta,.btn.primary.navcta{background:var(--ink);color:var(--bg);box-shadow:none;padding:0 20px;display:inline-flex;align-items:center}
+.navcta:hover,.btn.primary.navcta:hover:not(:disabled){background:var(--ink);filter:none;opacity:.88;transform:none;box-shadow:none}
+.navuser,.acctdd>summary.navuser{border-color:var(--line2);background:transparent}
+.ddpanel{border-radius:18px;background:var(--surface);border-color:var(--line)}
+.menulinks .navlink .ni{color:var(--accent)}
+.nav{border-bottom:0}

@@ -160,7 +160,7 @@ const M = {
   groupDefault:{ uz:"Ma’lumotlar", ru:"Данные" },
   // Yuristlar katalogi va Pro
   navLabel:{ uz:"Asosiy bo‘limlar", ru:"Основные разделы" }, navLawyers:{ uz:"Yuristlar", ru:"Юристы" }, navPlans:{ uz:"Tariflar", ru:"Тарифы" },
-  navApply:{ uz:"Ariza tayyorlash", ru:"Составить заявление" }, navCabinet:{ uz:"Kabinet", ru:"Кабинет" },
+  navApply:{ uz:"Ariza yozish", ru:"Написать заявление" }, navFaq:{ uz:"Savollar", ru:"Вопросы" }, navCabinet:{ uz:"Kabinet", ru:"Кабинет" },
   navLogin:{ uz:"Kirish", ru:"Войти" }, navRegister:{ uz:"Ro‘yxatdan o‘tish", ru:"Зарегистрироваться" },
   navAccount:{ uz:"Hisobim", ru:"Мой аккаунт" }, themeToggle:{ uz:"Yorug‘ yoki qorong‘i mavzu", ru:"Светлая или тёмная тема" }, navAdmin:{ uz:"Admin panel", ru:"Админ-панель" }, navProfile:{ uz:"Profil", ru:"Профиль" }, navLogout:{ uz:"Chiqish", ru:"Выйти" }, navAcctMenu:{ uz:"Hisob menyusi", ru:"Меню аккаунта" },
   roleCitizen:{ uz:"Fuqaro", ru:"Гражданин" }, roleLawyer:{ uz:"Yurist", ru:"Юрист" }, roleOrg:{ uz:"Tashkilot", ru:"Организация" }, roleModerator:{ uz:"Moderator", ru:"Модератор" }, roleAdmin:{ uz:"Administrator", ru:"Администратор" }, navMenu:{ uz:"Menyu", ru:"Меню" },

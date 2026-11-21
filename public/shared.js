@@ -73,7 +73,9 @@ const NI = {
   logout: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>'
 };
 const ni = (k, cls = "") => `<svg class="ni ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${NI[k]}</svg>`;
-const LOGO = '<svg class="logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>';
+const LOGO = '<svg class="logo" viewBox="0 0 34 34" aria-hidden="true" focusable="false"><circle cx="17" cy="17" r="15.5" fill="#1E5B52"/><path d="M9 24 C14 21 12 14 25 10" fill="none" stroke="#FBF7EF" stroke-width="2" stroke-dasharray="3 3"/><circle cx="25" cy="10" r="2.6" fill="#E2A33B"/></svg>';
+// O‘zbekiston bayrog‘i — til tugmasida (sayt mamlakati belgisi)
+const FLAG = '<svg class="flag" width="20" height="14" viewBox="0 0 22 15" aria-hidden="true" focusable="false"><rect width="22" height="15" fill="#FFFFFF"/><rect width="22" height="4.6" fill="#0099B5"/><rect y="10.4" width="22" height="4.6" fill="#1EB53A"/><rect y="4.6" width="22" height=".6" fill="#CE1126"/><rect y="9.8" width="22" height=".6" fill="#CE1126"/></svg>';
 const LANG_LABEL = { uz:["O‘zb", "O‘zbekcha (lotin)"], cyr:["Ўзб", "Ўзбекча (кирилл)"], ru:["Рус", "Русский"] };
 const initialsOf = n => String(n || "").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "•";
 
@@ -107,22 +109,24 @@ export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null
   const applyLink = mode === "app"
     ? `<button type="button" class="navlink" data-go="1">${ni("apply")}<span>${esc(t("navApply"))}</span></button>`
     : `<a class="navlink" href="/"${cur("/")}>${ni("apply")}<span>${esc(t("navApply"))}</span></a>`;
-  const linksHTML = applyLink + links.map(([href, ic, k]) => `<a class="navlink" href="${href}" data-nav="${href}"${cur(href)}${nav.includes(href) ? "" : " hidden"}>${ni(ic)}<span>${esc(t(k))}</span></a>`).join("");
+  const faqLink = mode === "app"
+    ? `<button type="button" class="navlink" data-go="1" data-to="savollar"><span>${esc(t("navFaq"))}</span></button>`
+    : `<a class="navlink" href="/#savollar"><span>${esc(t("navFaq"))}</span></a>`;
+  const linksHTML = applyLink + links.map(([href, ic, k]) => `<a class="navlink" href="${href}" data-nav="${href}"${cur(href)}${nav.includes(href) ? "" : " hidden"}>${ni(ic)}<span>${esc(t(k))}</span></a>`).join("") + faqLink;
   const langs = ["uz", "cyr", "ru"].map(l => mode === "app"
     ? `<button type="button" data-lang="${l}" aria-pressed="${l === lang}" lang="${l === "cyr" ? "uz-Cyrl" : l}" title="${LANG_LABEL[l][1]}">${LANG_LABEL[l][0]}</button>`
     : `<a href="${esc(langHref(l))}"${l === lang ? ` aria-current="page"` : ""} lang="${l === "cyr" ? "uz-Cyrl" : l}" title="${LANG_LABEL[l][1]}">${LANG_LABEL[l][0]}</a>`).join("");
   const langGroup = `<div class="langsw" role="group" aria-label="${esc(t("langGroup"))}">${langs}</div>`;
   const brand = mode === "app"
-    ? `<button class="brand" id="home" type="button" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l<small>${esc(t("navTagline"))}</small></span></button>`
-    : `<a class="brand" href="/" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l<small>${esc(t("navTagline"))}</small></span></a>`;
+    ? `<button class="brand" id="home" type="button" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l</span></button>`
+    : `<a class="brand" href="/" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l</span></a>`;
   const a11yBtn = a11y ? `<button class="btn ghost a11ybtn" id="a11yBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="a11yDlg" title="${esc(t("a11y"))}"><span class="aa" aria-hidden="true">Aa</span><span class="a11ylbl sr">${esc(t("a11y"))}</span></button>` : "";
   return `<div class="navbar"${user ? " data-auth" : ""}>
     ${brand}
     <nav class="navlinks" aria-label="${esc(t("navLabel"))}">${linksHTML}</nav>
     <div class="navright">
-      <a class="navbtn themebtn" href="/mavzu?to=toggle&amp;back=${encodeURIComponent(path)}" data-theme-toggle title="${esc(t("themeToggle"))}">${ni("moon", "moon")}${ni("sun", "sun")}<span class="sr">${esc(t("themeToggle"))}</span></a>
       ${a11yBtn}
-      <details class="navdd langdd"><summary title="${esc(t("langGroup"))}">${ni("globe")}<span>${LANG_LABEL[lang][0]}</span>${ni("chev", "chev")}<span class="sr"> — ${esc(t("langGroup"))}</span></summary><div class="ddpanel">${langGroup}</div></details>
+      <details class="navdd langdd"><summary title="${esc(t("langGroup"))}">${FLAG}<span>${LANG_LABEL[lang][0]}</span>${ni("chev", "chev")}<span class="sr"> — ${esc(t("langGroup"))}</span></summary><div class="ddpanel">${langGroup}</div></details>
       <div class="acct" data-acct>${acctHTML(user, t, { nav, path })}</div>
       <details class="navdd navmenu"><summary aria-label="${esc(t("navMenu"))}">${ni("menu")}</summary>
         <div class="ddpanel menupanel">

@@ -121,7 +121,7 @@ test("Navbar: barcha sahifalarda bir xil; faol bo‘lim, til, hisob; mobil menyu
   assert.equal((home.match(/id="a11yBtn"/g) || []).length, 1);
   assert.match(home, /<button type="button" class="navlink" data-go="1">/);         // SPA: «Ariza tayyorlash» — qayta yuklamasdan
   assert.match(home, /data-lang="uz" aria-pressed="true"/);
-  assert.match(await (await get("/", "ru")).text(), /Составить заявление/);
+  assert.match(await (await get("/", "ru")).text(), /Написать заявление/);
   const me = await get("/api/me");
   assert.equal(me.headers.get("cache-control"), "private, no-store");
   assert.deepEqual(await me.json(), { user: null, nav: ["/", "/yuristlar", "/tariflar"] });
