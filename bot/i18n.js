@@ -9,6 +9,9 @@ const M = {
   privacy:{
     uz:"🔒 Matningiz saqlanmaydi. Bot faqat 1 soat davomida joriy holatni eslab turadi; /delete — darhol o‘chirish. (Chat tarixi Telegram’ning o‘zida qoladi.)",
     ru:"🔒 Ваш текст не сохраняется. Бот помнит текущую ситуацию только 1 час; /delete — удалить сразу. (История чата остаётся в самом Telegram.)" },
+  privacyAiG:{
+    uz:"AI tahlili uchun matn Google (Gemini) ga uzatiladi.",
+    ru:"Для AI-анализа текст передаётся в Google (Gemini)." },
   privacyAi:{
     uz:"AI tahlili uchun matn Anthropic (Claude) ga uzatiladi.",
     ru:"Для AI-анализа текст передаётся в Anthropic (Claude)." },

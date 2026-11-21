@@ -3,7 +3,7 @@
 import { makeT, HTML_LANG, fmtDate, fmtSum } from "../public/i18n.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor } from "./kb.js";
-import { siteNav } from "../public/shared.js";
+import { siteNav, siteFooter, a11yDialogHTML } from "../public/shared.js";
 import { parseISO } from "./dates.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -57,7 +57,7 @@ export function statsPage({ lang, s, cssHref, fs, user = null, accHref = "" }){
   return `<!doctype html><html${fs ? ` data-fs="${fs}"` : ""} lang="${HTML_LANG[lang]}" data-lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(t("stTitle"))} — HuquqYo‘l</title><meta name="description" content="${esc(t("stLead"))}"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="${cssHref}"></head>
 <body><a class="skip" href="#main">${t("skip")}</a><div class="wrap">
-<header class="nav">${siteNav({ lang, t, mode: "page", path: "/statistika", user, langHref: l => `/statistika?lang=${l}` })}</header>
+<header class="nav">${siteNav({ lang, t, mode: "page", path: "/statistika", user, langHref: l => `/statistika?lang=${l}`, a11y: true })}</header>
 <main id="main" class="stats">
 <h1>${t("stTitle")}</h1>
 <p class="lead">${t("stLead")}</p>
@@ -66,5 +66,7 @@ ${body}
   <li>${t("stHow1")}</li><li>${t("stHow2")}</li><li>${t("stHow3")}</li><li>${t("stHow4")}</li></ul></section>
 <p class="small muted">${esc(t("stSince", { date: date(s.since) }))} <a href="/api/stats">${t("stJson")}</a></p>
 <p><a class="btn primary" href="/">${t("toHome")}</a></p>
-</main></div>${accHref ? `<script type="module" src="${accHref}"></script>` : ""}</body></html>`;
+</main>
+${siteFooter(t, { path: "/statistika", botUrl: process.env.TELEGRAM_BOT_URL })}</div>
+${a11yDialogHTML(t)}${accHref ? `<script type="module" src="${accHref}"></script>` : ""}</body></html>`;
 }

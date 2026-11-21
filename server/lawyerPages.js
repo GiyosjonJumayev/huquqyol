@@ -157,7 +157,7 @@ export function profileEditPage({ lang, cssHref, fs, user, accHref, profile }){
       <fieldset class="card"><legend>${esc(t("sAreas"))}</legend>${checks("areas", areas.map(a => [a.id, a.title]), p.areas)}</fieldset>
       <fieldset class="card"><legend>${esc(t("sFormat"))}</legend>${checks("formats", [["online", t("online")], ["office", t("office")]], p.formats || ["online"])}${checks("langs", [["uz", t("l_uz")], ["ru", t("l_ru")], ["en", t("l_en")]], p.langs || ["uz"])}</fieldset>
       <fieldset class="card"><legend>${esc(t("sServices"))}</legend>
-        <div class="tscroll"><table class="svcedit"><thead><tr><th scope="col">${esc(t("svcName"))}</th><th scope="col">${esc(t("svcMin"))}</th><th scope="col">${esc(t("svcFmt"))}</th><th scope="col">${esc(t("svcPrice"))}</th><th scope="col">${esc(t("svcFrom"))}</th></tr></thead><tbody>${svcRows}</tbody></table></div>
+        <div class="tscroll" tabindex="0"><table class="svcedit"><thead><tr><th scope="col">${esc(t("svcName"))}</th><th scope="col">${esc(t("svcMin"))}</th><th scope="col">${esc(t("svcFmt"))}</th><th scope="col">${esc(t("svcPrice"))}</th><th scope="col">${esc(t("svcFrom"))}</th></tr></thead><tbody>${svcRows}</tbody></table></div>
         <p class="hint">${esc(t("svcHint"))}</p></fieldset>
       <fieldset class="card"><legend>${esc(t("sContact"))}</legend><div class="grid2">
         ${field("p_region", t("region"), sel("region", regionOpts, p.region || ""))}
@@ -184,7 +184,7 @@ export function lawyerStatsPage({ lang, cssHref, fs, user, accHref, profile, sta
   const funnel = [["f_requested", cons.requested], ["f_offered", cons.offered], ["f_agreed", cons.agreed], ["f_completed", cons.completed], ["f_lost", cons.lost]];
   const fmax = Math.max(1, ...funnel.map(f => f[1]));
   const bar = (n, m) => `<svg class="hbar" width="100%" height="12" aria-hidden="true" focusable="false"><rect class="track" width="100%" height="12" rx="4"/>${n ? `<rect class="fill" width="${Math.max(1, n / m * 100).toFixed(2)}%" height="12" rx="4"/>` : ""}</svg>`;
-  const tbl = (head, rows) => rows.length ? `<div class="tscroll"><table class="stt bars"><thead><tr>${head.map(h => `<th scope="col"${h.startsWith("#") ? ` class="numc"` : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : `<p class="empty">${esc(t("none"))}</p>`;
+  const tbl = (head, rows) => rows.length ? `<div class="tscroll" tabindex="0"><table class="stt bars"><thead><tr>${head.map(h => `<th scope="col"${h.startsWith("#") ? ` class="numc"` : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : `<p class="empty">${esc(t("none"))}</p>`;
   return page({ lang, cssHref, fs, user, accHref, path: "/hisob/statistika", title: t("stTitle"), desc: "", body: `
     <p><a href="/hisob">${esc(t("back"))}</a></p><h1>${esc(t("stTitle"))}</h1>
     <div class="kabstats">${tile(fmtSum(views.d7), t("stViews7"))}${tile(fmtSum(views.d30), t("stViews30"))}${tile(fmtSum(views.total), t("stViewsAll"))}${tile(fmtSum(cons.total), t("requests"))}

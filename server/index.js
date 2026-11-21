@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
 import { SCENARIOS, NORMS, LEX_URL, kbFor, COURTS } from "./kb.js";
-import { analyze, aiEnabled } from "./analyze.js";
+import { analyze, aiEnabled, aiProvider } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, customModel, toDocx, toPdf } from "./documents.js";
-import { plansPage, lawyersPage, lawyerPage, cabinetPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
+import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
 import { initDb, migrate, dbEnabled } from "./db.js";
 import { attachUser, requireUser, requireRole, register, login, logout, changePassword } from "./auth.js";
 import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats } from "./market.js";
@@ -22,7 +22,7 @@ initDb();
 import { securityHeaders, requireJson, rateLimit, sameOrigin, httpsRedirect } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
-import { domainCardsHTML, examplesHTML, siteNav } from "../public/shared.js";
+import { domainCardsHTML, examplesHTML, siteNav, siteFooter, a11yDialogHTML } from "../public/shared.js";
 import { makeT, LANGS, HTML_LANG } from "../public/i18n.js";
 import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
 import { stats, DEFAULT_FILE as STATS_FILE } from "./stats.js";
@@ -85,7 +85,7 @@ app.get("/api/courts", (req, res) => {
   if (req.get("If-None-Match") === COURTS_ETAG) return res.status(304).end();
   res.type("json").send(COURTS_JSON);
 });
-app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
+app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), aiProvider: aiProvider(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
 // Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
 function metaOf(lang){
@@ -101,7 +101,7 @@ function metaOf(lang){
   });
 }
 const META = Object.fromEntries(LANGS.map(l => [l, metaOf(l)]));
-app.get("/api/meta", (req, res) => res.set("Vary", "Cookie, Accept-Language").json({ ai: aiEnabled(), ...META[req.lang] }));
+app.get("/api/meta", (req, res) => res.set("Vary", "Cookie, Accept-Language").json({ ai: aiEnabled(), aiProvider: aiProvider(), ...META[req.lang] }));
 
 app.post("/api/analyze", rateLimit({ max: 15, name:"analyze" }), wrap(async (req, res) => {
   const v = vAnalyze(req.body);
@@ -199,17 +199,19 @@ const TEMPLATE = versioned(readFileSync(join(PUBLIC, "index.html"), "utf8"), ASS
 const OG_BASE = /^[a-z0-9.-]+(?::\d+)?$/i.test(process.env.PUBLIC_HOST || "") ? `https://${process.env.PUBLIC_HOST}` : "";
 const OG_LOCALE = { uz:"uz_UZ", cyr:"uz_UZ", ru:"ru_RU" };
 function renderIndex(lang){
-  const t = makeT(lang), meta = { ai: aiEnabled(), ...META[lang] };
+  const t = makeT(lang), meta = { ai: aiEnabled(), aiProvider: aiProvider(), ...META[lang] };
   return TEMPLATE
     .replace("{{ogBase}}", OG_BASE).replace("{{ogLocale}}", OG_LOCALE[lang])
     .replace("{{ogUrl}}", OG_BASE ? `
 <meta property="og:url" content="${OG_BASE}/?lang=${lang}">` : "")
     .replace("<!--NAV-->", siteNav({ lang, t, mode: "app", path: "/", a11y: true }))
+    .replace("<!--FOOTER-->", siteFooter(t, { mode: "app", path: "/", botUrl: process.env.TELEGRAM_BOT_URL }))
+    .replace("<!--A11Y-->", a11yDialogHTML(t))
     .replace("<!--DOMAINS-->", domainCardsHTML(meta, t))
     .replace("<!--EXAMPLES-->", examplesHTML(lang))
     .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
     .replace(`data-lang="${lang}" aria-pressed="false"`, `data-lang="${lang}" aria-pressed="true"`)
-    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "pdfjsBase" ? PDFJS_BASE : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff")) : k === "privacy" ? escAttr(t(meta.ai ? "privacyAi" : "privacy")) : escAttr(t(k)));
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "pdfjsBase" ? PDFJS_BASE : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff", { p: meta.aiProvider === "gemini" ? "Gemini" : "Claude" })) : k === "privacy" ? escAttr(t(!meta.ai ? "privacy" : meta.aiProvider === "gemini" ? "privacyAiG" : "privacyAi")) : escAttr(t(k)));
 }
 const INDEX = Object.fromEntries(LANGS.map(l => [l, renderIndex(l)]));
 app.get(["/", "/index.html"], (req, res) => {
@@ -227,7 +229,7 @@ app.get("/statistika", (req, res) => {
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
-    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
+    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user, accHref: `/account.js?v=${VER["account.js"]}` })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
 });
 // ---------- Biznes: tariflar, yuristlar katalogi, Yurist Pro kabineti ----------
 const REDIRECTED = Symbol("redirected");
@@ -246,6 +248,7 @@ function bizPage(render){
   })(req, res, next);
 }
 app.get("/tariflar", bizPage(plansPage));
+app.get("/maxfiylik", bizPage(a => privacyPage({ ...a, ai: aiEnabled(), provider: aiProvider(), botUrl: process.env.TELEGRAM_BOT_URL })));
 app.get("/yuristlar", bizPage(lawyersPage));
 app.get("/yuristlar/rasm/:id", (req, res, next) => dbEnabled() ? wrap(sendPhoto)(req, res, next) : next());
 app.get("/yuristlar/:id", bizPage(args => { const h = lawyerPage(args); if (h) recordView(args.id, args.query.soha); return h; }));
@@ -335,7 +338,7 @@ export function start({ port = process.env.PORT || 3000, host = process.env.HOST
   if (dbEnabled()) migrate().then(n => n && console.log(`[db] ${n} ta migratsiya qo‘llandi`)).catch(e => console.error("[db] migratsiya:", e.message));
   ocrWarmUp();                                                    // OCR til fayllari oldindan yuklanadi (birinchi rasm tezroq o‘qiladi)
   const p = /^\d+$/.test(String(port)) ? Number(port) : port;
-  const onListen = () => console.log(`HuquqYo‘l ishga tushdi: ${typeof p === "number" ? `http://${host || "localhost"}:${p}` : p}  (AI: ${aiEnabled() ? "Claude" : "o‘chiq — qidiruv rejimi"})`);
+  const onListen = () => console.log(`HuquqYo‘l ishga tushdi: ${typeof p === "number" ? `http://${host || "localhost"}:${p}` : p}  (AI: ${aiEnabled() ? aiProvider() : "o‘chiq — qidiruv rejimi"})`);
   const server = host && typeof p === "number" ? app.listen(p, host, onListen) : app.listen(p, onListen);
   server.requestTimeout = 30_000; server.headersTimeout = 15_000; server.keepAliveTimeout = 65_000;
   const stop = () => { stats.close(); ocrShutdown(); server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 8000).unref(); };   // statistika diskka yoziladi

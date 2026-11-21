@@ -3,7 +3,7 @@
 // Tamoyil o‘zgarmaydi: AI/OCR faqat rasmda KO‘RINIB TURGAN faktlarni ajratadi (kim, qachon, qancha, raqam).
 // Holatni tasniflash — mavjud analyze() orqali (bazadagi normalar bilan), muddat va summa — kodda (plan.js).
 // Rasm serverda saqlanmaydi va logga yozilmaydi: faqat xotirada, so‘rov davomida.
-import { analyze, aiClient, MODEL } from "./analyze.js";
+import { analyze, aiEnabled, aiComplete, parseJsonReply } from "./analyze.js";
 import { SCENARIO_BY_ID } from "./kb.js";
 import { parseISO, startOfDay } from "./dates.js";
 import { vForm, clean, ValidationError } from "./validate.js";
@@ -103,13 +103,11 @@ export class PhotoError extends Error {
   constructor(key, status){ super(key); this.key = key; this.status = status; }
 }
 
-async function visionRead(client, { images, note }){
-  const res = await client.messages.create({ model: MODEL, max_tokens: 600, system: SYSTEM, messages: [{ role:"user", content: [
-    ...images.map(i => ({ type:"image", source:{ type:"base64", media_type: i.mediaType, data: i.data } })),
-    { type:"text", text: (images.length > 1 ? `Bu bitta hujjatning ${images.length} ta sahifasi.\n` : "") + PROMPT(note) }
-  ] }] });
-  const out = res.content.filter(c => c.type === "text").map(c => c.text).join("");
-  return JSON.parse(out.slice(out.indexOf("{"), out.lastIndexOf("}") + 1));
+// Rasmni AI o‘qiydi (provayder — analyze.js: Claude yoki Gemini). Rasm bilan sekinroq — 20 soniya chegarasi.
+async function visionRead({ images, note }){
+  const text = (images.length > 1 ? `Bu bitta hujjatning ${images.length} ta sahifasi.
+` : "") + PROMPT(note);
+  return parseJsonReply(await aiComplete({ system: SYSTEM, text, images, maxTokens: 600, timeoutMs: 20_000 }));
 }
 
 // Hujjat turi aniq bo‘lsa — holat to‘g‘ridan-to‘g‘ri (fuqaro izoh yozmagan bo‘lsa)
@@ -134,9 +132,8 @@ export async function readPhoto(input, lang = "uz"){
     doc = cleanDoc(parsed);
     if (!hasFacts(doc)) throw new PhotoError("photoUnread", 422);
   } else {
-    const client = aiClient();
-    if (client){
-      try { doc = cleanDoc(await visionRead(client, { images, note })); if (!hasFacts(doc)) doc = null; }
+    if (aiEnabled()){
+      try { doc = cleanDoc(await visionRead({ images, note })); if (!hasFacts(doc)) doc = null; }
       catch (e) { console.warn("[photo] AI xatosi, OCR ga o‘tildi:", e?.status || e?.name || "error"); doc = null; }   // rasm va matn logga yozilmaydi
     }
     if (!doc){

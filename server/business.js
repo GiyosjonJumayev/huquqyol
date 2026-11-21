@@ -5,7 +5,7 @@ import { readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { HTML_LANG, fmtSum, makeT } from "../public/i18n.js";
-import { siteNav } from "../public/shared.js";
+import { siteNav, siteFooter, a11yDialogHTML, botUrlOf, TELEGRAM_BOT_URL } from "../public/shared.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
 import { clean, ValidationError } from "./validate.js";
@@ -27,7 +27,9 @@ const nm = (v, lang) => Array.isArray(v) ? pick(v, lang) : lang === "uz" ? v : t
 const T = {
   navHome: ["Bosh sahifa", "Главная"], navLogin: ["Kirish", "Войти"], navAccount: ["Hisobim", "Мой аккаунт"], navAdmin: ["Admin", "Админ"], navLawyers: ["Yuristlar", "Юристы"], navPlans: ["Tariflar", "Тарифы"], navCabinet: ["Yurist kabineti", "Кабинет юриста"],
   skip: ["Asosiy qismga o‘tish", "Перейти к основному"],
-  demo: ["Namuna", "Пример"],
+  demo: ["namuna profil", "образец профиля"],
+  fakeContact: ["namuna — ishlamaydi", "образец — не работает"],
+  demoNoReq: ["Namuna profilga so‘rov yuborib bo‘lmaydi: bu haqiqiy yurist emas.", "Образцу профиля нельзя отправить запрос: это не настоящий юрист."],
   demoNote: ["Bu namuna profil: haqiqiy yurist emas, aloqa ma’lumotlari ishlamaydi. Katalog ishga tushganda faqat litsenziyasi tekshirilgan yuristlar ko‘rsatiladi.", "Это пример профиля: не настоящий юрист, контакты не работают. После запуска каталога будут показаны только юристы с проверенной лицензией."],
   demoList: ["Katalog sinov rejimida: quyidagi profillar namuna, haqiqiy yuristlar emas.", "Каталог в тестовом режиме: профили ниже — примеры, а не настоящие юристы."],
   advokat: ["Advokat", "Адвокат"], yurist: ["Yurist", "Юрист"], firma: ["Yuridik firma", "Юридическая фирма"], mediator: ["Mediator", "Медиатор"],
@@ -127,13 +129,15 @@ function minPrice(l){
 
 // ---------- Umumiy sahifa qobig‘i ----------
 export function page({ lang, title, desc, path, cssHref, fs, body, scripts = "", user = null, accHref = "" }){
-  const t = tr(lang), here = p => p === path.split("?")[0] ? ` aria-current="page"` : "";
+  const t = tr(lang), mt = makeT(lang);
   const sep = path.includes("?") ? "&" : "?";
   return `<!doctype html><html${fs ? ` data-fs="${fs}"` : ""} lang="${HTML_LANG[lang]}" data-lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} — HuquqYo‘l</title><meta name="description" content="${esc(desc)}"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="${cssHref}"></head>
 <body class="biz"><a class="skip" href="#main">${esc(t("skip"))}</a><div class="wrap">
-<header class="nav">${siteNav({ lang, t: makeT(lang), mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}` })}</header>
-<main id="main">${body}</main></div>${accHref ? `<script type="module" src="${accHref}"></script>` : ""}${scripts}</body></html>`;
+<header class="nav">${siteNav({ lang, t: mt, mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}`, a11y: true })}</header>
+<main id="main">${body}</main>
+${siteFooter(mt, { path, botUrl: process.env.TELEGRAM_BOT_URL })}</div>
+${a11yDialogHTML(mt)}${accHref ? `<script type="module" src="${accHref}"></script>` : ""}${scripts}</body></html>`;
 }
 
 // ---------- Tariflar ----------
@@ -155,7 +159,7 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
   // Solishtirish jadvali
   const rows = [...FEAT.free.map((f, i) => [f, ["free", "pro", "firma", "org"], `free:${i}`]), ...FEAT.pro.map((f, i) => [f, ["pro", "firma", "org"], `pro:${i}`]),
     ...FEAT.firma.map((f, i) => [f, ["firma"], `firma:${i}`]), ...FEAT.org.map((f, i) => [f, ["org"], `org:${i}`])];
-  const table = `<div class="tscroll"><table class="cmp"><thead><tr><th scope="col">${esc(t("cmpFeature"))}</th>${PLANS.map(p => `<th scope="col">${esc(t(p.name))}</th>`).join("")}</tr></thead><tbody>
+  const table = `<div class="tscroll" tabindex="0"><table class="cmp"><thead><tr><th scope="col">${esc(t("cmpFeature"))}</th>${PLANS.map(p => `<th scope="col">${esc(t(p.name))}</th>`).join("")}</tr></thead><tbody>
     ${rows.map(([f, has, key]) => `<tr><th scope="row">${esc(pick(f, lang).replace("{docs}", docs))}${SOON.has(key) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</th>${PLANS.map(p => `<td>${has.includes(p.id) ? `<span class="yes" aria-label="+">✓</span>` : `<span class="no" aria-label="—">—</span>`}</td>`).join("")}</tr>`).join("")}
   </tbody></table></div>`;
   return page({ lang, cssHref, fs, user, accHref, path:"/tariflar", title:t("plTitle"), desc:t("plLead"), body:`
@@ -166,6 +170,8 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
 }
 
 // ---------- Katalog ----------
+// Namuna (demo:true) profillar: aniq «DEMO» belgisi — katalog kartasida ham, profil sahifasida ham. Haqiqiy profillarda yo‘q.
+const demoBadge = (l, lang) => l.demo === true ? ` <span class="tag demo">DEMO — ${esc(tr(lang)("demo"))}</span>` : "";
 const initials = n => n.replace(/[«»"()]/g, "").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 // Avatar: yurist yuklagan rasm yoki bosh harflar
 const avatar = (l, big = false) => l.photo
@@ -177,7 +183,7 @@ function lawyerCard(l, lang, qs){
   return `<article class="lawyer" aria-labelledby="lw_${l.id}">
     ${avatar(l)}
     <div class="lwbody">
-      <h2 id="lw_${l.id}"><a href="/yuristlar/${l.id}${qs}">${esc(nm(l.name, lang))}</a>${l.demo ? ` <span class="tag demo">${esc(t("demo"))}</span>` : ""}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h2>
+      <h2 id="lw_${l.id}"><a href="/yuristlar/${l.id}${qs}">${esc(nm(l.name, lang))}</a>${demoBadge(l, lang)}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h2>
       <p class="meta">${esc(t(l.kind))} · ${esc(t("years", { n: l.experience }))} · ${esc(regionName(l.region, lang))}, ${esc(districtName(l.district, l.region, lang))}</p>
       <p class="head">${esc(pick(l.headline, lang))}</p>
       <ul class="chips">${l.areas.map(a => `<li>${esc(areas.find(x => x.id === a)?.title || a)}</li>`).join("")}</ul>
@@ -219,16 +225,20 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
   const t = tr(lang), areas = areaList(lang);
   const qs = new URLSearchParams(Object.entries(query).filter(([k, v]) => ["soha", "hudud", "shakl", "kim"].includes(k) && typeof v === "string" && v.length < 80)).toString();
   const svc = l.services.map(s => `<tr><th scope="row">${esc(pick(s.name, lang))}</th><td>${s.min ? esc(t("min", { n: s.min })) : "—"}</td><td>${esc(t(s.format))}</td><td class="numc">${s.price === 0 ? esc(t("free")) : esc(s.from ? t("from", { p: money(s.price, lang) }) : money(s.price, lang))}</td></tr>`).join("");
-  const tel = l.contacts.phone ? `<li><span>${esc(t("phone"))}:</span> ${l.demo ? `<span class="mono">${esc(l.contacts.phone)}</span>` : `<a href="tel:${esc(l.contacts.phone.replace(/\s/g, ""))}">${esc(l.contacts.phone)}</a>`}</li>` : "";
-  const tg = l.contacts.telegram ? `<li><span>Telegram:</span> <a href="https://t.me/${esc(l.contacts.telegram)}" target="_blank" rel="noopener noreferrer">@${esc(l.contacts.telegram)}</a></li>` : "";
-  const web = l.contacts.website ? `<li><span>${esc(t("website"))}:</span> <a href="${esc(l.contacts.website)}" target="_blank" rel="noopener noreferrer nofollow">${esc(l.contacts.website.replace(/^https:\/\//, ""))}</a></li>` : "";
-  const mail = l.contacts.email ? `<li><span>${esc(t("email"))}:</span> ${l.demo ? `<span class="mono">${esc(l.contacts.email)}</span>` : `<a href="mailto:${esc(l.contacts.email)}">${esc(l.contacts.email)}</a>`}</li>` : "";
+  // Namuna profilda aloqa ma’lumotlari havola emas va «namuna — ishlamaydi» deb belgilanadi
+  const fake = `<span class="fakec">${esc(t("fakeContact"))}</span>`;
+  const row = (label, value, link) => `<li><span>${esc(label)}:</span> ${l.demo ? `<span class="mono">${esc(value)}</span> ${fake}` : link}</li>`;
+  const c = l.contacts;
+  const tel = c.phone ? row(t("phone"), c.phone, `<a href="tel:${esc(c.phone.replace(/\s/g, ""))}">${esc(c.phone)}</a>`) : "";
+  const tg = c.telegram ? row("Telegram", `@${c.telegram}`, `<a href="https://t.me/${esc(c.telegram)}" target="_blank" rel="noopener noreferrer">@${esc(c.telegram)}</a>`) : "";
+  const web = c.website ? row(t("website"), c.website.replace(/^https:\/\//, ""), `<a href="${esc(c.website)}" target="_blank" rel="noopener noreferrer nofollow">${esc(c.website.replace(/^https:\/\//, ""))}</a>`) : "";
+  const mail = c.email ? row(t("email"), c.email, `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`) : "";
   return page({ lang, cssHref, fs, user, accHref, path:`/yuristlar/${l.id}`, title:nm(l.name, lang), desc:pick(l.headline, lang), body:`
     <p><a href="/yuristlar${qs ? `?${esc(qs)}` : ""}">${esc(t("back"))}</a></p>
     ${l.demo ? `<p class="note warn" role="note">${esc(t("demoNote"))}</p>` : ""}
     <section class="card prof">
       ${avatar(l, true)}
-      <div><h1>${esc(nm(l.name, lang))}${l.demo ? ` <span class="tag demo">${esc(t("demo"))}</span>` : ""}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h1>
+      <div><h1>${esc(nm(l.name, lang))}${demoBadge(l, lang)}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h1>
         ${l.firm ? `<p class="meta">${esc(nm(l.firm, lang))}</p>` : ""}
         <p class="meta">${esc(t(l.kind))} · ${esc(t("years", { n: l.experience }))} · ${esc(l.langs.map(x => x.toUpperCase()).join(" / "))} · ${esc(l.license.verified ? t("verified") : t("notVerified"))}</p>
         <p class="head">${esc(pick(l.headline, lang))}</p></div>
@@ -241,15 +251,15 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
         ${l.license?.number ? `<p class="small muted">${esc(t("licenseNo"))}: ${esc(l.license.number)}${l.license.issuer ? ` · ${esc(l.license.issuer)}` : ""}</p>` : ""}
         <h2 class="sec">${esc(t("areas"))}</h2><ul class="chips">${l.areas.map(a => `<li><a href="/yuristlar?soha=${a}">${esc(areas.find(x => x.id === a)?.title || a)}</a></li>`).join("")}</ul>
         <h2 class="sec">${esc(t("services"))}</h2>
-        <div class="tscroll"><table class="svc"><thead><tr><th scope="col">${esc(t("svc"))}</th><th scope="col">${esc(t("dur"))}</th><th scope="col">${esc(t("fmt"))}</th><th scope="col" class="numc">${esc(t("price"))}</th></tr></thead><tbody>${svc}</tbody></table></div>
-        <h2 class="sec">${esc(t("howTitle"))}</h2><ol class="how"><li>${esc(t("how1"))}</li><li>${esc(t("how2"))}</li><li>${esc(t("how3"))}</li></ol>
+        <div class="tscroll" tabindex="0"><table class="svc"><thead><tr><th scope="col">${esc(t("svc"))}</th><th scope="col">${esc(t("dur"))}</th><th scope="col">${esc(t("fmt"))}</th><th scope="col" class="numc">${esc(t("price"))}</th></tr></thead><tbody>${svc}</tbody></table></div>
+        <h2 class="sec">${esc(t("howTitle"))}</h2><ol class="lwhow"><li>${esc(t("how1"))}</li><li>${esc(t("how2"))}</li><li>${esc(t("how3"))}</li></ol>
         <p class="small muted">${esc(t("privacy"))}</p>
       </div>
       <aside class="card side">
         <h2>${esc(t("contacts"))}</h2><ul class="contact">${tel}${tg}${mail}${web}</ul>
         <h2>${esc(t("where"))}</h2><p>${esc(regionName(l.region, lang))}, ${esc(pick(l.address, lang))}</p><p class="muted">${esc(pick(l.hours, lang))}</p>
         <p class="meta">${l.formats.map(f => esc(t(f))).join(" · ")}</p>
-        ${l.demo ? "" : requestBox(l, lang, user, query)}
+        ${l.demo ? `<p class="note warn" role="note">${esc(t("demoNoReq"))}</p>` : requestBox(l, lang, user, query)}
       </aside>
     </div>` });
 }
@@ -277,7 +287,7 @@ export function cabinetPage({ lang, cssHref, fs, jsHref, user, accHref, pro, db 
       : `<p class="rowbtn"><button class="btn primary" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: "pro" }))}'>${esc(t("plSubscribe"))}</button><a class="btn ghost" href="/tariflar">${esc(t("navPlans"))}</a></p><p class="err" data-err hidden></p>`;
     return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"), body:`
       <section class="cabgate"><h1>${esc(t("cabTitle"))}</h1><p class="lead">${esc(user ? t("cabNeedPro") : t("cabLead"))}</p>
-      <ul class="feat big">${list}</ul>${cta}</section>` });
+      <ul class="feat featlist">${list}</ul>${cta}</section>` });
   }
   return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"),
     body:`<div id="kab" class="kab" data-lang="${lang}" data-sync="1"><h1>${esc(t("cabTitle"))}</h1><noscript><p class="card">${esc(t("cabNoJs"))}</p></noscript></div>`,
@@ -316,4 +326,43 @@ export function vCustom(b){
   const title = clean(b?.title, 120), text = String(b?.text ?? "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "").slice(0, 20000).trim();
   if (text.length < 2) throw new ValidationError("docText");
   return { title, text, letterhead: vLetterhead(b?.letterhead) };
+}
+
+// ---------- Maxfiylik ----------
+// Faqat kodda haqiqatan bajariladigan narsalar yoziladi (stats.js, photo.js, auth.js, bot/). Huquqiy ko‘rib chiqish kerak.
+const PV = {
+  title: ["Maxfiylik", "Конфиденциальность"],
+  lead: ["HuquqYo‘l qaysi ma’lumotlarni ishlatadi, qayerda saqlaydi va ularni qanday o‘chirish mumkin.", "Какие данные использует HuquqYo‘l, где хранит и как их удалить."],
+  h1: ["Hisobsiz foydalanish", "Без аккаунта"],
+  p1: ["Ariza uchun kiritgan ma’lumotlaringiz (ism, manzil, holat tafsilotlari) faqat shu brauzerda saqlanadi. Ularni istalgan vaqtda pastdagi «Ma’lumotlarimni o‘chirish» havolasi bilan o‘chirishingiz mumkin.", "Данные для заявления (ФИО, адрес, детали ситуации) хранятся только в этом браузере. Их можно в любой момент удалить по ссылке «Удалить мои данные» внизу страницы."],
+  h2: ["Tahlil va hujjat", "Анализ и документ"],
+  p2: ["Holat matni tahlil uchun serverga yuboriladi va saqlanmaydi. Ariza ma’lumotlari faqat DOCX yoki PDF fayl yasash uchun ishlatiladi.", "Текст ситуации отправляется на сервер для анализа и не сохраняется. Данные заявления используются только для создания файла DOCX или PDF."],
+  pAi: ["Hozir AI rejimi yoqilgan: tahlil uchun matn Anthropic (Claude, AQSH) ga uzatiladi.", "Сейчас включён режим AI: для анализа текст передаётся в Anthropic (Claude, США)."],
+  pAiG: ["Hozir AI rejimi yoqilgan: tahlil uchun matn Google (Gemini) ga yuboriladi; HuquqYo‘l uni saqlamaydi. Gemini’ning bepul tarifida Google so‘rovlardan o‘z xizmatlarini yaxshilash uchun foydalanishi mumkin, shuning uchun pilotda u faqat namoyish uchun ishlatiladi.", "Сейчас включён режим AI: для анализа текст отправляется в Google (Gemini); HuquqYo‘l его не сохраняет. На бесплатном тарифе Gemini Google может использовать запросы для улучшения своих сервисов, поэтому в пилоте он используется только для демонстрации."],
+  pNoAi: ["Hozir AI rejimi o‘chirilgan: tahlil faqat shu serverda, qoidalar bilan bajariladi.", "Сейчас режим AI выключен: анализ выполняется только на этом сервере, по правилам."],
+  h3: ["Hujjat rasmi va PDF", "Фото документа и PDF"],
+  p3: ["Rasm o‘qish uchun serverga yuboriladi: faqat so‘rov davomida xotirada turadi, saqlanmaydi va logga yozilmaydi. PDF faylning o‘zi serverga yuborilmaydi — brauzer undan matn yoki sahifa rasmlarini oladi.", "Фото отправляется на сервер для распознавания: находится в памяти только во время запроса, не сохраняется и не пишется в журнал. Сам PDF-файл на сервер не отправляется — браузер извлекает из него текст или изображения страниц."],
+  h4: ["Anonim statistika", "Анонимная статистика"],
+  p4: ["Faqat sonlar saqlanadi: qaysi soha va holat ochilgani, nechta hujjat yasalgani. Matn, ariza ma’lumotlari, IP manzil va cookie saqlanmaydi.", "Сохраняются только числа: какие области и ситуации открывались, сколько документов создано. Текст, данные заявлений, IP-адрес и cookie не сохраняются."],
+  h5: ["Cookie", "Cookie"],
+  p5: ["hy_lang — til, hy_fs — shrift o‘lchami, hy_theme — mavzu, hy_photo — rasm paneli yopilgani. Hisobga kirsangiz — kirish uchun sessiya cookie (HttpOnly).", "hy_lang — язык, hy_fs — размер шрифта, hy_theme — тема, hy_photo — закрыта ли панель фото. Если вы вошли в аккаунт — cookie сессии (HttpOnly, только для входа)."],
+  h6: ["Hisob", "Аккаунт"],
+  p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист."],
+  h7: ["Telegram bot", "Telegram-бот"],
+  p7: ["Bot suhbat holatini faqat xotirada, 1 soatgacha saqlaydi; /delete buyrug‘i uni darhol o‘chiradi. Xabarlar matni logga yozilmaydi.", "Бот хранит состояние диалога только в памяти, до 1 часа; команда /delete сразу его удаляет. Текст сообщений не пишется в журнал."],
+  botSoon: ["Bot havolasi tez orada shu yerda bo‘ladi.", "Ссылка на бота скоро появится здесь."],
+  botOpen: ["Botni ochish", "Открыть бота"]
+};
+export function privacyPage({ lang, cssHref, fs, user, accHref, ai = false, provider = null, botUrl = "" }){
+  // Texnik nomlar (cookie nomlari, buyruqlar, fayl turlari) kirillga o‘girilmaydi
+  const keep = /(hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|Google|Gemini|DOCX|PDF|AI|Telegram)/;
+  const p = k => { const s = PV[k][idx(lang)]; return lang === "cyr" ? s.split(keep).map((x, i) => i % 2 ? x : toCyrillic(x)).join("") : s; };
+  const mt = makeT(lang);
+  const bot = botUrlOf(botUrl) || botUrlOf(TELEGRAM_BOT_URL);
+  const sec = (h, ...ps) => `<section class="pvsec"><h2 class="sec">${esc(p(h))}</h2>${ps.map(x => `<p>${esc(p(x))}</p>`).join("")}</section>`;
+  return page({ lang, cssHref, fs, user, accHref, path: "/maxfiylik", title: p("title"), desc: p("lead"), body: `
+    <h1>${esc(p("title"))}</h1><p class="lead">${esc(p("lead"))}</p>
+    ${sec("h1", "p1")}${sec("h2", "p2", !ai ? "pNoAi" : provider === "gemini" ? "pAiG" : "pAi")}${sec("h3", "p3")}${sec("h4", "p4")}${sec("h5", "p5")}${sec("h6", "p6")}
+    <section class="pvsec" id="bot"><h2 class="sec">${esc(p("h7"))}</h2><p>${esc(p("p7"))}</p>
+      <p>${bot ? `<a class="btn ghost" href="${esc(bot)}" target="_blank" rel="noopener noreferrer">${esc(p("botOpen"))}<span class="sr"> ${esc(mt("newTab"))}</span></a>` : esc(p("botSoon"))}</p></section>` });
 }
