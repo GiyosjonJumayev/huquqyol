@@ -34,7 +34,10 @@ test("Bosh sahifa v3: salom, sarlavha, suhbat ko‘rinishidagi kiritish, 4 misol
   for (const [lang, hi, h1] of [["uz", "Assalomu alaykum!", "Qanday muammo bo‘ldi?"], ["cyr", "Ассалому алайкум!", "Қандай муаммо бўлди?"], ["ru", "Здравствуйте!", "Что случилось?"]]){
     const html = await (await fetch(base + "/", { headers: { cookie: `hy_lang=${lang}` } })).text();
     assert.ok(html.includes(hi) && html.includes(h1), lang);
-    assert.equal((html.match(/class="[^"]*\bhand\b/g) || []).length, 3, `${lang}: Caveat (qo‘lyozma) 3 marta — salom, rasm izohi, footer shiori`);
+    assert.equal((html.match(/class="[^"]*\bhand\b/g) || []).length, 2, `${lang}: Caveat (qo‘lyozma) 2 marta — rasm izohi, footer shiori (salom suhbat pufakchasida)`);
+    assert.doesNotMatch(html, /class="hello/, `${lang}: sarlavha ustidagi qo‘lyozma salom olib tashlangan`);
+    assert.match(html, /class="flowstrip"[\s\S]*?murojaat\.gov\.uz[\s\S]*?pm\.gov\.uz[\s\S]*?yurxizmat\.uz/, `${lang}: «Bu qanday ishlaydi» ostida yo‘l chizig‘i`);
+    assert.match(html, /<script src="\/boot\.js\?v=/, `${lang}: boot.js <head>da`);
     assert.match(html, /<div class="chat" id="chat">\s*<span class="ikat" aria-hidden="true"><\/span>/);        // suhbat kartasi
     assert.match(html, /<div class="msg bot">[\s\S]*?<span class="typing" aria-hidden="true">[\s\S]*?<p class="bubtext">/);
     assert.match(html, /<label for="problem" class="sr">/);
@@ -56,7 +59,7 @@ test("Footer hamma sahifada bir xil: ikat chizig‘i, shior, ogohlantirish, Yord
   for (const p of ["/", "/tariflar", "/yuristlar", "/yuristlar/namuna-1", "/statistika", "/maxfiylik", "/kirish", "/royxat"]){
     const html = await (await fetch(base + p)).text();
     assert.match(html, /<footer class="sitefoot">\s*<span class="ikatf" aria-hidden="true"><\/span>/, p);
-    for (const s of ["huquqingizni biling — yo‘lni birga topamiz", "Bu yuridik maslahat emas.", "Normalar 2026-yil noyabr holatiga tekshirilgan.", "© 2026 HuquqYo‘l",
+    for (const s of ["huquqingizni biling — yo‘lni birga topamiz", "Bu yuridik maslahat emas.", "Normalar 2026-yil noyabr holatiga tekshirilgan.", "© 2026 HuquqYo‘l · Mizon jamoasi, Toshkent",
       'href="https://lex.uz"', 'href="https://murojaat.gov.uz"', 'href="https://pm.gov.uz"', 'href="https://yurxizmat.uz"', 'href="/maxfiylik"', 'href="/statistika"']) assert.ok(html.includes(s), `${p}: ${s}`);
     assert.ok(/id="wipe"|href="\/\?ochirish=1"/.test(html), `${p}: «Ma’lumotlarimni o‘chirish»`);
   }
