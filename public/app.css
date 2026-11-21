@@ -945,8 +945,9 @@ html,body{overflow-x:clip}
 .stepsrow[hidden]{display:none}
 .nav:has(.stepsrow:not([hidden])) .navbar{min-height:60px}
 /* Moslashuvchanlik */
-@media (max-width:1100px){.navlink .ni{display:none}.navlink{padding-inline:11px}}
-@media (max-width:900px){
+.navlinks .navlink .ni{display:none}
+.navlinks .navlink{padding-inline:11px}
+@media (max-width:940px){
   .navlinks,.langdd,.navright>.acct{display:none}
   .navmenu{display:block}
   .navright,.navlinks+.navright{gap:6px;margin-left:auto}

@@ -73,8 +73,9 @@ const initialsOf = n => String(n || "").split(/\s+/).filter(w => /^\p{L}/u.test(
 
 /** Hisob bloki: kirmagan — «Kirish» (+ panelda «Ro‘yxatdan o‘tish»); kirgan — avatar va ism (+ admin uchun «Admin»). */
 export function acctHTML(user, t, { full = false } = {}){
-  if (!user) return `<a class="navlink" href="/kirish">${esc(t("navLogin"))}</a>`
-    + `<a class="btn primary navcta" href="/royxat">${esc(t(full ? "navRegister" : "navRegisterShort"))}</a>`;
+  if (!user) return full
+    ? `<a class="navlink" href="/kirish">${esc(t("navLogin"))}</a><a class="btn primary navcta" href="/royxat">${esc(t("navRegister"))}</a>`
+    : `<a class="btn primary navcta" href="/kirish">${esc(t("navLogin"))}</a>`;
   return (user.role === "admin" ? `<a class="navlink" href="/admin">${esc(t("navAdmin"))}</a>` : "")
     + `<a class="navuser" href="/hisob" title="${esc(t("navAccount"))}"><span class="av" aria-hidden="true">${esc(initialsOf(user.name))}</span><span class="un">${esc(user.name)}</span><span class="sr"> — ${esc(t("navAccount"))}</span></a>`;
 }

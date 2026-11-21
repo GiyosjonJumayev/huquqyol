@@ -23,6 +23,13 @@ before(async () => {
 });
 after(async () => { await browser?.close(); server?.close(); await ocrShutdown(); });
 
+// Til navbar menyusida: desktopda til menyusi, telefonda «☰» menyu — foydalanuvchi kabi avval menyuni ochamiz
+async function pickLang(p, l){
+  const visible = p.locator(`[data-lang='${l}']:visible`);
+  if (!(await visible.count())) await p.locator(".langdd:visible > summary, .navmenu:visible > summary").first().click();
+  await Promise.all([p.waitForNavigation(), p.locator(`[data-lang='${l}']:visible`).first().click()]);
+}
+
 async function page(opts = {}){
   const ctx = await browser.newContext({ viewport:{ width:1280, height:900 }, acceptDownloads:true, bypassCSP:true, ...opts });
   const p = await ctx.newPage();
@@ -111,7 +118,7 @@ test("Kirill yozuvi, telefon ekrani, qorong‘i mavzu", { skip }, async () => {
   await p.goto(base);
   await p.waitForSelector(".domain");
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
-  await Promise.all([p.waitForNavigation(), p.click("[data-lang='cyr']")]);
+  await pickLang(p, "cyr");
   await p.waitForSelector(".domain");
   assert.equal(await p.innerText("h1.hero"), "Ҳуқуқингиз бузилдими?");
   assert.deepEqual(await audit(p), []);
@@ -156,7 +163,7 @@ test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til alma
   const dl = p.waitForEvent("download");
   await p.click("#dlPdf");
   assert.match((await dl).suggestedFilename(), /\.pdf$/);
-  await Promise.all([p.waitForNavigation(), p.click("[data-lang='uz']")]);
+  await pickLang(p, "uz");
   await p.waitForSelector("#paper .ttl");
   assert.equal(await p.innerText("#v3 h1"), "Arizani to‘ldiring");
   assert.equal(await p.innerText("#paper .ttl"), "TALABNOMA");

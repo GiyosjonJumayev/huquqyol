@@ -160,7 +160,7 @@ const M = {
   // Yuristlar katalogi va Pro
   navLabel:{ uz:"Asosiy bo‘limlar", ru:"Основные разделы" }, navLawyers:{ uz:"Yuristlar", ru:"Юристы" }, navPlans:{ uz:"Tariflar", ru:"Тарифы" },
   navApply:{ uz:"Ariza tayyorlash", ru:"Составить заявление" }, navCabinet:{ uz:"Kabinet", ru:"Кабинет" },
-  navLogin:{ uz:"Kirish", ru:"Войти" }, navRegister:{ uz:"Ro‘yxatdan o‘tish", ru:"Зарегистрироваться" }, navRegisterShort:{ uz:"Boshlash", ru:"Начать" },
+  navLogin:{ uz:"Kirish", ru:"Войти" }, navRegister:{ uz:"Ro‘yxatdan o‘tish", ru:"Зарегистрироваться" },
   navAccount:{ uz:"Hisobim", ru:"Мой аккаунт" }, navAdmin:{ uz:"Admin", ru:"Админ" }, navMenu:{ uz:"Menyu", ru:"Меню" },
   navTagline:{ uz:"Huquqiy yo‘l xaritasi", ru:"Правовая дорожная карта" },
   noDomain:{ uz:"Holatingizga mos soha topilmadimi? Yurist yoki advokat bilan maslahatlashing →", ru:"Не нашли свою ситуацию? Проконсультируйтесь с юристом или адвокатом →" },
