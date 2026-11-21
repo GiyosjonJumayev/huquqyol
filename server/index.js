@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
 import { SCENARIOS, NORMS, LEX_URL, kbFor, COURTS } from "./kb.js";
-import { analyze, aiEnabled, aiProvider } from "./analyze.js";
+import { analyze, aiEnabled, aiProvider, aiLastError } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, customModel, toDocx, toPdf } from "./documents.js";
 import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
@@ -92,7 +92,7 @@ app.get("/api/courts", (req, res) => {
   if (req.get("If-None-Match") === COURTS_ETAG) return res.status(304).end();
   res.type("json").send(COURTS_JSON);
 });
-app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), aiProvider: aiProvider(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
+app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), aiProvider: aiProvider(), aiLastError: aiLastError(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
 // Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
 function metaOf(lang){

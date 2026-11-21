@@ -26,7 +26,7 @@ const asCatalog = r => {
     experience: r.experience, langs: r.langs.length ? r.langs : ["uz"], areas: r.areas, formats: r.formats.length ? r.formats : ["online"],
     services, photo: r.photo_at ? `/yuristlar/rasm/${r.id}?v=${new Date(r.photo_at).getTime()}` : null,
     contacts: { phone: r.phone, email: r.email || "", telegram: r.telegram || "", website: r.website || "" },
-    license: { verified: true, number: r.license || "", issuer: r.license_issuer || "" }, userId: r.user_id ? Number(r.user_id) : null
+    license: { verified: false, number: r.license || "", issuer: r.license_issuer || "" }, userId: r.user_id ? Number(r.user_id) : null
   };
 };
 // Katalogda: admin tasdiqlagan (litsenziya tekshirilgan) VA Yurist Pro / Firma to‘lovi faol (sinov emas) profillar

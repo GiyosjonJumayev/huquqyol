@@ -1,7 +1,7 @@
 // Gemini provayderi: REST (fetch soxtalanadi), JSON rejimi, kalit faqat sarlavhada, xatoda — qoidalar rejimi.
 import { test, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import { analyze, pickProvider, aiProvider, aiModel, _setGemini, _setClient, _setAiTimeout } from "../server/analyze.js";
+import { analyze, pickProvider, aiProvider, aiModel, _setGemini, _setClient, _setAiTimeout, _resetAiCooldown } from "../server/analyze.js";
 import { readPhoto } from "../server/photo.js";
 
 const KEY = "AIzaSyTEST-not-a-real-key-0123456789";
@@ -70,7 +70,7 @@ test("Gemini: buzuq JSON, noma’lum holat, HTTP xato, tarmoq xatosi → qoidala
       ["HTTP 403 (kalit noto‘g‘ri)", () => json(403, { error: { message: `API key ${KEY} not valid` } })],
       ["tarmoq", () => { throw new TypeError(`fetch failed for ${KEY}`); }]
     ]){
-      mock(handler);
+      mock(handler); _resetAiCooldown();   // har holat alohida: 5 daqiqalik pauza ishlamasin
       const r = await analyze("3 oydan beri maosh bermayapti");
       assert.equal(r.source, "rules", name);
       assert.equal(r.fallbackReason, "ai_error", name);

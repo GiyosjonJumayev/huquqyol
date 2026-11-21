@@ -40,10 +40,17 @@ const searchScen = buildIndex(scenDocs);
 export function rankScenarios(text){
   const t = normalize(text);
   const bm = Object.fromEntries(searchScen(text, 10).map(r => [r.id, r.score]));
-  return SCENARIOS.map(s => {
+  const ranked = SCENARIOS.map(s => {
     const kw = s.keywords.reduce((a,k) => a + (t.includes(normalize(k)) ? 1 : 0), 0);
     return { id:s.id, keywordHits:kw, score: kw * 2 + (bm[s.id] || 0) };
   }).sort((a,b) => b.score - a.score);
+  // Bo‘shatish + to‘lanmagan maosh bir matnda: asosiy hodisa — bo‘shatish (ish haqi — ikkinchi darajali; o‘z xohishi bilan ketgan odamning hisob-kitobi esa o‘zgarmaydi).
+  // Muddat (3 oy, MK 9) bo‘shatishdan hisoblanadi va qisqaroq, shuning uchun u birinchi turadi.
+  const top = ranked[0], dis = ranked.find(r => r.id === "ishdan_boshatish");
+  if (dis && dis.keywordHits >= 1 && top.id === "ish_haqi"){
+    ranked.splice(ranked.indexOf(dis), 1); ranked.unshift(dis);
+  }
+  return ranked;
 }
 
 // Tahlil uchun kontekst: eng mos 2 holatning normalari + matn bo‘yicha topilgan normalar

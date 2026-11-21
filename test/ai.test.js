@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { analyze, _setClient } from "../server/analyze.js";
+import { analyze, _setClient, aiLastError, aiReady } from "../server/analyze.js";
 
 const fake = reply => ({ messages:{ create: async req => { fake.last = req; return { content:[{ type:"text", text: reply }] }; } } });
 
@@ -23,4 +23,22 @@ test("AI xatosi — qoidalarga qaytadi", async () => {
   assert.equal(r.source, "rules");
   assert.equal(r.scenario, "ish_haqi");
   _setClient(null);
+});
+
+test("AI xatosidan keyin 5 daqiqa AI chaqirilmaydi; aiLastError — faqat holat va vaqt, matn emas", async () => {
+  let calls = 0;
+  _setClient({ messages:{ create: async () => { calls++; throw Object.assign(new Error("Sirli matn 12345"), { status: 529 }); } } });
+  assert.equal(aiLastError(), null);
+  await analyze("3 oydan beri maosh bermayapti");
+  assert.equal(calls, 1);
+  assert.equal(aiReady(), false);
+  const r = await analyze("3 oydan beri maosh bermayapti");
+  assert.equal(calls, 1, "pauza ichida AI chaqirilmaydi");
+  assert.equal(r.source, "rules");
+  const e = aiLastError();
+  assert.equal(e.status, 529);
+  assert.deepEqual(Object.keys(e).sort(), ["at", "status"]);
+  assert.doesNotMatch(JSON.stringify(e), /Sirli|12345|maosh/);
+  _setClient(null);
+  assert.equal(aiLastError(), null);
 });
