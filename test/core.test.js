@@ -70,7 +70,9 @@ test("Holat tasnifi (oflayn)", () => {
     "Ish beruvchim 3 oydan beri maosh bermayapti": "ish_haqi",
     "Meni ogohlantirmasdan ishdan bo‘shatishdi": "ishdan_boshatish",
     "2 yildan beri ta’tilga chiqarishmayapti": "tatil",
-    "Ishdan ketdim, hisob-kitob va mehnat daftarchamni berishmayapti": "hisob_kitob"
+    "Ishdan ketdim, hisob-kitob va mehnat daftarchamni berishmayapti": "hisob_kitob",
+    "direktor bilan janjallashdim, kadrlar bo‘limi meni ishga kirgizmay qo‘ydi": "ishdan_boshatish",   // migrant_agentlik emas
+    "Meni ishdan bo‘shatishdi va oxirgi 3 oylik maoshimni ham berishmadi": "ishdan_boshatish"          // bo‘shatish + maosh: asosiysi bo‘shatish
   };
   for (const [t, id] of Object.entries(cases)) assert.equal(rankScenarios(t)[0].id, id, t);
 });

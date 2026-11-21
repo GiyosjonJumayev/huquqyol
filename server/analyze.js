@@ -37,8 +37,17 @@ export const aiModel = () => provider === "gemini" ? GEMINI_MODEL : ANTHROPIC_MO
 export const aiClient = () => client;          // eski moslik (Anthropic mijozi)
 export const MODEL = ANTHROPIC_MODEL;
 // Testlar uchun: _setClient(c) — Anthropic soxta mijozi; _setGemini(key) — Gemini (fetch soxtalanadi)
-export const _setClient = c => { client = c; provider = c ? "anthropic" : null; geminiKey = null; };
-export const _setGemini = key => { geminiKey = key || null; provider = key ? "gemini" : null; client = null; thinkIdx = 0; };
+// AI xatosidan keyin 5 daqiqa AI chaqirilmaydi (matn ham, rasm ham): darrov qoidalar yoki OCR.
+// Faqat HTTP holati (yoki "timeout"/"network") va vaqt saqlanadi — foydalanuvchi matni hech qachon.
+export const AI_COOLDOWN_MS = 5 * 60_000;
+let coolUntil = 0, lastError = null;
+export const aiReady = () => aiEnabled() && Date.now() >= coolUntil;
+export const aiLastError = () => lastError;
+export const _resetAiCooldown = () => { coolUntil = 0; lastError = null; };   // testlar uchun
+const noteAiError = e => { lastError = { status: e?.status ?? e?.name ?? "error", at: new Date().toISOString() }; coolUntil = Date.now() + AI_COOLDOWN_MS; };
+
+export const _setClient = c => { _resetAiCooldown(); client = c; provider = c ? "anthropic" : null; geminiKey = null; };
+export const _setGemini = key => { _resetAiCooldown(); geminiKey = key || null; provider = key ? "gemini" : null; client = null; thinkIdx = 0; };
 
 // Gemini fikrlash darajasi: tezlik kerak (tasniflash + faktlar), shuning uchun eng past daraja.
 // GEMINI_THINKING: minimal | low | medium | high | son (thinkingBudget) | off. Model darajani qabul qilmasa — keyingisi.
@@ -80,7 +89,11 @@ async function geminiCall({ system, text, images = [], maxTokens, timeoutMs }){
 }
 
 // Yagona provayder funksiyasi: tizim ko‘rsatmasi + foydalanuvchi matni (+ rasmlar) → model javobi (matn)
-export async function aiComplete({ system, text, images = [], maxTokens = 700, timeoutMs = aiTimeout }){
+export async function aiComplete(args){
+  try { return await aiCompleteRaw(args); }
+  catch (e) { if (e?.status !== "off") noteAiError(e); throw e; }
+}
+async function aiCompleteRaw({ system, text, images = [], maxTokens = 700, timeoutMs = aiTimeout }){
   if (provider === "gemini" && geminiKey) return geminiCall({ system, text, images, maxTokens, timeoutMs });
   if (provider === "anthropic" && client){
     const content = images.length ? [...images.map(i => ({ type:"image", source:{ type:"base64", media_type: i.mediaType, data: i.data } })), { type:"text", text }] : text;
@@ -167,7 +180,7 @@ const searchText = text => /[\u0400-\u04FF]/.test(text) ? `${text} ${toLatin(tex
 export async function analyze(text, lang = "uz"){
   const ctx = retrieve(searchText(text));
   const retrieval = { norms: ctx.norms.map(n => ({ id:n.id, article:n.article, score:n.score })), articles: ctx.articles.map(a => ({ article:a.article, title:a.title, score:a.score })), scenarios: ctx.ranked };
-  if (aiEnabled()){
+  if (aiReady()){
     try { return { ...(await aiAnalyze(text, ctx, lang)), source:"ai", provider, model: aiModel(), retrieval }; }
     catch (e) {
       console.warn("[analyze] AI xatosi, qoidalarga o‘tildi:", e?.status || e?.name || "error");  // foydalanuvchi matni logga yozilmaydi

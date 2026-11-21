@@ -203,7 +203,7 @@ scen(id="ish_haqi", domain="mehnat", title="Ish haqi to‘lanmayapti", card="Mao
 DISM_P = "{{trigger}}da ish beruvchi tashabbusi bilan men bilan tuzilgan mehnat shartnomasi bekor qilindi. Bo‘shatish qonuniy asossiz va belgilangan tartib buzilgan holda amalga oshirildi: Mehnat kodeksining 161-moddasiga ko‘ra ish beruvchi tashabbusi bilan bekor qilish asoslangan bo‘lishi, 165-moddaga ko‘ra esa xodim oldindan yozma ogohlantirilishi shart."
 scen(id="ishdan_boshatish", domain="mehnat", title="Noqonuniy ishdan bo‘shatishdi", card="Ogohlantirmasdan yoki asossiz bo‘shatishdi", short="Ishdan bo‘shatish",
   lead="Ish beruvchi sizni faqat qonunda sanalgan asos bilan va tartibga rioya qilib bo‘shatishi mumkin. Aks holda sud sizni ishga tiklaydi.",
-  keywords=["bo‘shat","haydash","haydab","ishdan chiqar","uvol","ozod qil","qisqart","shtat","ishga tikla","ogohlantir"],
+  keywords=["bo‘shat","haydash","haydab","haydadi","ishdan chiqar","uvol","ozod qil","qisqart","shtat","ishga tikla","ogohlantir","ishga kirgizma","ishga kiritma","ishga qo‘ymay","kadrlar bo‘limi"],
   norms=["m161","m165","sud","muddat","m562","m171","m9"],
   deadline={"months":3, "label":"Sudga murojaat uchun qoldi"}, trigger="Bo‘shatish buyrug‘i qo‘lingizga tekkan sana",
   calc=None, partyField="employer",

@@ -3,7 +3,7 @@
 // Tamoyil o‘zgarmaydi: AI/OCR faqat rasmda KO‘RINIB TURGAN faktlarni ajratadi (kim, qachon, qancha, raqam).
 // Holatni tasniflash — mavjud analyze() orqali (bazadagi normalar bilan), muddat va summa — kodda (plan.js).
 // Rasm serverda saqlanmaydi va logga yozilmaydi: faqat xotirada, so‘rov davomida.
-import { analyze, aiEnabled, aiComplete, parseJsonReply } from "./analyze.js";
+import { analyze, aiReady, aiComplete, parseJsonReply } from "./analyze.js";
 import { SCENARIO_BY_ID } from "./kb.js";
 import { parseISO, startOfDay } from "./dates.js";
 import { vForm, clean, ValidationError } from "./validate.js";
@@ -132,7 +132,7 @@ export async function readPhoto(input, lang = "uz"){
     doc = cleanDoc(parsed);
     if (!hasFacts(doc)) throw new PhotoError("photoUnread", 422);
   } else {
-    if (aiEnabled()){
+    if (aiReady()){
       try { doc = cleanDoc(await visionRead({ images, note })); if (!hasFacts(doc)) doc = null; }
       catch (e) { console.warn("[photo] AI xatosi, OCR ga o‘tildi:", e?.status || e?.name || "error"); doc = null; }   // rasm va matn logga yozilmaydi
     }
