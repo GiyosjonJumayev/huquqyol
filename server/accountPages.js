@@ -8,6 +8,7 @@ import { PRICES } from "./market.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const T = {
+  bar: ["Ulush (diagramma)", "Доля (диаграмма)"],
   login: ["Kirish", "Вход"], register: ["Ro‘yxatdan o‘tish", "Регистрация"], email: ["E-pochta", "Эл. почта"], password: ["Parol", "Пароль"],
   name: ["F.I.Sh.", "ФИО"], phone: ["Telefon (ixtiyoriy)", "Телефон (необязательно)"],
   pwHint: ["Kamida 8 belgi: harf va raqam.", "Не менее 8 символов: буквы и цифры."],
@@ -150,7 +151,7 @@ export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons, pane
 // ---------- Admin ----------
 const SECTIONS = ["umumiy", "murojaat", "daromad", "obuna", "yurist", "kelishuv", "users"];
 const bar = (n, max) => `<svg class="hbar" width="100%" height="12" aria-hidden="true" focusable="false"><rect class="track" width="100%" height="12" rx="4"/>${n ? `<rect class="fill" width="${Math.max(1, n / max * 100).toFixed(2)}%" height="12" rx="4"/>` : ""}</svg>`;
-const table = (head, rows, cls = "") => rows.length ? `<div class="tscroll"><table class="${cls}"><thead><tr>${head.map(h => `<th scope="col"${/^#/.test(h) ? ` class="numc"` : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : "";
+const table = (head, rows, cls = "") => rows.length ? `<div class="tscroll" tabindex="0"><table class="${cls}"><thead><tr>${head.map(h => /^@/.test(h) ? `<th scope="col"><span class="sr">${esc(h.slice(1))}</span></th>` : `<th scope="col"${/^#/.test(h) ? ` class="numc"` : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : "";
 const tile = (v, label) => `<div class="stattile"><div class="stv">${v}</div><div class="stl">${esc(label)}</div></div>`;
 
 export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
@@ -164,11 +165,11 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
   const users = a.roles.reduce((n, r) => n + r.n, 0);
   const domains = kb.DOMAINS.map(d => ({ id: d.id, title: cy(d.title), n: s.byDomain[d.id] || 0, docs: s.docsByDomain[d.id] || 0 })).sort((x, y) => y.n - x.n);
   const maxD = Math.max(1, ...domains.map(d => d.n));
-  const domainTable = table([t("domain"), "", "#" + t("appeals"), "#" + t("share"), "#" + t("docs")], domains.map(d =>
+  const domainTable = table([t("domain"), "@" + t("bar"), "#" + t("appeals"), "#" + t("share"), "#" + t("docs")], domains.map(d =>
     `<tr><th scope="row">${esc(d.title)}</th><td class="barcell">${bar(d.n, maxD)}</td><td class="numc">${fmtSum(d.n)}</td><td class="numc">${s.total ? Math.round(d.n / s.total * 100) : 0}%</td><td class="numc">${fmtSum(d.docs)}</td></tr>`), "stt bars");
   const revTable = table([t("month"), "#" + t("fromSubs"), "#" + t("fromComm"), "#" + t("total")], revMonths.map(m =>
     `<tr><th scope="row">${esc(m)}</th><td class="numc">${esc(money(revBy(m, "subscription"), lang))}</td><td class="numc">${esc(money(revBy(m, "commission"), lang))}</td><td class="numc"><b>${esc(money(revBy(m, "subscription") + revBy(m, "commission"), lang))}</b></td></tr>`));
-  const nav = `<nav class="kabtabs" aria-label="${esc(t("adTitle"))}">${SECTIONS.map(x => `<a href="/admin?b=${x}"${x === b ? ` aria-selected="true" aria-current="page"` : ""}>${esc(t("ad_" + x))}</a>`).join("")}</nav>`;
+  const nav = `<nav class="kabtabs" aria-label="${esc(t("adTitle"))}">${SECTIONS.map(x => `<a href="/admin?b=${x}"${x === b ? ` aria-current="page"` : ""}>${esc(t("ad_" + x))}</a>`).join("")}</nav>`;
   const evRef = ref => a.events.find(e => e.lawyer_ref === ref) || { views: 0, requests: 0 };
   let body = "";
   if (b === "umumiy") body = `<div class="kabstats">
@@ -183,7 +184,7 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
     const maxS = Math.max(1, ...scen.map(x => x[1]));
     body = `<div class="kabstats">${tile(fmtSum(s.total), t("kAppeals"))}${tile(fmtSum(s.documents), t("kDocs"))}${tile(`${s.analyzed ? Math.round(s.outOfScope / s.analyzed * 100) : 0}%`, t("kOut"))}${tile(fmtSum(s.series.reduce((n, x) => n + x.opens, 0)), t("last30"))}</div>
       <h2 class="sec">${esc(t("byDomain"))}</h2>${domainTable}
-      <h2 class="sec">${esc(t("topCases"))}</h2>${table([t("domain"), "", "#" + t("appeals")], scen.map(([id, n]) => `<tr><th scope="row">${esc(cy(kb.SCENARIO_BY_ID[id].title))}</th><td class="barcell">${bar(n, maxS)}</td><td class="numc">${fmtSum(n)}</td></tr>`), "stt bars") || `<p class="empty">${esc(t("none"))}</p>`}
+      <h2 class="sec">${esc(t("topCases"))}</h2>${table([t("domain"), "@" + t("bar"), "#" + t("appeals")], scen.map(([id, n]) => `<tr><th scope="row">${esc(cy(kb.SCENARIO_BY_ID[id].title))}</th><td class="barcell">${bar(n, maxS)}</td><td class="numc">${fmtSum(n)}</td></tr>`), "stt bars") || `<p class="empty">${esc(t("none"))}</p>`}
       <h2 class="sec">${esc(t("last30"))}</h2>${table([t("day"), "#" + t("appeals"), "#" + t("docs")], [...s.series].reverse().map(x => `<tr><th scope="row">${esc(x.day)}</th><td class="numc">${fmtSum(x.opens)}</td><td class="numc">${fmtSum(x.docs)}</td></tr>`))}`;
   }
   else if (b === "daromad") body = `<div class="kabstats">${tile(esc(money(a.mrr.mrr, lang)), t("kMrr"))}${tile(esc(money(revBy(ym, "subscription") + revBy(ym, "commission"), lang)), t("kMonth"))}${tile(esc(money(commTotal, lang)), t("kComm"))}${tile(fmtSum(a.pendingPay.length), t("pendingPay"))}</div>
@@ -207,7 +208,7 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
   }
   else if (b === "kelishuv"){
     const maxC = Math.max(1, ...a.cons.map(c => c.n));
-    body = `<h2 class="sec">${esc(t("consBy"))}</h2>${table([t("status"), "", "#" + t("count"), "#" + t("value")], a.cons.map(c => `<tr><th scope="row">${esc(t("c_" + c.status))}</th><td class="barcell">${bar(c.n, maxC)}</td><td class="numc">${c.n}</td><td class="numc">${esc(money(c.value, lang))}</td></tr>`), "stt bars") || `<p class="empty">${esc(t("none"))}</p>`}
+    body = `<h2 class="sec">${esc(t("consBy"))}</h2>${table([t("status"), "@" + t("bar"), "#" + t("count"), "#" + t("value")], a.cons.map(c => `<tr><th scope="row">${esc(t("c_" + c.status))}</th><td class="barcell">${bar(c.n, maxC)}</td><td class="numc">${c.n}</td><td class="numc">${esc(money(c.value, lang))}</td></tr>`), "stt bars") || `<p class="empty">${esc(t("none"))}</p>`}
       <h2 class="sec">${esc(t("consDomain"))}</h2>${table([t("domain"), "#" + t("count")], a.consDomain.map(d => `<tr><th scope="row">${esc(cy(kb.DOMAINS.find(x => x.id === d.domain)?.title || d.domain))}</th><td class="numc">${d.n}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}`;
   }
   else if (b === "users"){

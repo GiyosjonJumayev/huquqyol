@@ -412,3 +412,41 @@ test("PDF: matnli PDF (OCR’siz) va skanerlangan PDF (OCR) — tur, holat, mudd
   assert.match(await p.innerText("#askErr"), /PDF/);
   assert.deepEqual(p.errors.filter(e => !/Invalid PDF|InvalidPDFException|Failed to load resource/i.test(e)), []);
 });
+
+test("«Aa Qulaylik» modal oynasi har bir sahifada: Esc, fon, ×, fokus qaytadi, sahifa surilmaydi; footer va DEMO belgisi", { skip }, async () => {
+  for (const path of ["", "tariflar", "yuristlar/namuna-1", "kirish", "statistika", "maxfiylik"]){
+    const p = await page();
+    await p.goto(base + path);
+    const top = await p.evaluate(() => document.querySelector("main").getBoundingClientRect().top);
+    await p.click("#a11yBtn");
+    await p.waitForSelector("#a11yDlg.in");
+    assert.ok(await p.evaluate(() => document.getElementById("a11yDlg").matches(":modal")), path);
+    assert.equal(await p.evaluate(() => document.querySelector("main").getBoundingClientRect().top), top, `${path}: kontent surilmaydi`);
+    assert.equal(await p.getAttribute("#a11yBtn", "aria-expanded"), "true");
+    assert.deepEqual(await audit(p), [], path);
+    for (let i = 0; i < 14; i++) await p.keyboard.press("Tab");
+    assert.ok(await p.evaluate(() => document.getElementById("a11yDlg").contains(document.activeElement)), `${path}: fokus ichida`);
+    await p.keyboard.press("Escape");
+    await p.waitForFunction(() => !document.getElementById("a11yDlg").open);
+    assert.equal(await p.evaluate(() => document.activeElement.id), "a11yBtn", `${path}: fokus tugmaga qaytdi`);
+    await p.click("#a11yBtn"); await p.waitForSelector("#a11yDlg.in");
+    await p.mouse.click(10, 890);                                                        // fon ustiga
+    await p.waitForFunction(() => !document.getElementById("a11yDlg").open);
+    await p.click("#a11yBtn"); await p.waitForSelector("#a11yDlg.in");
+    await p.click("#a11yDlg [data-set-theme='dark']");
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), "dark");
+    await p.click("#a11yDlg [data-a11y-close]");
+    await p.waitForFunction(() => !document.getElementById("a11yDlg").open);
+    for (const href of ["/statistika", "/tariflar", "/yuristlar", "/maxfiylik"]) assert.equal(await p.locator(`footer .footlinks a[href='${href}']`).count(), 1, `${path} ${href}`);
+    assert.match(await p.innerText("footer .disclaim"), /yuridik maslahat emas/);
+    assert.deepEqual(p.errors, [], path);
+    await p.context().close();
+  }
+  const d = await page({ viewport:{ width:320, height:740 } });
+  await d.context().addCookies([{ name:"hy_fs", value:"3", url: base }]);
+  await d.goto(base + "yuristlar/namuna-1");
+  assert.match(await d.innerText("h1"), /DEMO — namuna profil/);
+  assert.equal(await d.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  assert.deepEqual(await audit(d), []);
+  await d.context().close();
+});

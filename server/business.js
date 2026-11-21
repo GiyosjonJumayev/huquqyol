@@ -159,7 +159,7 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
   // Solishtirish jadvali
   const rows = [...FEAT.free.map((f, i) => [f, ["free", "pro", "firma", "org"], `free:${i}`]), ...FEAT.pro.map((f, i) => [f, ["pro", "firma", "org"], `pro:${i}`]),
     ...FEAT.firma.map((f, i) => [f, ["firma"], `firma:${i}`]), ...FEAT.org.map((f, i) => [f, ["org"], `org:${i}`])];
-  const table = `<div class="tscroll"><table class="cmp"><thead><tr><th scope="col">${esc(t("cmpFeature"))}</th>${PLANS.map(p => `<th scope="col">${esc(t(p.name))}</th>`).join("")}</tr></thead><tbody>
+  const table = `<div class="tscroll" tabindex="0"><table class="cmp"><thead><tr><th scope="col">${esc(t("cmpFeature"))}</th>${PLANS.map(p => `<th scope="col">${esc(t(p.name))}</th>`).join("")}</tr></thead><tbody>
     ${rows.map(([f, has, key]) => `<tr><th scope="row">${esc(pick(f, lang).replace("{docs}", docs))}${SOON.has(key) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</th>${PLANS.map(p => `<td>${has.includes(p.id) ? `<span class="yes" aria-label="+">✓</span>` : `<span class="no" aria-label="—">—</span>`}</td>`).join("")}</tr>`).join("")}
   </tbody></table></div>`;
   return page({ lang, cssHref, fs, user, accHref, path:"/tariflar", title:t("plTitle"), desc:t("plLead"), body:`
@@ -251,7 +251,7 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
         ${l.license?.number ? `<p class="small muted">${esc(t("licenseNo"))}: ${esc(l.license.number)}${l.license.issuer ? ` · ${esc(l.license.issuer)}` : ""}</p>` : ""}
         <h2 class="sec">${esc(t("areas"))}</h2><ul class="chips">${l.areas.map(a => `<li><a href="/yuristlar?soha=${a}">${esc(areas.find(x => x.id === a)?.title || a)}</a></li>`).join("")}</ul>
         <h2 class="sec">${esc(t("services"))}</h2>
-        <div class="tscroll"><table class="svc"><thead><tr><th scope="col">${esc(t("svc"))}</th><th scope="col">${esc(t("dur"))}</th><th scope="col">${esc(t("fmt"))}</th><th scope="col" class="numc">${esc(t("price"))}</th></tr></thead><tbody>${svc}</tbody></table></div>
+        <div class="tscroll" tabindex="0"><table class="svc"><thead><tr><th scope="col">${esc(t("svc"))}</th><th scope="col">${esc(t("dur"))}</th><th scope="col">${esc(t("fmt"))}</th><th scope="col" class="numc">${esc(t("price"))}</th></tr></thead><tbody>${svc}</tbody></table></div>
         <h2 class="sec">${esc(t("howTitle"))}</h2><ol class="lwhow"><li>${esc(t("how1"))}</li><li>${esc(t("how2"))}</li><li>${esc(t("how3"))}</li></ol>
         <p class="small muted">${esc(t("privacy"))}</p>
       </div>
