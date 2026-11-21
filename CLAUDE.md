@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (151 tests; 4 DB tests skip without TEST_DATABASE_URL)
+npm test                 # node:test, must stay green (154 tests; 4 DB tests skip without TEST_DATABASE_URL)
 npm run test:e2e         # 14 browser tests incl. axe and navbar overlap per role; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
@@ -72,6 +72,12 @@ become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, 
 - `server/validate.js` — per-scenario field spec validation. `server/security.js` — CSP, origin check, rate limit.
 - Knowledge base: **source of truth is `scripts/build-kb.py`** (+ `kb_ru.py`, `kb_evidence.py`, `kb_offices.py`).
   Never hand-edit `server/kb/*.json`; edit the Python, run `npm run kb`, then `npm test`.
+- **Design v3 «iliq, insoniy»** (spec: `docs/design/home-v3-reference.html`, implemented with our CSS — no inline styles):
+  tokens on `:root` in `public/app.css` (paper #FBF7EF, card #FFFDF8, border #E6DAC4, ink #2A2420, green #1E5B52,
+  saffron, terracotta, olive, danger #B42318/#FEF3F2; warm dark theme). Fonts self-hosted via @fontsource: Spectral
+  (headings, italic accent), Onest (body), Caveat (handwritten accent — max 3 uses on the home page, never body text).
+  Pill buttons, 18–22px cards, shadow only on the main input, ikat strip on the input card and footer.
+  Copy tone: plain, warm, short sentences, «siz», no jargon. `test/design.test.js` checks fonts are local.
 - Cyrillic output is auto-transliterated from uz-Latin (`public/translit.js`). Russian is a separate overlay (`ru.json`), must stay structurally in sync.
 
 ## Open issues
