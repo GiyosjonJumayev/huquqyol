@@ -144,7 +144,7 @@ test("DEMO belgisi: namuna profil — katalog kartasida va profilda, aloqa «nam
   const prof = await (await get("/yuristlar/namuna-1")).text();
   assert.match(prof, /<h1>[^<]+<span class="tag demo">DEMO — namuna profil<\/span>/);
   assert.equal((prof.match(/<span class="fakec">namuna — ishlamaydi<\/span>/g) || []).length, 2);     // telefon va e-pochta
-  assert.ok(!/href="(tel:|mailto:|https:\/\/t\.me\/)/.test(prof));
+  assert.ok(!/href="(tel:|mailto:|https:\/\/t\.me\/)/.test(prof.split('<main id="main">')[1].split("</main>")[0]));   // footer’dagi bot havolasi hisobga olinmaydi
   assert.match(prof, /Namuna profilga so‘rov yuborib bo‘lmaydi/);
   const ru = await (await get("/yuristlar/namuna-1", "ru")).text();
   assert.match(ru, /DEMO — образец профиля/);
@@ -159,4 +159,16 @@ test("DEMO belgisi: namuna profil — katalog kartasida va profilda, aloqa «nam
   assert.ok(!/DEMO|fakec|tag demo/.test(rp));
   assert.match(rp, /href="tel:\+998901234567"/);
   assert.match(rp, /href="mailto:yurist@misol\.uz"/);
+});
+
+test("Telegram bot havolasi: @nom, t.me/nom, to‘liq URL qabul qilinadi; noto‘g‘ri qiymatda standart bot", async () => {
+  const { botUrlOf, botHref, siteFooter } = await import("../public/shared.js");
+  const { makeT } = await import("../public/i18n.js");
+  for (const v of ["@huquq_yol_bot", "huquq_yol_bot", "t.me/huquq_yol_bot", "https://t.me/huquq_yol_bot"]) assert.equal(botUrlOf(v), "https://t.me/huquq_yol_bot", v);
+  for (const v of ["", "@ab", "javascript:alert(1)", "https://evil.com/x", "@bad name"]) assert.equal(botUrlOf(v), "", v);
+  assert.equal(botHref("javascript:alert(1)"), "https://t.me/huquq_yol_bot");
+  const f = siteFooter(makeT("uz"), { botUrl: "@huquq_yol_bot" });
+  assert.match(f, /<a href="https:\/\/t\.me\/huquq_yol_bot" target="_blank" rel="noopener noreferrer">Telegram bot/);
+  const html = await (await get("/maxfiylik")).text();
+  assert.match(html, /href="https:\/\/t\.me\/huquq_yol_bot"[^>]*>Botni ochish/);
 });

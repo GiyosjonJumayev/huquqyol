@@ -159,10 +159,14 @@ export function a11yDialogHTML(t){
 }
 
 /* ---------- Umumiy pastki qism (footer) ---------- */
-// TODO: Telegram bot havolasi BotFather’da nom olingach shu yerga yoziladi (masalan "https://t.me/<bot_nomi>").
-// Bo‘sh bo‘lsa yoki serverda TELEGRAM_BOT_URL berilmasa — havola «Maxfiylik» sahifasidagi bot bo‘limiga olib boradi.
-export const TELEGRAM_BOT_URL = "";
-export const botHref = (url = TELEGRAM_BOT_URL) => /^https:\/\/t\.me\/\w{5,32}$/.test(url || "") ? url : "/maxfiylik#bot";
+// Telegram bot havolasi. Serverda TELEGRAM_BOT_URL bilan almashtirish mumkin: "https://t.me/nom", "t.me/nom", "@nom" yoki "nom".
+// Noto‘g‘ri qiymat bo‘lsa — havola «Maxfiylik» sahifasidagi bot bo‘limiga olib boradi.
+export const TELEGRAM_BOT_URL = "https://t.me/huquq_yol_bot";
+export function botUrlOf(v){
+  const m = /^(?:https?:\/\/)?(?:t\.me\/|@)?([A-Za-z]\w{4,31})\/?$/.exec(String(v || "").trim());
+  return m ? `https://t.me/${m[1]}` : "";
+}
+export const botHref = (url = TELEGRAM_BOT_URL) => botUrlOf(url) || botUrlOf(TELEGRAM_BOT_URL) || "/maxfiylik#bot";
 // mode "app" — bosh sahifa (o‘chirish tugmasi joyida ishlaydi); boshqa sahifalarda — bosh sahifaga o‘tib o‘chiriladi
 export function siteFooter(t, { mode = "page", path = "/", botUrl = TELEGRAM_BOT_URL } = {}){
   const bh = botHref(botUrl), ext = bh.startsWith("https:");

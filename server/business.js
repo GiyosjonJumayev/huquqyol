@@ -5,7 +5,7 @@ import { readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { HTML_LANG, fmtSum, makeT } from "../public/i18n.js";
-import { siteNav, siteFooter, a11yDialogHTML } from "../public/shared.js";
+import { siteNav, siteFooter, a11yDialogHTML, botUrlOf, TELEGRAM_BOT_URL } from "../public/shared.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
 import { clean, ValidationError } from "./validate.js";
@@ -357,7 +357,7 @@ export function privacyPage({ lang, cssHref, fs, user, accHref, ai = false, botU
   const keep = /(hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|DOCX|PDF|AI|Telegram)/;
   const p = k => { const s = PV[k][idx(lang)]; return lang === "cyr" ? s.split(keep).map((x, i) => i % 2 ? x : toCyrillic(x)).join("") : s; };
   const mt = makeT(lang);
-  const bot = /^https:\/\/t\.me\/\w{5,32}$/.test(botUrl || "") ? botUrl : "";
+  const bot = botUrlOf(botUrl) || botUrlOf(TELEGRAM_BOT_URL);
   const sec = (h, ...ps) => `<section class="pvsec"><h2 class="sec">${esc(p(h))}</h2>${ps.map(x => `<p>${esc(p(x))}</p>`).join("")}</section>`;
   return page({ lang, cssHref, fs, user, accHref, path: "/maxfiylik", title: p("title"), desc: p("lead"), body: `
     <h1>${esc(p("title"))}</h1><p class="lead">${esc(p("lead"))}</p>
