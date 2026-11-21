@@ -3,6 +3,7 @@ import { esc, ICONS, examples, domainCardsHTML, examplesHTML } from "/shared.js"
 import { makeT, normLang, fmtDate, fmtMoney } from "/i18n.js";
 import { toCyrillic as toCyr } from "/translit.js";
 import { getFs, setFs, ttsSupported, speak, pause as ttsPauseToggle, stop as ttsStop, isSpeaking } from "/a11y.js";
+import { findPlace, courtFromForm, allCourts } from "/courts.js";
 const $ = s => document.querySelector(s);
 const fmtSum = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 const iso = d => { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
@@ -259,6 +260,7 @@ function renderPlan(){
     <div class="laws">${p.norms.slice(0, 3).map(law).join("")}</div>
     ${p.norms.length > 3 ? `<details class="more"><summary>${t("moreNorms", { n: p.norms.length - 3 })}</summary><div class="laws">${p.norms.slice(3).map(law).join("")}</div></details>` : ""}
     <div class="sources">${laws.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)} — lex.uz ↗</a>`).join("")}</div>
+    <aside class="card lawcta" aria-labelledby="lawCtaP"><h2 id="lawCtaP">${t("lawTitle")}</h2><p>${t("lawTextPlan")}</p><a class="btn ghost" href="${esc(lawyersHref())}">${t("lawBtn")}</a></aside>
     <div class="planextra"><button class="linkbtn" type="button" id="printPlan">${t("printPlan")}</button></div>
     <div class="cta"><span class="small muted ctahint">${t("nextHint")}</span><button class="btn primary" type="button" data-go="3">${t("makeDoc")}</button></div>`;
   $("#printPlan").addEventListener("click", printPlan);
@@ -591,9 +593,11 @@ function fieldHTML(f){
   else {
     const t = { phone:'type="tel" inputmode="tel" autocomplete="tel"', money:'inputmode="numeric" autocomplete="off"', int:'inputmode="numeric" autocomplete="off"', date:`type="date" max="${iso(new Date())}"` }[f.type]
       || ({ fio:'autocomplete="name"', address:'autocomplete="street-address"' }[f.k] || 'autocomplete="off"');
-    input = `<input id="f_${f.k}" data-k="${f.k}" data-type="${f.type}" ${desc} placeholder="${ph}" value="${esc(f.type === "money" && v ? fmtSum(v) : v)}" ${t} maxlength="200">`;
+    const list = f.type === "court" ? ' list="dl_court"' : f.k === "district" && scenarioMeta(state.scn)?.court ? ' list="dl_place"' : "";
+    input = `<input id="f_${f.k}" data-k="${f.k}" data-type="${f.type}" ${desc} placeholder="${ph}" value="${esc(f.type === "money" && v ? fmtSum(v) : v)}" ${t}${list} maxlength="200">`;
   }
-  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}${note}<span class="err" id="e_${f.k}" role="alert" hidden></span></div>`;
+  const info = f.type === "court" ? `<div class="courtinfo" id="ci_court" aria-live="polite"></div>` : "";
+  return `<div class="field" data-f="${f.k}" ${hidden ? "hidden" : ""}><label for="f_${f.k}">${esc(f.label)}</label>${input}${note}${info}<span class="err" id="e_${f.k}" role="alert" hidden></span></div>`;
 }
 function renderDocView(){
   const m = scenarioMeta(state.scn);
@@ -607,8 +611,115 @@ function renderDocView(){
     <details class="more" ${extra ? "open" : ""}><summary>${t("extraSummary")}</summary>
       <div class="field"><label for="f_extra">${t("extraLabel")}</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
   dateWords($("#docForm"));
+  $("#lawLink").href = lawyersHref();
+  $("#lhNote").hidden = !letterhead().length;
   renderHowto();
+  if (COURTS) syncCourt(null); else renderCourt();
+  renderWhere();
   previewDoc();
+  if (!COURTS && (m.court || m.whereTo)) loadCourts().then(() => { if (scenarioMeta(state.scn) === m){ syncCourt(null); renderWhere(); persist(); previewDoc(); } });
+}
+
+/* ---------- Sud: tuman (shahar) bo‘yicha avtomatik ----------
+   Tuman maydoni yoki holatdagi manzil/idora nomidan sud aniqlanadi (public/courts.js — server bilan bir xil mantiq).
+   Foydalanuvchi sud nomini o‘zi yozsa, u saqlanadi; «Shu sudni qo‘yish» tugmasi avtomatik nomga qaytaradi. */
+let COURTS = null, courtsReq = null;
+const loadCourts = () => courtsReq ||= fetch("/api/courts").then(r => r.ok ? r.json() : null).then(c => (COURTS = c)).catch(() => (courtsReq = null));
+const RU = LANG === "ru";
+const out = s => LANG === "cyr" ? toCyr(s) : s;                  // kirill interfeysda lotin nomlar o‘giriladi
+const placeLabel = p => RU ? p.cyr : out(p.name);
+function autoCourt(){
+  const spec = scenarioMeta(state.scn)?.court;
+  if (!spec || !COURTS) return null;
+  const r = courtFromForm(COURTS, spec, form(), { cyr: RU });
+  if (r?.name) r.name = out(r.name);
+  return r;
+}
+const setInput = (k, v) => { const el = $("#f_" + k); if (el && el.value !== v) el.value = v; };
+// Manzil yoki idora nomi o‘zgarsa — tuman maydoni bo‘sh (yoki avvalroq avtomatik to‘ldirilgan) bo‘lsa, uni to‘ldiradi
+function syncDistrict(){
+  const spec = scenarioMeta(state.scn)?.court, f = form();
+  if (!spec || !COURTS || !fieldSpec("district") || (f.district && !f._districtAuto)) return;
+  for (const k of spec.from){
+    const hit = f[k] && findPlace(COURTS, f[k], { strict: true });
+    if (hit?.place){ const v = placeLabel(hit.place); setField("district", v); setField("_districtAuto", true); setInput("district", v); return; }
+  }
+  if (f._districtAuto){ setField("district", ""); setInput("district", ""); }
+}
+function syncCourt(k){
+  const spec = scenarioMeta(state.scn)?.court;
+  if (!spec) return;
+  if (k === "court") setField("_courtManual", !!form().court);
+  if (k === "district") setField("_districtAuto", false);
+  if (k !== "court" && k !== "district") syncDistrict();
+  const f = form(), auto = autoCourt();
+  if (!f._courtManual && COURTS){ const v = auto?.name || ""; if (v !== (f.court || "")){ setField("court", v); setInput("court", v); } }
+  renderCourt(auto);
+}
+function renderCourt(auto = autoCourt()){
+  const box = $("#ci_court"), spec = scenarioMeta(state.scn)?.court;
+  if (!box || !spec) return;
+  const f = form(), parts = [`<p class="rule">${esc(spec.rule)}</p>`];
+  if (COURTS){
+    if (auto?.options) parts.push(`<p>${esc(t("courtPick", { name: placeLabel(auto.options[0]).replace(/ (tumani|shahri|тумани|шаҳри|туманы|шаҳри)$/, "") }))}</p><p class="opts">${auto.options.map(o => `<button type="button" class="chip" data-place="${esc(placeLabel(o))}">${esc(placeLabel(o))}</button>`).join("")}</p>`);
+    else if (f._courtManual && auto?.name && auto.name !== f.court) parts.push(`<p>${esc(t("courtManual", { court: auto.name }))} <button type="button" class="linkbtn" data-act="courtAuto">${esc(t("courtUseAuto"))}</button></p>`);
+    else if (auto?.name && f.court === auto.name){
+      const place = auto.place ? placeLabel(auto.place) : (RU ? auto.region.cyr : out(auto.region.name));
+      parts.push(`<p class="ok">${esc(t("courtAuto", { place, court: auto.name }))}</p>`);
+    }
+    else if (!f.court) parts.push(`<p>${esc(f.district ? t("courtNoPlace", { text: f.district }) : t("courtNone"))}</p>`);
+    parts.push(`<p class="src">${esc(t("courtSrc", { date: fmtDate(new Date(COURTS.checked + "T00:00:00"), LANG) }))}</p>`);
+    const dl = $("#dl_court");
+    if (!dl || dl.dataset.kind !== spec.kind){
+      dl?.remove(); $("#dl_place")?.remove();
+      document.body.insertAdjacentHTML("beforeend",
+        `<datalist id="dl_court" data-kind="${spec.kind}">${allCourts(COURTS, spec.kind, { cyr: RU }).map(c => `<option value="${esc(out(c))}">`).join("")}</datalist>` +
+        `<datalist id="dl_place">${COURTS.regions.flatMap(r => r.districts.map(d => `<option value="${esc(RU ? `${d.cyr}, ${r.cyr}` : out(`${d.name}, ${r.name}`))}">`)).join("")}</datalist>`);
+    }
+  }
+  box.innerHTML = parts.join("");
+}
+
+/* ---------- «Qayerga yozish kerak?» — yuqori organ / murojaat oluvchisi ----------
+   Hudud idora nomi yoki manzildan aniqlanadi; aniq nom chiqqan takliflarni bir tugma bilan maydonga yozish mumkin. */
+const GEN = { hokimlik: "wtGenHokimlik", prokuratura: "wtGenProk", by: "wtGenBy", placeHokimlik: "wtGenPlace" };
+const TOK = Object.fromEntries(Object.keys(GEN).map(k => [toCyr(k), k]));
+function whereHit(w){
+  if (!COURTS) return null;
+  const f = form();
+  for (const k of w.from){ const hit = f[k] && findPlace(COURTS, f[k], { strict: k !== "district" }); if (hit?.region) return hit; }
+  return null;
+}
+function placeHokimlik(p){
+  const base = (RU ? p.cyr : p.name).replace(/ (tumani|shahri|тумани|шаҳри)$/, "");
+  if (RU) return `Хокимият ${p.kind === "shahar" ? "города" : "района"} «${base}»`;
+  return p.kind === "shahar" ? `${base} shahar hokimligi` : `${p.name} hokimligi`;
+}
+function whereText(tpl, hit){
+  let ok = true;
+  const s = tpl.replace(/\{([^{}\s]+)\}/g, (m, k) => {
+    k = GEN[k] ? k : TOK[k];                                  // kirill interfeysda meta matni (belgilar ham) kirillda keladi
+    if (!k) return m;
+    const r = hit?.region, v = k === "placeHokimlik" ? (hit?.place && placeHokimlik(hit.place)) : r && (RU ? r.ru[k] : r[k]);
+    if (v) return v;
+    ok = false; return t(GEN[k]);
+  });
+  return { text: ok ? out(s) : s, ok };
+}
+function renderWhere(){
+  document.querySelectorAll(".wtbox").forEach(x => x.remove());
+  const w = scenarioMeta(state.scn)?.whereTo;
+  if (!w || (w.for !== "*" && w.for !== state.recipient)) return;
+  const field = document.querySelector(`[data-f="${w.field}"]`);
+  if (!field) return;
+  const hit = whereHit(w), cur = form()[w.field] || "";
+  const items = w.items.map(it => {
+    const x = whereText(it.t, hit), btn = it.fill && x.ok
+      ? (cur === x.text ? `<span class="done">✓ ${esc(t("wtFilled"))}</span>` : `<button type="button" class="linkbtn" data-wt="${esc(x.text)}">${esc(t("wtFill"))}</button>`) : "";
+    return `<li><b>${esc(x.text)}</b> ${btn}<br><span>${esc(it.when)}</span></li>`;
+  });
+  const need = !hit?.region && w.items.some(it => it.t.includes("{"));
+  field.insertAdjacentHTML("afterend", `<div class="wtbox" id="wt_box"><h3>${esc(t("wtTitle"))}</h3><p>${esc(w.note)}</p><ul>${items.join("")}</ul>${need ? `<p class="need">${esc(t("wtNeedRegion"))}</p>` : ""}</div>`);
 }
 function renderHowto(){
   if ($("#onlineStatus")) $("#onlineStatus").textContent = "";
@@ -671,7 +782,10 @@ function cleanForm(){
   for (const [k, v] of Object.entries(form())){ const f = fieldSpec(k); if (f && v !== "" && v != null && !validateField(f, String(v))) out[k] = v; }
   return out;
 }
-const docRequest = () => ({ scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form: cleanForm(), evidence: state.evidence });
+// Yurist Pro: kabinetda yoqilgan blanka barcha hujjatlarga qo‘shiladi (ma’lumot shu brauzerda)
+const letterhead = () => { try { const lh = JSON.parse(localStorage.getItem("huquqyol:pro"))?.letterhead; return lh?.on ? lh.lines.map(s => String(s).trim()).filter(Boolean).slice(0, 4) : []; } catch { return []; } };
+const docRequest = () => ({ scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form: cleanForm(), evidence: state.evidence, letterhead: letterhead() });
+const lawyersHref = () => `/yuristlar?holat=${encodeURIComponent(state.scn || "")}`;
 
 let previewSeq = 0;
 async function previewDoc(){
@@ -704,6 +818,7 @@ const partsHTML = ps => ps.map(p => p.v != null ? esc(p.v) : `<span class="ph">$
 const partsText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
 function blockHTML(b){
   switch (b.t){
+    case "head": return `<div class="lhead">${b.lines.map((l, i) => `<div${i ? "" : ` class="b"`}>${partsHTML(l)}</div>`).join("")}</div>`;
     case "addr": return `<div class="addr">${b.lines.map(l => `<div>${partsHTML(l)}</div>`).join("")}</div>`;
     case "title": return `<div class="ttl">${esc(b.text)}</div>`;
     case "sub": return `<div class="sub">${esc(b.text)}</div>`;
@@ -716,6 +831,7 @@ function blockHTML(b){
 }
 function docText(){
   return state.blocks.map(b => {
+    if (b.t === "head") return b.lines.map(partsText).join("\n") + "\n";
     if (b.t === "addr") return b.lines.map(l => "\t\t\t\t" + partsText(l)).join("\n") + "\n";
     if (b.t === "title") return "\n" + b.text;
     if (b.t === "sub" || b.t === "lbl") return b.text;
@@ -816,7 +932,12 @@ document.addEventListener("click", e => {
   const lb = e.target.closest(".langsw [data-lang]");
   if (lb){ setLang(lb.dataset.lang); return; }
   const r = e.target.closest("#seg button");
-  if (r) selectRecipient(r.dataset.r);
+  if (r){ selectRecipient(r.dataset.r); return; }
+  if (e.target.closest('[data-act="courtAuto"]')){ setField("_courtManual", false); setField("court", ""); syncCourt(null); persist(); onForm(); $("#f_court")?.focus(); return; }
+  const pl = e.target.closest("[data-place]");
+  if (pl){ setField("district", pl.dataset.place); setInput("district", pl.dataset.place); syncCourt("district"); persist(); onForm(); return; }
+  const wt = e.target.closest("[data-wt]");
+  if (wt){ const k = scenarioMeta(state.scn).whereTo.field; setField(k, wt.dataset.wt); setInput(k, wt.dataset.wt); persist(); onForm(); renderWhere(); $("#f_" + k)?.focus(); }
 });
 // Ariza oluvchisini tanlash (3-sahifadagi tugmalar va rejadagi havolalar uchun bitta yo‘l)
 function selectRecipient(id){
@@ -825,16 +946,22 @@ function selectRecipient(id){
   document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.r === id)));
   syncVisibility();
   renderHowto();
+  renderWhere();
   previewDoc();
 }
 const onForm = debounce(previewDoc, 220);
+const onWhere = debounce(renderWhere, 300);
 const onDocCalc = debounce(() => refreshPlan(false).catch(() => {}), 300);
 function onDocInput(e){
   const k = e.target.dataset.k; if (!k) return;
   const f = fieldSpec(k);
   let v = e.target.value;
   if (f?.type === "money"){ v = v.replace(/\D/g, "").slice(0, 13); e.target.value = v ? fmtSum(v) : ""; }
-  setField(k, v); persist(); onForm();
+  setField(k, v);
+  const m = scenarioMeta(state.scn);
+  if (m?.court && (k === "court" || k === "district" || m.court.from.includes(k))) syncCourt(k);
+  if (m?.whereTo && (m.whereTo.from.includes(k) || k === m.whereTo.field)) onWhere();
+  persist(); onForm();
   const c = $("#c_" + k); if (c) c.value = e.target.value;
   if (f?.calc) onDocCalc();
 }

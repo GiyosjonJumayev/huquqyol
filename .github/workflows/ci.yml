@@ -8,6 +8,18 @@ jobs:
     strategy:
       matrix:
         node: [18, 20, 22]          # hostinglarda uchraydigan versiyalar
+    services:
+      postgres:                     # hisoblar, obunalar va kelishuvlar testlari (test/db.test.js)
+        image: postgres:16
+        env:
+          POSTGRES_USER: huquqyol
+          POSTGRES_PASSWORD: huquqyol
+          POSTGRES_DB: huquqyol_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U huquqyol" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://huquqyol:huquqyol@127.0.0.1:5432/huquqyol_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

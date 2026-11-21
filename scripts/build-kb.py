@@ -14,6 +14,7 @@ LAWS = {
   "mjtk": {"name":"Ma’muriy javobgarlik to‘g‘risidagi kodeks", "full":"Ma’muriy javobgarlik to‘g‘risidagi kodeks (MJtK)", "url":"https://lex.uz/acts/-97664"},
   "fk":   {"name":"Fuqarolik kodeksi", "full":"O‘zbekiston Respublikasining Fuqarolik kodeksi", "url":"https://lex.uz/mact/-111189"},
   "dbq":  {"name":"Davlat boji to‘g‘risidagi qonun", "full":"«Davlat boji to‘g‘risida»gi Qonun (O‘RQ-600, 06.01.2020)", "url":"https://lex.uz/docs/4680955"},
+  "fpk":  {"name":"Fuqarolik protsessual kodeksi", "full":"O‘zbekiston Respublikasining Fuqarolik protsessual kodeksi (22.01.2018)", "url":"https://lex.uz/docs/3517337"},
   "fk2":  {"name":"Fuqarolik kodeksi (II qism)", "full":"O‘zbekiston Respublikasining Fuqarolik kodeksi, ikkinchi qism (29.08.1996)", "url":"https://lex.uz/docs/180550"},
   "bank": {"name":"Banklar to‘g‘risidagi qonun", "full":"«Banklar va bank faoliyati to‘g‘risida»gi Qonun (O‘RQ-580 tahririda, 05.11.2019)", "url":"https://lex.uz/acts/12011"},
   "mfo":  {"name":"Mikromoliya faoliyati to‘g‘risidagi qonun", "full":"«Nobank kredit tashkilotlari va mikromoliya faoliyati to‘g‘risida»gi Qonun (O‘RQ-765, 20.04.2022)", "url":"https://lex.uz/acts/5972413"},
@@ -91,12 +92,17 @@ norm("yhxx_el","mjtk",None,"YHXX jarimasi ustidan elektron shikoyat","Yo‘l har
 norm("mjtk332","mjtk","332¹-modda","Jarimani ixtiyoriy to‘lashda imtiyoz","Qaror topshirilgan kundan 15 kun ichida jarimaning 50 foizini yoki 30 kun ichida 70 foizini to‘lasangiz, qolgan qismi kechiriladi. Qaror ustidan shikoyat qilingan bo‘lsa, bu imtiyoz qo‘llanmaydi.")
 
 # ---- Qarz ----
-norm("fk732","fk","732-modda","Qarz shartnomasi","Qarz oluvchi olgan pul summasini qaytarishi shart. Qaytarish muddati shartnomada ko‘rsatilmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytariladi.")
+norm("fk732","fk2","732-modda","Qarz shartnomasi","Qarz oluvchi olgan pul summasini qarz beruvchiga qaytarishi shart. Shartnoma pul berilgan paytdan tuzilgan hisoblanadi.")
+norm("fk735","fk2","735-modda","Qarzni qaytarish muddati","Qarz shartnomada belgilangan muddatda qaytariladi. Muddat belgilanmagan bo‘lsa, qarz beruvchi talab qilgan kundan boshlab 30 kun ichida qaytarilishi kerak. Sudga shu 30 kun o‘tgach murojaat qilinadi.")
+norm("fpk133","fpk","133-modda","Davlat bojini kechiktirish yoki kamaytirish","Sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi, bo‘lib-bo‘lib to‘lashga ruxsat berishi yoki ularning miqdorini kamaytirishi mumkin. Buning uchun da’vo bilan birga iltimosnoma va mulkiy ahvolni tasdiqlovchi hujjatlar beriladi. Iltimosnoma rad etilsa, boj to‘lanmaguncha ariza qaytariladi (FPK 195-modda).")
 norm("fk150","fk","150-modda","Umumiy da’vo muddati","Umumiy da’vo muddati 3 yil. U huquq buzilganini bilgan yoki bilishi kerak bo‘lgan kundan boshlanadi. Muddat o‘tgan bo‘lsa ham sud arizani qabul qiladi, lekin javobgar so‘rasa, da’vo rad etilishi mumkin.")
 
 # ---- Ijara (FK ikkinchi qism) ----
-norm("fk540","fk2","540-modda","Muddatsiz ijarani bekor qilish","Ijara muddati ko‘rsatilmagan bo‘lsa, shartnoma muddatsiz tuzilgan hisoblanadi. Har bir tomon uni istalgan vaqtda bekor qilishi mumkin, lekin ikkinchi tomonni yozma ogohlantirishi shart: ko‘char mulk uchun 1 oy, ko‘chmas mulk (uy, kvartira) uchun 3 oy oldin. Qonun yoki shartnomada boshqa muddat belgilanishi mumkin.")
-norm("fk551","fk2","551-modda","Ijara beruvchi talabi bilan muddatidan oldin bekor qilish","Ijara beruvchi shartnomani muddatidan oldin faqat sud orqali va qonundagi asoslar bo‘lsa bekor qildira oladi: mulkdan shartnoma yoki maqsadiga jiddiy zid foydalanish, mulkni jiddiy yomonlashtirish, ijara haqini ketma-ket ikki martadan ortiq o‘z vaqtida to‘lamaslik va boshqalar. Bundan oldin ijarachiga yozma ogohlantirish berib, majburiyatni bajarishi uchun imkon berilishi shart.")
+norm("fk603","fk2","603-modda","Turar joy ijarasi shartnomasining shakli","Turar joy ijarasi shartnomasi yozma tuziladi. Fuqarolar o‘rtasidagi shartnoma soliq organida hisobga qo‘yiladi. Yozma shartnoma va to‘lov hujjatlari nizoda asosiy dalil bo‘ladi.")
+norm("fk604","fk2","604-modda","Uy sotilganda ijara saqlanadi","Ijaradagi uyga mulk huquqi boshqa shaxsga o‘tsa, shartnoma o‘zgarmaydi va bekor bo‘lmaydi. Yangi egasi avvalgi shartlar asosida ijara beruvchi bo‘ladi.")
+norm("fk612","fk2","612-modda","Turar joy ijarasining muddati","Turar joy ijarasi besh yilgacha muddatga tuziladi. Muddat shartnomada ko‘rsatilmagan bo‘lsa, besh yilga tuzilgan hisoblanadi. Ijarachi shartnomani yangi muddatga tuzishda ustuvor huquqqa ega.")
+norm("fk615","fk2","615-modda","Turar joy ijarasini bekor qilish","Uy egasi shartnomani faqat sud orqali va quyidagi hollarda bekor qildira oladi: ijara haqi 6 oy to‘lanmasa (bir yilgacha bo‘lgan qisqa muddatli ijarada — ikki martadan ortiq), uy buzilsa yoki yaroqsiz holga keltirilsa, undan huquqqa xilof maqsadda foydalanilsa. Ijarachi esa uy egasini 3 oy oldin yozma ogohlantirib, shartnomani istalgan vaqtda bekor qilishi mumkin.")
+norm("fk616","fk2","616-modda","Uydan chiqarish faqat sud qarori bilan","Turar joy ijarasi shartnomasi bekor qilinganda ham ijarachi va u bilan yashovchilar uydan faqat sud qarori asosida chiqariladi.")
 norm("fk1023","fk2","1023-modda","Asossiz boyishni qaytarish majburiyati","Qonun yoki shartnomada asos bo‘lmagan holda boshqa shaxs hisobidan mol-mulk (pul) olgan yoki tejagan shaxs uni qaytarishi shart. Ijara tugagach qaytarilmagan garov puli yoki ortiqcha undirilgan to‘lovni shu qoida asosida talab qilish mumkin.")
 
 # ---- Xizmatlar (kommunal) ----
@@ -459,14 +465,14 @@ scen(id="jarima", domain="jarima", title="Jarimaga rozi emasman", card="Inspeksi
 # ===== QARZ =====
 DEBT = "Qarz"
 DEBT_P1 = "{{loanDate}}da men {{debtor}}ga {{amount}} miqdorida qarz berganman. Buni {{proof}} tasdiqlaydi. Qarzni qaytarish muddati {{trigger}}da kelgan, biroq qarz hozirgacha qaytarilmagan."
-DEBT_P2 = "Fuqarolik kodeksining 732-moddasiga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytarilishi kerak."
+DEBT_P2 = "Fuqarolik kodeksining 732 va 735-moddalariga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga shartnomada belgilangan muddatda qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan kundan boshlab o‘ttiz kun ichida qaytarilishi kerak."
 scen(id="qarz", domain="fuqarolik", title="Qarzimni qaytarishmayapti", card="Qarzga bergan pulimni qaytarishmayapti", short="Qarz",
   lead="Qarz muddati kelib qaytarilmasa, avval yozma talab qilasiz, keyin sudga murojaat qilasiz. Umumiy da’vo muddati 3 yil.",
   keywords=["qarzga ber","qarzimni","qarzni qaytar","qarzdor","tilxat","raspiska","pulimni qaytar","qarz olgan","qarz bergan","qaytarmayapti","qaytarmay"],
-  norms=["fk732","fk150"],
+  norms=["fk732","fk735","fk150"],
   deadline={"years":3, "label":"Da’vo muddati tugashiga qoldi"}, trigger="Qarz qaytarilishi kerak bo‘lgan sana",
   calc=None, partyField="debtor", amountField="amount",
-  steps=[{"org":"Qarzdor","t":"Yozma talabnoma yuboring","when":"Bugun","body":"Pochta orqali xabarnoma bilan. Muddat belgilanmagan bo‘lsa, talab qilingan sana muhim."},
+  steps=[{"org":"Qarzdor","t":"Yozma talabnoma yuboring","when":"Bugun","body":"Pochta orqali xabarnoma bilan. Muddat belgilanmagan bo‘lsa, qarz talab olingan kundan 30 kun ichida qaytarilishi kerak (FK 735-modda): sudga shundan keyin murojaat qiling."},
          {"org":"Sud","t":"Qarzni sud orqali undiring","when":"{deadline} gacha","hot":True,"body":"Fuqarolik sudiga da’vo. Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq."},
          {"org":"Majburiy ijro byurosi","t":"Qaror ijrosi","when":"Sud qaroridan keyin","body":"To‘lanmasa, sud hujjati majburiy ijroga yuboriladi."}],
   evidence=["Tilxat (raspiska)","Bank o‘tkazmasi ko‘chirmasi","Yozishmalar va ovozli xabarlar","Talabnoma va pochta kvitansiyasi","Guvohlar"],
@@ -480,7 +486,7 @@ scen(id="qarz", domain="fuqarolik", title="Qarzimni qaytarishmayapti", card="Qar
   ],
   docs=[
     doc("debtor","Qarzdorga", ["{{debtor}}ga","manzil: {{debtorAddress}}","{{applicant}} dan"], "TALABNOMA", [DEBT_P1, DEBT_P2],
-        ["{{amount}} miqdoridagi qarzni ushbu talabnoma olingan kundan e’tiboran 10 kun ichida qaytarishni."],
+        ["{{amount}} miqdoridagi qarzni ushbu talabnoma olingan kundan e’tiboran 30 kun ichida qaytarishni."],
         ["Qarzni tasdiqlovchi hujjat nusxasi"], sub="qarzni qaytarish to‘g‘risida", askLabel="Talab qilaman:",
         closing="Qarz qaytarilmagan taqdirda qarz summasi va sud xarajatlarini undirish uchun sudga murojaat qilishimni ma’lum qilaman."),
     doc("court","Sudga", ["{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga","Da’vogar: {{applicant}}","Javobgar: {{debtor}}, manzil: {{debtorAddress}}","Da’vo summasi: {{amount}}"], "DA’VO ARIZASI",
@@ -510,7 +516,7 @@ DEP_P2 = "Fuqarolik kodeksining 1023-moddasiga ko‘ra qonun yoki shartnomada as
 scen(id="ijara_depozit", domain="ijara", title="Uy egasi garov pulini qaytarmayapti", card="Ijaradan chiqdim, depozit yoki oldindan to‘lagan pulim qaytarilmadi", short="Garov puli",
   lead="Ijara tugagach, ushlab qolishga asos bo‘lmasa, garov (depozit) puli va yashalmagan davr uchun to‘langan ijara haqi qaytarilishi kerak. Avval yozma talab qilasiz, keyin sudga murojaat qilasiz. Umumiy da’vo muddati 3 yil.",
   keywords=["depozit","zalog","garov puli","garovni","uy egasi","kvartira egasi","xo‘jayin","ijaradan chiqdim","ijarada turgan","kvartirant","arenda","ijara puli"],
-  norms=["fk1023","fk540","fk150"],
+  norms=["fk1023","fk603","fk150"],
   deadline={"years":3, "label":"Da’vo muddati tugashiga qoldi"}, trigger="Uyni topshirgan (chiqib ketgan) sana",
   calc=None, partyField="landlord", amountField="deposit",
   steps=[{"org":"Uy egasi","t":"Yozma talabnoma yuboring","when":"Bugun","body":"Uy soz holatda topshirilganini tasdiqlovchi dalillarni (foto, video, dalolatnoma) ilova qiling. Pochta orqali xabarnoma bilan yuborish ham mumkin."},
@@ -530,11 +536,11 @@ scen(id="ijara_depozit", domain="ijara", title="Uy egasi garov pulini qaytarmaya
   ])
 
 EV_P1 = "[?leaseDate]{{leaseDate}}da [/]men bilan {{propAddress}} manzilidagi uyni ijaraga berish to‘g‘risida shartnoma tuzilgan, uning muddati: {{leaseEnd}}. Men ijara haqini o‘z vaqtida to‘lab kelyapman. {{trigger}}da uy egasi mendan uyni muddatidan oldin bo‘shatishni talab qildi."
-EV_P2 = "Fuqarolik kodeksining 551-moddasiga ko‘ra ijara beruvchi shartnomani muddatidan oldin faqat sud tartibida va qonunda sanab o‘tilgan asoslar mavjud bo‘lganda bekor qildira oladi; bundan oldin ijarachiga yozma ogohlantirish berilishi shart. Bunday asoslar yo‘q. Muddatsiz ijarada ham 540-moddaga ko‘ra uy egasi kamida uch oy oldin yozma ogohlantirishi kerak."
+EV_P2 = "Fuqarolik kodeksining 615-moddasiga ko‘ra turar joy ijarasi shartnomasi uy egasining talabi bilan faqat sud tartibida va qonunda sanab o‘tilgan hollarda — ijara haqi olti oy davomida to‘lanmaganda, uy buzilganda yoki yaroqsiz holga keltirilganda, undan huquqqa xilof maqsadda foydalanilganda — bekor qilinishi mumkin. Bunday asoslar yo‘q. Kodeksning 616-moddasiga ko‘ra ijarachini uydan chiqarish faqat sud qarori asosida amalga oshiriladi. Shartnomada muddat ko‘rsatilmagan bo‘lsa ham, 612-moddaga ko‘ra u besh yilga tuzilgan hisoblanadi."
 scen(id="ijara_chiqarish", domain="ijara", title="Uy egasi muddatidan oldin chiqaryapti", card="Shartnoma muddati tugamasdan chiqib ketishni talab qilyapti yoki narsalarimni chiqarib tashladi", short="Ijaradan chiqarish",
-  lead="Uy egasi ijara shartnomasini muddatidan oldin faqat sud orqali va qonundagi asoslar bo‘lsa bekor qildira oladi. Muddatsiz ijarada ham kamida 3 oy oldin yozma ogohlantirishi shart. Qulfni almashtirish yoki narsalarni chiqarib tashlash — o‘zboshimchalik.",
+  lead="Uy egasi turar joy ijarasini faqat sud orqali va qonunda sanab o‘tilgan hollarda bekor qildira oladi: 6 oy to‘lanmasa, uy buzilsa yoki noqonuniy maqsadda ishlatilsa. Muddat yozilmagan bo‘lsa, shartnoma 5 yilga tuzilgan hisoblanadi. Uydan faqat sud qarori bilan chiqarish mumkin; qulfni almashtirish yoki narsalarni chiqarib tashlash — o‘zboshimchalik.",
   keywords=["ijaradan chiqar","uydan chiqar","kvartiradan chiqar","chiqib ketishimni","bo‘shatishni talab","muddatidan oldin","narsalarimni chiqarib","qulfni almashtir","ijara shartnomasi","uy egasi","kvartirant","ijarachi"],
-  norms=["fk551","fk540","fk1023"],
+  norms=["fk615","fk616","fk612","fk604","fk1023"],
   deadline={"none":True, "label":"Murojaat muddati", "note":"Qat’iy muddat yo‘q. Uy egasining talabiga darhol yozma javob bering va barcha yozishmalarni saqlang."},
   trigger="Uy egasi chiqishni talab qilgan sana",
   calc=None, partyField="landlord", amountField="prepaid",
@@ -983,6 +989,118 @@ for sc in S:
         if f.get("docs") and first in f["docs"]: f["docs"] = f["docs"] + ["mediatsiya"]
     sc["norms"] = sc["norms"] + ["med7"]
 
+# ---------- Sud: tuman (shahar) bo‘yicha avtomatik (kb_courts.py, PF-6034 10-ilova) ----------
+# Shablonda {{court}} — sud nomi. Foydalanuvchi yozmasa, «Tuman yoki shahar» yoki holatdagi manzil/idora
+# maydonidan aniqlanadi (public/courts.js — sayt, bot va hujjat dvigateli uchun bitta mantiq).
+COURT_RULE = {
+  "civil": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring.",
+  "civil_own": "Bu da’voni o‘zingiz yashaydigan yoki javobgar joylashgan tumandagi sudga berishingiz mumkin (FPK 33–34-moddalar). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring.",
+  "admin": "Ariza qarori yoki harakati ustidan shikoyat qilinayotgan organ joylashgan hududdagi tumanlararo ma’muriy sudga beriladi (MSIYK 32-modda). Sud nomi organ yoki tuman nomidan avtomatik aniqlanadi.",
+  "criminal": "Shikoyat odatda jarima qarorini chiqargan organ joylashgan tumandagi (shahardagi) jinoyat ishlari bo‘yicha sudga beriladi. Sud nomi tuman nomidan avtomatik tuziladi; kerak bo‘lsa o‘zgartiring."
+}
+COURT_EG = {"civil": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi", "admin": "Toshkent tumanlararo ma’muriy sudi", "criminal": "Jinoyat ishlari bo‘yicha Mirobod tuman sudi"}
+OWN_COURT = lambda sc: sc["domain"] == "mehnat" or sc["id"] == "aliment"     # FPK 34-modda: da’vogarning yashash joyi bo‘yicha ham
+def court_kind(line):
+    if "ma’muriy" in line: return "admin"
+    if "jinoyat" in line: return "criminal"
+    return "civil"
+for sc in S:
+    court = next((d for d in sc["docs"] if d["id"] == "court"), None)
+    if not court: continue
+    assert "{{district}}" in court["to"][0] and court["to"][0].endswith("sudiga"), (sc["id"], court["to"][0])
+    kind = court_kind(court["to"][0])
+    court["to"] = ["{{court}}ga"] + court["to"][1:]          # yangi ro‘yxat: ba’zi holatlar bitta shablon ro‘yxatini bo‘lishadi
+    if kind == "admin": frm = ["agency"]
+    elif kind == "criminal": frm = ["organ"]
+    else: frm = [f["k"] for f in sc["fields"] if f["k"].endswith("Address") and f["k"] != "propAddress"] + (["address"] if OWN_COURT(sc) else [])
+    sc["court"] = {"kind": kind, "from": frm, "rule": COURT_RULE["civil_own" if kind == "civil" and OWN_COURT(sc) else kind]}
+    di = next(i for i, f in enumerate(sc["fields"]) if f["k"] == "district")
+    dist = sc["fields"][di]
+    if dist.get("docs") is not None and "court" not in dist["docs"]: dist["docs"] = dist["docs"] + ["court"]
+    sc["fields"].insert(di + 1, F("court", "Sud", "sud nomi", "court", group=dist.get("group"), docs=["court"], hint=COURT_EG[kind]))
+
+# ---------- «Qayerga yozish kerak?» — yuqori organ va murojaat oluvchisi bo‘yicha yo‘l-yo‘riq ----------
+# {hokimlik}, {prokuratura}, {by} — hudud bo‘yicha (kb_courts.py), {placeHokimlik} — tuman (shahar) hokimligi.
+# fill=True — tugma bosilganda matn maydonga yoziladi. Hudud «from» maydonlaridan aniqlanadi.
+P_VQ = "O‘zbekiston Respublikasi Prezidentining Virtual qabulxonasi"
+W_SUD_ADM = {"t": "Sud", "when": "Yuqori organga yozish majburiy emas: qaror ustidan to‘g‘ridan-to‘g‘ri ma’muriy sudga ham ariza berishingiz mumkin («Ma’muriy sudga» hujjati)."}
+W_SUD_FINE = {"t": "Sud", "when": "Yuqori organga yozmasdan to‘g‘ridan-to‘g‘ri jinoyat ishlari bo‘yicha sudga ham shikoyat qilish mumkin («Sudga» hujjati)."}
+W_PROK = {"t": "{prokuratura}", "fill": True, "when": "Mansabdor shaxs qonunni ochiq buzgan bo‘lsa: prokuratura qonunlar ijrosini nazorat qiladi."}
+WHERE = {
+  "murojaat_javobsiz": {"for": "higher", "field": "higherAgency", "from": ["agency", "district", "address"],
+    "note": "Yuqori turuvchi organ — javob bermagan idoraga rahbarlik qiladigan yoki uni nazorat qiladigan organ. Shikoyat huquq buzilganini bilganingizdan keyin 1 yil ichida beriladi (Murojaatlar to‘g‘risidagi qonun, 22-modda).",
+    "items": [
+      {"t": "{hokimlik}", "fill": True, "when": "Tuman (shahar) hokimligi, uning bo‘limi yoki hokimlikka bo‘ysunadigan tashkilot javob bermasa."},
+      {"t": "Vazirlik, qo‘mita yoki agentlikning viloyat (shahar) boshqarmasi", "when": "Javob bermagan idora vazirlik yoki agentlikning tuman bo‘limi bo‘lsa. Boshqarma ham javob bermasa — vazirlikning o‘ziga."},
+      W_PROK,
+      {"t": P_VQ, "fill": True, "when": "Qaysi organ yuqori ekanini bilmasangiz: pm.gov.uz murojaatni tegishli organga yo‘naltiradi va ko‘rib chiqilishini nazorat qiladi."}]},
+  "pensiya": {"for": "higher", "field": "higherAgency", "from": ["agency", "district", "address"],
+    "note": "Pensiya bo‘yicha qaror ustidan yuqori organga yoki sudga shikoyat qilinadi (Pensiya ta’minoti to‘g‘risidagi qonun, 48-modda).",
+    "items": [
+      {"t": "Byudjetdan tashqari Pensiya jamg‘armasining {by} boshqarmasi", "fill": True, "when": "Tuman (shahar) bo‘limi qarori ustidan — birinchi navbatda."},
+      {"t": "O‘zbekiston Respublikasi Iqtisodiyot va moliya vazirligi huzuridagi Byudjetdan tashqari Pensiya jamg‘armasi", "fill": True, "when": "Viloyat (shahar) boshqarmasi ham rad etsa."},
+      W_SUD_ADM]},
+  "ijtimoiy_nafaqa": {"for": "higher", "field": "higherAgency", "from": ["agency", "district", "address"],
+    "note": "Nafaqa bo‘yicha rad javobi ustidan yuqori organga yoki sudga shikoyat qilinadi.",
+    "items": [
+      {"t": "Ijtimoiy himoya milliy agentligining {by} boshqarmasi", "fill": True, "when": "Tuman (shahar) «Inson» markazi yoki bo‘limi rad etsa."},
+      {"t": "O‘zbekiston Respublikasi Prezidenti huzuridagi Ijtimoiy himoya milliy agentligi", "fill": True, "when": "Hududiy boshqarma ham rad etsa."},
+      W_SUD_ADM]},
+  "jarima": {"for": "higher", "field": "higherOrgan", "from": ["organ", "district", "address"],
+    "note": "Shikoyat qaror nusxasi olingan kundan 10 kun ichida beriladi (MJtK). Yuqori organning nomi va manzili odatda jarima qarorining (bayonnomaning) yuqori qismida yoziladi.",
+    "items": [
+      {"t": "Qaror chiqargan mansabdor shaxsning bevosita rahbari yoki yuqori turuvchi organ", "when": "Masalan, tuman soliq inspeksiyasi qarori ustidan — viloyat (shahar) soliq boshqarmasiga; tuman bo‘limi qarori ustidan — shu tashkilotning viloyat boshqarmasiga."},
+      W_PROK, W_SUD_FINE]},
+  "yhxx_jarima": {"for": "higher", "field": "higherOrgan", "from": ["organ", "district", "address"],
+    "note": "Shikoyat qaror nusxasi olingan kundan 10 kun ichida beriladi (MJtK). YHXX jarimasi ustidan my.gov.uz orqali elektron shikoyat qilish ham mumkin.",
+    "items": [
+      {"t": "Jarima solgan inspektor xizmat qiladigan IIB YHXX bo‘linmasining boshlig‘i", "when": "Bo‘linma nomi jarima qarorida yoki my.gov.uz’dagi qaror kartasida ko‘rsatiladi."},
+      W_PROK, W_SUD_FINE]},
+  "murojaat_umumiy": {"for": "*", "field": "body", "from": ["body", "district", "address"],
+    "note": "Murojaat masalani hal qilish vakolatiga ega organga yuboriladi. Idoraning aniq nomini murojaat.gov.uz katalogidan topish mumkin.",
+    "items": [
+      {"t": "{placeHokimlik}", "fill": True, "when": "Mahalliy masalalar: yo‘l va ko‘chalar, ko‘cha chiroqlari, obodonlashtirish, maktab va bog‘cha, kommunal xizmatlar."},
+      {"t": "{hokimlik}", "fill": True, "when": "Masala bir nechta tumanga taalluqli bo‘lsa yoki tuman (shahar) hokimligi hal qilmasa."},
+      {"t": "Tegishli vazirlik, qo‘mita yoki agentlik", "when": "Soha masalalari: soliq, sog‘liqni saqlash, ta’lim, pensiya va boshqalar."},
+      {"t": P_VQ, "fill": True, "when": "Qaysi idoraga yozishni bilmasangiz: Virtual qabulxona murojaatni tegishli organga yo‘naltiradi."}]}
+}
+for sc in S:
+    w = WHERE.get(sc["id"])
+    if not w: continue
+    keys = {f["k"] for f in sc["fields"]}
+    assert w["field"] in keys, (sc["id"], w["field"])
+    w = {**w, "from": [k for k in w["from"] if k in keys | {"address"}]}     # holatda yo‘q maydon (masalan, district) tushib qoladi
+    assert w["for"] == "*" or any(d["id"] == w["for"] for d in sc["docs"]), sc["id"]
+    sc["whereTo"] = w
+assert set(WHERE) <= {s["id"] for s in S}
+
+# ---------- Davlat boji bo‘yicha iltimosnoma (FPK 133-modda) ----------
+# Fuqaro davlat bojidan ozod bo‘lmagan fuqarolik da’volari. Mehnat, aliment, iste’molchi va OSGO da’volarida
+# boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda), ma’muriy sudda jismoniy shaxslar boj to‘lamaydi.
+BOJI_IDS = ["qarz","ijara_depozit","ijara_chiqarish","kommunal_hisob","kommunal_sifat","bank_karta","kredit_mfo","migrant_agentlik"]
+BOJI_P2 = "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}."
+BOJI_P3 = "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+def boji_doc(sc):
+    court = next(d for d in sc["docs"] if d["id"] == "court")
+    assert court["sub"].endswith("to‘g‘risida"), (sc["id"], court["sub"])
+    to = [t for t in court["to"] if not t.startswith("Da’vo summasi")]
+    return doc("boji", "Davlat boji: iltimosnoma", to, "ILTIMOSNOMA",
+               ["Men ushbu sudga " + court["sub"] + "gi da’vo arizasini taqdim etmoqdaman.", BOJI_P2, BOJI_P3],
+               ["davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+                "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+                "yoki davlat boji miqdorini kamaytirishni."],
+               ["Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"],
+               sub="davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida", askLabel="So‘rayman:")
+for sc in S:
+    if sc["id"] not in BOJI_IDS: continue
+    grp = next(f.get("group") for f in sc["fields"] if f["k"] == "district")
+    sc["docs"].append(boji_doc(sc))
+    for f in sc["fields"]:                       # iltimosnoma ham shu sudga: tuman va sud maydonlari unda ham ko‘rinsin
+        if f["k"] in ("court", "district") and f.get("docs") is not None and "boji" not in f["docs"]: f["docs"] = f["docs"] + ["boji"]
+    sc["fields"].append(F("hardship", "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz", "mulkiy ahvol", group=grp, docs=["boji"],
+                          hint="ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"))
+    sc["norms"] = sc["norms"] + ["fpk133"]
+
 # ---------- «Qanday topshiriladi» ----------
 L_SUD = {"label":"Sudlarning interaktiv xizmatlari — my.sud.uz", "url":"https://my.sud.uz/"}
 L_PM = {"label":"Prezidentning virtual qabulxonasi — pm.gov.uz", "url":"https://pm.gov.uz/"}
@@ -1016,9 +1134,11 @@ HOW = {
 FEE = {
   "mehnat": "Mehnat nizolarida xodim sud xarajatlaridan ozod.",
   "aliment": "Aliment da’vosida davlat boji to‘lanmaydi.",
-  "admin": "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi.",
-  "qarz": "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling.",
-  "civil": "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+  "admin": "Ariza va ilovalar nusxasini javobgar organga buyurtma xat bilan yuboring va pochta kvitansiyasini arizaga ilova qiling (MSIYK 130-modda). Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi.",
+  "qarz": "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling. Mulkiy ahvolingiz og‘ir bo‘lsa, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering: sud bojni kechiktirishi, bo‘lib to‘lashga ruxsat berishi yoki kamaytirishi mumkin (FPK 133-modda).",
+  "istemol": "Iste’molchilar huquqlari buzilganligi bo‘yicha da’volarda davlat boji to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda 10-band).",
+  "osgo": "Majburiy sug‘urta shartnomasidan kelib chiqadigan da’voda jabrlanuvchi davlat bojini to‘lamaydi (Davlat boji to‘g‘risidagi qonun, 8-modda 22¹-band).",
+  "civil": "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
 }
 # Hujjat turi va sud boji turi (ruscha baza ham shu funksiyalardan foydalanadi)
 FINE_IDS = {"jarima", "yhxx_jarima"}
@@ -1026,13 +1146,14 @@ PRIVATE_DOCS = {"mediatsiya","employer","seller","debtor","landlord","provider",
 def howto_kind(sc, d):
     if sc["id"] in FINE_IDS: return "fine"
     if d["id"] in PRIVATE_DOCS: return "private"
-    if d["id"] == "court": return "court"
+    if d["id"] in ("court", "boji"): return "court"
     if d["id"] == "cbu": return "cbu"
     return "state"
 def fee_key(sc):
     if sc["domain"] in ("davlat", "nafaqa"): return "admin"
     if sc["domain"] == "mehnat": return "mehnat"
-    if sc["id"] in ("aliment", "qarz"): return sc["id"]
+    if sc["id"] in ("aliment", "qarz", "osgo"): return sc["id"]
+    if sc["domain"] == "istemol": return "istemol"
     if sc["domain"] in ("ijara", "kommunal", "bank", "transport", "migrant"): return "civil"
     return None
 for sc in S:
@@ -1044,6 +1165,21 @@ for sc in S:
             if fk: h["steps"].append(FEE[fk])
         if sc["id"] in FINE_IDS and d["id"] == "court": h["links"] = []
         d["howto"] = h
+
+# Sud arizasi ilovalari: pochta xarajatlari (FPK 191-modda 3-band, MSIYK 130-modda 1¹-band) va
+# ma’muriy sudda nusxa javobgarga yuborilganining isboti (MSIYK 130-modda 2-band). Mehnat nizolarida
+# xodim sud xarajatlaridan ozod (MK 562), jarima shikoyatlari MJtK tartibida — ularga qo‘shilmaydi.
+POSTAL_ATT = "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
+ADMIN_COPY = ("Ariza nusxasi (javobgar uchun)", "Ariza va ilovalar nusxalari javobgarga yuborilganini tasdiqlovchi pochta kvitansiyasi")
+def court_attach(sc, d, attach, postal, admin_copy):
+    if d["id"] != "court" or howto_kind(sc, d) != "court": return attach
+    fk = fee_key(sc)
+    if fk == "mehnat": return attach
+    out = [admin_copy[1] if (fk == "admin" and a == admin_copy[0]) else a for a in attach]
+    if fk == "admin": assert admin_copy[1] in out, (sc["id"], "admin copy")
+    return out + [postal]
+for sc in S:
+    for d in sc["docs"]: d["attach"] = court_attach(sc, d, d["attach"], POSTAL_ATT, ADMIN_COPY)
 
 APPLICANT = [F("fio","F.I.Sh.","F.I.Sh.", hint="Karimov Aziz Botirovich"), F("address","Yashash manzili","manzil", hint="Toshkent sh., Chilonzor t., …"), F("phone","Telefon","telefon","phone", hint="+998 90 123 45 67")]
 
@@ -1063,7 +1199,7 @@ os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kb_ru
 for s_ in S: s_["keywords"] = s_["keywords"] + [k for k in kb_ru.KEYWORDS[s_["id"]] if k not in s_["keywords"]]
-RU = kb_ru.build_ru(S, howto_kind, fee_key)
+RU = kb_ru.build_ru(S, howto_kind, fee_key, court_attach)
 # Dalillar yo‘riqnomasi va idoralar (ikki tilda bitta manbadan)
 import kb_evidence, kb_offices
 for s_ in S:
@@ -1083,6 +1219,7 @@ for k, r in kb_offices.OFFICES_RU.items():
 RU["offices"] = kb_offices.OFFICES_RU
 RU["officesChecked"] = kb_offices.CHECKED
 assert set(RU["norms"]) == ids and set(RU["laws"]) == set(LAWS)
-for name, data in (("ru", RU), ("laws", LAWS), ("domains", DOMAINS), ("norms", N), ("scenarios", S), ("applicant", APPLICANT), ("offices", {"checked": kb_offices.CHECKED, "list": OFFICES})):
+import kb_courts
+for name, data in (("courts", kb_courts.build()), ("ru", RU), ("laws", LAWS), ("domains", DOMAINS), ("norms", N), ("scenarios", S), ("applicant", APPLICANT), ("offices", {"checked": kb_offices.CHECKED, "list": OFFICES})):
     with open(os.path.join(OUT, name + ".json"), "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=1)
 print(len(N), "norma;", len(S), "holat;", len(DOMAINS), "soha")

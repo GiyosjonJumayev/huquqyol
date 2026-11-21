@@ -141,6 +141,17 @@
     "hint": "Chilonzor tumani"
    },
    {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
     "k": "empAddress",
     "label": "Ish beruvchi manzili",
     "ph": "ish beruvchi manzili",
@@ -266,7 +277,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{employer}}, manzil: {{empAddress}}",
      "[?amount]Da’vo summasi: {{amount}} va kechiktirish kompensatsiyasi[/]"
@@ -307,6 +318,14 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "empAddress",
+    "address"
+   ],
+   "rule": "Bu da’voni o‘zingiz yashaydigan yoki javobgar joylashgan tumandagi sudga berishingiz mumkin (FPK 33–34-moddalar). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -452,6 +471,17 @@
     "hint": "Chilonzor tumani"
    },
    {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
     "k": "empAddress",
     "label": "Ish beruvchi manzili",
     "ph": "ish beruvchi manzili",
@@ -467,7 +497,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{employer}}, manzil: {{empAddress}}"
     ],
@@ -546,6 +576,14 @@
     "office": "dmi"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "empAddress",
+    "address"
+   ],
+   "rule": "Bu da’voni o‘zingiz yashaydigan yoki javobgar joylashgan tumandagi sudga berishingiz mumkin (FPK 33–34-moddalar). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -973,6 +1011,17 @@
     "hint": "Chilonzor tumani"
    },
    {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Ish joyi",
+    "docs": [
+     "court"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
     "k": "empAddress",
     "label": "Ish beruvchi manzili",
     "ph": "ish beruvchi manzili",
@@ -1096,7 +1145,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{employer}}, manzil: {{empAddress}}"
     ],
@@ -1136,6 +1185,14 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "empAddress",
+    "address"
+   ],
+   "rule": "Bu da’voni o‘zingiz yashaydigan yoki javobgar joylashgan tumandagi sudga berishingiz mumkin (FPK 33–34-moddalar). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -1357,6 +1414,17 @@
      "court"
     ],
     "hint": "Yunusobod tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Sotuvchi va tovar",
+    "docs": [
+     "court"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
    }
   ],
   "docs": [
@@ -1472,7 +1540,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{seller}}, manzil: {{sellerAddress}}"
     ],
@@ -1493,14 +1561,16 @@
      "Da’vo arizasining javobgar uchun nusxasi",
      "Pasport nusxasi",
      "Chek nusxasi",
-     "Sotuvchiga berilgan talabnoma nusxasi"
+     "Sotuvchiga berilgan talabnoma nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "iste’molchi huquqlarini himoya qilish to‘g‘risida",
     "howto": {
      "steps": [
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
-      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali."
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Iste’molchilar huquqlari buzilganligi bo‘yicha da’volarda davlat boji to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda 10-band)."
      ],
      "links": [
       {
@@ -1512,6 +1582,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "sellerAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -1889,6 +1966,17 @@
     "type": "text",
     "group": "Ikkinchi ota-ona va bolalar",
     "hint": "Denov tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Ikkinchi ota-ona va bolalar",
+    "docs": [
+     "court"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
    }
   ],
   "docs": [
@@ -1896,7 +1984,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{respondent}}, manzil: {{respAddress}}[?respWork], ish joyi: {{respWork}}[/]"
     ],
@@ -1915,7 +2003,8 @@
     "attach": [
      "Da’vo arizasining javobgar uchun nusxasi",
      "Pasport nusxasi",
-     "Bola(lar)ning tug‘ilganlik guvohnomasi nusxasi"
+     "Bola(lar)ning tug‘ilganlik guvohnomasi nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "voyaga yetmagan bolalar uchun aliment undirish to‘g‘risida",
     "howto": {
@@ -1935,6 +2024,14 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "respAddress",
+    "address"
+   ],
+   "rule": "Bu da’voni o‘zingiz yashaydigan yoki javobgar joylashgan tumandagi sudga berishingiz mumkin (FPK 33–34-moddalar). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -2090,6 +2187,17 @@
      "court"
     ],
     "hint": "Denov tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Murojaat",
+    "docs": [
+     "court"
+    ],
+    "hint": "Toshkent tumanlararo ma’muriy sudi"
    }
   ],
   "docs": [
@@ -2135,7 +2243,7 @@
     "id": "court",
     "label": "Ma’muriy sudga",
     "to": [
-     "{{district}} tumanlararo ma’muriy sudiga",
+     "{{court}}ga",
      "Arizachi: {{applicant}}",
      "Javobgar: {{agency}}"
     ],
@@ -2151,10 +2259,11 @@
      "javobgarni murojaatimni mazmunan ko‘rib chiqib, yozma javob berishga majburlashni."
     ],
     "attach": [
-     "Ariza nusxasi (javobgar uchun)",
+     "Ariza va ilovalar nusxalari javobgarga yuborilganini tasdiqlovchi pochta kvitansiyasi",
      "Pasport nusxasi",
      "Murojaat nusxasi",
-     "Murojaat yuborilganini tasdiqlovchi hujjat"
+     "Murojaat yuborilganini tasdiqlovchi hujjat",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "ma’muriy organning harakatsizligini qonunga xilof deb topish to‘g‘risida",
     "howto": {
@@ -2162,7 +2271,7 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
+      "Ariza va ilovalar nusxasini javobgar organga buyurtma xat bilan yuboring va pochta kvitansiyasini arizaga ilova qiling (MSIYK 130-modda). Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
      ],
      "links": [
       {
@@ -2174,6 +2283,44 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "admin",
+   "from": [
+    "agency"
+   ],
+   "rule": "Ariza qarori yoki harakati ustidan shikoyat qilinayotgan organ joylashgan hududdagi tumanlararo ma’muriy sudga beriladi (MSIYK 32-modda). Sud nomi organ yoki tuman nomidan avtomatik aniqlanadi."
+  },
+  "whereTo": {
+   "for": "higher",
+   "field": "higherAgency",
+   "from": [
+    "agency",
+    "district",
+    "address"
+   ],
+   "note": "Yuqori turuvchi organ — javob bermagan idoraga rahbarlik qiladigan yoki uni nazorat qiladigan organ. Shikoyat huquq buzilganini bilganingizdan keyin 1 yil ichida beriladi (Murojaatlar to‘g‘risidagi qonun, 22-modda).",
+   "items": [
+    {
+     "t": "{hokimlik}",
+     "fill": true,
+     "when": "Tuman (shahar) hokimligi, uning bo‘limi yoki hokimlikka bo‘ysunadigan tashkilot javob bermasa."
+    },
+    {
+     "t": "Vazirlik, qo‘mita yoki agentlikning viloyat (shahar) boshqarmasi",
+     "when": "Javob bermagan idora vazirlik yoki agentlikning tuman bo‘limi bo‘lsa. Boshqarma ham javob bermasa — vazirlikning o‘ziga."
+    },
+    {
+     "t": "{prokuratura}",
+     "fill": true,
+     "when": "Mansabdor shaxs qonunni ochiq buzgan bo‘lsa: prokuratura qonunlar ijrosini nazorat qiladi."
+    },
+    {
+     "t": "O‘zbekiston Respublikasi Prezidentining Virtual qabulxonasi",
+     "fill": true,
+     "when": "Qaysi organ yuqori ekanini bilmasangiz: pm.gov.uz murojaatni tegishli organga yo‘naltiradi va ko‘rib chiqilishini nazorat qiladi."
+    }
+   ]
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -2300,6 +2447,17 @@
     "type": "text",
     "group": "Qaror",
     "hint": "Denov tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Qaror",
+    "docs": [
+     "court"
+    ],
+    "hint": "Toshkent tumanlararo ma’muriy sudi"
    }
   ],
   "docs": [
@@ -2307,7 +2465,7 @@
     "id": "court",
     "label": "Ma’muriy sudga",
     "to": [
-     "{{district}} tumanlararo ma’muriy sudiga",
+     "{{court}}ga",
      "Arizachi: {{applicant}}",
      "Javobgar: {{agency}}"
     ],
@@ -2324,9 +2482,10 @@
      "zarur bo‘lsa, ish bo‘yicha qaror chiqarilguniga qadar nizolashilayotgan hujjat ijrosini to‘xtatib turishni."
     ],
     "attach": [
-     "Ariza nusxasi (javobgar uchun)",
+     "Ariza va ilovalar nusxalari javobgarga yuborilganini tasdiqlovchi pochta kvitansiyasi",
      "Pasport nusxasi",
-     "Nizolashilayotgan qaror nusxasi"
+     "Nizolashilayotgan qaror nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "ma’muriy hujjatni haqiqiy emas deb topish to‘g‘risida",
     "howto": {
@@ -2334,7 +2493,7 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
+      "Ariza va ilovalar nusxasini javobgar organga buyurtma xat bilan yuboring va pochta kvitansiyasini arizaga ilova qiling (MSIYK 130-modda). Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
      ],
      "links": [
       {
@@ -2346,6 +2505,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "admin",
+   "from": [
+    "agency"
+   ],
+   "rule": "Ariza qarori yoki harakati ustidan shikoyat qilinayotgan organ joylashgan hududdagi tumanlararo ma’muriy sudga beriladi (MSIYK 32-modda). Sud nomi organ yoki tuman nomidan avtomatik aniqlanadi."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -2493,6 +2659,17 @@
      "court"
     ],
     "hint": "Mirobod tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Jarima",
+    "docs": [
+     "court"
+    ],
+    "hint": "Jinoyat ishlari bo‘yicha Mirobod tuman sudi"
    }
   ],
   "docs": [
@@ -2538,7 +2715,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} jinoyat ishlari bo‘yicha sudiga",
+     "{{court}}ga",
      "Shikoyatchi: {{applicant}}",
      "Qaror chiqargan organ: {{organ}}"
     ],
@@ -2570,6 +2747,38 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "criminal",
+   "from": [
+    "organ"
+   ],
+   "rule": "Shikoyat odatda jarima qarorini chiqargan organ joylashgan tumandagi (shahardagi) jinoyat ishlari bo‘yicha sudga beriladi. Sud nomi tuman nomidan avtomatik tuziladi; kerak bo‘lsa o‘zgartiring."
+  },
+  "whereTo": {
+   "for": "higher",
+   "field": "higherOrgan",
+   "from": [
+    "organ",
+    "district",
+    "address"
+   ],
+   "note": "Shikoyat qaror nusxasi olingan kundan 10 kun ichida beriladi (MJtK). Yuqori organning nomi va manzili odatda jarima qarorining (bayonnomaning) yuqori qismida yoziladi.",
+   "items": [
+    {
+     "t": "Qaror chiqargan mansabdor shaxsning bevosita rahbari yoki yuqori turuvchi organ",
+     "when": "Masalan, tuman soliq inspeksiyasi qarori ustidan — viloyat (shahar) soliq boshqarmasiga; tuman bo‘limi qarori ustidan — shu tashkilotning viloyat boshqarmasiga."
+    },
+    {
+     "t": "{prokuratura}",
+     "fill": true,
+     "when": "Mansabdor shaxs qonunni ochiq buzgan bo‘lsa: prokuratura qonunlar ijrosini nazorat qiladi."
+    },
+    {
+     "t": "Sud",
+     "when": "Yuqori organga yozmasdan to‘g‘ridan-to‘g‘ri jinoyat ishlari bo‘yicha sudga ham shikoyat qilish mumkin («Sudga» hujjati)."
+    }
+   ]
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -2626,8 +2835,10 @@
   ],
   "norms": [
    "fk732",
+   "fk735",
    "fk150",
-   "med7"
+   "med7",
+   "fpk133"
   ],
   "deadline": {
    "years": 3,
@@ -2642,7 +2853,7 @@
     "org": "Qarzdor",
     "t": "Yozma talabnoma yuboring",
     "when": "Bugun",
-    "body": "Pochta orqali xabarnoma bilan. Muddat belgilanmagan bo‘lsa, talab qilingan sana muhim."
+    "body": "Pochta orqali xabarnoma bilan. Muddat belgilanmagan bo‘lsa, qarz talab olingan kundan 30 kun ichida qaytarilishi kerak (FK 735-modda): sudga shundan keyin murojaat qiling."
    },
    {
     "org": "Mediator",
@@ -2718,9 +2929,33 @@
     "type": "text",
     "group": "Qarz",
     "docs": [
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Denov tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Qarz",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Qarz",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -2735,11 +2970,11 @@
     "title": "TALABNOMA",
     "body": [
      "{{loanDate}}da men {{debtor}}ga {{amount}} miqdorida qarz berganman. Buni {{proof}} tasdiqlaydi. Qarzni qaytarish muddati {{trigger}}da kelgan, biroq qarz hozirgacha qaytarilmagan.",
-     "Fuqarolik kodeksining 732-moddasiga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytarilishi kerak."
+     "Fuqarolik kodeksining 732 va 735-moddalariga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga shartnomada belgilangan muddatda qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan kundan boshlab o‘ttiz kun ichida qaytarilishi kerak."
     ],
     "askLabel": "Talab qilaman:",
     "asks": [
-     "{{amount}} miqdoridagi qarzni ushbu talabnoma olingan kundan e’tiboran 10 kun ichida qaytarishni."
+     "{{amount}} miqdoridagi qarzni ushbu talabnoma olingan kundan e’tiboran 30 kun ichida qaytarishni."
     ],
     "attach": [
      "Qarzni tasdiqlovchi hujjat nusxasi"
@@ -2795,7 +3030,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{debtor}}, manzil: {{debtorAddress}}",
      "Da’vo summasi: {{amount}}"
@@ -2803,7 +3038,7 @@
     "title": "DA’VO ARIZASI",
     "body": [
      "{{loanDate}}da men {{debtor}}ga {{amount}} miqdorida qarz berganman. Buni {{proof}} tasdiqlaydi. Qarzni qaytarish muddati {{trigger}}da kelgan, biroq qarz hozirgacha qaytarilmagan.",
-     "Fuqarolik kodeksining 732-moddasiga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan vaqtda qaytarilishi kerak.",
+     "Fuqarolik kodeksining 732 va 735-moddalariga ko‘ra qarz oluvchi olgan pul summasini qarz beruvchiga shartnomada belgilangan muddatda qaytarishi shart; qaytarish muddati belgilanmagan bo‘lsa, qarz beruvchi talab qilgan kundan boshlab o‘ttiz kun ichida qaytarilishi kerak.",
      "Fuqarolik kodeksining 150-moddasiga ko‘ra umumiy da’vo muddati uch yil bo‘lib, u o‘tkazib yuborilmagan."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
@@ -2816,7 +3051,8 @@
      "Pasport nusxasi",
      "Qarzni tasdiqlovchi hujjat nusxasi",
      "Davlat boji to‘langanligi to‘g‘risidagi kvitansiya",
-     "Talabnoma nusxasi"
+     "Talabnoma nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "qarzni undirish to‘g‘risida",
     "howto": {
@@ -2824,7 +3060,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling."
+      "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling. Mulkiy ahvolingiz og‘ir bo‘lsa, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering: sud bojni kechiktirishi, bo‘lib to‘lashga ruxsat berishi yoki kamaytirishi mumkin (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{debtor}}, manzil: {{debtorAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga qarzni undirish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanadi, miqdori da’vo summasiga bog‘liq. To‘lov kvitansiyasini ilova qiling. Mulkiy ahvolingiz og‘ir bo‘lsa, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering: sud bojni kechiktirishi, bo‘lib to‘lashga ruxsat berishi yoki kamaytirishi mumkin (FPK 133-modda)."
      ],
      "links": [
       {
@@ -2836,6 +3112,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "debtorAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -2895,9 +3178,10 @@
   ],
   "norms": [
    "fk1023",
-   "fk540",
+   "fk603",
    "fk150",
-   "med7"
+   "med7",
+   "fpk133"
   ],
   "deadline": {
    "years": 3,
@@ -2989,9 +3273,33 @@
     "type": "text",
     "group": "Ijara",
     "docs": [
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Yunusobod tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Ijara",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Ijara",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -3067,7 +3375,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{landlord}}, manzil: {{landlordAddress}}",
      "Da’vo summasi: {{deposit}}"
@@ -3088,7 +3396,8 @@
      "Pasport nusxasi",
      "Ijara shartnomasi nusxasi",
      "Garov to‘langanini tasdiqlovchi hujjat nusxasi",
-     "Talabnoma nusxasi"
+     "Talabnoma nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "asossiz ushlab qolingan pulni undirish to‘g‘risida",
     "howto": {
@@ -3096,7 +3405,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{landlord}}, manzil: {{landlordAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga asossiz ushlab qolingan pulni undirish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -3108,6 +3457,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "landlordAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -3146,7 +3502,7 @@
   "title": "Uy egasi muddatidan oldin chiqaryapti",
   "card": "Shartnoma muddati tugamasdan chiqib ketishni talab qilyapti yoki narsalarimni chiqarib tashladi",
   "short": "Ijaradan chiqarish",
-  "lead": "Uy egasi ijara shartnomasini muddatidan oldin faqat sud orqali va qonundagi asoslar bo‘lsa bekor qildira oladi. Muddatsiz ijarada ham kamida 3 oy oldin yozma ogohlantirishi shart. Qulfni almashtirish yoki narsalarni chiqarib tashlash — o‘zboshimchalik.",
+  "lead": "Uy egasi turar joy ijarasini faqat sud orqali va qonunda sanab o‘tilgan hollarda bekor qildira oladi: 6 oy to‘lanmasa, uy buzilsa yoki noqonuniy maqsadda ishlatilsa. Muddat yozilmagan bo‘lsa, shartnoma 5 yilga tuzilgan hisoblanadi. Uydan faqat sud qarori bilan chiqarish mumkin; qulfni almashtirish yoki narsalarni chiqarib tashlash — o‘zboshimchalik.",
   "keywords": [
    "ijaradan chiqar",
    "uydan chiqar",
@@ -3170,9 +3526,12 @@
    "арендатор"
   ],
   "norms": [
-   "fk551",
-   "fk540",
-   "fk1023"
+   "fk615",
+   "fk616",
+   "fk612",
+   "fk604",
+   "fk1023",
+   "fpk133"
   ],
   "deadline": {
    "none": true,
@@ -3267,9 +3626,33 @@
     "type": "text",
     "group": "Ijara",
     "docs": [
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Yunusobod tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Ijara",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Ijara",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -3284,7 +3667,7 @@
     "title": "BILDIRISHNOMA",
     "body": [
      "[?leaseDate]{{leaseDate}}da [/]men bilan {{propAddress}} manzilidagi uyni ijaraga berish to‘g‘risida shartnoma tuzilgan, uning muddati: {{leaseEnd}}. Men ijara haqini o‘z vaqtida to‘lab kelyapman. {{trigger}}da uy egasi mendan uyni muddatidan oldin bo‘shatishni talab qildi.",
-     "Fuqarolik kodeksining 551-moddasiga ko‘ra ijara beruvchi shartnomani muddatidan oldin faqat sud tartibida va qonunda sanab o‘tilgan asoslar mavjud bo‘lganda bekor qildira oladi; bundan oldin ijarachiga yozma ogohlantirish berilishi shart. Bunday asoslar yo‘q. Muddatsiz ijarada ham 540-moddaga ko‘ra uy egasi kamida uch oy oldin yozma ogohlantirishi kerak."
+     "Fuqarolik kodeksining 615-moddasiga ko‘ra turar joy ijarasi shartnomasi uy egasining talabi bilan faqat sud tartibida va qonunda sanab o‘tilgan hollarda — ijara haqi olti oy davomida to‘lanmaganda, uy buzilganda yoki yaroqsiz holga keltirilganda, undan huquqqa xilof maqsadda foydalanilganda — bekor qilinishi mumkin. Bunday asoslar yo‘q. Kodeksning 616-moddasiga ko‘ra ijarachini uydan chiqarish faqat sud qarori asosida amalga oshiriladi. Shartnomada muddat ko‘rsatilmagan bo‘lsa ham, 612-moddaga ko‘ra u besh yilga tuzilgan hisoblanadi."
     ],
     "askLabel": "Ma’lum qilaman:",
     "asks": [
@@ -3309,14 +3692,14 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{landlord}}, manzil: {{landlordAddress}}"
     ],
     "title": "DA’VO ARIZASI",
     "body": [
      "[?leaseDate]{{leaseDate}}da [/]men bilan {{propAddress}} manzilidagi uyni ijaraga berish to‘g‘risida shartnoma tuzilgan, uning muddati: {{leaseEnd}}. Men ijara haqini o‘z vaqtida to‘lab kelyapman. {{trigger}}da uy egasi mendan uyni muddatidan oldin bo‘shatishni talab qildi.",
-     "Fuqarolik kodeksining 551-moddasiga ko‘ra ijara beruvchi shartnomani muddatidan oldin faqat sud tartibida va qonunda sanab o‘tilgan asoslar mavjud bo‘lganda bekor qildira oladi; bundan oldin ijarachiga yozma ogohlantirish berilishi shart. Bunday asoslar yo‘q. Muddatsiz ijarada ham 540-moddaga ko‘ra uy egasi kamida uch oy oldin yozma ogohlantirishi kerak.",
+     "Fuqarolik kodeksining 615-moddasiga ko‘ra turar joy ijarasi shartnomasi uy egasining talabi bilan faqat sud tartibida va qonunda sanab o‘tilgan hollarda — ijara haqi olti oy davomida to‘lanmaganda, uy buzilganda yoki yaroqsiz holga keltirilganda, undan huquqqa xilof maqsadda foydalanilganda — bekor qilinishi mumkin. Bunday asoslar yo‘q. Kodeksning 616-moddasiga ko‘ra ijarachini uydan chiqarish faqat sud qarori asosida amalga oshiriladi. Shartnomada muddat ko‘rsatilmagan bo‘lsa ham, 612-moddaga ko‘ra u besh yilga tuzilgan hisoblanadi.",
      "Javobgar shartnomani sud tartibida bekor qildirmasdan, menga uydan foydalanishda to‘sqinlik qilmoqda."
     ],
     "askLabel": "Yuqoridagilarga asosan, so‘rayman:",
@@ -3329,7 +3712,8 @@
      "Da’vo arizasining javobgar uchun nusxasi",
      "Pasport nusxasi",
      "Ijara shartnomasi nusxasi",
-     "Ijara haqi to‘langanini tasdiqlovchi hujjatlar nusxasi"
+     "Ijara haqi to‘langanini tasdiqlovchi hujjatlar nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "ijara shartnomasidan kelib chiqadigan huquqlarni himoya qilish to‘g‘risida",
     "howto": {
@@ -3337,7 +3721,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{landlord}}, manzil: {{landlordAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga ijara shartnomasidan kelib chiqadigan huquqlarni himoya qilish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -3349,6 +3773,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "landlordAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -3413,7 +3844,8 @@
    "ihq23",
    "ihq29",
    "fk150",
-   "med7"
+   "med7",
+   "fpk133"
   ],
   "deadline": {
    "years": 3,
@@ -3517,9 +3949,33 @@
     "group": "Xizmat",
     "docs": [
      "agency",
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Xizmat",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Xizmat",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -3634,7 +4090,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{provider}}, manzil: {{providerAddress}}"
     ],
@@ -3653,7 +4109,8 @@
      "Da’vo arizasining javobgar uchun nusxasi",
      "Pasport nusxasi",
      "To‘lov kvitansiyalari nusxasi",
-     "Talabnoma nusxasi"
+     "Talabnoma nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "hisob-kitobni qayta ko‘rib chiqish va pulni undirish to‘g‘risida",
     "howto": {
@@ -3661,7 +4118,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{provider}}, manzil: {{providerAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga hisob-kitobni qayta ko‘rib chiqish va pulni undirish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -3673,6 +4170,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "providerAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -3740,7 +4244,8 @@
    "ihq19",
    "ihq22",
    "ihq23",
-   "ihq29"
+   "ihq29",
+   "fpk133"
   ],
   "deadline": {
    "months": 6,
@@ -3829,9 +4334,33 @@
     "group": "Xizmat",
     "docs": [
      "agency",
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Xizmat",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Xizmat",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -3911,7 +4440,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{provider}}, manzil: {{providerAddress}}"
     ],
@@ -3931,7 +4460,8 @@
      "Da’vo arizasining javobgar uchun nusxasi",
      "Pasport nusxasi",
      "To‘lov kvitansiyalari nusxasi",
-     "Talabnoma nusxasi"
+     "Talabnoma nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "iste’molchi huquqlarini himoya qilish to‘g‘risida",
     "howto": {
@@ -3939,7 +4469,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{provider}}, manzil: {{providerAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga iste’molchi huquqlarini himoya qilish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -3951,6 +4521,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "providerAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -4015,7 +4592,8 @@
    "bank_jav",
    "cbu_shik",
    "bank_sir",
-   "fk150"
+   "fk150",
+   "fpk133"
   ],
   "deadline": {
    "none": true,
@@ -4124,9 +4702,33 @@
     "type": "text",
     "group": "Bank va amaliyot",
     "docs": [
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Mirzo Ulug‘bek tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Bank va amaliyot",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Bank va amaliyot",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -4207,7 +4809,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{bank}}, manzil: {{bankAddress}}",
      "Da’vo summasi: {{amount}}"
@@ -4227,7 +4829,8 @@
      "Da’vo arizasining javobgar uchun nusxasi",
      "Pasport nusxasi",
      "Karta (hisob) ko‘chirmasi",
-     "Bankka ariza nusxasi"
+     "Bankka ariza nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "ruxsatsiz yechilgan pulni undirish to‘g‘risida",
     "howto": {
@@ -4235,7 +4838,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{bank}}, manzil: {{bankAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga ruxsatsiz yechilgan pulni undirish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -4247,6 +4890,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "bankAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -4316,7 +4966,8 @@
    "mfo28",
    "mfo33",
    "cbu_shik",
-   "fk1023"
+   "fk1023",
+   "fpk133"
   ],
   "deadline": {
    "years": 3,
@@ -4423,9 +5074,33 @@
     "type": "text",
     "group": "Qarz",
     "docs": [
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Shayxontohur tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Qarz",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Qarz",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -4507,7 +5182,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{lender}}, manzil: {{lenderAddress}}"
     ],
@@ -4528,7 +5203,8 @@
      "Pasport nusxasi",
      "Shartnoma nusxasi",
      "To‘lov jadvali",
-     "To‘lovlar ko‘chirmasi"
+     "To‘lovlar ko‘chirmasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "ortiqcha undirilgan summani undirish to‘g‘risida",
     "howto": {
@@ -4536,7 +5212,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{lender}}, manzil: {{lenderAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga ortiqcha undirilgan summani undirish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -4548,6 +5264,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "lenderAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -4719,6 +5442,17 @@
      "court"
     ],
     "hint": "Mirobod tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Jarima va avtomobil",
+    "docs": [
+     "court"
+    ],
+    "hint": "Jinoyat ishlari bo‘yicha Mirobod tuman sudi"
    }
   ],
   "docs": [
@@ -4764,7 +5498,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} jinoyat ishlari bo‘yicha sudiga",
+     "{{court}}ga",
      "Shikoyatchi: {{applicant}}",
      "Qaror chiqargan organ: {{organ}}"
     ],
@@ -4796,6 +5530,38 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "criminal",
+   "from": [
+    "organ"
+   ],
+   "rule": "Shikoyat odatda jarima qarorini chiqargan organ joylashgan tumandagi (shahardagi) jinoyat ishlari bo‘yicha sudga beriladi. Sud nomi tuman nomidan avtomatik tuziladi; kerak bo‘lsa o‘zgartiring."
+  },
+  "whereTo": {
+   "for": "higher",
+   "field": "higherOrgan",
+   "from": [
+    "organ",
+    "district",
+    "address"
+   ],
+   "note": "Shikoyat qaror nusxasi olingan kundan 10 kun ichida beriladi (MJtK). YHXX jarimasi ustidan my.gov.uz orqali elektron shikoyat qilish ham mumkin.",
+   "items": [
+    {
+     "t": "Jarima solgan inspektor xizmat qiladigan IIB YHXX bo‘linmasining boshlig‘i",
+     "when": "Bo‘linma nomi jarima qarorida yoki my.gov.uz’dagi qaror kartasida ko‘rsatiladi."
+    },
+    {
+     "t": "{prokuratura}",
+     "fill": true,
+     "when": "Mansabdor shaxs qonunni ochiq buzgan bo‘lsa: prokuratura qonunlar ijrosini nazorat qiladi."
+    },
+    {
+     "t": "Sud",
+     "when": "Yuqori organga yozmasdan to‘g‘ridan-to‘g‘ri jinoyat ishlari bo‘yicha sudga ham shikoyat qilish mumkin («Sudga» hujjati)."
+    }
+   ]
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -4966,6 +5732,17 @@
      "court"
     ],
     "hint": "Olmazor tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Sug‘urta va zarar",
+    "docs": [
+     "court"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
    }
   ],
   "docs": [
@@ -5006,7 +5783,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{insurer}}, manzil: {{insurerAddress}}"
     ],
@@ -5026,7 +5803,8 @@
      "Pasport nusxasi",
      "YTH ma’lumotnomasi nusxasi",
      "Sug‘urtachiga ariza nusxasi",
-     "Baholash hisoboti nusxasi"
+     "Baholash hisoboti nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "sug‘urta to‘lovini undirish to‘g‘risida",
     "howto": {
@@ -5034,7 +5812,7 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Majburiy sug‘urta shartnomasidan kelib chiqadigan da’voda jabrlanuvchi davlat bojini to‘lamaydi (Davlat boji to‘g‘risidagi qonun, 8-modda 22¹-band)."
      ],
      "links": [
       {
@@ -5046,6 +5824,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "insurerAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -5203,6 +5988,17 @@
      "court"
     ],
     "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Pensiya",
+    "docs": [
+     "court"
+    ],
+    "hint": "Toshkent tumanlararo ma’muriy sudi"
    }
   ],
   "docs": [
@@ -5248,7 +6044,7 @@
     "id": "court",
     "label": "Ma’muriy sudga",
     "to": [
-     "{{district}} tumanlararo ma’muriy sudiga",
+     "{{court}}ga",
      "Arizachi: {{applicant}}",
      "Javobgar: {{agency}}"
     ],
@@ -5264,10 +6060,11 @@
      "javobgarni pensiyani qonunga muvofiq tayinlash (qayta hisoblash)ga majburlashni."
     ],
     "attach": [
-     "Ariza nusxasi (javobgar uchun)",
+     "Ariza va ilovalar nusxalari javobgarga yuborilganini tasdiqlovchi pochta kvitansiyasi",
      "Pasport nusxasi",
      "Qaror nusxasi",
-     "Staj va ish haqini tasdiqlovchi hujjatlar nusxasi"
+     "Staj va ish haqini tasdiqlovchi hujjatlar nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "pensiya bo‘yicha qarorni qonunga xilof deb topish to‘g‘risida",
     "howto": {
@@ -5275,7 +6072,7 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
+      "Ariza va ilovalar nusxasini javobgar organga buyurtma xat bilan yuboring va pochta kvitansiyasini arizaga ilova qiling (MSIYK 130-modda). Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
      ],
      "links": [
       {
@@ -5287,6 +6084,39 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "admin",
+   "from": [
+    "agency"
+   ],
+   "rule": "Ariza qarori yoki harakati ustidan shikoyat qilinayotgan organ joylashgan hududdagi tumanlararo ma’muriy sudga beriladi (MSIYK 32-modda). Sud nomi organ yoki tuman nomidan avtomatik aniqlanadi."
+  },
+  "whereTo": {
+   "for": "higher",
+   "field": "higherAgency",
+   "from": [
+    "agency",
+    "district",
+    "address"
+   ],
+   "note": "Pensiya bo‘yicha qaror ustidan yuqori organga yoki sudga shikoyat qilinadi (Pensiya ta’minoti to‘g‘risidagi qonun, 48-modda).",
+   "items": [
+    {
+     "t": "Byudjetdan tashqari Pensiya jamg‘armasining {by} boshqarmasi",
+     "fill": true,
+     "when": "Tuman (shahar) bo‘limi qarori ustidan — birinchi navbatda."
+    },
+    {
+     "t": "O‘zbekiston Respublikasi Iqtisodiyot va moliya vazirligi huzuridagi Byudjetdan tashqari Pensiya jamg‘armasi",
+     "fill": true,
+     "when": "Viloyat (shahar) boshqarmasi ham rad etsa."
+    },
+    {
+     "t": "Sud",
+     "when": "Yuqori organga yozish majburiy emas: qaror ustidan to‘g‘ridan-to‘g‘ri ma’muriy sudga ham ariza berishingiz mumkin («Ma’muriy sudga» hujjati)."
+    }
+   ]
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -5446,6 +6276,17 @@
      "court"
     ],
     "hint": "Chilonzor tumani"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Nafaqa",
+    "docs": [
+     "court"
+    ],
+    "hint": "Toshkent tumanlararo ma’muriy sudi"
    }
   ],
   "docs": [
@@ -5492,7 +6333,7 @@
     "id": "court",
     "label": "Ma’muriy sudga",
     "to": [
-     "{{district}} tumanlararo ma’muriy sudiga",
+     "{{court}}ga",
      "Arizachi: {{applicant}}",
      "Javobgar: {{agency}}"
     ],
@@ -5508,10 +6349,11 @@
      "javobgarni nafaqa tayinlash masalasini qonunga muvofiq qayta ko‘rib chiqishga majburlashni."
     ],
     "attach": [
-     "Ariza nusxasi (javobgar uchun)",
+     "Ariza va ilovalar nusxalari javobgarga yuborilganini tasdiqlovchi pochta kvitansiyasi",
      "Pasport nusxasi",
      "Rad javobi nusxasi",
-     "Daromad va oila tarkibi haqidagi ma’lumotnomalar"
+     "Daromad va oila tarkibi haqidagi ma’lumotnomalar",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "nafaqa tayinlashni rad etish to‘g‘risidagi qarorni qonunga xilof deb topish to‘g‘risida",
     "howto": {
@@ -5519,7 +6361,7 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
+      "Ariza va ilovalar nusxasini javobgar organga buyurtma xat bilan yuboring va pochta kvitansiyasini arizaga ilova qiling (MSIYK 130-modda). Jismoniy shaxslar ma’muriy sudga ariza berishda davlat boji to‘lamaydi; ariza rad etilsa, BHMning 70 foizi undiriladi."
      ],
      "links": [
       {
@@ -5531,6 +6373,39 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "admin",
+   "from": [
+    "agency"
+   ],
+   "rule": "Ariza qarori yoki harakati ustidan shikoyat qilinayotgan organ joylashgan hududdagi tumanlararo ma’muriy sudga beriladi (MSIYK 32-modda). Sud nomi organ yoki tuman nomidan avtomatik aniqlanadi."
+  },
+  "whereTo": {
+   "for": "higher",
+   "field": "higherAgency",
+   "from": [
+    "agency",
+    "district",
+    "address"
+   ],
+   "note": "Nafaqa bo‘yicha rad javobi ustidan yuqori organga yoki sudga shikoyat qilinadi.",
+   "items": [
+    {
+     "t": "Ijtimoiy himoya milliy agentligining {by} boshqarmasi",
+     "fill": true,
+     "when": "Tuman (shahar) «Inson» markazi yoki bo‘limi rad etsa."
+    },
+    {
+     "t": "O‘zbekiston Respublikasi Prezidenti huzuridagi Ijtimoiy himoya milliy agentligi",
+     "fill": true,
+     "when": "Hududiy boshqarma ham rad etsa."
+    },
+    {
+     "t": "Sud",
+     "when": "Yuqori organga yozish majburiy emas: qaror ustidan to‘g‘ridan-to‘g‘ri ma’muriy sudga ham ariza berishingiz mumkin («Ma’muriy sudga» hujjati)."
+    }
+   ]
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -5595,7 +6470,8 @@
    "xab15_1",
    "xab20",
    "xab17",
-   "fk150"
+   "fk150",
+   "fpk133"
   ],
   "deadline": {
    "years": 3,
@@ -5692,9 +6568,33 @@
     "type": "text",
     "group": "Agentlik",
     "docs": [
-     "court"
+     "court",
+     "boji"
     ],
     "hint": "Qarshi shahri"
+   },
+   {
+    "k": "court",
+    "label": "Sud",
+    "ph": "sud nomi",
+    "type": "court",
+    "group": "Agentlik",
+    "docs": [
+     "court",
+     "boji"
+    ],
+    "hint": "Fuqarolik ishlari bo‘yicha Mirobod tumanlararo sudi"
+   },
+   {
+    "k": "hardship",
+    "label": "Mulkiy ahvolingiz: nega bojni hozir to‘lay olmaysiz",
+    "ph": "mulkiy ahvol",
+    "type": "text",
+    "group": "Agentlik",
+    "docs": [
+     "boji"
+    ],
+    "hint": "ishsizman; oilada 3 nafar voyaga yetmagan bola bor; oylik daromadim 1,5 mln so‘m"
    }
   ],
   "docs": [
@@ -5775,7 +6675,7 @@
     "id": "court",
     "label": "Sudga",
     "to": [
-     "{{district}} fuqarolik ishlari bo‘yicha tumanlararo sudiga",
+     "{{court}}ga",
      "Da’vogar: {{applicant}}",
      "Javobgar: {{recruiter}}, manzil: {{recruiterAddress}}",
      "Da’vo summasi: {{paid}}"
@@ -5796,7 +6696,8 @@
      "Pasport nusxasi",
      "Shartnoma nusxasi",
      "To‘lov hujjati nusxasi",
-     "Talabnoma nusxasi"
+     "Talabnoma nusxasi",
+     "Pochta xarajatlari to‘langanligi to‘g‘risidagi kvitansiya"
     ],
     "sub": "to‘langan pulni undirish to‘g‘risida",
     "howto": {
@@ -5804,7 +6705,47 @@
       "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
       "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
       "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
-      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang."
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
+     ],
+     "links": [
+      {
+       "label": "Sudlarning interaktiv xizmatlari — my.sud.uz",
+       "url": "https://my.sud.uz/"
+      }
+     ]
+    },
+    "office": "courts"
+   },
+   {
+    "id": "boji",
+    "label": "Davlat boji: iltimosnoma",
+    "to": [
+     "{{court}}ga",
+     "Da’vogar: {{applicant}}",
+     "Javobgar: {{recruiter}}, manzil: {{recruiterAddress}}"
+    ],
+    "title": "ILTIMOSNOMA",
+    "body": [
+     "Men ushbu sudga to‘langan pulni undirish to‘g‘risidagi da’vo arizasini taqdim etmoqdaman.",
+     "Mening mulkiy ahvolim davlat bojini da’vo arizasi berilayotgan paytda to‘liq to‘lash imkonini bermaydi: {{hardship}}.",
+     "Fuqarolik protsessual kodeksining 133-moddasiga ko‘ra sud tarafning mulkiy ahvoliga qarab davlat daromadiga undiriladigan sud xarajatlarini to‘lashni kechiktirishi yoki bo‘lib-bo‘lib to‘lashga ruxsat berishi, shuningdek ularning miqdorini kamaytirishi mumkin."
+    ],
+    "askLabel": "So‘rayman:",
+    "asks": [
+     "davlat bojini to‘lashni ish bo‘yicha hal qiluv qarori chiqarilgunga qadar kechiktirishni;",
+     "yoki uni bo‘lib-bo‘lib to‘lashga ruxsat berishni;",
+     "yoki davlat boji miqdorini kamaytirishni."
+    ],
+    "attach": [
+     "Mulkiy ahvolni tasdiqlovchi hujjatlar (daromad, oila tarkibi, nogironlik haqida ma’lumotnomalar)"
+    ],
+    "sub": "davlat bojini to‘lashni kechiktirish, bo‘lib-bo‘lib to‘lash yoki miqdorini kamaytirish to‘g‘risida",
+    "howto": {
+     "steps": [
+      "Arizani imzolang va ilovalarni qo‘shing. Qog‘ozda topshirilsa, ishda ishtirok etuvchi shaxslar soniga qarab nusxalar ilova qilinadi.",
+      "Elektron yo‘l: sudlarning interaktiv xizmatlari portali orqali. Ariza holatini shaxsiy kabinetda kuzatasiz.",
+      "Qog‘ozda: tegishli sud devonxonasiga shaxsan yoki pochta orqali.",
+      "Davlat boji to‘lanishi mumkin: miqdori va imtiyozlar bor-yo‘qligini sud devonxonasida yoki my.sud.uz da aniqlang. Iste’molchi sifatida huquqingiz buzilgan bo‘lsa, boj to‘lanmaydi (Davlat boji to‘g‘risidagi qonun, 8-modda). Bojni hozir to‘lay olmasangiz, «Davlat boji: iltimosnoma» hujjatini da’vo bilan birga bering (FPK 133-modda)."
      ],
      "links": [
       {
@@ -5816,6 +6757,13 @@
     "office": "courts"
    }
   ],
+  "court": {
+   "kind": "civil",
+   "from": [
+    "recruiterAddress"
+   ],
+   "rule": "Da’vo javobgar yashaydigan (joylashgan) tumandagi sudga beriladi (FPK 33-modda). Tumanni yozsangiz, sud nomi avtomatik qo‘yiladi; kerak bo‘lsa o‘zgartiring."
+  },
   "evidenceInfo": [
    {
     "need": "m",
@@ -6342,6 +7290,36 @@
     }
    }
   ],
+  "whereTo": {
+   "for": "*",
+   "field": "body",
+   "from": [
+    "body",
+    "address"
+   ],
+   "note": "Murojaat masalani hal qilish vakolatiga ega organga yuboriladi. Idoraning aniq nomini murojaat.gov.uz katalogidan topish mumkin.",
+   "items": [
+    {
+     "t": "{placeHokimlik}",
+     "fill": true,
+     "when": "Mahalliy masalalar: yo‘l va ko‘chalar, ko‘cha chiroqlari, obodonlashtirish, maktab va bog‘cha, kommunal xizmatlar."
+    },
+    {
+     "t": "{hokimlik}",
+     "fill": true,
+     "when": "Masala bir nechta tumanga taalluqli bo‘lsa yoki tuman (shahar) hokimligi hal qilmasa."
+    },
+    {
+     "t": "Tegishli vazirlik, qo‘mita yoki agentlik",
+     "when": "Soha masalalari: soliq, sog‘liqni saqlash, ta’lim, pensiya va boshqalar."
+    },
+    {
+     "t": "O‘zbekiston Respublikasi Prezidentining Virtual qabulxonasi",
+     "fill": true,
+     "when": "Qaysi idoraga yozishni bilmasangiz: Virtual qabulxona murojaatni tegishli organga yo‘naltiradi."
+    }
+   ]
+  },
   "evidenceInfo": [
    {
     "need": "m",

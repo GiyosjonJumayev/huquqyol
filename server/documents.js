@@ -1,8 +1,9 @@
-import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer, PageNumber } from "docx";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer, PageNumber, BorderStyle } from "docx";
 import PDFDocument from "pdfkit";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { kbFor } from "./kb.js";
+import { kbFor, COURTS } from "./kb.js";
+import { courtFromForm } from "../public/courts.js";
 import { deadlineFrom, parseISO, startOfDay, addMonths } from "./dates.js";
 import { alimonyShare } from "./plan.js";
 import { fmtDate, fmtMoney, termText } from "../public/i18n.js";
@@ -32,6 +33,8 @@ function makeContext(s, form, trigger, deadline, now, kb){
     else if (f.type === "select"){ const o = f.options.find(o => o.v === raw); if (o){ vals[k] = o.doc; if (o.court) vals[k + "Court"] = o.court; } }
     else vals[k] = raw;
   }
+  // Sud nomi yozilmagan bo‘lsa — tuman yoki manzildan (sayt bilan bir xil mantiq; bot ham shundan foydalanadi)
+  if (!vals.court && s.court){ const c = courtFromForm(COURTS, s.court, form, { cyr: lang === "ru" }); if (c?.name) vals.court = c.name; }
   vals.trigger = fmtDate(trigger, lang);
   if (deadline) vals.deadline = fmtDate(deadline, lang);
   vals.deadlineTerm = termText(s.deadline, lang);
@@ -68,7 +71,7 @@ const field = (k, ctx) => {
 const P = (v, ph, k) => (v ? { v: String(v) } : { ph, k });
 
 // Hujjat modeli: bloklar ro‘yxati. Ko‘rinish (JSON), DOCX va PDF shu modeldan yasaladi.
-export function documentModel({ scenario, recipient, form = {}, evidence = [], triggerDate, today = new Date(), lang = "uz" }){
+export function documentModel({ scenario, recipient, form = {}, evidence = [], triggerDate, today = new Date(), lang = "uz", letterhead = [] }){
   const kb = kbFor(lang === "ru" ? "ru" : "uz");
   const s = kb.SCENARIO_BY_ID[scenario];
   if (!s) throw Object.assign(new Error("Noma’lum holat."), { status: 400 });
@@ -80,6 +83,7 @@ export function documentModel({ scenario, recipient, form = {}, evidence = [], t
   const R = t => render(t, ctx);
   const B = [];
 
+  if (letterhead.length) B.push(headBlock(letterhead));            // Yurist Pro: o‘z blankasi (rekvizitlar)
   const lines = tpl.to.map(R).filter(Boolean);
   B.push({ t:"addr", lines });
   B.push({ t:"title", text: tpl.title });
@@ -107,6 +111,22 @@ export function documentModel({ scenario, recipient, form = {}, evidence = [], t
   return { scenario, recipient: tpl.id, lang: kb.lang, blocks: B, missing };
 }
 
+// Blanka: yurist yoki tashkilot rekvizitlari (hujjat tepasida, markazda, ostida chiziq)
+const headBlock = lines => ({ t:"head", lines: lines.map(l => [{ v: l }]) });
+
+// Yurist Pro: o‘z shabloni — erkin matn (bo‘sh qator — yangi xatboshi), blanka, sana va imzo
+export function customModel({ title = "", text, letterhead = [], today = new Date(), lang = "uz" }){
+  const W = DOC[lang === "ru" ? "ru" : "uz"], B = [];
+  if (letterhead.length) B.push(headBlock(letterhead));
+  if (title) B.push({ t:"title", text: title });
+  for (const para of text.split(/\n{2,}/)){
+    const lines = para.split("\n").map(s => s.trim()).filter(Boolean);
+    if (lines.length) B.push({ t:"p", parts:[{ v: lines.join(" ") }] });
+  }
+  B.push({ t:"sign", left: fmtDate(startOfDay(today), lang === "ru" ? "ru" : "uz"), right:[{ v: W.sign }] });
+  return { scenario: null, recipient: "custom", lang, blocks: B, missing: [] };
+}
+
 const partText = ps => ps.map(p => p.v ?? `[${p.ph}]`).join("");
 
 // ---------- DOCX ----------
@@ -116,7 +136,9 @@ export async function toDocx(model){
   const runs = ps => ps.map(p => run(p.v ?? `[${p.ph}]`));
   const children = [];
   for (const b of model.blocks){
-    if (b.t === "addr") b.lines.forEach((l, i) => children.push(new Paragraph({ children: runs(l), indent:{ left: 4820 }, spacing:{ after: i === b.lines.length - 1 ? 240 : 40 } })));
+    if (b.t === "head") b.lines.forEach((l, i) => children.push(new Paragraph({ children: l.map(p => run(p.v, { b: i === 0 })), alignment: AlignmentType.CENTER,
+      spacing:{ after: i === b.lines.length - 1 ? 360 : 0 }, ...(i === b.lines.length - 1 ? { border:{ bottom:{ style: BorderStyle.SINGLE, size: 8, color:"000000", space: 4 } } } : {}) })));
+    else if (b.t === "addr") b.lines.forEach((l, i) => children.push(new Paragraph({ children: runs(l), indent:{ left: 4820 }, spacing:{ after: i === b.lines.length - 1 ? 240 : 40 } })));
     else if (b.t === "title") children.push(new Paragraph({ children:[run(b.text, { b:true })], alignment: AlignmentType.CENTER, spacing:{ before:120, after:40 } }));
     else if (b.t === "sub") children.push(new Paragraph({ children:[run(b.text, { i:true })], alignment: AlignmentType.CENTER, spacing:{ after:240 } }));
     else if (b.t === "p") children.push(new Paragraph({ children: runs(b.parts), alignment: AlignmentType.JUSTIFIED, indent:{ firstLine: 709 }, spacing:{ after:80, line:300 } }));
@@ -146,7 +168,12 @@ export function toPdf(model){
     const W = doc.page.width - 85 - 42, size = 11.5;
     doc.fontSize(size);
     for (const b of model.blocks){
-      if (b.t === "addr"){ b.lines.forEach(l => doc.font("R").text(partText(l), 85 + W * 0.48, undefined, { width: W * 0.52 })); doc.moveDown(1); }
+      if (b.t === "head"){
+        b.lines.forEach((l, i) => doc.font(i === 0 ? "B" : "R").fontSize(i === 0 ? size : size - 1.5).text(partText(l), 85, undefined, { width: W, align:"center" }));
+        doc.fontSize(size); doc.moveDown(0.3);
+        doc.moveTo(85, doc.y).lineTo(85 + W, doc.y).lineWidth(0.8).stroke(); doc.moveDown(1);
+      }
+      else if (b.t === "addr"){ b.lines.forEach(l => doc.font("R").text(partText(l), 85 + W * 0.48, undefined, { width: W * 0.52 })); doc.moveDown(1); }
       else if (b.t === "title") doc.font("B").text(b.text, 85, undefined, { width: W, align:"center", characterSpacing: 1 });
       else if (b.t === "sub"){ doc.font("I").text(b.text, 85, undefined, { width: W, align:"center" }); doc.moveDown(0.8); }
       else if (b.t === "p") doc.font("R").text(partText(b.parts), 85, undefined, { width: W, align:"justify", indent: 28, paragraphGap: 4, lineGap: 1.5 });

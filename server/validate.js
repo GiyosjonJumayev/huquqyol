@@ -83,5 +83,6 @@ export function vDocument(body){
   const recipient = s.docs.some(d => d.id === body?.recipient) ? body.recipient : s.docs[0].id;
   const n = s.evidence.length;
   const evidence = Array.isArray(body?.evidence) ? [...new Set(body.evidence.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < n))] : [];
-  return { scenario: s.id, recipient, form: vForm(s, body?.form, l), evidence, triggerDate: date(body?.triggerDate, dateLabel(l)), lang: l };
+  const letterhead = Array.isArray(body?.letterhead) ? body.letterhead.slice(0, 4).map(x => clean(x, 120)).filter(Boolean) : [];
+  return { scenario: s.id, recipient, form: vForm(s, body?.form, l), evidence, triggerDate: date(body?.triggerDate, dateLabel(l)), lang: l, letterhead };
 }

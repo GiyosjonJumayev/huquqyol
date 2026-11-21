@@ -32,6 +32,24 @@ const M = {
   num:{ uz:"{label} noto‘g‘ri.", ru:"{label}: неверное значение." },
   option:{ uz:"{label}: noma’lum variant.", ru:"{label}: неизвестный вариант." },
   phone:{ uz:"Telefon raqami noto‘g‘ri.", ru:"Неверный номер телефона." },
+  email:{ uz:"E-pochta manzili noto‘g‘ri.", ru:"Неверный адрес эл. почты." },
+  weakPassword:{ uz:"Parol kamida 8 belgi bo‘lsin va harf hamda raqamdan iborat bo‘lsin.", ru:"Пароль — не менее 8 символов, буквы и цифры." },
+  emailTaken:{ uz:"Bu e-pochta bilan hisob allaqachon bor. Kirish sahifasidan foydalaning.", ru:"Аккаунт с этой почтой уже существует. Воспользуйтесь входом." },
+  badLogin:{ uz:"E-pochta yoki parol noto‘g‘ri.", ru:"Неверная почта или пароль." },
+  locked:{ uz:"Ko‘p marta noto‘g‘ri parol kiritildi. 15 daqiqadan keyin qayta urinib ko‘ring.", ru:"Слишком много неверных попыток. Попробуйте через 15 минут." },
+  terms:{ uz:"Foydalanish shartlariga roziligingizni belgilang.", ru:"Отметьте согласие с условиями использования." },
+  inn:{ uz:"STIR 9 ta raqamdan iborat bo‘lishi kerak.", ru:"ИНН должен состоять из 9 цифр." },
+  auth:{ uz:"Avval hisobingizga kiring.", ru:"Сначала войдите в аккаунт." },
+  forbidden:{ uz:"Bu amal uchun ruxsat yo‘q.", ru:"Нет доступа к этому действию." },
+  dbOff:{ uz:"Hisoblar hali ulanmagan: serverda ma’lumotlar bazasi sozlanmagan.", ru:"Аккаунты пока не подключены: на сервере не настроена база данных." },
+  message:{ uz:"Vaziyatni kamida bir gap bilan yozing.", ru:"Опишите ситуацию хотя бы одним предложением." },
+  lawyerNotFound:{ uz:"Yurist topilmadi yoki hali tasdiqlanmagan.", ru:"Юрист не найден или ещё не подтверждён." },
+  ownProfile:{ uz:"O‘zingizga so‘rov yubora olmaysiz.", ru:"Нельзя отправить запрос самому себе." },
+  badState:{ uz:"Bu amalni hozirgi holatda bajarib bo‘lmaydi. Sahifani yangilang.", ru:"Это действие недоступно в текущем статусе. Обновите страницу." },
+  ownRole:{ uz:"O‘zingizni admin rolidan chiqara olmaysiz.", ru:"Нельзя снять с себя роль администратора." },
+  required:{ uz:"Majburiy maydon to‘ldirilmagan: {label}.", ru:"Не заполнено обязательное поле: {label}." },
+  consent:{ uz:"Ma’lumotlaringizni katalog uchun ko‘rib chiqishga roziligingizni belgilang.", ru:"Отметьте согласие на рассмотрение данных для каталога." },
+  docText:{ uz:"Hujjat matnini yozing.", ru:"Введите текст документа." },
   short:{ uz:"Vaziyatni bir-ikki gap bilan yozing.", ru:"Опишите ситуацию в одном-двух предложениях." },
   long:{ uz:"Matn juda uzun (4000 belgigacha).", ru:"Текст слишком длинный (до 4000 символов)." },
   dateLabel:{ uz:"Sana", ru:"Дата" },
@@ -59,7 +77,7 @@ export function msg(lang, key, vars = {}){
 
 // Javobdagi barcha matnlarni kirillga o‘girish. Identifikator, URL va texnik kalitlar o‘zgarmaydi.
 const KEEP = new Set(["id","k","v","type","domain","law","scenario","recipient","level","calc","url","lawUrl","lex","source","model",
-  "partyField","amountField","fallbackReason","lang","fmt","docType","analysisSource"]);
+  "partyField","amountField","fallbackReason","lang","fmt","docType","analysisSource","from","field","kind","for"]);
 const SKIP_TREE = new Set(["retrieval", "keywords", "raw", "form", "photo"]);   // photo — hujjatdan o‘qilgan asl matn
 export function deepCyr(x, key){
   if (typeof x === "string") return KEEP.has(key) ? x : toCyrillic(x);

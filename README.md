@@ -32,7 +32,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 
 | Sohalar / holatlar | Normalar | Hujjat shablonlari | Dalillar | Idoralar | Kalkulyatorlar | Testlar |
 |---|---|---|---|---|---|---|
-| 12 / 24 | 62 (55 tasi modda raqami bilan) | 63 × 3 til = 189 | 123 | 14 | 5 | 115 unit + 12 brauzer |
+| 12 / 24 | 67 (60 tasi modda raqami bilan) | 71 × 3 til = 213 | 123 | 14 | 5 | 115 unit + 12 brauzer |
 
 ## Ko‘rinishlar
 
@@ -47,7 +47,7 @@ Huquqi buzilgan fuqaro uch narsani bilmaydi: qaysi qonun himoya qiladi, qayerga 
 ```mermaid
 flowchart LR
   U[Fuqaro: matn / ovoz / soha] --> A["/api/analyze"]
-  A --> R[BM25 qidiruv + kalit so‘zlar<br/>62 norma, 24 holat]
+  A --> R[BM25 qidiruv + kalit so‘zlar<br/>67 norma, 24 holat]
   R --> C{Claude bormi?}
   C -- ha --> AI[Claude: tasniflash va faktlar<br/>faqat bazadagi normalar]
   C -- yo‘q --> RU[Qoidalar bo‘yicha tasniflash]
@@ -114,7 +114,7 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 115 ta unit/API test (jumladan ruscha, kirillcha, rasmdan OCR, PDF va Telegram bot)
+npm test                  # 132 ta unit/API test (TEST_DATABASE_URL bilan — PostgreSQL oqimi ham)
 npm run test:e2e          # 12 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
 ```
 
@@ -126,6 +126,34 @@ Docker orqali:
 docker build -t huquqyol .
 docker run -p 3000:3000 -e ANTHROPIC_API_KEY=sk-ant-... huquqyol
 ```
+
+### Hisoblar, obunalar va admin paneli (PostgreSQL)
+
+Fuqaro uchun reja va hujjat tayyorlash bazasiz ishlaydi. Ro‘yxatdan o‘tish, kirish, yuristlarga so‘rov va kelishuvlar,
+obunalar va admin paneli uchun PostgreSQL kerak (`DATABASE_URL`). Jadvallar ilova ishga tushganda avtomatik yaratiladi.
+
+```bash
+createdb huquqyol
+export DATABASE_URL=postgres://huquqyol:PAROL@127.0.0.1:5432/huquqyol
+export ADMIN_EMAILS=siz@example.com          # shu e-pochta bilan ro‘yxatdan o‘tgan foydalanuvchi — admin
+npm start                                    # /royxat, /kirish, /hisob, /admin
+TEST_DATABASE_URL=postgres://.../huquqyol_test npm test   # baza testlari (test bazasi tozalanadi!)
+```
+
+| Sahifa | Kim uchun | Nima bor |
+|---|---|---|
+| `/yuristlar`, `/yuristlar/:id` | Fuqaro | Katalog (soha, hudud, shakl), profil, narxlar, aloqa, konsultatsiyaga yozilish |
+| `/tariflar` | Yurist, firma, tashkilot | Fuqaro (bepul), Yurist Pro, Firma, Tashkilot; obuna |
+| `/kabinet` | Yurist, tashkilot yuristi | Mijozlar va ishlar, muddatlar kalendari (.ics), blanka, shablonlar, tashkilot hujjatlari, katalog profili |
+| `/hisob` | Hammasi | Obuna holati, so‘rovlar va kelishuvlar (taklif → rozilik → bajarildi), parolni almashtirish |
+| `/admin` | Admin | Sohalar bo‘yicha murojaatlar, oylik daromad va MRR, obunalar (tashkilot/korxona), yuristlar bo‘yicha murojaatlar, kelishuvlar, moderatsiya, to‘lovni tasdiqlash, rollar |
+
+Biznes model: obunalar (Yurist Pro 149 000, Firma 490 000 so‘m/oy, Tashkilot — kelishuv bo‘yicha; ro‘yxatda 14 kun sinov)
+va kelishuvlardan platforma komissiyasi (`COMMISSION_PCT`, standart 10%). To‘lov tizimi (Click/Payme) ulanmaguncha
+to‘lovni admin tasdiqlaydi; tasdiqlangach obuna 30 kunga faollashadi. Katalogdagi `namuna-*` profillar — namuna, haqiqiy yurist emas.
+
+Xavfsizlik: parol scrypt (tuz bilan), sessiya tokeni HttpOnly cookie da, bazada faqat SHA-256 xeshi; 5 ta xato urinishdan
+keyin 15 daqiqa blok; IP bo‘yicha rate limit; barcha POST lar faqat o‘z saytidan (Fetch Metadata).
 
 Bepul joylashtirish: Render’da repo ulanadi, `render.yaml` hamma narsani o‘zi sozlaydi (faqat `ANTHROPIC_API_KEY` ni kiriting). Railway va boshqa platformalarda start buyrug‘i `npm start`.
 

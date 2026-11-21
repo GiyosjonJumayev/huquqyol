@@ -1,0 +1,578 @@
+{
+ "note": "NAMUNA profillar: haqiqiy yurist yoki advokat emas. Telefon raqamlari ataylab mavjud bo‘lmagan «00» kodli, e-pochta — example.com. Haqiqiy profillar faqat litsenziya tekshirilgandan keyin qo‘shiladi.",
+ "areas": {
+  "jinoyat": [
+   "Jinoyat ishlari",
+   "Уголовные дела"
+  ],
+  "soliq": [
+   "Soliq",
+   "Налоги"
+  ],
+  "biznes": [
+   "Biznes va korporativ",
+   "Бизнес и корпоративное право"
+  ],
+  "shartnoma": [
+   "Shartnomalar",
+   "Договоры"
+  ],
+  "meros": [
+   "Meros",
+   "Наследство"
+  ],
+  "yer": [
+   "Yer va ko‘chmas mulk",
+   "Земля и недвижимость"
+  ]
+ },
+ "list": [
+  {
+   "id": "namuna-1",
+   "demo": true,
+   "kind": "advokat",
+   "plan": "pro",
+   "name": "Dilnoza Karimova",
+   "firm": [
+    "«Adolat yo‘li» advokatlik byurosi (namuna)",
+    "Адвокатское бюро «Адолат йўли» (пример)"
+   ],
+   "headline": [
+    "Mehnat nizolari: ish haqi, ishdan bo‘shatish, ishga tiklash",
+    "Трудовые споры: зарплата, увольнение, восстановление на работе"
+   ],
+   "about": [
+    "Mehnat nizolarini avval sudgacha, mediatsiya va mehnat inspeksiyasi orqali hal qilishga harakat qilaman. Kerak bo‘lsa, sudda vakillik qilaman.",
+    "Стараюсь решать трудовые споры до суда — через медиацию и инспекцию труда. При необходимости представляю интересы в суде."
+   ],
+   "region": "Toshkent shahri",
+   "district": "Mirobod tumani",
+   "address": [
+    "Mirobod tumani (namuna manzil)",
+    "Мирабадский район (пример адреса)"
+   ],
+   "experience": 11,
+   "langs": [
+    "uz",
+    "ru"
+   ],
+   "areas": [
+    "mehnat",
+    "migrant",
+    "shartnoma"
+   ],
+   "formats": [
+    "online",
+    "office"
+   ],
+   "hours": [
+    "Du–Ju 09:00–18:00",
+    "Пн–Пт 09:00–18:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Birinchi konsultatsiya",
+      "Первая консультация"
+     ],
+     "min": 30,
+     "format": "online",
+     "price": 0
+    },
+    {
+     "name": [
+      "Konsultatsiya va hujjatlarni ko‘rib chiqish",
+      "Консультация и разбор документов"
+     ],
+     "min": 60,
+     "format": "office",
+     "price": 300000
+    },
+    {
+     "name": [
+      "Sudda vakillik (bir ish)",
+      "Представительство в суде (одно дело)"
+     ],
+     "format": "office",
+     "price": 3000000,
+     "from": true
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 01",
+    "email": "namuna1@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-2",
+   "demo": true,
+   "kind": "yurist",
+   "plan": "pro",
+   "name": "Aziz Rahimov",
+   "firm": "",
+   "headline": [
+    "Iste’molchi huquqlari, kommunal hisoblar, bank va mikroqarz",
+    "Права потребителей, коммунальные начисления, банки и микрозаймы"
+   ],
+   "about": [
+    "Sotuvchi, bank va kommunal korxonalarga talabnoma va shikoyatlar tayyorlayman, Markaziy bank va Raqobat qo‘mitasiga murojaat qilishda yordam beraman.",
+    "Готовлю претензии и жалобы продавцам, банкам и коммунальным службам, помогаю с обращениями в ЦБ и Комитет по конкуренции."
+   ],
+   "region": "Toshkent shahri",
+   "district": "Yunusobod tumani",
+   "address": [
+    "Yunusobod tumani (namuna manzil)",
+    "Юнусабадский район (пример адреса)"
+   ],
+   "experience": 6,
+   "langs": [
+    "uz",
+    "ru",
+    "en"
+   ],
+   "areas": [
+    "istemol",
+    "kommunal",
+    "bank"
+   ],
+   "formats": [
+    "online"
+   ],
+   "hours": [
+    "Du–Sh 10:00–20:00",
+    "Пн–Сб 10:00–20:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Onlayn konsultatsiya",
+      "Онлайн-консультация"
+     ],
+     "min": 30,
+     "format": "online",
+     "price": 150000
+    },
+    {
+     "name": [
+      "Talabnoma yoki shikoyat tayyorlash",
+      "Подготовка претензии или жалобы"
+     ],
+     "format": "online",
+     "price": 250000
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 02",
+    "email": "namuna2@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-3",
+   "demo": true,
+   "kind": "advokat",
+   "plan": "free",
+   "name": "Shahnoza Yo‘ldosheva",
+   "firm": "",
+   "headline": [
+    "Oila: aliment, ajrim, bolalar bilan bog‘liq nizolar",
+    "Семья: алименты, развод, споры о детях"
+   ],
+   "about": [
+    "Oilaviy nizolarda mijozning va bolalarning manfaatini birinchi o‘ringa qo‘yaman.",
+    "В семейных спорах ставлю на первое место интересы клиента и детей."
+   ],
+   "region": "Samarqand viloyati",
+   "district": "Samarqand shahri",
+   "address": [
+    "Samarqand shahri (namuna manzil)",
+    "город Самарканд (пример адреса)"
+   ],
+   "experience": 8,
+   "langs": [
+    "uz",
+    "ru"
+   ],
+   "areas": [
+    "oila",
+    "meros"
+   ],
+   "formats": [
+    "online",
+    "office"
+   ],
+   "hours": [
+    "Du–Ju 09:00–17:00",
+    "Пн–Пт 09:00–17:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Konsultatsiya",
+      "Консультация"
+     ],
+     "min": 45,
+     "format": "office",
+     "price": 200000
+    },
+    {
+     "name": [
+      "Aliment da’vosi bo‘yicha vakillik",
+      "Представительство по иску об алиментах"
+     ],
+     "format": "office",
+     "price": 1500000,
+     "from": true
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 03",
+    "email": "namuna3@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-4",
+   "demo": true,
+   "kind": "yurist",
+   "plan": "pro",
+   "name": "Bekzod Tursunov",
+   "firm": [
+    "«Ijara Huquq» yuridik firmasi (namuna)",
+    "Юридическая фирма «Ижара Ҳуқуқ» (пример)"
+   ],
+   "headline": [
+    "Ijara, uy-joy, qarz va shartnomalar",
+    "Аренда, жильё, долги и договоры"
+   ],
+   "about": [
+    "Ijara shartnomalarini tuzish va nizolarni hal qilish, qarzni undirish, tilxat va shartnomalarni tekshirish.",
+    "Составление договоров аренды и разрешение споров, взыскание долгов, проверка расписок и договоров."
+   ],
+   "region": "Toshkent shahri",
+   "district": "Chilonzor tumani",
+   "address": [
+    "Chilonzor tumani (namuna manzil)",
+    "Чиланзарский район (пример адреса)"
+   ],
+   "experience": 9,
+   "langs": [
+    "uz",
+    "ru"
+   ],
+   "areas": [
+    "ijara",
+    "fuqarolik",
+    "shartnoma",
+    "yer"
+   ],
+   "formats": [
+    "online",
+    "office"
+   ],
+   "hours": [
+    "Du–Ju 09:00–18:00",
+    "Пн–Пт 09:00–18:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Konsultatsiya",
+      "Консультация"
+     ],
+     "min": 30,
+     "format": "online",
+     "price": 120000
+    },
+    {
+     "name": [
+      "Shartnoma tuzish yoki tekshirish",
+      "Составление или проверка договора"
+     ],
+     "format": "online",
+     "price": 400000,
+     "from": true
+    },
+    {
+     "name": [
+      "Qarzni sud orqali undirish",
+      "Взыскание долга через суд"
+     ],
+     "format": "office",
+     "price": 2000000,
+     "from": true
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 04",
+    "email": "namuna4@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-5",
+   "demo": true,
+   "kind": "advokat",
+   "plan": "free",
+   "name": "Jasur Qodirov",
+   "firm": "",
+   "headline": [
+    "YHXX va ma’muriy jarimalar, transport, OSGO",
+    "Штрафы ДПС и административные штрафы, транспорт, ОСАГО"
+   ],
+   "about": [
+    "Jarima qarorlari ustidan shikoyat, avtohalokatdan keyingi sug‘urta to‘lovlari va zararni undirish.",
+    "Обжалование постановлений о штрафах, страховые выплаты и возмещение ущерба после ДТП."
+   ],
+   "region": "Farg‘ona viloyati",
+   "district": "Farg‘ona shahri",
+   "address": [
+    "Farg‘ona shahri (namuna manzil)",
+    "город Фергана (пример адреса)"
+   ],
+   "experience": 7,
+   "langs": [
+    "uz"
+   ],
+   "areas": [
+    "transport",
+    "jarima",
+    "davlat"
+   ],
+   "formats": [
+    "office"
+   ],
+   "hours": [
+    "Du–Ju 09:00–18:00",
+    "Пн–Пт 09:00–18:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Konsultatsiya",
+      "Консультация"
+     ],
+     "min": 30,
+     "format": "office",
+     "price": 100000
+    },
+    {
+     "name": [
+      "Jarima ustidan shikoyat",
+      "Жалоба на штраф"
+     ],
+     "format": "office",
+     "price": 500000
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 05",
+    "email": "namuna5@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-6",
+   "demo": true,
+   "kind": "yurist",
+   "plan": "pro",
+   "name": "Malika Usmonova",
+   "firm": "",
+   "headline": [
+    "Davlat idoralari, pensiya va nafaqa, ma’muriy sud",
+    "Госорганы, пенсии и пособия, административный суд"
+   ],
+   "about": [
+    "Davlat idoralarining qarorlari ustidan yuqori organga va ma’muriy sudga shikoyat tayyorlayman.",
+    "Готовлю жалобы на решения госорганов в вышестоящий орган и в административный суд."
+   ],
+   "region": "Surxondaryo viloyati",
+   "district": "Termiz shahri",
+   "address": [
+    "Termiz shahri (namuna manzil)",
+    "город Термез (пример адреса)"
+   ],
+   "experience": 5,
+   "langs": [
+    "uz",
+    "ru"
+   ],
+   "areas": [
+    "davlat",
+    "nafaqa"
+   ],
+   "formats": [
+    "online"
+   ],
+   "hours": [
+    "Du–Ju 10:00–19:00",
+    "Пн–Пт 10:00–19:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Onlayn konsultatsiya",
+      "Онлайн-консультация"
+     ],
+     "min": 30,
+     "format": "online",
+     "price": 0
+    },
+    {
+     "name": [
+      "Ma’muriy sudga ariza",
+      "Заявление в административный суд"
+     ],
+     "format": "online",
+     "price": 600000
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 06",
+    "email": "namuna6@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-7",
+   "demo": true,
+   "kind": "firma",
+   "plan": "firma",
+   "name": [
+    "«Biznes Huquq» yuridik firmasi (namuna)",
+    "Юридическая фирма «Бизнес Ҳуқуқ» (пример)"
+   ],
+   "firm": "",
+   "headline": [
+    "Korxonalar uchun: shartnomalar, soliq, korporativ masalalar",
+    "Для компаний: договоры, налоги, корпоративные вопросы"
+   ],
+   "about": [
+    "Korxona va tadbirkorlarga abonent yuridik xizmati: shartnomalar, soliq tekshiruvlari, mehnat munosabatlari, korporativ hujjatlar.",
+    "Абонентское юридическое обслуживание компаний: договоры, налоговые проверки, трудовые отношения, корпоративные документы."
+   ],
+   "region": "Toshkent shahri",
+   "district": "Yakkasaroy tumani",
+   "address": [
+    "Yakkasaroy tumani (namuna manzil)",
+    "Яккасарайский район (пример адреса)"
+   ],
+   "experience": 14,
+   "langs": [
+    "uz",
+    "ru",
+    "en"
+   ],
+   "areas": [
+    "biznes",
+    "soliq",
+    "shartnoma",
+    "mehnat"
+   ],
+   "formats": [
+    "online",
+    "office"
+   ],
+   "hours": [
+    "Du–Ju 09:00–18:00",
+    "Пн–Пт 09:00–18:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Konsultatsiya",
+      "Консультация"
+     ],
+     "min": 60,
+     "format": "office",
+     "price": 500000
+    },
+    {
+     "name": [
+      "Abonent xizmati (oyiga)",
+      "Абонентское обслуживание (в месяц)"
+     ],
+     "format": "office",
+     "price": 5000000,
+     "from": true
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 07",
+    "email": "namuna7@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  },
+  {
+   "id": "namuna-8",
+   "demo": true,
+   "kind": "advokat",
+   "plan": "free",
+   "name": "Sardor Ismoilov",
+   "firm": "",
+   "headline": [
+    "Jinoyat ishlari va himoya",
+    "Уголовные дела и защита"
+   ],
+   "about": [
+    "Tergov va sud bosqichlarida himoya.",
+    "Защита на стадии следствия и в суде."
+   ],
+   "region": "Qashqadaryo viloyati",
+   "district": "Qarshi shahri",
+   "address": [
+    "Qarshi shahri (namuna manzil)",
+    "город Карши (пример адреса)"
+   ],
+   "experience": 12,
+   "langs": [
+    "uz",
+    "ru"
+   ],
+   "areas": [
+    "jinoyat",
+    "jarima"
+   ],
+   "formats": [
+    "office"
+   ],
+   "hours": [
+    "Du–Sh 09:00–18:00",
+    "Пн–Сб 09:00–18:00"
+   ],
+   "services": [
+    {
+     "name": [
+      "Konsultatsiya",
+      "Консультация"
+     ],
+     "min": 60,
+     "format": "office",
+     "price": 400000
+    }
+   ],
+   "contacts": {
+    "phone": "+998 00 000 00 08",
+    "email": "namuna8@example.com"
+   },
+   "license": {
+    "verified": false
+   }
+  }
+ ]
+}

@@ -43,6 +43,9 @@ function build(lang){
   };
 }
 
+// Sudlarning hududiy yurisdiksiyasi (PF-6034, 10-ilova) — ikki til uchun bitta ma’lumot (kirill nomlar ichida)
+export const COURTS = load("courts.json");
+
 // uz — asosiy baza (kirill yozuvi chiqishda lotindan o‘giriladi), ru — tarjima
 const KB = { uz: build("uz"), ru: build("ru") };
 export const kbFor = lang => lang === "ru" ? KB.ru : KB.uz;
