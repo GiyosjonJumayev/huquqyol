@@ -23,8 +23,8 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (134 tests; 3 DB tests skip without TEST_DATABASE_URL)
-npm run test:e2e         # optional: npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
+npm test                 # node:test, must stay green (136 tests; 3 DB tests skip without TEST_DATABASE_URL)
+npm run test:e2e         # 13 browser tests incl. axe; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
 ```
@@ -32,16 +32,19 @@ npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: 
 
 Env (see `.env.example`): `ANTHROPIC_API_KEY` (optional), `DATABASE_URL` (PostgreSQL; empty → accounts/catalog
 DB features return 503, citizen flow still works), `ADMIN_EMAILS` (comma list; users registered with these e-mails
-become admin), `TELEGRAM_BOT_TOKEN`, `TZ=Asia/Tashkent`, `HOLIDAYS_EXTRA`, `OCR=0` to disable OCR, `TEST_DATABASE_URL` (DB tests; DB is wiped).
+become admin), `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_URL` (footer link), `TZ=Asia/Tashkent`, `HOLIDAYS_EXTRA`, `OCR=0` to disable OCR, `TEST_DATABASE_URL` (DB tests; DB is wiped).
 
 ## Architecture (v3.14)
 - `app.cjs` → `server/index.js` (Express 5). At startup it pre-renders `public/index.html` once per language
   (uz, cyr, ru) by replacing `{{key}}` from `public/i18n.js`, domain cards, and embedded meta JSON. Assets versioned `?v=hash`.
 - Frontend: `public/app.js` — vanilla ES modules, 3 screens (Situation → Plan → Application). No framework.
-- Shared UI in `public/shared.js` (server + browser): `siteNav` (one navbar for all pages, mobile menu, account state).
-  `public/a11y.js`: font size (4 levels, `hy_fs` cookie) and read aloud. Theme light/dark via `hy_theme` cookie (`/mavzu`).
+- Shared UI in `public/shared.js` (server + browser), used by the home page and every server page:
+  `siteNav` (navbar, mobile menu, account state), `siteFooter` (disclaimer, «Normalar … tekshirilgan», links incl.
+  Maxfiylik and Telegram bot — `TELEGRAM_BOT_URL` constant/env, TODO), `a11yDialogHTML` («Aa Qulaylik» modal).
+  `public/a11y.js` `mountA11y()` drives the modal: 4 font sizes (`hy_fs` cookie), read aloud, light/dark (`hy_theme` cookie).
+  One type scale: server pages reuse the home classes/sizes — don't reuse home-only classes like `.big`/`.how` for other things.
 - Server-rendered pages use `page()` in `server/business.js` (+ `statsPage.js`): `/yuristlar`, `/yuristlar/:id`,
-  `/tariflar`, `/kabinet`, `/kirish`, `/royxat`, `/hisob`, `/hisob/profil`, `/hisob/statistika`, `/admin`, `/statistika`.
+  `/tariflar`, `/kabinet`, `/kirish`, `/royxat`, `/hisob`, `/hisob/profil`, `/hisob/statistika`, `/admin`, `/statistika`, `/maxfiylik`.
   Client scripts for them: `public/account.js` (forms → JSON API), `public/kabinet.js` (Pro cabinet).
 - Accounts: PostgreSQL (`server/db.js` pool + migrations, `server/auth.js` scrypt passwords, HttpOnly session cookie,
   roles citizen / lawyer / org / admin). `server/accountPages.js` — login, register, «Hisobim», admin dashboard.
