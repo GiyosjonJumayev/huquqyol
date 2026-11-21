@@ -11,10 +11,11 @@ import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, customModel, toDocx, toPdf } from "./documents.js";
 import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
 import { initDb, migrate, dbEnabled } from "./db.js";
-import { attachUser, requireUser, requireRole, register, login, logout, changePassword } from "./auth.js";
-import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats } from "./market.js";
-import { loginPage, registerPage, accountPage, adminPage } from "./accountPages.js";
-import { proStatus, requirePro, myProfile, saveProfile, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
+import { attachUser, register, login, logout, changePassword } from "./auth.js";
+import { accessMiddleware, HOME, navFor, roleOf } from "./access.js";
+import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue } from "./market.js";
+import { loginPage, registerPage, accountPage, adminPage, applyPage, forbiddenPage } from "./accountPages.js";
+import { proStatus, myProfile, saveProfile, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
 import { lawyerPanel, profileEditPage, lawyerStatsPage } from "./lawyerPages.js";
 
 // PostgreSQL (DATABASE_URL bo‘lsa): hisoblar, obunalar, kelishuvlar. Migratsiyalar start() da qo‘llanadi.
@@ -55,6 +56,12 @@ const apiLimit = rateLimit({ max: 600, name:"api" });
 // Tanlangan mavzu (cookie) — sahifa chizilishidan oldin <html data-theme="…"> sifatida (ekran «miltillamaydi»)
 const themeOf = req => /(?:^|;\s*)hy_theme=(light|dark)(?:;|$)/.exec(req.headers.cookie || "")?.[1] || "";
 const withTheme = (req, html) => { const th = themeOf(req); return th ? html.replace("<html", `<html data-theme="${th}"`) : html; };
+// Kirish huquqlari (server/access.js): noto‘g‘ri rol — do‘stona 403 sahifa, rolning o‘z sahifasiga havola bilan
+const guard = accessMiddleware({ proStatus, forbidden: (req, res, reason) => {
+  const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
+  res.status(403).set({ "Cache-Control": "private, no-store", "Vary": "Cookie" }).type("html").send(withTheme(req, forbiddenPage({ lang: req.lang, fs, user: req.user, reason,
+    cssHref: `/app.css?v=${VER["app.css"]}`, accHref: `/account.js?v=${VER["account.js"]}`, home: HOME[roleOf(req.user)] })));
+} });
 const wrapEarly = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "8mb", strict: true }),
   (req, res, next) => { req.lang = resolveLang(req); next(); },
@@ -65,14 +72,14 @@ app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin
     res.json(out(req.lang, r));
   }));
 // Yurist rasmi va kabinet ma’lumotlari: kattaroq tana (rasm brauzerda 480 px ga kichraytiriladi)
-const langUser = [(req, res, next) => { req.lang = resolveLang(req); next(); }, attachUser,
+const langUser = [(req, res, next) => { req.lang = resolveLang(req); next(); }, attachUser, guard,
   (req, res, next) => dbEnabled() ? next() : res.status(503).json({ error: msg(req.lang, "dbOff") })];
-app.post("/api/lawyer/photo", apiLimit, rateLimit({ max: 20, name:"lphoto" }), sameOrigin, requireJson, express.json({ limit: "800kb", strict: true }), ...langUser,
-  (req, res, next) => req.user ? next() : res.status(401).json({ error: msg(req.lang, "auth") }), wrapEarly(savePhoto));
-app.post("/api/cabinet", apiLimit, rateLimit({ max: 120, name:"cab" }), sameOrigin, requireJson, express.json({ limit: "1mb", strict: true }), ...langUser, requirePro, wrapEarly(putCabinet));
+app.post("/api/lawyer/photo", apiLimit, rateLimit({ max: 20, name:"lphoto" }), sameOrigin, requireJson, express.json({ limit: "800kb", strict: true }), ...langUser, wrapEarly(savePhoto));
+app.post("/api/cabinet", apiLimit, rateLimit({ max: 120, name:"cab" }), sameOrigin, requireJson, express.json({ limit: "1mb", strict: true }), ...langUser, wrapEarly(putCabinet));
 app.use("/api", apiLimit, sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
 app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 app.use(attachUser);
+app.use(guard);                       // kirish huquqlari: server/access.js (barcha sahifa va /api yo‘llari)
 
 // Fayl nomi: faqat xavfsiz belgilar (sarlavhaga in’ektsiya bo‘lmasligi uchun)
 const safeName = s => String(s).replace(/[^A-Za-z0-9._-]/g, "_").slice(0, 120);
@@ -154,22 +161,22 @@ app.post("/api/lawyers/apply", rateLimit({ max: 5, name:"apply" }), wrap(async (
 
 // ---------- Hisoblar (PostgreSQL) ----------
 // Navbar uchun: kim kirgan (bosh sahifa keshlanadi — hisob holati shu orqali olinadi)
-app.get("/api/me", (req, res) => res.set("Cache-Control", "private, no-store").json({ user: req.user ? { name: req.user.name, role: req.user.role } : null }));
+app.get("/api/me", (req, res) => res.set("Cache-Control", "private, no-store").json({ user: req.user ? { name: req.user.name, role: req.user.role } : null, nav: navFor(roleOf(req.user)) }));
 const needDb = (req, res, next) => dbEnabled() ? next() : res.status(503).json({ error: msg(req.lang, "dbOff") });
 const authLimit = rateLimit({ max: Number(process.env.AUTH_RATE || 10), name:"auth" });
 app.post("/api/auth/register", needDb, authLimit, wrap(register));
 app.post("/api/auth/login", needDb, authLimit, wrap(login));
 app.post("/api/auth/logout", wrap(logout));
-app.post("/api/auth/password", needDb, authLimit, requireUser, wrap(changePassword));
+app.post("/api/auth/password", needDb, authLimit, wrap(changePassword));
 // Obuna va kelishuvlar
-app.post("/api/subscriptions", needDb, requireUser, rateLimit({ max: 10, name:"sub" }), wrap(subscribe));
-app.post("/api/consultations", needDb, requireUser, rateLimit({ max: 10, name:"cons" }), wrap(requestConsultation));
-app.post("/api/consultations/:id/:act", needDb, requireUser, rateLimit({ max: 60, name:"consact" }), wrap(actConsultation));
+app.post("/api/subscriptions", needDb, rateLimit({ max: 10, name:"sub" }), wrap(subscribe));
+app.post("/api/consultations", needDb, rateLimit({ max: 10, name:"cons" }), wrap(requestConsultation));
+app.post("/api/consultations/:id/:act", needDb, rateLimit({ max: 60, name:"consact" }), wrap(actConsultation));
 // Admin amallari
-app.post("/api/admin/:kind/:id/:act", needDb, requireRole("admin"), wrap(adminAct));
+app.post("/api/admin/:kind/:id/:act", needDb, wrap(adminAct));
 // Yurist profili va Pro kabineti
-app.post("/api/lawyer/profile", needDb, requireUser, rateLimit({ max: 30, name:"lprof" }), wrap(saveProfile));
-app.get("/api/cabinet", needDb, requirePro, wrap(getCabinet));
+app.post("/api/lawyer/profile", needDb, rateLimit({ max: 30, name:"lprof" }), wrap(saveProfile));
+app.get("/api/cabinet", needDb, wrap(getCabinet));
 
 // Anonim statistika: faqat yig‘ma sanoqlar (holat → soha)
 const SCEN_DOMAIN = Object.fromEntries(SCENARIOS.map(s => [s.id, s.domain]));
@@ -181,8 +188,8 @@ app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFo
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js", "kabinet.js", "account.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
-const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "courts.js", "kabinet.js", "account.js"];
+const ASSETS = ["app.css", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 // Service worker keshi har yangi relizda avtomatik almashadi: versiya — barcha resurslar xeshidan
 const BUILD = createHash("sha256").update(Object.values(VER).join("") + hashOf("index.html")).digest("hex").slice(0, 12);
@@ -241,7 +248,7 @@ function bizPage(render){
     const query = Object.fromEntries(Object.entries(req.query).filter(([k, v]) => k !== "lang" && typeof v === "string" && v.length < 100));
     const extra = req.path.startsWith("/yuristlar") ? await approvedLawyers() : [];
     const html = await render({ lang: forced || req.lang, cssHref: `/app.css?v=${VER["app.css"]}`, jsHref: `/kabinet.js?v=${VER["kabinet.js"]}`,
-      accHref: `/account.js?v=${VER["account.js"]}`, fs, query, id: req.params.id, user: req.user, extra, db: dbEnabled(), res });
+      accHref: `/account.js?v=${VER["account.js"]}`, fs, query, id: req.params.id, user: req.user, extra, db: dbEnabled(), res, req });
     if (!html) return next();
     if (html === REDIRECTED) return;
     res.set({ "Cache-Control": req.user ? "private, no-store" : "no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[forced || req.lang] }).type("html").send(withTheme(req, html));
@@ -252,7 +259,7 @@ app.get("/maxfiylik", bizPage(a => privacyPage({ ...a, ai: aiEnabled(), provider
 app.get("/yuristlar", bizPage(lawyersPage));
 app.get("/yuristlar/rasm/:id", (req, res, next) => dbEnabled() ? wrap(sendPhoto)(req, res, next) : next());
 app.get("/yuristlar/:id", bizPage(args => { const h = lawyerPage(args); if (h) recordView(args.id, args.query.soha); return h; }));
-app.get("/kabinet", bizPage(async a => cabinetPage({ ...a, pro: a.user && dbEnabled() ? await proStatus(a.user.id) : null })));
+app.get("/kabinet", bizPage(async a => cabinetPage({ ...a, pro: a.req.pro || await proStatus(a.user.id) })));
 // Mavzu (yorug‘ / qorong‘i): JavaScript’siz ham ishlaydi — cookie qo‘yib, sahifaga qaytaradi (to=toggle — almashtirish)
 app.get("/mavzu", (req, res) => {
   const cur = themeOf(req);
@@ -261,10 +268,10 @@ app.get("/mavzu", (req, res) => {
   const back = typeof req.query.back === "string" && /^\/[a-z0-9/_?=&%.-]*$/i.test(req.query.back) && !req.query.back.startsWith("//") ? req.query.back : "/";
   res.redirect(303, back);
 });
-app.get("/kirish", bizPage(a => a.user ? (a.res.redirect(303, a.user.role === "admin" ? "/admin" : "/hisob"), REDIRECTED) : loginPage(a)));
-app.get("/royxat", bizPage(a => a.user ? (a.res.redirect(303, "/hisob"), REDIRECTED) : registerPage(a)));
+app.get("/kirish", bizPage(a => a.user ? (a.res.redirect(303, HOME[roleOf(a.user)]), REDIRECTED) : loginPage(a)));
+app.get("/royxat", bizPage(a => a.user ? (a.res.redirect(303, HOME[roleOf(a.user)]), REDIRECTED) : registerPage(a)));
+// Quyidagi sahifalarga kim kira olishini guard (server/access.js) hal qiladi — bu yerda faqat chizish
 app.get("/hisob", bizPage(async a => {
-  if (!a.user){ a.res.redirect(303, "/kirish?next=/hisob"); return REDIRECTED; }
   const subs = await mySubscriptions(a.user.id);
   let panel = "";
   if (a.user.role === "lawyer"){
@@ -272,22 +279,16 @@ app.get("/hisob", bizPage(async a => {
     panel = lawyerPanel({ ...a, profile, pro, stats: profile ? await lawyerStats(profile.id) : null,
       pendingSub: subs.some(s => s.status === "pending" && s.plan === "pro") });
   }
-  return accountPage({ ...a, subs, cons: await consultationsFor(a.user), panel });
+  const application = a.user.role === "citizen" ? await myProfile(a.user.id) : null;      // «Yurist bo‘lish» arizasi holati
+  return accountPage({ ...a, subs, cons: await consultationsFor(a.user), panel, application });
 }));
-const needLogin = (a, next) => { if (!a.user){ a.res.redirect(303, `/kirish?next=${encodeURIComponent(next)}`); return true; } return false; };
-app.get("/hisob/profil", bizPage(async a => needLogin(a, "/hisob/profil") ? REDIRECTED : profileEditPage({ ...a, profile: await myProfile(a.user.id) })));
+app.get("/yurist-bolish", bizPage(async a => applyPage({ ...a, application: await myProfile(a.user.id) })));
+app.get("/hisob/profil", bizPage(async a => profileEditPage({ ...a, profile: await myProfile(a.user.id) })));
 app.get("/hisob/statistika", bizPage(async a => {
-  if (needLogin(a, "/hisob/statistika")) return REDIRECTED;
-  const pro = await proStatus(a.user.id);
-  if (!pro.tools && a.user.role !== "admin"){ a.res.redirect(303, "/tariflar"); return REDIRECTED; }
   const profile = await myProfile(a.user.id);
   return lawyerStatsPage({ ...a, profile, stats: profile ? await lawyerStats(profile.id) : null });
 }));
-app.get("/admin", bizPage(async a => {
-  if (!a.user){ a.res.redirect(303, "/kirish?next=/admin"); return REDIRECTED; }
-  if (a.user.role !== "admin"){ a.res.status(403); return null; }
-  return adminPage({ ...a, a: await adminStats(), s: stats.summary({ scenarioDomain: SCEN_DOMAIN }) });
-}));
+app.get("/admin", bizPage(async a => adminPage({ ...a, a: await adminStats(), s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), photos: await photoQueue() })));
 
 // JS modullari ichidagi importlar ham versiyalanadi
 const rewriteImports = src => MODULES.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`).replaceAll(`"./${f}"`, `"/${f}?v=${VER[f]}"`), src);

@@ -36,9 +36,9 @@ test("Katalog filtri: soha, hudud, shakl; Pro profillar yuqorida", () => {
   assert.equal(PLANS.length, 4);
 });
 
-test("Sahifalar uch tilda: tariflar, katalog, profil, kabinet; inline skript va style yo‘q", async () => {
+test("Sahifalar uch tilda: tariflar, katalog, profil; inline skript va style yo‘q", async () => {
   for (const lang of ["uz", "cyr", "ru"]){
-    for (const p of ["/tariflar", "/yuristlar", "/yuristlar?soha=oila&shakl=online", "/yuristlar/namuna-1", "/kabinet"]){
+    for (const p of ["/tariflar", "/yuristlar", "/yuristlar?soha=oila&shakl=online", "/yuristlar/namuna-1"]){
       const r = await get(p, lang), html = await r.text();
       assert.equal(r.status, 200, `${lang} ${p}`);
       assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>/i.test(html), `${p}: inline skript`);
@@ -56,9 +56,9 @@ test("Sahifalar uch tilda: tariflar, katalog, profil, kabinet; inline skript va 
   assert.equal((await get("/yuristlar/yoq-profil")).status, 404);
   const plans = await (await get("/tariflar")).text();
   for (const s of ["Mijozlar va ishlar kartotekasi", "Barcha muddatlar bitta kalendarda", "O‘z blankasi", "Katalogda profil", "Tashkilot hujjatlari kutubxonasi"]) assert.ok(plans.includes(s), s);
-  const kab = await (await get("/kabinet")).text();                          // kirmagan foydalanuvchi: imkoniyatlar va kirish yo‘li
-  assert.ok(!kab.includes("kabinet.js"));
-  assert.match(kab, /Mijozlar va ishlar kartotekasi/);
+  const kab = await fetch(base + "/kabinet", { redirect: "manual" });       // kirmagan foydalanuvchi — kirish sahifasiga (server/access.js)
+  assert.equal(kab.status, 303);
+  assert.equal(kab.headers.get("location"), "/kirish?next=%2Fkabinet");
 });
 
 test("Holatdan katalogga: ?holat= sohani tanlaydi", async () => {
@@ -67,16 +67,19 @@ test("Holatdan katalogga: ?holat= sohani tanlaydi", async () => {
   assert.match(html, /Holatingiz: Ish haqi/);
 });
 
-test("Katalogga ariza: rozilik, telefon va e-pochta tekshiriladi; moderatsiya fayliga yoziladi", async () => {
+test("«Yurist bo‘lish» arizasi: faqat kirgan fuqaro; rozilik, telefon va e-pochta tekshiriladi", async () => {
+  const { vLawyerApply, saveApplication } = await import("../server/business.js");
   const ok = { name:"Test Yurist", phone:"+998 90 123 45 67", email:"t@example.com", kind:"advokat", areas:["mehnat", "yoq-soha"], region:"Toshkent shahri", formats:["online"], consent:true };
-  assert.equal((await post("/api/lawyers/apply", { ...ok, consent:false })).status, 400);
-  assert.equal((await post("/api/lawyers/apply", { ...ok, phone:"abc" })).status, 400);
-  assert.equal((await post("/api/lawyers/apply", { ...ok, email:"yomon" })).status, 400);
-  assert.equal((await post("/api/lawyers/apply", ok)).status, 201);
+  assert.equal((await post("/api/lawyers/apply", ok)).status, 401);                // hisobsiz ariza yo‘q (server/access.js)
+  assert.throws(() => vLawyerApply({ ...ok, consent:false }));
+  assert.throws(() => vLawyerApply({ ...ok, phone:"abc" }));
+  assert.throws(() => vLawyerApply({ ...ok, email:"yomon" }));
+  const v = vLawyerApply(ok);
+  assert.deepEqual(v.areas, ["mehnat"]);                                         // noma’lum soha tashlanadi
+  saveApplication(v);
   assert.ok(existsSync(process.env.LAWYER_APPS_FILE));
   const rec = JSON.parse(readFileSync(process.env.LAWYER_APPS_FILE, "utf8").trim().split("\n").at(-1));
   assert.equal(rec.status, "pending");
-  assert.deepEqual(rec.areas, ["mehnat"]);                                    // noma’lum soha tashlanadi
 });
 
 test("Blanka: hujjat tepasida rekvizitlar; o‘z shabloni DOCX va PDF", async () => {
@@ -105,12 +108,13 @@ test("Blanka: hujjat tepasida rekvizitlar; o‘z shabloni DOCX va PDF", async ()
 test("Navbar: barcha sahifalarda bir xil; faol bo‘lim, til, hisob; mobil menyu; /api/me", async () => {
   const { siteNav, acctHTML } = await import("../public/shared.js");
   const { makeT } = await import("../public/i18n.js");
-  for (const [p, cur] of [["/", null], ["/yuristlar", "/yuristlar"], ["/tariflar", "/tariflar"], ["/kabinet", "/kabinet"], ["/statistika", null]]){
+  for (const [p, cur] of [["/", null], ["/yuristlar", "/yuristlar"], ["/tariflar", "/tariflar"], ["/statistika", null], ["/maxfiylik", null]]){
     const html = await (await get(p)).text();
     assert.match(html, /<header class="nav"/, p);
     assert.match(html, /class="navdd navmenu"/, p);                                 // mobil menyu
     assert.match(html, /href="\/kirish"/, p);
-    if (cur) assert.match(html, new RegExp(`class="navlink" href="${cur}" aria-current="page"`), p);
+    if (cur) assert.match(html, new RegExp(`class="navlink" href="${cur}" data-nav="${cur}" aria-current="page"`), p);
+    assert.match(html, /<a class="navlink" href="\/kabinet" data-nav="\/kabinet" hidden>/, p);               // mehmon uchun «Kabinet» yashirin
     assert.ok(!/\sstyle=/.test(html.replace(/<svg[\s\S]*?<\/svg>/g, "")), p);
   }
   const home = await (await get("/")).text();
@@ -120,11 +124,14 @@ test("Navbar: barcha sahifalarda bir xil; faol bo‘lim, til, hisob; mobil menyu
   assert.match(await (await get("/", "ru")).text(), /Составить заявление/);
   const me = await get("/api/me");
   assert.equal(me.headers.get("cache-control"), "private, no-store");
-  assert.deepEqual(await me.json(), { user: null });
-  // Kirgan foydalanuvchi: avatar, ism; admin uchun «Admin»
+  assert.deepEqual(await me.json(), { user: null, nav: ["/", "/yuristlar", "/tariflar"] });
+  // Kirgan foydalanuvchi: avatar tugmasi va menyu; admin uchun «Admin panel», «Hisobim» yo‘q (rollar — server/access.js)
+  const { navFor } = await import("../server/access.js");
   const t = makeT("uz");
-  const a = acctHTML({ name: "Giyosjon Jumayev", role: "admin" }, t);
+  const a = acctHTML({ name: "Giyosjon Jumayev", role: "admin" }, t, { nav: navFor("admin") });
   assert.match(a, /href="\/admin"/);
+  assert.ok(!/href="\/hisob"/.test(a));
+  assert.match(a, /<button class="btn danger logoutbtn" type="button" data-logout>/);
   assert.match(a, /<span class="av" aria-hidden="true">GJ<\/span>/);
   assert.match(siteNav({ lang: "cyr", t: makeT("cyr"), path: "/tariflar" }), /Тарифлар/);
 });

@@ -76,8 +76,9 @@ test("Biznes oqimi: yurist profili → moderatsiya → katalog → kelishuv → 
   assert.equal((await reg(org, { name: "Tashkilot yuristi", email: "org@test.uz", role: "org", orgName: "«Namuna» MChJ", orgKind: "korxona", inn: "123456789" })).status, 201);
   // Yurist: 14 kunlik sinov obunasi
   assert.equal((await db.one("select s.status from subscriptions s join users u on u.id = s.user_id where u.email = 'karim@test.uz'")).status, "trial");
-  // Katalogga ariza (tizimga kirgan yurist) → moderatsiya
-  assert.equal((await lawyer.post("/api/lawyers/apply", { name: "Karim Yurist", phone: "+998 90 000 11 22", kind: "advokat", areas: ["mehnat"], region: "Toshkent shahri", formats: ["online"], price: "200000", license: "A-123", consent: true })).status, 201);
+  // Yurist hisobi: profilni to‘ldiradi → moderatsiya («Yurist bo‘lish» arizasi faqat fuqaro uchun — yurist uchun 403)
+  assert.equal((await lawyer.post("/api/lawyers/apply", { name: "Karim Yurist", phone: "+998 90 000 11 22", consent: true })).status, 403);
+  assert.equal((await lawyer.post("/api/lawyer/profile", { name: "Karim Yurist", phone: "+998 90 000 11 22", kind: "advokat", areas: ["mehnat"], region: "Toshkent shahri", formats: ["online"], price: "200000", license: "A-123" })).status, 200);
   const prof = await db.one("select id, status from lawyer_profiles where name = 'Karim Yurist'");
   assert.equal(prof.status, "pending");
   assert.ok(!(await (await citizen.get("/yuristlar?soha=mehnat")).text()).includes("Karim Yurist"));
@@ -177,11 +178,11 @@ test("Yurist profili: tahrirlash, rasm, qayta moderatsiya; Pro vositalari, kabin
   const st = await lw.get("/hisob/statistika");
   assert.equal(st.status, 200);
   assert.match(await st.text(), /Profil ko‘rishlari — so‘nggi 30 kun/);
-  // Kabinet: fuqaro (Pro yo‘q) — taklif sahifasi va API 402; yurist — ilova va hisobda saqlash
-  assert.ok(!(await (await cz.get("/kabinet")).text()).includes("kabinet.js"));
-  assert.equal((await cz.post("/api/cabinet", { data: { v: 1 } })).status, 402);
+  // Kabinet: fuqaro — rol yetmaydi (403, server/access.js); yurist — ilova va hisobda saqlash
+  assert.equal((await cz.get("/kabinet")).status, 403);
+  assert.equal((await cz.post("/api/cabinet", { data: { v: 1 } })).status, 403);
   assert.equal(cz.cookie !== "", true);
-  assert.equal((await cz.get("/hisob/statistika")).status, 303);
+  assert.equal((await cz.get("/hisob/statistika")).status, 403);
   assert.match(await (await lw.get("/kabinet")).text(), /data-sync="1"/);
   const data = { v: 1, plan: "pro", clients: [{ id: "a", name: "Mijoz 1" }], cases: [{ id: "c", title: "Ish 1", deadlines: [{ id: "d", date: "2026-12-01", note: "Sud" }] }], templates: [], org: { name: "", docs: [] }, letterhead: { on: false, lines: [] }, savedAt: "2026-11-21T10:00:00Z" };
   assert.equal((await lw.post("/api/cabinet", { data: { v: 2 } })).status, 400);
@@ -199,3 +200,48 @@ test("Yurist profili: tahrirlash, rasm, qayta moderatsiya; Pro vositalari, kabin
   assert.match(await (await fetch(base + "/", { headers: { Cookie: "hy_theme=light" } })).text(), /<html data-theme="light"/);
 });
 
+
+// Kirish huquqlari: har bir rol × har bir himoyalangan yo‘l, haqiqiy sessiya bilan (kutilgan jadval — test/fixtures/access-matrix.js)
+test("Kirish huquqlari: har bir rol × har bir sahifa va API (200 / 303 / 401 / 402 / 403)", opts, async () => {
+  const { ACTORS, PAGES, API } = await import("./fixtures/access-matrix.js");
+  const actors = { guest: client() };
+  for (const a of ACTORS.filter(x => x !== "guest")){
+    const c = client(), role = a.replace("NoPro", "");
+    const r = await reg(c, { name: `Rol ${a}`, email: `acc-${a.toLowerCase()}@test.uz`, role: ["lawyer", "org"].includes(role) ? role : "citizen", orgName: role === "org" ? "«Sinov» MChJ" : undefined });
+    assert.equal(r.status, 201, a);
+    const id = (await db.one("select id from users where email = $1", [`acc-${a.toLowerCase()}@test.uz`])).id;
+    if (["moderator", "admin"].includes(role)) await db.q("update users set role = $2 where id = $1", [id, role]);
+    if (a.endsWith("NoPro")) await db.q("update subscriptions set status = 'cancelled', ends_at = now() where user_id = $1", [id]);
+    actors[a] = c;
+  }
+  const fails = [];
+  for (const [url, exp] of Object.entries(PAGES)) for (const a of ACTORS){
+    const r = await actors[a].get(url);
+    if (r.status !== exp[a]) fails.push(`${a} GET ${url}: ${r.status} ≠ ${exp[a]}`);
+    if (r.status === 403 && !/Mening sahifamga/.test(await r.text())) fails.push(`${a} ${url}: 403 sahifasida rol havolasi yo‘q`);
+  }
+  for (const [k, exp] of Object.entries(API)){
+    const [method, url] = k.split(" ");
+    for (const a of ACTORS){
+      if (url === "/api/auth/logout") continue;                                 // sessiyani o‘chirmaslik uchun
+      const r = method === "GET" ? await actors[a].get(url) : await actors[a].post(url, {});
+      const got = [401, 402, 403].includes(r.status) ? r.status : "ok";
+      if (got !== exp[a]) fails.push(`${a} ${k}: ${r.status} ≠ ${exp[a]}`);
+    }
+  }
+  assert.deepEqual(fails, []);
+  // Kirgan foydalanuvchi /kirish ga kelsa — o‘z «uyi»ga
+  assert.equal((await actors.admin.get("/kirish")).headers.get("location"), "/admin");
+  assert.equal((await actors.moderator.get("/kirish")).headers.get("location"), "/admin");
+  assert.equal((await actors.citizen.get("/kirish")).headers.get("location"), "/hisob");
+  // /api/me: navbar uchun rol ocha oladigan sahifalar
+  assert.deepEqual((await (await actors.admin.get("/api/me")).json()).nav, ["/", "/yuristlar", "/tariflar", "/admin"]);
+  // Moderator panelida faqat 2 bo‘lim; chiqish tugmasi bor
+  const mod = await (await actors.moderator.get("/admin")).text();
+  assert.match(mod, /href="\/admin\?b=yurist"/);
+  assert.ok(!/href="\/admin\?b=daromad"/.test(mod) && !/href="\/admin\?b=users"/.test(mod));
+  assert.match(mod, /<button class="btn danger logoutbtn" type="button" data-logout>/);
+  // Chiqish: sessiya yopiladi
+  assert.equal((await actors.citizen.post("/api/auth/logout")).status, 200);
+  assert.equal((await actors.citizen.get("/hisob")).status, 303);
+});

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { HTML_LANG, fmtSum, makeT } from "../public/i18n.js";
 import { siteNav, siteFooter, a11yDialogHTML, botUrlOf, TELEGRAM_BOT_URL } from "../public/shared.js";
+import { navFor, roleOf } from "./access.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
 import { clean, ValidationError } from "./validate.js";
@@ -61,7 +62,7 @@ const T = {
   website: ["Veb-sayt", "Сайт"], education: ["Ta’lim va malaka", "Образование и квалификация"], achievements: ["Yutuqlar va tajriba", "Достижения и опыт"], licenseNo: ["Litsenziya", "Лицензия"],
   joinTitle: ["Yuristmisiz? Katalogga qo‘shiling", "Вы юрист? Попадите в каталог"],
   joinText: ["Ro‘yxatdan o‘ting, profilingizni rasm, tajriba va narxlar bilan to‘ldiring. Litsenziya tekshirilgach va Yurist Pro faollashtirilgach, profilingiz katalogda chiqadi.", "Зарегистрируйтесь и заполните профиль: фото, опыт, цены. После проверки лицензии и активации «Юрист Pro» профиль появится в каталоге."],
-  joinBtn: ["Profilni to‘ldirish", "Заполнить профиль"],
+  joinBtn: ["Profilni to‘ldirish", "Заполнить профиль"], joinApply: ["Yurist bo‘lish uchun ariza", "Подать заявку юриста"], joinReg: ["Yurist sifatida ro‘yxatdan o‘tish", "Зарегистрироваться как юрист"],
   // Tariflar
   plTitle: ["Tariflar", "Тарифы"],
   plLead: ["Fuqarolar uchun HuquqYo‘l bepul. Yuristlar, advokatlik byurolari va tashkilotlar uchun — ish jarayonini tartibga soladigan Pro imkoniyatlari.", "Для граждан HuquqYo‘l бесплатен. Для юристов, адвокатских бюро и организаций — Pro-возможности для ведения работы."],
@@ -134,7 +135,7 @@ export function page({ lang, title, desc, path, cssHref, fs, body, scripts = "",
   return `<!doctype html><html${fs ? ` data-fs="${fs}"` : ""} lang="${HTML_LANG[lang]}" data-lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} — HuquqYo‘l</title><meta name="description" content="${esc(desc)}"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="${cssHref}"></head>
 <body class="biz"><a class="skip" href="#main">${esc(t("skip"))}</a><div class="wrap">
-<header class="nav">${siteNav({ lang, t: mt, mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}`, a11y: true })}</header>
+<header class="nav">${siteNav({ lang, t: mt, mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}`, a11y: true, nav: navFor(roleOf(user)) })}</header>
 <main id="main">${body}</main>
 ${siteFooter(mt, { path, botUrl: process.env.TELEGRAM_BOT_URL })}</div>
 ${a11yDialogHTML(mt)}${accHref ? `<script type="module" src="${accHref}"></script>` : ""}${scripts}</body></html>`;
@@ -154,7 +155,7 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
       ${p.id === "free" ? `<a class="btn ghost" href="/">${esc(t("plStart"))}</a>`
         : user ? `<button class="btn ${p.best ? "primary" : "ghost"}" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: p.id }))}'>${esc(t("plSubscribe"))}</button><p class="err small" data-err hidden></p>`
         : `<a class="btn ${p.best ? "primary" : "ghost"}" href="/royxat?tarif=${p.id}">${esc(t("plSubscribe"))}</a>`}
-      ${p.id !== "free" ? `<a class="small" href="${p.cta[1]}">${esc(t("plTry"))}</a>` : ""}</article>`;
+      ${p.id !== "free" && (!user || ["lawyer", "org"].includes(user.role)) ? `<a class="small" href="${user ? p.cta[1] : `/royxat?tarif=${p.id}`}">${esc(t("plTry"))}</a>` : ""}</article>`;
   }).join("");
   // Solishtirish jadvali
   const rows = [...FEAT.free.map((f, i) => [f, ["free", "pro", "firma", "org"], `free:${i}`]), ...FEAT.pro.map((f, i) => [f, ["pro", "firma", "org"], `pro:${i}`]),
@@ -216,9 +217,17 @@ export function lawyersPage({ lang, cssHref, fs, query = {}, user, accHref, extr
     </form>
     <p class="count" aria-live="polite">${esc(t("found", { n: list.length }))}</p>
     ${list.length ? `<div class="lawyers">${list.map(l => lawyerCard(l, lang, back)).join("")}</div>` : `<p class="card">${esc(t("none"))}</p>`}
-    <aside class="card join"><h2>${esc(t("joinTitle"))}</h2><p>${esc(t("joinText"))}</p><a class="btn ghost" href="/hisob/profil">${esc(t("joinBtn"))}</a></aside>` });
+    <aside class="card join"><h2>${esc(t("joinTitle"))}</h2><p>${esc(t("joinText"))}</p>${joinLink(user, t)}</aside>` });
 }
 
+// «Katalogga qo‘shiling»: har bir rol uchun to‘g‘ri yo‘l (server/access.js bilan mos)
+const joinLink = (user, t) => {
+  const role = user?.role || "guest";
+  if (role === "lawyer") return `<a class="btn ghost" href="/hisob/profil">${esc(t("joinBtn"))}</a>`;
+  if (role === "citizen") return `<a class="btn ghost" href="/yurist-bolish">${esc(t("joinApply"))}</a>`;
+  if (role === "guest") return `<a class="btn ghost" href="/royxat?rol=lawyer">${esc(t("joinReg"))}</a>`;
+  return "";
+};
 export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, extra = [] }){
   const l = [...extra, ...LAWYERS].find(x => x.id === id);
   if (!l) return null;
@@ -279,7 +288,7 @@ function requestBox(l, lang, user, query){
 // Kabinet faqat Yurist Pro (sinov yoki faol) obunachilari uchun; qolganlarga — imkoniyatlar va obuna yo‘li
 export function cabinetPage({ lang, cssHref, fs, jsHref, user, accHref, pro, db }){
   const t = tr(lang);
-  const open = user && (pro?.tools || user.role === "admin");
+  const open = user && pro?.tools;                       // kim kira olishini server/access.js hal qiladi (admin uchun istisno yo‘q)
   if (!open){
     const list = FEAT.pro.map(f => `<li>${esc(pick(f, lang))}</li>`).join("");
     const cta = !db ? `<p class="note warn">${esc(t("cabNoDb"))}</p>`

@@ -8,6 +8,7 @@ import { clean, ValidationError } from "./validate.js";
 
 const scrypt = promisify(_scrypt);
 const N = 16384, KEYLEN = 64;
+import { HOME } from "./access.js";           // kirgandan keyin har bir rol o‘z «uyi»ga
 export async function hashPassword(pw){
   const salt = randomBytes(16);
   const key = await scrypt(pw, salt, KEYLEN, { N, r: 8, p: 1 });
@@ -92,7 +93,7 @@ export async function register(req, res){
     return u;
   }).catch(e => { throw e.code === "23505" ? new ValidationError("emailTaken") : e; });
   await createSession(res, req, user.id);
-  res.status(201).json({ ok: true, role: user.role, next: user.role === "admin" ? "/admin" : "/hisob" });
+  res.status(201).json({ ok: true, role: user.role, next: HOME[user.role] || "/hisob" });
 }
 
 export async function login(req, res){
@@ -108,7 +109,7 @@ export async function login(req, res){
   const role = admins().has(email) && u.role !== "admin" ? "admin" : u.role;
   await q("update users set failed_logins = 0, locked_until = null, last_login_at = now(), role = $2 where id = $1", [u.id, role]);
   await createSession(res, req, u.id);
-  res.json({ ok: true, role, next: role === "admin" ? "/admin" : "/hisob" });
+  res.json({ ok: true, role, next: HOME[role] || "/hisob" });
 }
 
 export async function logout(req, res){

@@ -108,7 +108,11 @@ const MIGRATIONS = [
      user_id bigint primary key references users(id) on delete cascade,
      data jsonb not null,
      updated_at timestamptz not null default now());
-   create index lawyer_events_day on lawyer_events(lawyer_ref, created_at);`
+   create index lawyer_events_day on lawyer_events(lawyer_ref, created_at);`,
+  // 3 — moderator roli (yurist arizalari va rasm moderatsiyasi) va rasm tekshirilgan vaqt
+  `alter table users drop constraint if exists users_role_check;
+   alter table users add constraint users_role_check check (role in ('citizen','lawyer','org','moderator','admin'));
+   alter table lawyer_profiles add column photo_reviewed_at timestamptz;`
 ];
 
 let pool = null;

@@ -147,6 +147,13 @@ export async function adminAct(req, res){
     if (r.rowCount && act === "approve") await q("update users set role = 'lawyer' where id = (select user_id from lawyer_profiles where id = $1) and role = 'citizen'", [id]);
     if (!r.rowCount) throw err("notFound", 404);
   }
+  else if (kind === "photo" && ["approve", "remove"].includes(act)){
+    // Rasm moderatsiyasi: tasdiqlash yoki o‘chirish (yurist keyin yangisini yuklashi mumkin)
+    const r = act === "approve"
+      ? await q("update lawyer_profiles set photo_reviewed_at = now() where id = $1 and photo is not null", [id])
+      : await q("update lawyer_profiles set photo = null, photo_type = null, photo_at = null, photo_reviewed_at = now() where id = $1", [id]);
+    if (!r.rowCount) throw err("notFound", 404);
+  }
   else if (kind === "payment" && act === "confirm"){
     await tx(async run => {
       const p = (await run("select * from payments where id = $1 for update", [id])).rows[0];
@@ -165,13 +172,19 @@ export async function adminAct(req, res){
     await q("update subscriptions set status = 'cancelled', ends_at = now() where id = $1", [id]);
   }
   else if (kind === "user" && act === "role"){
-    const role = ["citizen", "lawyer", "org", "admin"].includes(req.body?.role) ? req.body.role : null;
+    const role = ["citizen", "lawyer", "org", "moderator", "admin"].includes(req.body?.role) ? req.body.role : null;
     if (!role) throw err("option");
     if (id === req.user.id && role !== "admin") throw err("ownRole");
     await q("update users set role = $2 where id = $1", [id, role]);
   }
   else throw err("option", 404);
   res.json({ ok: true });
+}
+
+// Rasm moderatsiyasi navbati: yangi yoki o‘zgargan, hali tekshirilmagan rasmlar
+export async function photoQueue(){
+  return (await q(`select id, name, kind, status, photo_at from lawyer_profiles
+    where photo is not null and (photo_reviewed_at is null or photo_at > photo_reviewed_at) order by photo_at limit 100`)).rows;
 }
 
 // Admin paneli uchun tahlil: foydalanuvchilar, obunalar, daromad, yuristlar, kelishuvlar

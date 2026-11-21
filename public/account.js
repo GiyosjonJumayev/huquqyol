@@ -2,6 +2,7 @@
 //  <form data-api="/api/..." data-next="/hisob">  — maydonlar JSON bo‘lib yuboriladi (checkbox → true/false)
 //  <button data-post="/api/..." data-body='{"plan":"pro"}'> — bitta amal; muvaffaqiyatda sahifa yangilanadi yoki next ga o‘tiladi
 import { mountA11y } from "/a11y.js";
+import "/session.js";
 const lang = document.documentElement.dataset.lang || "uz";
 mountA11y({ lang });                                 // «Aa Qulaylik» oynasi (shrift, ovoz, mavzu) — bosh sahifadagi bilan bir xil
 const NET = { uz:"Internet aloqasi yo‘q. Qayta urinib ko‘ring.", cyr:"Интернет алоқаси йўқ. Қайта уриниб кўринг.", ru:"Нет соединения. Попробуйте ещё раз." };
