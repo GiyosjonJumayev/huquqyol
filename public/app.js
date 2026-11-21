@@ -2,7 +2,7 @@
 import { esc, ICONS, examples, domainCardsHTML, examplesHTML, acctHTML } from "/shared.js";
 import { makeT, normLang, fmtDate, fmtMoney } from "/i18n.js";
 import { toCyrillic as toCyr } from "/translit.js";
-import { getFs, setFs, ttsSupported, speak, pause as ttsPauseToggle, stop as ttsStop, isSpeaking } from "/a11y.js";
+import { ttsSupported, stop as ttsStop, isSpeaking, mountA11y } from "/a11y.js";
 import { findPlace, courtFromForm, allCourts } from "/courts.js";
 const $ = s => document.querySelector(s);
 const fmtSum = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -504,50 +504,13 @@ function pageItems(){
   return v === 2 ? planItems() : v === 3 ? docItems() : homeItems();
 }
 
-let ttsRate = 1, warnedRu = false;
-try { ttsRate = Number(localStorage.getItem("huquqyol:rate")) || 1; } catch {}
-function ttsUi(st){
-  const on = st === "playing" || st === "paused";
-  $("#ttsBar").hidden = !on;
-  document.body.classList.toggle("speaking", on);
-  $("#ttsState").textContent = t(st === "paused" ? "ttsPaused" : "ttsReading");
-  $("#ttsPause").textContent = t(st === "paused" ? "ttsResume" : "ttsPause");
-  document.querySelectorAll("[data-tts]").forEach(b => b.setAttribute("aria-pressed", String(on)));
-  if (st === "error") toast(t("ttsErr"));
-}
-async function readAloud(items){
-  if (!ttsSupported()){ toast(t("ttsNone")); return; }
-  if (isSpeaking()){ ttsStop(); return; }                  // ikkinchi bosish — to‘xtatish
-  const r = await speak(items, { lang: LANG === "ru" ? "ru" : "uz", rate: ttsRate, onState: ttsUi });
-  if (r.mode === "ru" && !warnedRu && LANG !== "ru"){ warnedRu = true; toast(t("ttsNoUz")); }
-}
-function syncA11y(){
-  const fs = getFs();
-  document.querySelectorAll(".fsopts [data-fs]").forEach(b => b.setAttribute("aria-pressed", String(Number(b.dataset.fs) === fs)));
-  document.querySelectorAll(".speed [data-rate]").forEach(b => b.setAttribute("aria-pressed", String(Number(b.dataset.rate) === ttsRate)));
-}
-function initA11y(){
-  const btn = $("#a11yBtn"), panel = $("#a11yPanel");
-  btn.addEventListener("click", () => { const open = panel.hidden; panel.hidden = !open; btn.setAttribute("aria-expanded", String(open)); if (open) panel.querySelector("[aria-pressed='true']")?.focus(); });
-  panel.addEventListener("click", e => {
-    const f = e.target.closest(".fsopts [data-fs]");
-    if (f){ const v = setFs(Number(f.dataset.fs)); syncA11y(); announce(t("fsDone", { v: t("fs" + v) })); return; }
-    const r = e.target.closest(".speed [data-rate]");
-    if (r){ ttsRate = Number(r.dataset.rate); try { localStorage.setItem("huquqyol:rate", String(ttsRate)); } catch {} syncA11y(); }
-  });
-  $("#ttsPage").addEventListener("click", () => readAloud(pageItems()));
-  $("#ttsDoc").addEventListener("click", () => readAloud(docItems()));
-  $("#ttsPause").addEventListener("click", ttsPauseToggle);
-  $("#ttsStopBtn").addEventListener("click", () => ttsStop());
-  document.addEventListener("keydown", e => {
-    if (e.key !== "Escape") return;
-    if (isSpeaking()){ ttsStop(); return; }
-    if (!panel.hidden && !$("#dlg").open){ panel.hidden = true; btn.setAttribute("aria-expanded", "false"); btn.focus(); }
-  });
-  if (!ttsSupported()){ $("#ttsNote").textContent = t("ttsNone"); $("#ttsPage").disabled = true; $("#ttsDoc").hidden = true; }
-  syncA11y();
-}
-initA11y();
+// «Aa Qulaylik» oynasi va ovozli o‘qish — public/a11y.js (barcha sahifalar uchun bitta komponent)
+const a11y = mountA11y({ lang: LANG, getItems: pageItems, notify: toast });
+const readAloud = items => a11y.readAloud(items);
+$("#ttsDoc").addEventListener("click", () => readAloud(docItems()));
+if (!ttsSupported()) $("#ttsDoc").hidden = true;
+// Boshqa sahifadagi «Ma’lumotlarimni o‘chirish» havolasi: /?ochirish=1 → shu yerda tasdiqlab o‘chiriladi
+if (new URLSearchParams(location.search).has("ochirish")){ history.replaceState(null, "", location.pathname); setTimeout(() => $("#wipe").click(), 0); }
 
 /* ---------- Kalendar eslatmasi (.ics) va rejani chop etish ---------- */
 const icsEsc = s => String(s).replace(/[\\;,]/g, m => "\\" + m).replace(/\r?\n/g, "\\n");
@@ -1188,12 +1151,3 @@ try {
   $("#cases").innerHTML = `<p class="error" role="alert">${esc(t("serverDown", { msg: e.message }))}</p>`;
 }
 
-// Mavzu: yorug‘ ↔ qorong‘i (sahifani qayta yuklamasdan); tanlov cookie da — server keyingi sahifani shu mavzuda chizadi
-document.addEventListener("click", e => {
-  const b = e.target.closest("[data-theme-toggle]"); if (!b) return;
-  e.preventDefault();
-  const root = document.documentElement, cur = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  const next = cur === "dark" ? "light" : "dark";
-  root.dataset.theme = next;
-  document.cookie = `hy_theme=${next}; path=/; max-age=31536000; samesite=lax`;
-});

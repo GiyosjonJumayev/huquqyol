@@ -1044,3 +1044,46 @@ html[data-fs="3"] .tools{grid-template-columns:minmax(0,1fr)}
 .feat.big li{position:relative;padding:12px 14px 12px 44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600}
 .feat.big li::before{content:"✓";position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:13px}
 .syncstate{font-weight:600;color:var(--ok)}
+
+/* ---------- «Aa Qulaylik» modal oynasi (barcha sahifalar) ---------- */
+/* Menyudek: navbar ostida o‘ng tomonda ochiladi; sahifa kontentini surmaydi. */
+.a11ydlg{position:fixed;inset:72px 16px auto auto;margin:0;padding:0;border:1px solid var(--line);border-radius:18px;
+  width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 88px);overflow:auto;overscroll-behavior:contain;
+  background:var(--surface);color:var(--ink);box-shadow:0 24px 60px -20px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(-10px) scale(.98);transform-origin:top right;transition:opacity .18s ease, transform .18s ease}
+.a11ydlg.in{opacity:1;transform:none}
+.a11ydlg.out{opacity:0;transform:translateY(-10px) scale(.98)}
+.a11ydlg::backdrop{background:rgba(10,15,25,0);transition:background-color .18s ease}
+.a11ydlg.in::backdrop{background:rgba(10,15,25,.55)}
+@media (prefers-reduced-motion:reduce){.a11ydlg,.a11ydlg::backdrop{transition:none}.a11ydlg{transform:none}}
+@media (max-width:520px){.a11ydlg{inset:auto 0 0 0;width:100%;max-width:none;max-height:88dvh;border-radius:18px 18px 0 0;transform:translateY(16px);transform-origin:bottom center}
+  .a11ydlg.out{transform:translateY(16px)}}
+.a11yin{display:grid;gap:18px;padding:18px 18px 20px}
+.a11ytop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.a11yx{flex:none;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);cursor:pointer}
+.a11yx svg{width:20px;height:20px}
+.a11yx:hover{background:var(--chip)}
+.a11ydlg .fsopts{grid-template-columns:repeat(2,minmax(0,1fr))}
+.thopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.thopts button{min-height:48px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:calc(15px * var(--fs))}
+.thopts button[aria-pressed="true"]{border:2px solid var(--accent);background:var(--accent-soft);font-weight:600}
+.thopts .ni{width:20px;height:20px;flex:none}
+html[data-fs="3"] .a11ydlg .fsopts,html[data-fs="3"] .thopts{grid-template-columns:minmax(0,1fr)}
+@media print{.a11ydlg{display:none!important}}
+
+/* ---------- Umumiy footer: havolalar ---------- */
+.footlinks ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:0 4px}
+.footlinks li{display:flex}
+.footlinks a,.footlinks .linkbtn{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;color:var(--accent);font-size:calc(14px * var(--fs))}
+.footlinks li:first-child a{padding-left:0}
+.footlinks [aria-current="page"]{color:var(--ink);font-weight:600}
+.pvsec p{max-width:70ch}
+/* Tor ekranda navbar sig‘ishi uchun: mavzu almashtirgich «Aa Qulaylik» oynasida bor — navbardan yashiriladi;
+   brend nomi katta shriftda ham cheklangan o‘lchamda */
+@media (max-width:420px){
+  .navright:has(.a11ybtn) .themebtn{display:none}
+  .nav .brand{font-size:min(calc(19px * var(--fs)), 22px)}
+  .nav .a11ybtn{padding-inline:10px}
+  .nav .a11ybtn .aa{font-size:min(calc(17px * var(--fs)), 20px)}
+}
+

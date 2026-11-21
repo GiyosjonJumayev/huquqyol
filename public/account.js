@@ -1,7 +1,9 @@
 // Hisob sahifalari (kirish, ro‘yxat, «Hisobim», admin, katalog, tariflar): formalar va tugmalar JSON API ga.
 //  <form data-api="/api/..." data-next="/hisob">  — maydonlar JSON bo‘lib yuboriladi (checkbox → true/false)
 //  <button data-post="/api/..." data-body='{"plan":"pro"}'> — bitta amal; muvaffaqiyatda sahifa yangilanadi yoki next ga o‘tiladi
+import { mountA11y } from "/a11y.js";
 const lang = document.documentElement.dataset.lang || "uz";
+mountA11y({ lang });                                 // «Aa Qulaylik» oynasi (shrift, ovoz, mavzu) — bosh sahifadagi bilan bir xil
 const NET = { uz:"Internet aloqasi yo‘q. Qayta urinib ko‘ring.", cyr:"Интернет алоқаси йўқ. Қайта уриниб кўринг.", ru:"Нет соединения. Попробуйте ещё раз." };
 const ERR = { uz:"Xatolik yuz berdi.", cyr:"Хатолик юз берди.", ru:"Произошла ошибка." };
 const MOD = { uz:"Profil moderatsiyaga yuborildi.", cyr:"Профил модерацияга юборилди.", ru:"Профиль отправлен на модерацию." };
@@ -82,12 +84,3 @@ document.addEventListener("change", e => {
   if (g) g.hidden = r.dataset.show !== "true";
 });
 
-// Mavzu: yorug‘ ↔ qorong‘i (sahifani qayta yuklamasdan); tanlov cookie da — server keyingi sahifani shu mavzuda chizadi
-document.addEventListener("click", e => {
-  const b = e.target.closest("[data-theme-toggle]"); if (!b) return;
-  e.preventDefault();
-  const root = document.documentElement, cur = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  const next = cur === "dark" ? "light" : "dark";
-  root.dataset.theme = next;
-  document.cookie = `hy_theme=${next}; path=/; max-age=31536000; samesite=lax`;
-});

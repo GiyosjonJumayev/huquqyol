@@ -81,7 +81,9 @@ test("Statistika sahifasi: uch tilda, inline style va skript yoâ€˜q, sohalar roâ
     assert.equal(r.status, 200);
     const html = await r.text();
     assert.ok(html.includes(word), lang);
-    assert.ok(!/\sstyle=|<script/.test(html), lang);
+    assert.ok(!/\sstyle=|<script(?![^>]*\bsrc=)/.test(html), lang);                 // faqat tashqi modul (Qulaylik oynasi)
+    assert.match(html, /<dialog class="a11ydlg" id="a11yDlg"/, lang);
+    assert.match(html, /<footer class="sitefoot">/, lang);
     assert.ok((html.match(/<td class="barcell" role="cell">/g) || []).length >= 12, lang);
   }
   assert.match(await (await fetch(base + "/statistika", { headers:{ cookie:"hy_fs=2" } })).text(), /<html data-fs="2"/);

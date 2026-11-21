@@ -115,7 +115,7 @@ const M = {
   evidenceHint:{ uz:"Belgilaganlaringiz arizaning «Ilovalar» ro‘yxatiga qo‘shiladi.", ru:"Отмеченное попадёт в раздел «Приложения» заявления." },
   evCount:{ uz:"· {a} / {b} bor", ru:"· есть {a} из {b}" },
   a11y:{ uz:"Qulaylik", ru:"Удобство" },
-  a11yTitle:{ uz:"Qulaylik: shrift va ovozli o‘qish", ru:"Удобство: шрифт и чтение вслух" },
+  a11yTitle:{ uz:"Qulaylik: shrift, ovoz va mavzu", ru:"Удобство: шрифт, голос и тема" },
   fsLabel:{ uz:"Shrift o‘lchami", ru:"Размер шрифта" },
   fs0:{ uz:"Oddiy", ru:"Обычный" }, fs1:{ uz:"Katta", ru:"Крупный" }, fs2:{ uz:"Juda katta", ru:"Очень крупный" }, fs3:{ uz:"Eng katta", ru:"Самый крупный" },
   fsDone:{ uz:"Shrift o‘lchami: {v}", ru:"Размер шрифта: {v}" },
@@ -300,6 +300,11 @@ const M = {
   onlineMissP:{ uz:"Matnda {n} ta bo‘sh joy [ ] bilan qoladi: {list}. Baribir nusxalaysizmi?", ru:"В тексте останутся пустые места [ ] ({n}): {list}. Всё равно скопировать?" },
   copyAnyway:{ uz:"Baribir nusxalash", ru:"Всё равно скопировать" },
   onlineOrgFallback:{ uz:"arizadagi idora", ru:"орган, указанный в заявлении" },
+  close:{ uz:"Yopish", ru:"Закрыть" },
+  ttsOff:{ uz:"O‘qishni to‘xtatish", ru:"Остановить чтение" },
+  themeLabel:{ uz:"Mavzu", ru:"Тема" }, themeLight:{ uz:"Yorug‘", ru:"Светлая" }, themeDark:{ uz:"Qorong‘i", ru:"Тёмная" },
+  footNav:{ uz:"Sayt bo‘limlari", ru:"Разделы сайта" }, footStats:{ uz:"Statistika", ru:"Статистика" },
+  footPrivacy:{ uz:"Maxfiylik", ru:"Конфиденциальность" }, footBot:{ uz:"Telegram bot", ru:"Telegram-бот" },
   dlDisclaimer:{ uz:"Bu yuridik maslahat emas — hujjat loyihasi.", ru:"Это не юридическая консультация — проект документа." }
 };
 

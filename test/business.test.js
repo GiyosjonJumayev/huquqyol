@@ -43,7 +43,7 @@ test("Sahifalar uch tilda: tariflar, katalog, profil, kabinet; inline skript va 
       assert.equal(r.status, 200, `${lang} ${p}`);
       assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>/i.test(html), `${p}: inline skript`);
       assert.ok(!/\sstyle=/i.test(html), `${p}: style atributi`);
-      if (lang === "ru") assert.ok(!/[a-z]{4,}/i.test(html.replace(/<[^>]+>/g, " ").replace(/HuquqYo‘l|Pro|example\.com|namuna\d|lex\.uz|UZ|RU|EN|my\.sud\.uz|O‘zb|Ўзб|DOCX|PDF|JSON|JavaScript/g, "")), `${p}: ruscha sahifada lotin matn`);
+      if (lang === "ru") assert.ok(!/[a-z]{4,}/i.test(html.replace(/<[^>]+>/g, " ").replace(/HuquqYo‘l|Pro|example\.com|namuna\d|lex\.uz|UZ|RU|EN|my\.sud\.uz|O‘zb|Ўзб|DOCX|PDF|JSON|JavaScript|Telegram/g, "")), `${p}: ruscha sahifada lotin matn`);
     }
   }
   const t = await (await get("/yuristlar")).text();

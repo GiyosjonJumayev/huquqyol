@@ -5,7 +5,7 @@ import { readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { HTML_LANG, fmtSum, makeT } from "../public/i18n.js";
-import { siteNav } from "../public/shared.js";
+import { siteNav, siteFooter, a11yDialogHTML } from "../public/shared.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
 import { clean, ValidationError } from "./validate.js";
@@ -127,13 +127,15 @@ function minPrice(l){
 
 // ---------- Umumiy sahifa qobig‘i ----------
 export function page({ lang, title, desc, path, cssHref, fs, body, scripts = "", user = null, accHref = "" }){
-  const t = tr(lang), here = p => p === path.split("?")[0] ? ` aria-current="page"` : "";
+  const t = tr(lang), mt = makeT(lang);
   const sep = path.includes("?") ? "&" : "?";
   return `<!doctype html><html${fs ? ` data-fs="${fs}"` : ""} lang="${HTML_LANG[lang]}" data-lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} — HuquqYo‘l</title><meta name="description" content="${esc(desc)}"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="${cssHref}"></head>
 <body class="biz"><a class="skip" href="#main">${esc(t("skip"))}</a><div class="wrap">
-<header class="nav">${siteNav({ lang, t: makeT(lang), mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}` })}</header>
-<main id="main">${body}</main></div>${accHref ? `<script type="module" src="${accHref}"></script>` : ""}${scripts}</body></html>`;
+<header class="nav">${siteNav({ lang, t: mt, mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}`, a11y: true })}</header>
+<main id="main">${body}</main>
+${siteFooter(mt, { path, botUrl: process.env.TELEGRAM_BOT_URL })}</div>
+${a11yDialogHTML(mt)}${accHref ? `<script type="module" src="${accHref}"></script>` : ""}${scripts}</body></html>`;
 }
 
 // ---------- Tariflar ----------
@@ -316,4 +318,42 @@ export function vCustom(b){
   const title = clean(b?.title, 120), text = String(b?.text ?? "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "").slice(0, 20000).trim();
   if (text.length < 2) throw new ValidationError("docText");
   return { title, text, letterhead: vLetterhead(b?.letterhead) };
+}
+
+// ---------- Maxfiylik ----------
+// Faqat kodda haqiqatan bajariladigan narsalar yoziladi (stats.js, photo.js, auth.js, bot/). Huquqiy ko‘rib chiqish kerak.
+const PV = {
+  title: ["Maxfiylik", "Конфиденциальность"],
+  lead: ["HuquqYo‘l qaysi ma’lumotlarni ishlatadi, qayerda saqlaydi va ularni qanday o‘chirish mumkin.", "Какие данные использует HuquqYo‘l, где хранит и как их удалить."],
+  h1: ["Hisobsiz foydalanish", "Без аккаунта"],
+  p1: ["Ariza uchun kiritgan ma’lumotlaringiz (ism, manzil, holat tafsilotlari) faqat shu brauzerda saqlanadi. Ularni istalgan vaqtda pastdagi «Ma’lumotlarimni o‘chirish» havolasi bilan o‘chirishingiz mumkin.", "Данные для заявления (ФИО, адрес, детали ситуации) хранятся только в этом браузере. Их можно в любой момент удалить по ссылке «Удалить мои данные» внизу страницы."],
+  h2: ["Tahlil va hujjat", "Анализ и документ"],
+  p2: ["Holat matni tahlil uchun serverga yuboriladi va saqlanmaydi. Ariza ma’lumotlari faqat DOCX yoki PDF fayl yasash uchun ishlatiladi.", "Текст ситуации отправляется на сервер для анализа и не сохраняется. Данные заявления используются только для создания файла DOCX или PDF."],
+  pAi: ["Hozir AI rejimi yoqilgan: tahlil uchun matn Anthropic (Claude, AQSH) ga uzatiladi.", "Сейчас включён режим AI: для анализа текст передаётся в Anthropic (Claude, США)."],
+  pNoAi: ["Hozir AI rejimi o‘chirilgan: tahlil faqat shu serverda, qoidalar bilan bajariladi.", "Сейчас режим AI выключен: анализ выполняется только на этом сервере, по правилам."],
+  h3: ["Hujjat rasmi va PDF", "Фото документа и PDF"],
+  p3: ["Rasm o‘qish uchun serverga yuboriladi: faqat so‘rov davomida xotirada turadi, saqlanmaydi va logga yozilmaydi. PDF faylning o‘zi serverga yuborilmaydi — brauzer undan matn yoki sahifa rasmlarini oladi.", "Фото отправляется на сервер для распознавания: находится в памяти только во время запроса, не сохраняется и не пишется в журнал. Сам PDF-файл на сервер не отправляется — браузер извлекает из него текст или изображения страниц."],
+  h4: ["Anonim statistika", "Анонимная статистика"],
+  p4: ["Faqat sonlar saqlanadi: qaysi soha va holat ochilgani, nechta hujjat yasalgani. Matn, ariza ma’lumotlari, IP manzil va cookie saqlanmaydi.", "Сохраняются только числа: какие области и ситуации открывались, сколько документов создано. Текст, данные заявлений, IP-адрес и cookie не сохраняются."],
+  h5: ["Cookie", "Cookie"],
+  p5: ["hy_lang — til, hy_fs — shrift o‘lchami, hy_theme — mavzu, hy_photo — rasm paneli yopilgani. Hisobga kirsangiz — kirish uchun sessiya cookie (HttpOnly).", "hy_lang — язык, hy_fs — размер шрифта, hy_theme — тема, hy_photo — закрыта ли панель фото. Если вы вошли в аккаунт — cookie сессии (HttpOnly, только для входа)."],
+  h6: ["Hisob", "Аккаунт"],
+  p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист."],
+  h7: ["Telegram bot", "Telegram-бот"],
+  p7: ["Bot suhbat holatini faqat xotirada, 1 soatgacha saqlaydi; /delete buyrug‘i uni darhol o‘chiradi. Xabarlar matni logga yozilmaydi.", "Бот хранит состояние диалога только в памяти, до 1 часа; команда /delete сразу его удаляет. Текст сообщений не пишется в журнал."],
+  botSoon: ["Bot havolasi tez orada shu yerda bo‘ladi.", "Ссылка на бота скоро появится здесь."],
+  botOpen: ["Botni ochish", "Открыть бота"]
+};
+export function privacyPage({ lang, cssHref, fs, user, accHref, ai = false, botUrl = "" }){
+  // Texnik nomlar (cookie nomlari, buyruqlar, fayl turlari) kirillga o‘girilmaydi
+  const keep = /(hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|DOCX|PDF|AI|Telegram)/;
+  const p = k => { const s = PV[k][idx(lang)]; return lang === "cyr" ? s.split(keep).map((x, i) => i % 2 ? x : toCyrillic(x)).join("") : s; };
+  const mt = makeT(lang);
+  const bot = /^https:\/\/t\.me\/\w{5,32}$/.test(botUrl || "") ? botUrl : "";
+  const sec = (h, ...ps) => `<section class="pvsec"><h2 class="sec">${esc(p(h))}</h2>${ps.map(x => `<p>${esc(p(x))}</p>`).join("")}</section>`;
+  return page({ lang, cssHref, fs, user, accHref, path: "/maxfiylik", title: p("title"), desc: p("lead"), body: `
+    <h1>${esc(p("title"))}</h1><p class="lead">${esc(p("lead"))}</p>
+    ${sec("h1", "p1")}${sec("h2", "p2", ai ? "pAi" : "pNoAi")}${sec("h3", "p3")}${sec("h4", "p4")}${sec("h5", "p5")}${sec("h6", "p6")}
+    <section class="pvsec" id="bot"><h2 class="sec">${esc(p("h7"))}</h2><p>${esc(p("p7"))}</p>
+      <p>${bot ? `<a class="btn ghost" href="${esc(bot)}" target="_blank" rel="noopener noreferrer">${esc(p("botOpen"))}<span class="sr"> ${esc(mt("newTab"))}</span></a>` : esc(p("botSoon"))}</p></section>` });
 }

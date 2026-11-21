@@ -9,7 +9,7 @@ import { SCENARIOS, NORMS, LEX_URL, kbFor, COURTS } from "./kb.js";
 import { analyze, aiEnabled } from "./analyze.js";
 import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, customModel, toDocx, toPdf } from "./documents.js";
-import { plansPage, lawyersPage, lawyerPage, cabinetPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
+import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
 import { initDb, migrate, dbEnabled } from "./db.js";
 import { attachUser, requireUser, requireRole, register, login, logout, changePassword } from "./auth.js";
 import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats } from "./market.js";
@@ -22,7 +22,7 @@ initDb();
 import { securityHeaders, requireJson, rateLimit, sameOrigin, httpsRedirect } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
-import { domainCardsHTML, examplesHTML, siteNav } from "../public/shared.js";
+import { domainCardsHTML, examplesHTML, siteNav, siteFooter, a11yDialogHTML } from "../public/shared.js";
 import { makeT, LANGS, HTML_LANG } from "../public/i18n.js";
 import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
 import { stats, DEFAULT_FILE as STATS_FILE } from "./stats.js";
@@ -205,6 +205,8 @@ function renderIndex(lang){
     .replace("{{ogUrl}}", OG_BASE ? `
 <meta property="og:url" content="${OG_BASE}/?lang=${lang}">` : "")
     .replace("<!--NAV-->", siteNav({ lang, t, mode: "app", path: "/", a11y: true }))
+    .replace("<!--FOOTER-->", siteFooter(t, { mode: "app", path: "/", botUrl: process.env.TELEGRAM_BOT_URL }))
+    .replace("<!--A11Y-->", a11yDialogHTML(t))
     .replace("<!--DOMAINS-->", domainCardsHTML(meta, t))
     .replace("<!--EXAMPLES-->", examplesHTML(lang))
     .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
@@ -227,7 +229,7 @@ app.get("/statistika", (req, res) => {
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
-    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
+    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user, accHref: `/account.js?v=${VER["account.js"]}` })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
 });
 // ---------- Biznes: tariflar, yuristlar katalogi, Yurist Pro kabineti ----------
 const REDIRECTED = Symbol("redirected");
@@ -246,6 +248,7 @@ function bizPage(render){
   })(req, res, next);
 }
 app.get("/tariflar", bizPage(plansPage));
+app.get("/maxfiylik", bizPage(a => privacyPage({ ...a, ai: aiEnabled(), botUrl: process.env.TELEGRAM_BOT_URL })));
 app.get("/yuristlar", bizPage(lawyersPage));
 app.get("/yuristlar/rasm/:id", (req, res, next) => dbEnabled() ? wrap(sendPhoto)(req, res, next) : next());
 app.get("/yuristlar/:id", bizPage(args => { const h = lawyerPage(args); if (h) recordView(args.id, args.query.soha); return h; }));

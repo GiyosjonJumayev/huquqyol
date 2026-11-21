@@ -33,30 +33,6 @@
       <li><button type="button" data-go="3" disabled><span class="n">3</span><span class="lbl">{{step3}}</span></button></li>
     </ol></nav>
   </header>
-  <section class="card a11y" id="a11yPanel" aria-labelledby="a11yH" hidden>
-    <h2 class="a11yh" id="a11yH">{{a11yTitle}}</h2>
-    <div class="a11yrow">
-      <span class="a11yname" id="fsLbl">{{fsLabel}}</span>
-      <div class="fsopts" role="group" aria-labelledby="fsLbl">
-        <button type="button" data-fs="0" aria-pressed="false"><span class="fsA" aria-hidden="true">A</span>{{fs0}}</button>
-        <button type="button" data-fs="1" aria-pressed="false"><span class="fsA" aria-hidden="true">A</span>{{fs1}}</button>
-        <button type="button" data-fs="2" aria-pressed="false"><span class="fsA" aria-hidden="true">A</span>{{fs2}}</button>
-        <button type="button" data-fs="3" aria-pressed="false"><span class="fsA" aria-hidden="true">A</span>{{fs3}}</button>
-      </div>
-    </div>
-    <div class="a11yrow" id="ttsRow">
-      <span class="a11yname" id="ttsLbl">{{ttsLabel}}</span>
-      <div class="ttsopts">
-        <button class="btn primary" id="ttsPage" type="button" data-tts><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>{{ttsPage}}</button>
-        <div class="speed" role="group" aria-label="{{ttsSpeed}}">
-          <span class="small muted" aria-hidden="true">{{ttsSpeed}}:</span>
-          <button type="button" data-rate="0.8" aria-pressed="false">{{ttsSlow}}</button>
-          <button type="button" data-rate="1" aria-pressed="true">{{ttsNormal}}</button>
-        </div>
-      </div>
-      <p class="small muted ttsnote" id="ttsNote">{{ttsSelHint}}</p>
-    </div>
-  </section>
 
   <main id="main">
   <div class="resume" id="resume" hidden></div>
@@ -162,22 +138,14 @@
   </section>
 
 </main>
-  <footer>
-    <div class="disclaim" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p><b>{{disclaimerB}}</b> {{disclaimer}}</p></div>
-    <div><b class="checked">{{checked}}</b> {{sources}} <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz<span class="sr"> {{newTab}}</span></a>.</div>
-    <div>{{local}} <button class="linkbtn" id="wipe" type="button">{{wipe}}</button> · <a href="/statistika">{{stLink}}</a></div>
-  </footer>
+  <!--FOOTER-->
 </div>
 <dialog class="dlg" id="dlg" aria-labelledby="dlgT" aria-describedby="dlgP">
   <h2 id="dlgT"></h2>
   <p id="dlgP"></p>
   <div class="dlgact"><button class="btn ghost" id="dlgNo" type="button" autofocus>{{cancel}}</button><button class="btn danger" id="dlgOk" type="button"></button></div>
 </dialog>
-<div class="ttsbar" id="ttsBar" role="region" aria-label="{{ttsLabel}}" hidden>
-  <span class="ttsdot" aria-hidden="true"></span><span class="ttsstate" id="ttsState" aria-live="polite">{{ttsReading}}</span>
-  <button class="btn ghost sm" id="ttsPause" type="button">{{ttsPause}}</button>
-  <button class="btn primary sm" id="ttsStopBtn" type="button">{{ttsStop}}</button>
-</div>
+<!--A11Y-->
 <!--META-->
 </body>
 </html>

@@ -96,7 +96,7 @@ export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null
   const brand = mode === "app"
     ? `<button class="brand" id="home" type="button" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l<small>${esc(t("navTagline"))}</small></span></button>`
     : `<a class="brand" href="/" aria-label="${esc(t("homeLabel"))}">${LOGO}<span class="bname">HuquqYo‘l<small>${esc(t("navTagline"))}</small></span></a>`;
-  const a11yBtn = a11y ? `<button class="btn ghost a11ybtn" id="a11yBtn" type="button" aria-expanded="false" aria-controls="a11yPanel" title="${esc(t("a11y"))}"><span class="aa" aria-hidden="true">Aa</span><span class="a11ylbl sr">${esc(t("a11y"))}</span></button>` : "";
+  const a11yBtn = a11y ? `<button class="btn ghost a11ybtn" id="a11yBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="a11yDlg" title="${esc(t("a11y"))}"><span class="aa" aria-hidden="true">Aa</span><span class="a11ylbl sr">${esc(t("a11y"))}</span></button>` : "";
   return `<div class="navbar">
     ${brand}
     <nav class="navlinks" aria-label="${esc(t("navLabel"))}">${linksHTML}</nav>
@@ -116,3 +116,71 @@ export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null
 }
 
 export const examplesHTML = lang => examples(lang).map((e, i) => `<button class="chipbtn" type="button" data-ex="${i}">${esc(e)}</button>`).join("");
+
+/* ---------- «Aa Qulaylik» oynasi (barcha sahifalar uchun bitta) ---------- */
+// Modal <dialog>: shrift o‘lchami (4 daraja), ovozli o‘qish, yorug‘/qorong‘i mavzu. Boshqaruv — public/a11y.js (mountA11y).
+const SPK = '<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>';
+export function a11yDialogHTML(t){
+  const fs = [0, 1, 2, 3].map(i => `<button type="button" data-fs="${i}" aria-pressed="false"><span class="fsA" aria-hidden="true">A</span>${esc(t("fs" + i))}</button>`).join("");
+  return `<dialog class="a11ydlg" id="a11yDlg" aria-labelledby="a11yH">
+  <div class="a11yin">
+    <div class="a11ytop"><h2 class="a11yh" id="a11yH">${esc(t("a11yTitle"))}</h2>
+      <button class="a11yx" type="button" data-a11y-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="sr">${esc(t("close"))}</span></button></div>
+    <div class="a11yrow">
+      <span class="a11yname" id="fsLbl">${esc(t("fsLabel"))}</span>
+      <div class="fsopts" role="group" aria-labelledby="fsLbl">${fs}</div>
+    </div>
+    <div class="a11yrow" id="ttsRow">
+      <span class="a11yname" id="ttsLbl">${esc(t("ttsLabel"))}</span>
+      <div class="ttsopts">
+        <button class="btn primary" id="ttsPage" type="button" data-tts aria-pressed="false" data-on="${esc(t("ttsOff"))}" data-off="${esc(t("ttsPage"))}">${SVG(SPK)}<span class="ttslbl">${esc(t("ttsPage"))}</span></button>
+        <div class="speed" role="group" aria-label="${esc(t("ttsSpeed"))}">
+          <span class="small muted" aria-hidden="true">${esc(t("ttsSpeed"))}:</span>
+          <button type="button" data-rate="0.8" aria-pressed="false">${esc(t("ttsSlow"))}</button>
+          <button type="button" data-rate="1" aria-pressed="true">${esc(t("ttsNormal"))}</button>
+        </div>
+      </div>
+      <p class="small muted ttsnote" id="ttsNote" data-none="${esc(t("ttsNone"))}">${esc(t("ttsSelHint"))}</p>
+    </div>
+    <div class="a11yrow">
+      <span class="a11yname" id="thLbl">${esc(t("themeLabel"))}</span>
+      <div class="thopts" role="group" aria-labelledby="thLbl">
+        <button type="button" data-set-theme="light" aria-pressed="false">${ni("sun")}${esc(t("themeLight"))}</button>
+        <button type="button" data-set-theme="dark" aria-pressed="false">${ni("moon")}${esc(t("themeDark"))}</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="ttsbar" id="ttsBar" role="region" aria-label="${esc(t("ttsLabel"))}" hidden data-reading="${esc(t("ttsReading"))}" data-paused="${esc(t("ttsPaused"))}" data-pause="${esc(t("ttsPause"))}" data-resume="${esc(t("ttsResume"))}" data-err="${esc(t("ttsErr"))}" data-no-uz="${esc(t("ttsNoUz"))}" data-fs-done="${esc(t("fsDone"))}" data-fs-names="${esc([0, 1, 2, 3].map(i => t("fs" + i)).join("|"))}">
+  <span class="ttsdot" aria-hidden="true"></span><span class="ttsstate" id="ttsState" aria-live="polite">${esc(t("ttsReading"))}</span>
+  <button class="btn ghost sm" id="ttsPause" type="button">${esc(t("ttsPause"))}</button>
+  <button class="btn primary sm" id="ttsStopBtn" type="button">${esc(t("ttsStop"))}</button>
+</div>`;
+}
+
+/* ---------- Umumiy pastki qism (footer) ---------- */
+// TODO: Telegram bot havolasi BotFather’da nom olingach shu yerga yoziladi (masalan "https://t.me/<bot_nomi>").
+// Bo‘sh bo‘lsa yoki serverda TELEGRAM_BOT_URL berilmasa — havola «Maxfiylik» sahifasidagi bot bo‘limiga olib boradi.
+export const TELEGRAM_BOT_URL = "";
+export const botHref = (url = TELEGRAM_BOT_URL) => /^https:\/\/t\.me\/\w{5,32}$/.test(url || "") ? url : "/maxfiylik#bot";
+// mode "app" — bosh sahifa (o‘chirish tugmasi joyida ishlaydi); boshqa sahifalarda — bosh sahifaga o‘tib o‘chiriladi
+export function siteFooter(t, { mode = "page", path = "/", botUrl = TELEGRAM_BOT_URL } = {}){
+  const bh = botHref(botUrl), ext = bh.startsWith("https:");
+  const cur = p => (path.split("?")[0] === p ? ` aria-current="page"` : "");
+  const wipe = mode === "app"
+    ? `<button class="linkbtn" id="wipe" type="button">${esc(t("wipe"))}</button>`
+    : `<a href="/?ochirish=1">${esc(t("wipe"))}</a>`;
+  return `<footer class="sitefoot">
+    <div class="disclaim" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p><b>${esc(t("disclaimerB"))}</b> ${esc(t("disclaimer"))}</p></div>
+    <div><b class="checked">${esc(t("checked"))}</b> ${esc(t("sources"))} <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz<span class="sr"> ${esc(t("newTab"))}</span></a>.</div>
+    <div>${esc(t("local"))}</div>
+    <nav class="footlinks" aria-label="${esc(t("footNav"))}"><ul>
+      <li><a href="/statistika"${cur("/statistika")}>${esc(t("footStats"))}</a></li>
+      <li><a href="/tariflar"${cur("/tariflar")}>${esc(t("navPlans"))}</a></li>
+      <li><a href="/yuristlar"${cur("/yuristlar")}>${esc(t("navLawyers"))}</a></li>
+      <li><a href="/maxfiylik"${cur("/maxfiylik")}>${esc(t("footPrivacy"))}</a></li>
+      <li>${wipe}</li>
+      <li><a href="${esc(bh)}"${ext ? ` target="_blank" rel="noopener noreferrer"` : ""}>${esc(t("footBot"))}${ext ? `<span class="sr"> ${esc(t("newTab"))}</span>` : ""}</a></li>
+    </ul></nav>
+  </footer>`;
+}
