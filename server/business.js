@@ -4,7 +4,8 @@
 import { readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { HTML_LANG, fmtSum } from "../public/i18n.js";
+import { HTML_LANG, fmtSum, makeT } from "../public/i18n.js";
+import { siteNav } from "../public/shared.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
 import { clean, ValidationError } from "./validate.js";
@@ -127,9 +128,7 @@ export function page({ lang, title, desc, path, cssHref, fs, body, scripts = "",
   return `<!doctype html><html${fs ? ` data-fs="${fs}"` : ""} lang="${HTML_LANG[lang]}" data-lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)} — HuquqYo‘l</title><meta name="description" content="${esc(desc)}"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="${cssHref}"></head>
 <body class="biz"><a class="skip" href="#main">${esc(t("skip"))}</a><div class="wrap">
-<header class="top bizhead"><a class="brand" href="/">HuquqYo‘l</a>
-<nav class="biznav" aria-label="HuquqYo‘l"><a href="/"${here("/")}>${esc(t("navHome"))}</a><a href="/yuristlar"${here("/yuristlar")}>${esc(t("navLawyers"))}</a><a href="/tariflar"${here("/tariflar")}>${esc(t("navPlans"))}</a><a href="/kabinet"${here("/kabinet")}>${esc(t("navCabinet"))}</a>${user ? (user.role === "admin" ? `<a href="/admin"${here("/admin")}>${esc(t("navAdmin"))}</a>` : "") + `<a href="/hisob"${here("/hisob")}>${esc(t("navAccount"))}</a>` : `<a href="/kirish"${here("/kirish")}>${esc(t("navLogin"))}</a>`}</nav>
-<nav class="langsw" aria-label="Til / Язык">${[["uz","O‘zb"],["cyr","Ўзб"],["ru","Рус"]].map(([l, n]) => `<a href="${esc(path + sep)}lang=${l}" ${l === lang ? `aria-current="page"` : ""} lang="${HTML_LANG[l]}">${n}</a>`).join("")}</nav></header>
+<header class="nav">${siteNav({ lang, t: makeT(lang), mode: "page", path, user, langHref: l => `${path}${sep}lang=${l}` })}</header>
 <main id="main">${body}</main></div>${accHref ? `<script type="module" src="${accHref}"></script>` : ""}${scripts}</body></html>`;
 }
 

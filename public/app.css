@@ -873,3 +873,89 @@ footer .checked{color:var(--ink)}
 .empty{color:var(--muted);background:var(--chip);border-radius:10px;padding:14px}
 .kab .ok{color:var(--ok);font-weight:600}
 .kab .err{color:var(--stamp)}
+
+/* ================= Navbar (barcha sahifalar) =================
+   Yopishqoq, shaffof-xira fon to‘liq kenglikda; desktop: havolalar + til menyusi + hisob;
+   ≤ 900px: «Aa» va «☰» menyu (havolalar, til, hisob ichida). */
+html,body{overflow-x:clip}
+.nav{position:sticky;top:0;z-index:40;margin-bottom:14px;isolation:isolate}
+.nav::before{content:"";position:absolute;inset:0 -100vmax;z-index:-1;background:color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter:saturate(1.5) blur(14px);backdrop-filter:saturate(1.5) blur(14px);border-bottom:1px solid color-mix(in srgb, var(--line) 80%, transparent)}
+.navbar{display:flex;align-items:center;gap:10px;min-height:68px}
+.nav .brand{display:inline-flex;align-items:center;gap:10px;flex:none;color:var(--ink);text-decoration:none;font-family:var(--f-display);font-weight:700;
+  font-size:calc(21px * var(--fs));background:none;border:0;padding:6px 8px 6px 0;border-radius:12px;cursor:pointer;min-height:44px}
+.nav .brand .logo{width:38px;height:38px;flex:none;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.nav .brand:hover .logo{transform:rotate(-12deg) scale(1.06)}
+.bname{display:grid;line-height:1.05;text-align:left}
+.bname small{font-family:var(--f-body, inherit);font-size:calc(11.5px * var(--fs));font-weight:600;letter-spacing:.04em;color:var(--muted);margin-top:3px}
+.ni{width:18px;height:18px;flex:none}
+.navlinks{display:flex;align-items:center;gap:2px;margin-inline:auto;min-width:0}
+.navlink{position:relative;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 13px;border:0;border-radius:999px;background:none;
+  color:var(--muted);font:inherit;font-weight:600;font-size:calc(14.5px * var(--fs));text-decoration:none;white-space:nowrap;cursor:pointer;transition:color .15s, background-color .15s}
+.navlink:hover{color:var(--ink);background:var(--chip)}
+.navlink[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+.navlink[aria-current="page"]::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:3px;margin-left:-9px;border-radius:3px;background:var(--accent)}
+.navlinks .navlink:first-child{color:var(--ink)}
+.navlinks .navlink:first-child .ni{color:var(--accent)}
+.navright{display:flex;align-items:center;gap:8px;flex:none;margin-left:auto}
+.navlinks+.navright{margin-left:0}
+.nav .a11ybtn{min-width:44px;min-height:44px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.nav .a11ybtn .aa{font-size:calc(17px * var(--fs))}
+.acct{display:flex;align-items:center;gap:6px}
+.acct .navlink{color:var(--ink)}
+.navcta{min-height:44px;padding:9px 18px;border-radius:999px;font-size:calc(14.5px * var(--fs));white-space:nowrap;
+  box-shadow:0 8px 18px -10px color-mix(in srgb, var(--accent) 80%, transparent);transition:transform .15s, box-shadow .15s}
+.navcta:hover{transform:translateY(-1px);box-shadow:0 12px 22px -10px color-mix(in srgb, var(--accent) 85%, transparent)}
+.navuser{display:inline-flex;align-items:center;gap:8px;min-height:44px;max-width:220px;padding:4px 14px 4px 4px;border:1px solid var(--line);border-radius:999px;
+  background:var(--surface);color:var(--ink);text-decoration:none;font-weight:600;font-size:calc(14px * var(--fs))}
+.navuser:hover{border-color:var(--accent)}
+.navuser .av{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:calc(12.5px * var(--fs));font-weight:700}
+.navuser .un{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Ochiladigan menyular (til, mobil menyu) — <details>, JavaScript’siz ham ishlaydi */
+.navdd{position:relative}
+.navdd>summary{list-style:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;justify-content:center;padding:0 12px;
+  border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font-weight:600;font-size:calc(14px * var(--fs));cursor:pointer;user-select:none}
+.navdd>summary::-webkit-details-marker{display:none}
+.navdd>summary:hover{border-color:var(--accent)}
+.navdd[open]>summary{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.navdd .chev{width:14px;height:14px;transition:transform .2s}
+.navdd[open] .chev{transform:rotate(180deg)}
+.ddpanel{position:absolute;right:0;top:calc(100% + 8px);z-index:50;min-width:100%;padding:8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);
+  box-shadow:0 18px 40px -16px rgba(15,23,42,.35);animation:ddIn .16s ease-out}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.langdd .langsw{display:grid;grid-auto-flow:row;gap:2px;background:none;padding:0}
+.langdd .langsw>*{min-height:44px;min-width:96px;display:flex;align-items:center;padding:8px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:600;text-align:left}
+.langdd .langsw>[aria-pressed="true"],.langdd .langsw>[aria-current="page"]{background:var(--accent-soft);color:var(--accent);box-shadow:none}
+.navmenu{display:none}
+.menupanel{width:min(340px, calc(100vw - 24px));display:grid;gap:12px;padding:12px}
+.menulinks{display:grid;gap:2px}
+.menulinks .navlink{justify-content:flex-start;border-radius:12px;padding:10px 12px;font-size:calc(15.5px * var(--fs))}
+.menulinks .navlink[aria-current="page"]::after{display:none}
+.menulinks .navlink .ni{display:block;width:20px;height:20px;color:var(--accent)}
+.menulinks .navlink{color:var(--ink)}
+.menupanel .langsw{display:flex;padding:4px;border-radius:12px}
+.menupanel .langsw>*{flex:1;justify-content:center;min-height:44px;display:flex;align-items:center;text-decoration:none;color:var(--muted);font-weight:600;border-radius:9px}
+.menupanel .langsw>[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.acct.full{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.acct.full>*{justify-content:center}
+.acct.full .navuser{grid-column:1/-1;max-width:none}
+.acct.full .navlink{border:1px solid var(--line);border-radius:12px}
+/* Qadamlar (bosh ilova): navbar ostida alohida qator */
+.stepsrow{display:flex;justify-content:center;padding:2px 0 10px}
+.stepsrow[hidden]{display:none}
+.nav:has(.stepsrow:not([hidden])) .navbar{min-height:60px}
+/* Moslashuvchanlik */
+@media (max-width:1100px){.navlink .ni{display:none}.navlink{padding-inline:11px}}
+@media (max-width:900px){
+  .navlinks,.langdd,.navright>.acct{display:none}
+  .navmenu{display:block}
+  .navright,.navlinks+.navright{gap:6px;margin-left:auto}
+  .navmenu .menupanel{position:fixed;left:max(12px, env(safe-area-inset-left,0px));right:max(12px, env(safe-area-inset-right,0px));top:76px;width:auto;min-width:0;max-height:calc(100dvh - 92px);overflow:auto}
+}
+@media (max-width:420px){.bname small{display:none}.nav .brand{font-size:calc(19px * var(--fs))}.nav .brand .logo{width:32px;height:32px}}
+html[data-fs="2"] .navlinks,html[data-fs="3"] .navlinks,html[data-fs="2"] .langdd,html[data-fs="3"] .langdd,html[data-fs="2"] .navright>.acct,html[data-fs="3"] .navright>.acct{display:none}
+html[data-fs="2"] .navmenu,html[data-fs="3"] .navmenu{display:block}
+html[data-fs="2"] .navlinks+.navright,html[data-fs="3"] .navlinks+.navright{margin-left:auto}
+html[data-fs="2"] .navmenu .menupanel,html[data-fs="3"] .navmenu .menupanel{position:fixed;left:12px;right:12px;top:76px;width:auto;min-width:0;max-height:calc(100dvh - 92px);overflow:auto}
+@media (prefers-reduced-motion:reduce){.nav .brand .logo,.navcta,.navdd .chev{transition:none}.ddpanel{animation:none}}
+@media print{.nav{display:none!important}}

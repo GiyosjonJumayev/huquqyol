@@ -100,3 +100,30 @@ test("Blanka: hujjat tepasida rekvizitlar; o‘z shabloni DOCX va PDF", async ()
   assert.equal((await post("/api/custom/docx", { title:"Xat", text:"" })).status, 400);
   assert.equal((await post("/api/custom/exe", { text:"Matn" })).status, 404);
 });
+
+test("Navbar: barcha sahifalarda bir xil; faol bo‘lim, til, hisob; mobil menyu; /api/me", async () => {
+  const { siteNav, acctHTML } = await import("../public/shared.js");
+  const { makeT } = await import("../public/i18n.js");
+  for (const [p, cur] of [["/", null], ["/yuristlar", "/yuristlar"], ["/tariflar", "/tariflar"], ["/kabinet", "/kabinet"], ["/statistika", null]]){
+    const html = await (await get(p)).text();
+    assert.match(html, /<header class="nav"/, p);
+    assert.match(html, /class="navdd navmenu"/, p);                                 // mobil menyu
+    assert.match(html, /href="\/kirish"/, p);
+    if (cur) assert.match(html, new RegExp(`class="navlink" href="${cur}" aria-current="page"`), p);
+    assert.ok(!/\sstyle=/.test(html.replace(/<svg[\s\S]*?<\/svg>/g, "")), p);
+  }
+  const home = await (await get("/")).text();
+  assert.equal((home.match(/id="a11yBtn"/g) || []).length, 1);
+  assert.match(home, /<button type="button" class="navlink" data-go="1">/);         // SPA: «Ariza tayyorlash» — qayta yuklamasdan
+  assert.match(home, /data-lang="uz" aria-pressed="true"/);
+  assert.match(await (await get("/", "ru")).text(), /Составить заявление/);
+  const me = await get("/api/me");
+  assert.equal(me.headers.get("cache-control"), "private, no-store");
+  assert.deepEqual(await me.json(), { user: null });
+  // Kirgan foydalanuvchi: avatar, ism; admin uchun «Admin»
+  const t = makeT("uz");
+  const a = acctHTML({ name: "Giyosjon Jumayev", role: "admin" }, t);
+  assert.match(a, /href="\/admin"/);
+  assert.match(a, /<span class="av" aria-hidden="true">GJ<\/span>/);
+  assert.match(siteNav({ lang: "cyr", t: makeT("cyr"), path: "/tariflar" }), /Тарифлар/);
+});

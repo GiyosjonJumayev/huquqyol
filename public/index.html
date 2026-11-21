@@ -25,25 +25,13 @@
 <a class="skip" href="#main">{{skip}}</a>
 <div class="sr" aria-live="polite" id="live"></div>
 <div class="wrap">
-  <header class="top">
-    <button class="brand" id="home" type="button" aria-label="{{homeLabel}}">
-      <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>
-      HuquqYo‘l
-    </button>
-    <nav id="stepsNav" aria-label="{{stepsNav}}" hidden><ol class="stepper">
+  <header class="nav" id="siteNav">
+    <!--NAV-->
+    <nav id="stepsNav" class="stepsrow" aria-label="{{stepsNav}}" hidden><ol class="stepper">
       <li><button type="button" data-go="1" aria-current="step"><span class="n">1</span><span class="lbl">{{step1}}</span></button></li>
       <li><button type="button" data-go="2" disabled><span class="n">2</span><span class="lbl">{{step2}}</span></button></li>
       <li><button type="button" data-go="3" disabled><span class="n">3</span><span class="lbl">{{step3}}</span></button></li>
     </ol></nav>
-    <div class="topact">
-      <nav class="topnav" aria-label="{{navLabel}}"><a href="/yuristlar">{{navLawyers}}</a><a href="/tariflar">{{navPlans}}</a></nav>
-      <button class="btn ghost a11ybtn" id="a11yBtn" type="button" aria-expanded="false" aria-controls="a11yPanel"><span class="aa" aria-hidden="true">Aa</span><span class="a11ylbl">{{a11y}}</span></button>
-    <div class="langsw" role="group" aria-label="{{langGroup}}">
-        <button type="button" data-lang="uz" aria-pressed="false" lang="uz" title="O‘zbekcha (lotin)">O‘zb</button>
-        <button type="button" data-lang="cyr" aria-pressed="false" lang="uz-Cyrl" title="Ўзбекча (кирилл)">Ўзб</button>
-        <button type="button" data-lang="ru" aria-pressed="false" lang="ru" title="Русский">Рус</button>
-      </div>
-    </div>
   </header>
   <section class="card a11y" id="a11yPanel" aria-labelledby="a11yH" hidden>
     <h2 class="a11yh" id="a11yH">{{a11yTitle}}</h2>

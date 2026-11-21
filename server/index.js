@@ -20,7 +20,7 @@ initDb();
 import { securityHeaders, requireJson, rateLimit, sameOrigin, httpsRedirect } from "./security.js";
 import { vAnalyze, vPlan, vDocument } from "./validate.js";
 import { cyrillicModel } from "../public/translit.js";
-import { domainCardsHTML, examplesHTML } from "../public/shared.js";
+import { domainCardsHTML, examplesHTML, siteNav } from "../public/shared.js";
 import { makeT, LANGS, HTML_LANG } from "../public/i18n.js";
 import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
 import { stats, DEFAULT_FILE as STATS_FILE } from "./stats.js";
@@ -142,6 +142,8 @@ app.post("/api/lawyers/apply", rateLimit({ max: 5, name:"apply" }), wrap(async (
 }));
 
 // ---------- Hisoblar (PostgreSQL) ----------
+// Navbar uchun: kim kirgan (bosh sahifa keshlanadi — hisob holati shu orqali olinadi)
+app.get("/api/me", (req, res) => res.set("Cache-Control", "private, no-store").json({ user: req.user ? { name: req.user.name, role: req.user.role } : null }));
 const needDb = (req, res, next) => dbEnabled() ? next() : res.status(503).json({ error: msg(req.lang, "dbOff") });
 const authLimit = rateLimit({ max: Number(process.env.AUTH_RATE || 10), name:"auth" });
 app.post("/api/auth/register", needDb, authLimit, wrap(register));
@@ -188,6 +190,7 @@ function renderIndex(lang){
     .replace("{{ogBase}}", OG_BASE).replace("{{ogLocale}}", OG_LOCALE[lang])
     .replace("{{ogUrl}}", OG_BASE ? `
 <meta property="og:url" content="${OG_BASE}/?lang=${lang}">` : "")
+    .replace("<!--NAV-->", siteNav({ lang, t, mode: "app", path: "/", a11y: true }))
     .replace("<!--DOMAINS-->", domainCardsHTML(meta, t))
     .replace("<!--EXAMPLES-->", examplesHTML(lang))
     .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
@@ -210,7 +213,7 @@ app.get("/statistika", (req, res) => {
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
-    .send(statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs }));
+    .send(statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user }));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
 });
 // ---------- Biznes: tariflar, yuristlar katalogi, Yurist Pro kabineti ----------
 const REDIRECTED = Symbol("redirected");

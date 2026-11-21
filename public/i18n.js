@@ -158,7 +158,11 @@ const M = {
   aboutYou:{ uz:"Siz haqingizda", ru:"О вас" },
   groupDefault:{ uz:"Ma’lumotlar", ru:"Данные" },
   // Yuristlar katalogi va Pro
-  navLabel:{ uz:"Bo‘limlar", ru:"Разделы" }, navLawyers:{ uz:"Yuristlar", ru:"Юристы" }, navPlans:{ uz:"Tariflar", ru:"Тарифы" },
+  navLabel:{ uz:"Asosiy bo‘limlar", ru:"Основные разделы" }, navLawyers:{ uz:"Yuristlar", ru:"Юристы" }, navPlans:{ uz:"Tariflar", ru:"Тарифы" },
+  navApply:{ uz:"Ariza tayyorlash", ru:"Составить заявление" }, navCabinet:{ uz:"Kabinet", ru:"Кабинет" },
+  navLogin:{ uz:"Kirish", ru:"Войти" }, navRegister:{ uz:"Ro‘yxatdan o‘tish", ru:"Зарегистрироваться" }, navRegisterShort:{ uz:"Boshlash", ru:"Начать" },
+  navAccount:{ uz:"Hisobim", ru:"Мой аккаунт" }, navAdmin:{ uz:"Admin", ru:"Админ" }, navMenu:{ uz:"Menyu", ru:"Меню" },
+  navTagline:{ uz:"Huquqiy yo‘l xaritasi", ru:"Правовая дорожная карта" },
   noDomain:{ uz:"Holatingizga mos soha topilmadimi? Yurist yoki advokat bilan maslahatlashing →", ru:"Не нашли свою ситуацию? Проконсультируйтесь с юристом или адвокатом →" },
   lawTitle:{ uz:"Yurist yoki advokat bilan maslahat", ru:"Консультация юриста или адвоката" },
   lawTextPlan:{ uz:"Holat murakkab bo‘lsa yoki sudda vakil kerak bo‘lsa — shu soha bo‘yicha yurist va advokatlar: narxlar, onlayn yoki ofisda, aloqa ma’lumotlari.", ru:"Если ситуация сложная или нужен представитель в суде — юристы и адвокаты по этой сфере: цены, онлайн или в офисе, контакты." },

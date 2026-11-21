@@ -3,13 +3,14 @@
 import { makeT, HTML_LANG, fmtDate, fmtSum } from "../public/i18n.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor } from "./kb.js";
+import { siteNav } from "../public/shared.js";
 import { parseISO } from "./dates.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const num = n => fmtSum(n || 0);
 const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
 
-export function statsPage({ lang, s, cssHref, fs }){
+export function statsPage({ lang, s, cssHref, fs, user = null, accHref = "" }){
   const t = makeT(lang), base = lang === "ru" ? "ru" : "uz", cy = x => lang === "cyr" ? toCyrillic(x) : x;
   const kb = kbFor(base);
   const date = d => cy(fmtDate(parseISO(d), base));
@@ -56,8 +57,7 @@ export function statsPage({ lang, s, cssHref, fs }){
   return `<!doctype html><html${fs ? ` data-fs="${fs}"` : ""} lang="${HTML_LANG[lang]}" data-lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(t("stTitle"))} — HuquqYo‘l</title><meta name="description" content="${esc(t("stLead"))}"><link rel="icon" href="/icons/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="${cssHref}"></head>
 <body><a class="skip" href="#main">${t("skip")}</a><div class="wrap">
-<header class="top"><a class="brand" href="/" aria-label="${esc(t("homeLabel"))}">HuquqYo‘l</a>
-<nav class="langsw" aria-label="${esc(t("langGroup"))}">${[["uz","O‘zb"],["cyr","Ўзб"],["ru","Рус"]].map(([l, n]) => `<a href="/statistika?lang=${l}" ${l === lang ? `aria-current="page"` : ""} lang="${HTML_LANG[l]}">${n}</a>`).join("")}</nav></header>
+<header class="nav">${siteNav({ lang, t, mode: "page", path: "/statistika", user, langHref: l => `/statistika?lang=${l}` })}</header>
 <main id="main" class="stats">
 <h1>${t("stTitle")}</h1>
 <p class="lead">${t("stLead")}</p>
@@ -66,5 +66,5 @@ ${body}
   <li>${t("stHow1")}</li><li>${t("stHow2")}</li><li>${t("stHow3")}</li><li>${t("stHow4")}</li></ul></section>
 <p class="small muted">${esc(t("stSince", { date: date(s.since) }))} <a href="/api/stats">${t("stJson")}</a></p>
 <p><a class="btn primary" href="/">${t("toHome")}</a></p>
-</main></div></body></html>`;
+</main></div>${accHref ? `<script type="module" src="${accHref}"></script>` : ""}</body></html>`;
 }

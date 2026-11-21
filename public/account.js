@@ -45,6 +45,10 @@ document.addEventListener("click", async e => {
   catch (x){ showErr(b.closest("li, article, form, div") || document.body, x.message); b.disabled = false; }
 });
 
+// Navbar: ochiladigan menyular tashqariga bosilganda yoki Esc bilan yopiladi
+document.addEventListener("click", e => { document.querySelectorAll("details.navdd[open]").forEach(d => { if (!d.contains(e.target)) d.removeAttribute("open"); }); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll("details.navdd[open]").forEach(d => { d.removeAttribute("open"); d.querySelector("summary")?.focus(); }); });
+
 // Ro‘yxatdan o‘tish: «Tashkilot» tanlanganda tashkilot maydonlari ko‘rinadi
 document.addEventListener("change", e => {
   const r = e.target.closest('input[data-toggle]'); if (!r) return;
