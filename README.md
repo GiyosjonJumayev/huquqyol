@@ -115,7 +115,7 @@ npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
 npm test                  # 154 ta unit/API test (TEST_DATABASE_URL bilan — PostgreSQL oqimi ham)
-npm run test:e2e          # 14 ta brauzer testi
+npm run test:e2e          # 15 ta brauzer testi
 node scripts/eval-ai.mjs  # AI va qoidalar rejimini namunalarda solishtirish (AI kaliti bilan; npm test ga kirmaydi) (Playwright kerak: npm i --no-save playwright)
 ```
 

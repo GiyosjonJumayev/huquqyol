@@ -178,7 +178,7 @@ test("Noaniq matnda muqobil holat taklif qilinadi va bir bosishda almashtiriladi
   assert.equal(await p.locator(".stops li").count(), 3);                                 // «Bu qanday ishlaydi» — 3 bekat
   assert.equal(await p.locator(".qcard[data-case]").count(), 4);                          // 4 ta misol vaziyat
   await p.fill("#problem", "Meni ishdan bo‘shatishdi va oxirgi oylikni bermadi");
-  await p.press("#problem", "Control+Enter");
+  await p.press("#problem", "Enter");
   await p.waitForSelector("[data-alt]");
   const before = await p.innerText("#v2 h1");
   await p.locator("[data-alt]").first().click();
@@ -200,11 +200,14 @@ test("UX standartlari: 320px, teginish maydoni, xato bog‘lanishi, tasdiqlash, 
   await p.waitForSelector(".domain");
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   assert.deepEqual(await small(".langsw button, .morex, .chipbtn, .case"), []);
-  // Xato maydonga bog‘langan va matn yozilganda yo‘qoladi
-  await p.click("#analyzeBtn");
+  // Suhbat: bo‘sh maydonda «Yuborish» o‘chiq; juda qisqa matn — xato maydonga bog‘langan, yozilganda yo‘qoladi
+  assert.equal(await p.isDisabled("#analyzeBtn"), true);
+  assert.equal(await p.getAttribute("#analyzeBtn", "aria-label"), "Yuborish");
+  await p.fill("#problem", "ish");
+  await p.press("#problem", "Enter");                                                       // Enter — yuborish
   assert.equal(await p.getAttribute("#problem", "aria-invalid"), "true");
   assert.ok((await p.getAttribute("#problem", "aria-describedby")).includes("askErr"));
-  await p.fill("#problem", "a");
+  await p.fill("#problem", "ishdan");
   assert.equal(await p.isVisible("#askErr"), false);
   // Doiradan tashqari ekranida keyingi qadam bor
   await p.fill("#problem", "Patent olish uchun qanday hujjatlar kerak");
@@ -518,4 +521,39 @@ test("Navbar har bir rol uchun: 1024 / 1280 / 1440 da hech narsa ustma-ust emas;
   await Promise.all([k.waitForURL(base), k.keyboard.press("Enter")]);
   assert.ok(loggedOut);
   await k.context().close();
+});
+
+test("Suhbat kiritish: yordamchi xabari, Shift+Enter — yangi qator, tez tanlash yuboradi, foydalanuvchi pufakchasi; 320px va qorong‘i", { skip }, async () => {
+  const p = await page();
+  await p.goto(base);
+  await p.waitForSelector(".domain");
+  assert.ok(await p.isVisible(".msg.bot .typing"));                                         // avval «yozmoqda…» nuqtalari
+  await p.waitForFunction(() => /Muammongizni/.test(document.querySelector(".msg.bot .bubtext").innerText), null, { timeout: 3000 });
+  assert.ok(await p.isHidden(".msg.bot .typing"));
+  assert.equal(await p.evaluate(() => document.activeElement.id), "problem");                // kompyuterda darhol yozish mumkin
+  await p.type("#problem", "Birinchi qator");
+  await p.keyboard.press("Shift+Enter");
+  await p.keyboard.type("ikkinchi qator");
+  assert.match(await p.inputValue("#problem"), /qator\nikkinchi/);                          // yangi qator, yuborilmadi
+  assert.equal(await p.isDisabled("#analyzeBtn"), false);
+  await p.fill("#problem", "");
+  assert.equal(await p.isDisabled("#analyzeBtn"), true);
+  await p.click(".qchip[data-quick='Maosh berilmayapti']");
+  await p.waitForSelector("#meMsg:not([hidden])");
+  assert.equal(await p.innerText("#meText"), "Maosh berilmayapti");
+  await p.waitForSelector("#v2 h1");                                                      // reja ochildi
+  assert.deepEqual(p.errors, []);
+  // Telefon (320px): avtofokus yo‘q, 48px tugmalar, gorizontal surish yo‘q; qorong‘i mavzuda axe
+  const m = await page({ viewport: { width: 320, height: 700 }, hasTouch: true, isMobile: true, colorScheme: "dark" });
+  await m.goto(base);
+  await m.waitForSelector(".domain");
+  assert.notEqual(await m.evaluate(() => document.activeElement.id), "problem");
+  for (const sel of ["#analyzeBtn", ".qchip", "#photoBtn"]){
+    const h = await m.evaluate(s => Math.round(document.querySelector(s).getBoundingClientRect().height), sel);
+    assert.ok(h >= 48, `${sel}: ${h}px`);
+  }
+  assert.equal(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  await m.waitForTimeout(1200);
+  assert.deepEqual(await audit(m), []);
+  await p.context().close(); await m.context().close();
 });

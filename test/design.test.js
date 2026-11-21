@@ -30,13 +30,18 @@ test("Shriftlar mahalliy: har bir @font-face /fonts/ dan, fayllar 200 va woff2; 
   assert.ok(!/googleapis|gstatic|@import/.test(css));
 });
 
-test("Bosh sahifa v3: salom, sarlavha, xat-qog‘oz kiritish, 4 misol vaziyat, yo‘l, yordam, FAQ; Caveat ≤ 3 marta", async () => {
+test("Bosh sahifa v3: salom, sarlavha, suhbat ko‘rinishidagi kiritish, 4 misol vaziyat, yo‘l, yordam, FAQ; Caveat ≤ 3 marta", async () => {
   for (const [lang, hi, h1] of [["uz", "Assalomu alaykum!", "Qanday muammo bo‘ldi?"], ["cyr", "Ассалому алайкум!", "Қандай муаммо бўлди?"], ["ru", "Здравствуйте!", "Что случилось?"]]){
     const html = await (await fetch(base + "/", { headers: { cookie: `hy_lang=${lang}` } })).text();
     assert.ok(html.includes(hi) && html.includes(h1), lang);
     assert.equal((html.match(/class="[^"]*\bhand\b/g) || []).length, 3, `${lang}: Caveat (qo‘lyozma) 3 marta — salom, rasm izohi, footer shiori`);
-    assert.match(html, /<div class="ask letter">\s*<span class="ikat" aria-hidden="true"><\/span>/);
-    assert.match(html, /<label for="problem" class="asklabel">/);                              // ko‘rinadigan yorliq
+    assert.match(html, /<div class="chat" id="chat">\s*<span class="ikat" aria-hidden="true"><\/span>/);        // suhbat kartasi
+    assert.match(html, /<div class="msg bot">[\s\S]*?<span class="typing" aria-hidden="true">[\s\S]*?<p class="bubtext">/);
+    assert.match(html, /<label for="problem" class="sr">/);
+    assert.match(html, /<button class="send" id="analyzeBtn" type="button" aria-label="[^"]+" disabled>/);   // yuborish — ichida, bo‘sh maydonda o‘chiq
+    assert.equal((html.match(/class="qchip" type="button" data-quick=/g) || []).length, 3);
+    assert.match(html, /<div class="msg me" id="meMsg" hidden>/);
+    assert.ok(!/repeating-linear-gradient\(transparent/.test(css.slice(css.indexOf(".chatin"))), "maydonda chiziqlar yo‘q");
     assert.match(html, /<svg viewBox="0 0 400 420" role="img" aria-label="[^"]{20,}">/);         // rasm — role=img + aria-label
     assert.deepEqual([...html.matchAll(/class="qcard c\d" data-case="(\w+)"/g)].map(m => m[1]), ["ishdan_boshatish", "nuqsonli_tovar", "aliment", "murojaat_javobsiz"]);
     assert.equal((html.match(/<li><span class="stop s\d" aria-hidden="true">/g) || []).length, 3);

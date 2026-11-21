@@ -1363,3 +1363,58 @@ html{background:var(--bg)}
 .wrap>main{flex:1 0 auto}
 .procta{background:var(--hero);border-radius:var(--r-lg)} .procta p,.procta p.small{color:var(--hero-muted)}
 .procta h2{color:var(--hero-ink)}
+
+/* =====================================================================================================
+   Bosh sahifa: kiritish — SUHBAT ko‘rinishida (yordamchi xabari, foydalanuvchi pufakchasi, yuborish tugmasi)
+   ===================================================================================================== */
+.chat{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:6px 6px var(--r-lg) var(--r-lg);box-shadow:var(--shadow-input);overflow:hidden;padding:0 0 18px}
+.chatlog{display:grid;gap:12px;padding:18px 18px 8px}
+.msg{display:flex;gap:10px;align-items:flex-end;min-width:0}
+.msg.me{justify-content:flex-end}
+.chatav{flex:none;width:36px;height:36px}
+.chatav svg{display:block;width:36px;height:36px}
+.bubble{position:relative;max-width:min(560px,86%);min-width:0;padding:12px 16px;border-radius:18px;font-size:calc(16.5px * var(--fs));line-height:1.5;overflow-wrap:anywhere}
+.bubble p{margin:0}
+.msg.bot .bubble{background:var(--chip);color:var(--ink);border-bottom-left-radius:6px}
+.msg.me .bubble{background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:6px;white-space:pre-wrap}
+/* «yozmoqda…» nuqtalari 1 soniya, keyin matn (joyi oldindan band — pufakcha sakramaydi) */
+.typing{position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;gap:5px;animation:hy-hide 0s linear 1s both}
+.typing i,.dots i{display:block;width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.35;animation:hy-dot 1s ease-in-out infinite}
+.typing i{background:var(--muted2)}
+.typing i:nth-child(2),.dots i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3),.dots i:nth-child(3){animation-delay:.3s}
+.bubtext{animation:hy-show 0s linear 1s both}
+@keyframes hy-hide{to{visibility:hidden}}
+@keyframes hy-show{from{visibility:hidden}to{visibility:visible}}
+@keyframes hy-dot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.mestatus{display:flex;align-items:center;gap:8px;margin-top:6px !important;font-size:calc(13.5px * var(--fs));font-weight:600}
+.dots{display:inline-flex;gap:4px}
+@media (prefers-reduced-motion:reduce){.typing{display:none}.bubtext{animation:none}.dots i{animation:none;opacity:.8}}
+/* Kiritish maydoni: yumaloq, bo‘sh ekani aniq; yuborish tugmasi ichida o‘ngda */
+.chatin{position:relative;margin:6px 18px 0}
+.chatin textarea{display:block;width:100%;min-height:calc(60px * var(--fs));max-height:40vh;resize:none;field-sizing:content;
+  padding:16px 68px 16px 20px;border:1.5px solid var(--line2);border-radius:28px;background:var(--bg);color:var(--ink);
+  font:inherit;font-size:calc(17px * var(--fs));line-height:1.5;caret-color:var(--accent);box-shadow:none}
+.chatin textarea::placeholder{color:var(--muted2);opacity:.8}
+.chatin textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.send{position:absolute;right:8px;bottom:6px;width:48px;height:48px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;
+  background:var(--accent);color:var(--accent-ink);transition:background-color .15s,transform .1s}
+.send:hover:not(:disabled){background:var(--accent-hover)}
+.send:active:not(:disabled){transform:scale(.96)}
+.send:disabled{background:var(--line2);color:var(--muted);cursor:not-allowed}
+.send svg{width:22px;height:22px}
+.send:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.chathint{margin:8px 24px 0;font-size:calc(13px * var(--fs));color:var(--muted2)}
+.chat .asktools{display:flex;flex-wrap:wrap;gap:8px;padding:12px 18px 0}
+.chat .btn.pillbtn{min-height:48px;width:auto}
+.quick{display:flex;flex-wrap:wrap;gap:8px;padding:12px 18px 0}
+.qchip{min-height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);
+  font:inherit;font-weight:600;font-size:calc(14.5px * var(--fs));cursor:pointer;transition:background-color .15s}
+.qchip:hover{background:color-mix(in srgb, var(--accent) 16%, var(--surface))}
+@media (prefers-reduced-motion:reduce){.send,.qchip{transition:none}}
+@media (max-width:640px){
+  .chatlog{padding:16px 12px 6px}.chatin{margin:6px 12px 0}.chathint{margin:8px 18px 0}
+  .chat .asktools,.quick{padding:10px 12px 0}
+  .chat .asktools .btn.pillbtn{flex:1 1 auto;justify-content:center}
+  .bubble{max-width:92%}
+}

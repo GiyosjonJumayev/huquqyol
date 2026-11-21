@@ -149,15 +149,27 @@ function setAskErr(msg){
   err.textContent = msg; err.hidden = !msg;
   $("#problem").setAttribute("aria-invalid", String(!!msg));
 }
+// Suhbat: foydalanuvchi matni o‘ng tomonda pufakcha bo‘lib chiqadi, «Tahlil qilinmoqda…» — keyin reja ochiladi
+let sending = false;
+const syncSend = () => { $("#analyzeBtn").disabled = sending || !$("#problem").value.trim(); };
+const pause = ms => matchMedia("(prefers-reduced-motion: reduce)").matches ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
 async function analyze(){
-  const text = $("#problem").value.trim(), btn = $("#analyzeBtn"), err = $("#askErr");
+  const text = $("#problem").value.trim(), err = $("#askErr");
   setAskErr("");
+  if (!text || sending) return;
   if (text.length < 8){ setAskErr(t("tooShort")); $("#problem").focus(); err.scrollIntoView({ block:"nearest" }); return; }
-  btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span> ${t("analyzing")}`;
-  announce(t("analyzing"));
-  try { await choose(await getJSON("/api/analyze", { text })); }
-  catch (e){ setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }
-  finally { btn.disabled = false; btn.textContent = t("analyze"); }
+  sending = true; syncSend();
+  $("#meText").textContent = text;
+  $("#meMsg").hidden = false; $("#meStatus").hidden = false;
+  $("#problem").value = "";                                   // suhbatdagidek: yuborilgan matn pufakchaga o‘tadi
+  $("#chat").setAttribute("aria-busy", "true");
+  announce(t("chatThinking"));
+  try {
+    const [a] = await Promise.all([getJSON("/api/analyze", { text }), pause(700)]);
+    await choose(a);
+  }
+  catch (e){ $("#problem").value = text; setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }   // xatoda matn qaytadi
+  finally { sending = false; $("#meStatus").hidden = true; $("#chat").removeAttribute("aria-busy"); syncSend(); }
 }
 
 function defaultTrigger(m, facts){
@@ -892,6 +904,8 @@ document.addEventListener("click", e => {
   const dm = e.target.closest("[data-domain]");
   if (dm){ renderDomain(dm.dataset.domain); return; }
   if (e.target.closest("#allDomains")){ renderDomains(); $("#cases .case")?.focus(); return; }
+  const qc = e.target.closest("[data-quick]");                 // tez tanlash: maydonni to‘ldiradi va yuboradi
+  if (qc){ $("#problem").value = qc.dataset.quick; syncSend(); analyze(); return; }
   const ex = e.target.closest("[data-ex]");
   if (ex){ $("#problem").value = examples(LANG)[ex.dataset.ex]; $("#problem").focus(); return; }
   const lb = e.target.closest(".langsw [data-lang]");
@@ -1046,7 +1060,7 @@ async function readPhotoFile(file){
   catch (e){ setAskErr(e.message); err.scrollIntoView({ block:"nearest" }); }
   finally {
     photoBusy = false; panel.classList.remove("busy"); panel.removeAttribute("aria-busy");
-    pick.disabled = false; $("#analyzeBtn").disabled = false; $("#photoBtn").disabled = false;
+    pick.disabled = false; syncSend(); $("#photoBtn").disabled = false;
     pick.innerHTML = pickLabel; $("#photoThumb").innerHTML = PHOTO_ICON;
   }
 }
@@ -1058,7 +1072,7 @@ $("#photoIn").addEventListener("change", e => {
   if (f) readPhotoFile(f);
 });
 // Rasmni panelga yoki matn maydoniga sudrab tashlash va Ctrl+V bilan qo‘yish
-for (const el of [$("#photoPanel"), $(".ask")]){
+for (const el of [$("#photoPanel"), $("#chat")]){
   el.addEventListener("dragover", e => { if ([...(e.dataTransfer?.items || [])].some(i => i.kind === "file")){ e.preventDefault(); $("#photoPanel").classList.add("drag"); } });
   el.addEventListener("dragleave", () => $("#photoPanel").classList.remove("drag"));
   el.addEventListener("drop", e => {
@@ -1103,7 +1117,13 @@ if (SR){
     catch { rec = null; toast(t("voiceErr")); }
   });
 }
-$("#problem").addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) analyze(); });
+// Enter — yuborish, Shift+Enter — yangi qator (IME bilan yozilayotganda emas)
+$("#problem").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); analyze(); } });
+$("#problem").addEventListener("input", syncSend);
+syncSend();
+// Kompyuterda maydonga darhol yozish mumkin; telefonda klaviatura o‘zi ochilib ketmasin
+if (matchMedia("(hover: hover) and (pointer: fine)").matches && innerWidth >= 900 && !$("#v1").hidden && !location.hash.replace(/^#(vaziyat)?$/, ""))
+  requestAnimationFrame(() => $("#problem").focus({ preventScroll: true }));
 $("#dlDocx").addEventListener("click", () => download("docx"));
 $("#dlPdf").addEventListener("click", () => download("pdf"));
 $("#printBtn").addEventListener("click", () => window.print());
