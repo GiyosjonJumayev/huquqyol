@@ -206,20 +206,42 @@ export const botHref = (url = TELEGRAM_BOT_URL) => botUrlOf(url) || botUrlOf(TEL
 export function siteFooter(t, { mode = "page", path = "/", botUrl = TELEGRAM_BOT_URL } = {}){
   const bh = botHref(botUrl), ext = bh.startsWith("https:");
   const cur = p => (path.split("?")[0] === p ? ` aria-current="page"` : "");
+  const out = (href, label) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${esc(label)}<span class="sr"> ${esc(t("newTab"))}</span></a>`;
   const wipe = mode === "app"
     ? `<button class="linkbtn" id="wipe" type="button">${esc(t("wipe"))}</button>`
     : `<a href="/?ochirish=1">${esc(t("wipe"))}</a>`;
   return `<footer class="sitefoot">
-    <div class="disclaim" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p><b>${esc(t("disclaimerB"))}</b> ${esc(t("disclaimer"))}</p></div>
-    <div><b class="checked">${esc(t("checked"))}</b> ${esc(t("sources"))} <a href="https://lex.uz" target="_blank" rel="noopener noreferrer">lex.uz<span class="sr"> ${esc(t("newTab"))}</span></a>.</div>
-    <div>${esc(t("local"))}</div>
-    <nav class="footlinks" aria-label="${esc(t("footNav"))}"><ul>
-      <li><a href="/statistika"${cur("/statistika")}>${esc(t("footStats"))}</a></li>
-      <li><a href="/tariflar"${cur("/tariflar")}>${esc(t("navPlans"))}</a></li>
-      <li><a href="/yuristlar"${cur("/yuristlar")}>${esc(t("navLawyers"))}</a></li>
-      <li><a href="/maxfiylik"${cur("/maxfiylik")}>${esc(t("footPrivacy"))}</a></li>
-      <li>${wipe}</li>
-      <li><a href="${esc(bh)}"${ext ? ` target="_blank" rel="noopener noreferrer"` : ""}>${esc(t("footBot"))}${ext ? `<span class="sr"> ${esc(t("newTab"))}</span>` : ""}</a></li>
-    </ul></nav>
-  </footer>`;
+  <span class="ikatf" aria-hidden="true"></span>
+  <div class="footin">
+    <div class="footgrid">
+      <div class="footbrand">
+        <p class="fbname">HuquqYo‘l</p>
+        <p class="motto hand">${esc(t("footMotto"))}</p>
+        <div class="disclaim" role="note"><p><b>${esc(t("disclaimerB"))}</b> ${esc(t("disclaimer"))} <b class="checked">${esc(t("checked"))}</b></p></div>
+        <p class="fsmall">${esc(t("local"))}</p>
+      </div>
+      <nav class="footlinks" aria-label="${esc(t("footNav"))}">
+        <div class="fcol"><h2 class="fh">${esc(t("footHelp"))}</h2><ul>
+          <li><a href="/"${cur("/")}>${esc(t("navApply"))}</a></li>
+          <li><a href="/yuristlar"${cur("/yuristlar")}>${esc(t("navLawyers"))}</a></li>
+          <li><a href="/tariflar"${cur("/tariflar")}>${esc(t("navPlans"))}</a></li>
+          <li>${out("https://gov.uz/oz/adliya/sections/professional-mediatorlar-reyestri", t("footMediators"))}</li>
+          <li><a href="${esc(bh)}"${ext ? ` target="_blank" rel="noopener noreferrer"` : ""}>${esc(t("footBot"))}${ext ? `<span class="sr"> ${esc(t("newTab"))}</span>` : ""}</a></li>
+        </ul></div>
+        <div class="fcol"><h2 class="fh">${esc(t("footOfficial"))}</h2><ul>
+          <li>${out("https://lex.uz", "lex.uz")}</li>
+          <li>${out("https://murojaat.gov.uz", "murojaat.gov.uz")}</li>
+          <li>${out("https://pm.gov.uz", "pm.gov.uz")}</li>
+          <li>${out("https://yurxizmat.uz", "yurxizmat.uz")}</li>
+        </ul></div>
+      </nav>
+    </div>
+    <div class="footbottom"><span>© 2026 HuquqYo‘l</span>
+      <ul class="footmini" aria-label="${esc(t("footNav"))}">
+        <li><a href="/maxfiylik"${cur("/maxfiylik")}>${esc(t("footPrivacy"))}</a></li>
+        <li><a href="/statistika"${cur("/statistika")}>${esc(t("footStats"))}</a></li>
+        <li>${wipe}</li>
+      </ul></div>
+  </div>
+</footer>`;
 }

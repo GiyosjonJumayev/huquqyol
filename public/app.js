@@ -104,7 +104,7 @@ window.addEventListener("popstate", () => {
 /* ---------- 1. Vaziyat ---------- */
 function renderStart(){
   renderDomains();
-  $("#examples").innerHTML = examplesHTML(LANG);
+  if ($("#examples")) $("#examples").innerHTML = examplesHTML(LANG);
   $("#aiDot").classList.toggle("on", state.meta.ai);
   $("#aiText").textContent = t(state.meta.ai ? "aiOn" : "aiOff", { p: providerName(state.meta.aiProvider) });
 }
@@ -942,7 +942,7 @@ $("#home").addEventListener("click", () => go(1));
 fetch("/api/me", { credentials:"same-origin" }).then(r => r.ok ? r.json() : null).then(d => applyNavState(d, t)).catch(() => {});
 document.addEventListener("click", e => { document.querySelectorAll("details.navdd[open]").forEach(d => { if (!d.contains(e.target) || e.target.closest(".ddpanel a, .ddpanel button")) d.removeAttribute("open"); }); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll("details.navdd[open]").forEach(d => { d.removeAttribute("open"); d.querySelector("summary")?.focus(); }); });
-$("#moreEx").addEventListener("click", e => {
+$("#moreEx")?.addEventListener("click", e => {
   $("#examples").classList.add("all"); e.currentTarget.hidden = true;
   $("#examples .chipbtn:nth-child(4)")?.focus();
 });

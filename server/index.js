@@ -207,6 +207,7 @@ const OG_BASE = /^[a-z0-9.-]+(?::\d+)?$/i.test(process.env.PUBLIC_HOST || "") ? 
 const OG_LOCALE = { uz:"uz_UZ", cyr:"uz_UZ", ru:"ru_RU" };
 function renderIndex(lang){
   const t = makeT(lang), meta = { ai: aiEnabled(), aiProvider: aiProvider(), ...META[lang] };
+  const pName = meta.aiProvider === "gemini" ? "Google (Gemini)" : "Anthropic (Claude)";
   return TEMPLATE
     .replace("{{ogBase}}", OG_BASE).replace("{{ogLocale}}", OG_LOCALE[lang])
     .replace("{{ogUrl}}", OG_BASE ? `
@@ -218,7 +219,8 @@ function renderIndex(lang){
     .replace("<!--EXAMPLES-->", examplesHTML(lang))
     .replace("<!--META-->", `<script type="application/json" id="meta-data">${jsonForHtml(meta)}</script>`)
     .replace(`data-lang="${lang}" aria-pressed="false"`, `data-lang="${lang}" aria-pressed="true"`)
-    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "pdfjsBase" ? PDFJS_BASE : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff", { p: meta.aiProvider === "gemini" ? "Gemini" : "Claude" })) : k === "privacy" ? escAttr(t(!meta.ai ? "privacy" : meta.aiProvider === "gemini" ? "privacyAiG" : "privacyAi")) : escAttr(t(k)));
+    .replace(/\{\{(\w+)\}\}/g, (_, k) => k === "htmlLang" ? HTML_LANG[lang] : k === "pdfjsBase" ? PDFJS_BASE : k === "lang" ? lang : k === "aiText" ? escAttr(t(meta.ai ? "aiOn" : "aiOff", { p: meta.aiProvider === "gemini" ? "Gemini" : "Claude" })) : k === "privacy" ? escAttr(t(!meta.ai ? "privacy" : meta.aiProvider === "gemini" ? "privacyAiG" : "privacyAi")) : k === "freeLine" ? escAttr(meta.ai ? t("freeLineAi", { p: pName }) : t("freeLine")) : k === "faq2a" ? escAttr(meta.ai ? t("faq2aAi", { p: pName }) : t("faq2a"))
+      : k === "allSituations" ? escAttr(t("allSituations", { d: meta.domains.length, s: SCENARIOS.length })) : escAttr(t(k)));
 }
 const INDEX = Object.fromEntries(LANGS.map(l => [l, renderIndex(l)]));
 app.get(["/", "/index.html"], (req, res) => {
@@ -228,7 +230,7 @@ app.get(["/", "/index.html"], (req, res) => {
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   let html = fs ? INDEX[req.lang].replace("<html ", `<html data-fs="${fs}" `) : INDEX[req.lang];
   // Foydalanuvchi rasm panelini yopgan bo‘lsa (cookie), sahifa shu holatda chiziladi — panel «miltillamaydi»
-  if (/(?:^|;\s*)hy_photo=0(?:;|$)/.test(req.headers.cookie || "")) html = html.replace('id="photoPanel"', 'id="photoPanel" hidden');
+  if (/(?:^|;\s*)hy_photo=1(?:;|$)/.test(req.headers.cookie || "")) html = html.replace('aria-labelledby="photoPanelT" hidden>', 'aria-labelledby="photoPanelT">');
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(withTheme(req, html));
 });
 app.get("/statistika", (req, res) => {

@@ -54,12 +54,12 @@ test("Til aniqlash: tana → ?lang → cookie → Accept-Language", () => {
 test("Bosh sahifa uch tilda serverda chiziladi", async () => {
   const ru = await (await fetch(base + "/?lang=ru")).text();
   assert.match(ru, /<html lang="ru" data-lang="ru">/);
-  assert.ok(ru.includes("Ваши права нарушены?") && ru.includes("4 ситуации →") && ru.includes('data-lang="ru" aria-pressed="true"'));
+  assert.ok(ru.includes("Что случилось?") && ru.includes("Вместе найдём выход.") && ru.includes("4 ситуации →") && ru.includes('data-lang="ru" aria-pressed="true"'));
   assert.ok(!/\{\{\w+\}\}/.test(ru), "to‘ldirilmagan shablon kaliti qolmagan");
   const cyr = await (await fetch(base + "/", { headers:{ cookie:"hy_lang=cyr" } })).text();
-  assert.ok(cyr.includes("Ҳуқуқингиз бузилдими?") && cyr.includes('lang="uz-Cyrl"'));
+  assert.ok(cyr.includes("Қандай муаммо бўлди?") && cyr.includes('lang="uz-Cyrl"'));
   const uz = await (await fetch(base + "/", { headers:{ "accept-language":"en-US" } })).text();
-  assert.ok(uz.includes("Huquqingiz buzildimi?"));
+  assert.ok(uz.includes("Qanday muammo bo‘ldi?") && uz.includes("Assalomu alaykum!"));
   const set = (await fetch(base + "/?lang=ru")).headers.get("set-cookie");
   assert.match(set, /hy_lang=ru/);
 });
