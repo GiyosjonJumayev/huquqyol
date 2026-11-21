@@ -54,12 +54,12 @@ test("Til aniqlash: tana → ?lang → cookie → Accept-Language", () => {
 test("Bosh sahifa uch tilda serverda chiziladi", async () => {
   const ru = await (await fetch(base + "/?lang=ru")).text();
   assert.match(ru, /<html lang="ru" data-lang="ru">/);
-  assert.ok(ru.includes("Ваши права нарушены?") && ru.includes("4 ситуации →") && ru.includes('data-lang="ru" aria-pressed="true"'));
+  assert.ok(ru.includes("Что случилось?") && ru.includes("Вместе найдём выход.") && ru.includes("4 ситуации →") && ru.includes('data-lang="ru" aria-pressed="true"'));
   assert.ok(!/\{\{\w+\}\}/.test(ru), "to‘ldirilmagan shablon kaliti qolmagan");
   const cyr = await (await fetch(base + "/", { headers:{ cookie:"hy_lang=cyr" } })).text();
-  assert.ok(cyr.includes("Ҳуқуқингиз бузилдими?") && cyr.includes('lang="uz-Cyrl"'));
+  assert.ok(cyr.includes("Қандай муаммо бўлди?") && cyr.includes('lang="uz-Cyrl"'));
   const uz = await (await fetch(base + "/", { headers:{ "accept-language":"en-US" } })).text();
-  assert.ok(uz.includes("Huquqingiz buzildimi?"));
+  assert.ok(uz.includes("Qanday muammo bo‘ldi?") && uz.includes("Assalomu alaykum!"));
   const set = (await fetch(base + "/?lang=ru")).headers.get("set-cookie");
   assert.match(set, /hy_lang=ru/);
 });
@@ -76,9 +76,9 @@ test("API ruscha va kirillcha javob beradi, xatolar ham shu tilda", async () => 
   assert.equal(m.domains[0].title, "Труд");
   assert.equal(m.scenarios[0].fields[0].k, "employer");
   const e1 = await (await post("/api/plan", { scenario:"yo‘q", lang:"ru" })).json();
-  assert.equal(e1.error, "Неизвестная ситуация.");
+  assert.equal(e1.error, "Такой ситуации нет. Выберите её заново на главной.");
   const e2 = await (await post("/api/document/preview", { scenario:"ish_haqi", form:{ phone:"abc" }, lang:"ru" })).json();
-  assert.equal(e2.error, "Неверный номер телефона.");
+  assert.equal(e2.error, "Проверьте номер телефона. Например: +998 90 123 45 67");
   const e3 = await fetch(base + "/api/plan", { method:"POST", body:"x", headers:{ "accept-language":"ru" } });
   assert.equal(e3.status, 415);
   assert.equal((await e3.json()).error, "Запрос должен быть в формате JSON.");

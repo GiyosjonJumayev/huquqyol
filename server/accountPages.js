@@ -21,15 +21,15 @@ const T = {
   kKorxona: ["Korxona", "Предприятие"], kMuassasa: ["Muassasa", "Учреждение"], kFirma: ["Yuridik firma", "Юридическая фирма"], kByuro: ["Advokatlik byurosi", "Адвокатское бюро"], kBoshqa: ["Boshqa", "Другое"],
   terms: ["Foydalanish shartlari va ma’lumotlarim qayta ishlanishiga roziman.", "Согласен(-на) с условиями использования и обработкой моих данных."],
   trialNote: ["Yurist va tashkilotlar uchun 14 kunlik bepul sinov avtomatik yoqiladi.", "Для юристов и организаций автоматически включается бесплатный пробный период на 14 дней."],
-  dbOff: ["Hisoblar hali ulanmagan: serverda ma’lumotlar bazasi (DATABASE_URL) sozlanmagan.", "Аккаунты пока не подключены: на сервере не настроена база данных (DATABASE_URL)."],
+  dbOff: ["Hisobga kirish hozircha ishlamayapti. Reja va arizani hisobsiz ham tayyorlashingiz mumkin.", "Вход в аккаунт сейчас недоступен. План и заявление можно подготовить и без аккаунта."],
   hello: ["Salom, {n}", "Здравствуйте, {n}"], logout: ["Chiqish", "Выйти"],
-  subs: ["Obuna", "Подписка"], noSubs: ["Obuna yo‘q.", "Подписки нет."], subscribe: ["Tariflar va obuna", "Тарифы и подписка"],
+  subs: ["Obuna", "Подписка"], noSubs: ["Hozircha obunangiz yo‘q.", "Подписки пока нет."], subscribe: ["Tariflar va obuna", "Тарифы и подписка"],
   until: ["{d} gacha", "до {d}"], price: ["Narx", "Цена"],
   st_trial: ["Sinov", "Пробный"], st_pending: ["To‘lov kutilmoqda", "Ожидает оплаты"], st_active: ["Faol", "Активна"], st_cancelled: ["Bekor qilingan", "Отменена"], st_expired: ["Muddati tugagan", "Истекла"],
   pl_pro: ["Yurist Pro", "Юрист Pro"], pl_firma: ["Firma", "Фирма"], pl_org: ["Tashkilot", "Организация"],
   payNote: ["To‘lov tizimi ulanmaguncha hisob-faktura bo‘yicha to‘lanadi; to‘lov tasdiqlangach obuna 30 kunga faollashadi.", "Пока платёжная система не подключена, оплата по счёту; после подтверждения подписка активна 30 дней."],
   myCons: ["Mening so‘rovlarim va kelishuvlarim", "Мои запросы и договорённости"], noCons: ["Hali so‘rov yo‘q. Katalogdan yurist tanlang.", "Запросов пока нет. Выберите юриста в каталоге."],
-  inCons: ["Mijozlardan so‘rovlar", "Запросы клиентов"], noIn: ["Hali so‘rov kelmagan.", "Запросов пока нет."],
+  inCons: ["Mijozlardan so‘rovlar", "Запросы клиентов"], noIn: ["Hozircha mijozlardan so‘rov yo‘q. Profilingiz to‘liq bo‘lsa, ular tezroq keladi.", "Запросов от клиентов пока нет. С заполненным профилем они приходят быстрее."],
   c_requested: ["So‘rov yuborilgan", "Запрос отправлен"], c_offered: ["Narx taklif qilingan", "Предложена цена"], c_agreed: ["Kelishuv tuzilgan", "Договорённость заключена"],
   c_completed: ["Bajarilgan", "Выполнено"], c_declined: ["Rad etilgan", "Отклонено"], c_cancelled: ["Bekor qilingan", "Отменено"],
   agree: ["Roziman — kelishuv tuzish", "Согласен — заключить договорённость"], cancel: ["Bekor qilish", "Отменить"],
@@ -84,7 +84,7 @@ const T = {
   fbRole: ["Siz «{r}» sifatida kirgansiz. Bu sahifani boshqa turdagi hisob ochadi.", "Вы вошли как «{r}». Эту страницу открывает аккаунт другого типа."],
   fbSection: ["Bu bo‘lim sizning rolingiz uchun yopiq.", "Этот раздел закрыт для вашей роли."],
   fbHome: ["Mening sahifamga", "На мою страницу"], fbStart: ["Bosh sahifaga", "На главную"], fbOther: ["Boshqa hisob bilan kirish", "Войти в другой аккаунт"],
-  none: ["Ma’lumot yo‘q.", "Нет данных."], statsOff: ["Anonim statistika o‘chirilgan (STATS=0).", "Анонимная статистика отключена (STATS=0)."]
+  none: ["Hozircha bu yerda hech narsa yo‘q.", "Пока здесь ничего нет."], statsOff: ["Anonim statistika o‘chirilgan (STATS=0).", "Анонимная статистика отключена (STATS=0)."]
 };
 const L = lang => (k, v = {}) => { const s = (T[k] || [k, k])[lang === "ru" ? 1 : 0].replace(/\{(\w+)\}/g, (_, x) => v[x] ?? ""); return lang === "cyr" ? toCyrillic(s) : s; };
 const money = (n, lang) => `${fmtSum(Number(n) || 0)} ${lang === "ru" ? "сум" : lang === "cyr" ? "сўм" : "so‘m"}`;

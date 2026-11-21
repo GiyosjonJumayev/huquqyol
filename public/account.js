@@ -6,7 +6,7 @@ import "/session.js";
 const lang = document.documentElement.dataset.lang || "uz";
 mountA11y({ lang });                                 // «Aa Qulaylik» oynasi (shrift, ovoz, mavzu) — bosh sahifadagi bilan bir xil
 const NET = { uz:"Internet aloqasi yo‘q. Qayta urinib ko‘ring.", cyr:"Интернет алоқаси йўқ. Қайта уриниб кўринг.", ru:"Нет соединения. Попробуйте ещё раз." };
-const ERR = { uz:"Xatolik yuz berdi.", cyr:"Хатолик юз берди.", ru:"Произошла ошибка." };
+const ERR = { uz:"Nimadir ishlamadi. Qayta urinib ko‘ring.", cyr:"Нимадир ишламади. Қайта уриниб кўринг.", ru:"Что-то пошло не так. Попробуйте ещё раз." };
 const MOD = { uz:"Profil moderatsiyaga yuborildi.", cyr:"Профил модерацияга юборилди.", ru:"Профиль отправлен на модерацию." };
 
 // Yurist rasmi: brauzerda markazdan kvadrat qilib 480×480 ga kichraytiriladi (JPEG), keyin yuboriladi
