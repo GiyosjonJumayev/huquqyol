@@ -120,7 +120,7 @@ test("Kirill yozuvi, telefon ekrani, qorong‘i mavzu", { skip }, async () => {
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
   await pickLang(p, "cyr");
   await p.waitForSelector(".domain");
-  assert.equal(await p.innerText("h1.hero"), "Ҳуқуқингиз бузилдими?");
+  assert.equal(await p.innerText("h1.hero"), "Қандай муаммо бўлди? Бирга йўлини топамиз.");
   assert.deepEqual(await audit(p), []);
   const d = await page({ colorScheme:"dark" });
   await d.goto(base);
@@ -134,7 +134,7 @@ test("Rus tili: matn → reja → namuna bilan to‘ldirish → hujjat; til alma
   const p = await page({ locale:"ru-RU" });
   await p.goto(base);
   await p.waitForSelector(".domain");
-  assert.equal(await p.innerText("h1.hero"), "Ваши права нарушены?");      // brauzer tili bo‘yicha
+  assert.equal(await p.innerText("h1.hero"), "Что случилось? Вместе найдём выход.");      // brauzer tili bo‘yicha
   assert.deepEqual(await audit(p), []);
   await p.fill("#problem", "Работодатель 3 месяца не платит зарплату, долг 9 млн сум");
   await p.click("#analyzeBtn");
@@ -175,7 +175,8 @@ test("Noaniq matnda muqobil holat taklif qilinadi va bir bosishda almashtiriladi
   const p = await page();
   await p.goto(base);
   await p.waitForSelector(".domain");
-  assert.equal(await p.locator(".how li").count(), 3);
+  assert.equal(await p.locator(".stops li").count(), 3);                                 // «Bu qanday ishlaydi» — 3 bekat
+  assert.equal(await p.locator(".qcard[data-case]").count(), 4);                          // 4 ta misol vaziyat
   await p.fill("#problem", "Meni ishdan bo‘shatishdi va oxirgi oylikni bermadi");
   await p.press("#problem", "Control+Enter");
   await p.waitForSelector("[data-alt]");
@@ -280,6 +281,7 @@ test("Qulaylik: shrift o‘lchami saqlanadi, sahifa va reja ovozda o‘qiladi, o
   await p.waitForSelector(".domain");
   await p.click("#a11yBtn");
   assert.equal(await p.getAttribute("#a11yBtn", "aria-expanded"), "true");
+  await p.waitForSelector("#a11yDlg.in"); await p.waitForTimeout(250);                      // ochilish animatsiyasi tugagach
   assert.deepEqual(await audit(p), []);
   const before = await p.evaluate(() => parseFloat(getComputedStyle(document.querySelector(".lead")).fontSize));
   await p.click(".fsopts [data-fs='3']");
@@ -346,10 +348,11 @@ test("Anonim statistika: holat ochilganda sanaladi, sahifa footer’dan ochiladi
   assert.deepEqual([...p.errors, ...m.errors], []);
 });
 
-test("Hujjat rasmi: panel doim ko‘rinadi, AI kalitisiz OCR o‘qiydi, muddat va ariza to‘ladi; panel yopiladi va qayta ochiladi", { skip }, async () => {
+test("Hujjat rasmi: «Hujjat rasmini yuklang» tugmasi, AI kalitisiz OCR o‘qiydi, muddat va ariza to‘ladi; panel yopiladi va qayta ochiladi", { skip }, async () => {
   const p = await page();
   await p.goto(base);
-  assert.ok(await p.isVisible("#photoPanel"));
+  assert.ok(await p.isHidden("#photoPanel"));                                              // v3: panel yopiq, tugma kiritish kartasida
+  assert.ok(await p.isVisible("#photoBtn"));
   assert.deepEqual(await audit(p), []);
   await p.setInputFiles("#photoIn", fileURLToPath(new URL("../fixtures/yhxx-qaror-foto.jpg", import.meta.url)));
   await p.waitForSelector("#photoCard", { timeout: 30_000 });
@@ -423,6 +426,7 @@ test("«Aa Qulaylik» modal oynasi har bir sahifada: Esc, fon, ×, fokus qaytadi
     assert.ok(await p.evaluate(() => document.getElementById("a11yDlg").matches(":modal")), path);
     assert.equal(await p.evaluate(() => document.querySelector("main").getBoundingClientRect().top), top, `${path}: kontent surilmaydi`);
     assert.equal(await p.getAttribute("#a11yBtn", "aria-expanded"), "true");
+    await p.waitForTimeout(250);                                                           // ochilish animatsiyasi tugagach
     assert.deepEqual(await audit(p), [], path);
     for (let i = 0; i < 14; i++) await p.keyboard.press("Tab");
     assert.ok(await p.evaluate(() => document.getElementById("a11yDlg").contains(document.activeElement)), `${path}: fokus ichida`);
@@ -437,7 +441,7 @@ test("«Aa Qulaylik» modal oynasi har bir sahifada: Esc, fon, ×, fokus qaytadi
     assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), "dark");
     await p.click("#a11yDlg [data-a11y-close]");
     await p.waitForFunction(() => !document.getElementById("a11yDlg").open);
-    for (const href of ["/statistika", "/tariflar", "/yuristlar", "/maxfiylik"]) assert.equal(await p.locator(`footer .footlinks a[href='${href}']`).count(), 1, `${path} ${href}`);
+    for (const href of ["/statistika", "/tariflar", "/yuristlar", "/maxfiylik"]) assert.ok(await p.locator(`footer.sitefoot a[href='${href}']`).count() >= 1, `${path} ${href}`);
     assert.match(await p.innerText("footer .disclaim"), /yuridik maslahat emas/);
     assert.deepEqual(p.errors, [], path);
     await p.context().close();
