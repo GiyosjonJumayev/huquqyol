@@ -306,6 +306,7 @@ app.use(`${PDFJS_BASE}/cmaps`, express.static(join(PDFJS_DIR, "cmaps"), fontOpts
 app.use(`${PDFJS_BASE}/standard_fonts`, express.static(join(PDFJS_DIR, "standard_fonts"), fontOpts));
 app.use("/fonts/onest", express.static(fontDir("@fontsource/onest"), fontOpts));
 app.use("/fonts/spectral", express.static(fontDir("@fontsource/spectral"), fontOpts));
+app.use("/fonts/caveat", express.static(fontDir("@fontsource/caveat"), fontOpts));
 app.use("/fonts/jetbrains-mono", express.static(fontDir("@fontsource/jetbrains-mono"), fontOpts));
 app.use(express.static(PUBLIC, {
   extensions:["html"], index:false,

@@ -29,31 +29,54 @@
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/jetbrains-mono/jetbrains-mono-cyrillic-ext-500-normal.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
 
 [hidden]{display:none!important}
-/* Layout: three calm screens — Vaziyat → Reja → Ariza — one decision per screen, a route-line stepper on top. */
+@font-face{font-family:"Spectral";font-style:italic;font-weight:600;font-display:swap;src:url(/fonts/spectral/spectral-latin-600-italic.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/caveat/caveat-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Spectral";font-style:italic;font-weight:600;font-display:swap;src:url(/fonts/spectral/spectral-latin-ext-600-italic.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/caveat/caveat-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Spectral";font-style:italic;font-weight:600;font-display:swap;src:url(/fonts/spectral/spectral-cyrillic-600-italic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/caveat/caveat-cyrillic-600-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Spectral";font-style:italic;font-weight:600;font-display:swap;src:url(/fonts/spectral/spectral-cyrillic-ext-600-italic.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/caveat/caveat-cyrillic-ext-600-normal.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
+
+[hidden]{display:none!important}
+/* ---------- Dizayn tizimi v3 — «iliq, insoniy». Barcha sahifalar (server sahifalari ham) shu o‘zgaruvchilardan foydalanadi. ----------
+   Qog‘oz #FBF7EF · karta #FFFDF8 · chegara #E6DAC4 · matn #2A2420 · xira #5C534B / #6E655C · yashil #1E5B52 (hover #123F39)
+   za’faron #E2A33B · terrakota #C0662A · zaytun #6E8F5E · xavf #B42318 / #FEF3F2. Matn uchun sariq/yashil — to‘qroq (AA kontrast). */
 :root{
   --fs:1;
-  --bg:#F3F4EF; --surface:#FFFFFF; --ink:#15203A; --muted:#5D6679; --line:#DDE0D6;
-  --accent:#0E6B5C; --accent-ink:#FFFFFF; --accent-soft:#E1F0EB;
-  --stamp:#A8322A; --warn:#8A5507; --on-sem:#FFFFFF; --ok:#2C7A4B; --chip:#ECEEE7;
+  --bg:#FBF7EF; --surface:#FFFDF8; --ink:#2A2420; --muted:#5C534B; --muted2:#6E655C; --line:#E6DAC4; --line2:#DCCFB8;
+  --accent:#1E5B52; --accent-hover:#123F39; --accent-ink:#FFFFFF; --accent-soft:#E5EFEA;
+  --saffron:#E2A33B; --terra:#C0662A; --olive:#6E8F5E; --sand:#F1E3C8; --road:#D6C29E;
+  --stamp:#B42318; --danger-bg:#FEF3F2; --warn:#8A5A0F; --on-sem:#FFFFFF; --ok:#3F6B32; --chip:#F4ECDD;
   --doc-bg:#FFFFFF; --doc-ink:#141414; --doc-line:#D3D3CC;
   --f-display:"Spectral", Georgia, "Times New Roman", serif;
   --f-body:"Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-hand:"Caveat", "Segoe Print", cursive;
   --f-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --r:14px; --shadow:0 1px 2px rgba(21,32,58,.06), 0 8px 24px -16px rgba(21,32,58,.25);
-  --field-line:#BFC4B7; --hero:#0B4F45; --hero-ink:#FFFFFF; --hero-muted:#D3E8E2; --hero-line:rgba(255,255,255,.3);
+  --r:18px; --r-lg:22px; --shadow:none; --shadow-input:0 2px 0 var(--line), 0 18px 40px -18px rgba(42,36,32,.35);
+  --ikat:repeating-linear-gradient(90deg, #1E5B52 0 18px, #E2A33B 18px 36px, #C0662A 36px 54px, transparent 54px 60px);
+  --ikat-foot:repeating-linear-gradient(90deg, #1E5B52 0 22px, #E2A33B 22px 44px, #C0662A 44px 66px, #6E8F5E 66px 88px);
+  --paper-lines:#EFE6D6;
+  --foot-bg:#2A2420; --foot-ink:#EADFCB; --foot-muted:#C9BCA6; --foot-line:#4A403A; --foot-head:#FFFFFF;
+  --field-line:#D3C3A7; --hero:#1E5B52; --hero-ink:#FBF7EF; --hero-muted:#D8E6E1; --hero-line:rgba(251,247,239,.3);
 }
+/* Qorong‘i mavzu: iliq to‘q jigarrang — kontrast WCAG AA */
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0E1420; --surface:#161F31; --ink:#E7EAF0; --muted:#9BA4B6; --line:#283247;
-  --accent:#3DB59D; --accent-ink:#06231D; --accent-soft:#12312C;
-  --stamp:#E36A61; --warn:#E2A847; --on-sem:#10151F; --ok:#5DBF85; --chip:#1D2639;
-  --doc-bg:#EEECE5; --doc-ink:#141414; --doc-line:#C9C6BC; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
-  --field-line:#3D4963; --hero:#12312C; --hero-ink:#EAF4F1; --hero-muted:#ABC9C1; --hero-line:rgba(255,255,255,.2) }}
+  --bg:#1B1612; --surface:#241E19; --ink:#F2EADC; --muted:#C9BDAC; --muted2:#B9AC9A; --line:#3E352D; --line2:#4D4238;
+  --accent:#7CC7B6; --accent-hover:#A3DACD; --accent-ink:#0F1F1C; --accent-soft:#1F332E;
+  --saffron:#E8B45A; --terra:#E58F5C; --olive:#9CB98A; --sand:#2E2620; --road:#5A4D3F;
+  --stamp:#F4877C; --danger-bg:#3A1E1A; --warn:#EBB662; --on-sem:#1B1612; --ok:#A5C993; --chip:#2E2620;
+  --doc-bg:#F4EFE4; --doc-ink:#141414; --doc-line:#C9C6BC; --shadow-input:0 18px 40px -18px rgba(0,0,0,.6); color-scheme:dark;
+  --paper-lines:#352D26; --foot-bg:#120F0C; --foot-line:#3A322B;
+  --field-line:#54483D; --hero:#1F332E; --hero-ink:#F2EADC; --hero-muted:#C9DCD5; --hero-line:rgba(242,234,220,.25) }}
 :root[data-theme="dark"]{
-  --bg:#0E1420; --surface:#161F31; --ink:#E7EAF0; --muted:#9BA4B6; --line:#283247;
-  --accent:#3DB59D; --accent-ink:#06231D; --accent-soft:#12312C;
-  --stamp:#E36A61; --warn:#E2A847; --on-sem:#10151F; --ok:#5DBF85; --chip:#1D2639;
-  --doc-bg:#EEECE5; --doc-ink:#141414; --doc-line:#C9C6BC; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
-  --field-line:#3D4963; --hero:#12312C; --hero-ink:#EAF4F1; --hero-muted:#ABC9C1; --hero-line:rgba(255,255,255,.2) }
+  --bg:#1B1612; --surface:#241E19; --ink:#F2EADC; --muted:#C9BDAC; --muted2:#B9AC9A; --line:#3E352D; --line2:#4D4238;
+  --accent:#7CC7B6; --accent-hover:#A3DACD; --accent-ink:#0F1F1C; --accent-soft:#1F332E;
+  --saffron:#E8B45A; --terra:#E58F5C; --olive:#9CB98A; --sand:#2E2620; --road:#5A4D3F;
+  --stamp:#F4877C; --danger-bg:#3A1E1A; --warn:#EBB662; --on-sem:#1B1612; --ok:#A5C993; --chip:#2E2620;
+  --doc-bg:#F4EFE4; --doc-ink:#141414; --doc-line:#C9C6BC; --shadow-input:0 18px 40px -18px rgba(0,0,0,.6); color-scheme:dark;
+  --paper-lines:#352D26; --foot-bg:#120F0C; --foot-line:#3A322B;
+  --field-line:#54483D; --hero:#1F332E; --hero-ink:#F2EADC; --hero-muted:#C9DCD5; --hero-line:rgba(242,234,220,.25) }
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:calc(16px * var(--fs));line-height:1.55;
@@ -1145,3 +1168,34 @@ html[data-fs="3"] .a11ydlg .fsopts,html[data-fs="3"] .thopts{grid-template-colum
 .navbar.compact .navmenu{display:block}
 .navbar.compact .navright{margin-left:auto}
 .navbar.compact .navmenu .menupanel{position:fixed;left:auto;right:max(12px, env(safe-area-inset-right,0px));top:76px;width:min(360px, calc(100vw - 24px));min-width:0;max-height:calc(100dvh - 92px);overflow:auto}
+
+/* =====================================================================================================
+   v3 — «iliq, insoniy»: asosiy komponentlar (tugmalar, kartalar, maydonlar, xabarlar). Barcha sahifalar uchun.
+   ===================================================================================================== */
+a{color:var(--accent);text-underline-offset:3px}
+a:hover{color:var(--accent-hover)}
+.btn{border-radius:999px;min-height:44px;padding:10px 22px;font-weight:600;line-height:1.2}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover:not(:disabled){background:var(--accent-hover);filter:none}
+.btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn.sm{min-height:40px;padding:8px 16px}
+.btn.icon{border-radius:999px}
+.btn.danger{background:var(--stamp);color:var(--on-sem)}
+.btn.danger:hover:not(:disabled){filter:brightness(.92)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:none}
+.field input,.field select,.field textarea,.ff select,.kform input,.kform select,.kform textarea{border-radius:12px;background:var(--surface);border:1px solid var(--field-line);color:var(--ink)}
+.field label,legend{font-weight:600}
+.tag{border-radius:999px}
+.chipbtn,.chips li,.chip{border-radius:999px}
+/* Xato va ogohlantirish xabarlari: qizil #B42318 och fon #FEF3F2 ustida */
+.error,.err:not([hidden]){color:var(--stamp);background:var(--danger-bg);border-radius:12px;padding:10px 14px}
+.field .err{background:none;padding:0}
+.note.warn{background:color-mix(in srgb, var(--saffron) 16%, var(--surface));color:var(--ink);border-left:4px solid var(--saffron)}
+.note.ok{background:var(--accent-soft);color:var(--ink);border-left:4px solid var(--accent)}
+.empty{background:var(--chip);color:var(--muted);border-radius:var(--r)}
+h1,h2,h3{color:var(--ink)}
+.sec{font-family:var(--f-display);font-weight:700;letter-spacing:-.005em}
+/* Ikat chizig‘i (yashil / za’faron / terrakota) — kiritish kartasi va footer tepasida */
+.ikat{display:block;height:8px;background:var(--ikat)}
+@media (max-width:430px){.btn{min-height:48px}}
