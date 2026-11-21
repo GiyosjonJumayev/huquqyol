@@ -114,8 +114,9 @@ Node.js 18.18 yoki undan yangi versiya kerak (tavsiya: 20 yoki 22).
 npm install
 cp .env.example .env      # ANTHROPIC_API_KEY ni yozing (ixtiyoriy)
 npm start                 # http://localhost:3000
-npm test                  # 136 ta unit/API test (TEST_DATABASE_URL bilan — PostgreSQL oqimi ham)
-npm run test:e2e          # 13 ta brauzer testi (Playwright kerak: npm i --no-save playwright)
+npm test                  # 145 ta unit/API test (TEST_DATABASE_URL bilan — PostgreSQL oqimi ham)
+npm run test:e2e          # 13 ta brauzer testi
+node scripts/eval-ai.mjs  # AI va qoidalar rejimini namunalarda solishtirish (AI kaliti bilan; npm test ga kirmaydi) (Playwright kerak: npm i --no-save playwright)
 ```
 
 API kaliti bo‘lmasa ham ilova to‘liq ishlaydi. Bu holda tahlilni BM25 qidiruvi va kalit so‘zlar bajaradi. Kalit qo‘shilsa, tahlilni Claude bajaradi. Claude faqat qidiruv topgan normalarga tayanadi va bazada yo‘q modda raqamlari javobdan avtomatik olib tashlanadi.

@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (136 tests; 3 DB tests skip without TEST_DATABASE_URL)
+npm test                 # node:test, must stay green (145 tests; 3 DB tests skip without TEST_DATABASE_URL)
 npm run test:e2e         # 13 browser tests incl. axe; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
@@ -32,7 +32,8 @@ npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: 
 
 Env (see `.env.example`): `ANTHROPIC_API_KEY` (optional), `DATABASE_URL` (PostgreSQL; empty → accounts/catalog
 DB features return 503, citizen flow still works), `ADMIN_EMAILS` (comma list; users registered with these e-mails
-become admin), `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_URL` (footer link), `TZ=Asia/Tashkent`, `HOLIDAYS_EXTRA`, `OCR=0` to disable OCR, `TEST_DATABASE_URL` (DB tests; DB is wiped).
+become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, anthropic first), `GEMINI_API_KEY`,
+`GEMINI_MODEL` (default gemini-4-hydrogen), `GEMINI_THINKING` (default lowest level), `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_URL` (footer link), `TZ=Asia/Tashkent`, `HOLIDAYS_EXTRA`, `OCR=0` to disable OCR, `TEST_DATABASE_URL` (DB tests; DB is wiped).
 
 ## Architecture (v3.14)
 - `app.cjs` → `server/index.js` (Express 5). At startup it pre-renders `public/index.html` once per language
@@ -57,7 +58,9 @@ become admin), `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_URL` (footer link), `TZ=Asia/
 - Telegram bot: `bot/` (grammY, long polling, imports the engine directly, sessions in memory, never logs user text).
 - API: `POST /api/analyze` · `/api/plan` · `/api/document/preview|docx|pdf` · `/api/photo` · `/api/auth/*` · `/api/subscriptions`
   · `/api/consultations` · `/api/lawyer/*` · `/api/cabinet` · `/api/admin/*` · `GET /api/meta|health|stats|courts|me`.
-- `server/analyze.js` — Claude call (JSON, prompt-injection guard, norm ids filtered to retrieved set) with rules fallback.
+- `server/analyze.js` — AI call behind one `aiComplete()` (Anthropic SDK or Gemini REST via fetch, key only in the
+  `x-goog-api-key` header), JSON, prompt-injection guard, norm ids filtered to retrieved set; any error / 10 s timeout → rules.
+  `server/photo.js` vision uses the same switch. `node scripts/eval-ai.mjs` compares AI vs rules on the test samples (not in npm test).
 - `server/rag.js` — BM25 over norms + scenarios, keyword hits, synonym expansion.
 - `server/plan.js` — deadlines, risk, calculators (`CALCS`). `server/dates.js` + `server/holidays.js` — date math (MK art. 9, holidays).
 - `server/documents.js` — template engine (`{{key}}`, `[?key]…[/]`, `[!key]…[/]`) → block model → DOCX/PDF.
