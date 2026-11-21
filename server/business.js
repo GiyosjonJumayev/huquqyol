@@ -56,9 +56,10 @@ const T = {
   reqTitle: ["Konsultatsiyaga yozilish", "Записаться на консультацию"], reqLogin: ["So‘rov yuborish va kelishuv tuzish uchun hisobingizga kiring.", "Чтобы отправить запрос и заключить договорённость, войдите в аккаунт."],
   reqMsg: ["Vaziyatingizni qisqacha yozing", "Кратко опишите ситуацию"], reqSend: ["So‘rov yuborish", "Отправить запрос"],
   reqNote: ["Yurist narx taklif qiladi; rozi bo‘lsangiz, kelishuv tuziladi. Holatini «Hisobim» sahifasida kuzatasiz.", "Юрист предложит цену; если согласитесь — договорённость заключена. Статус — на странице «Мой аккаунт»."],
+  website: ["Veb-sayt", "Сайт"], education: ["Ta’lim va malaka", "Образование и квалификация"], achievements: ["Yutuqlar va tajriba", "Достижения и опыт"], licenseNo: ["Litsenziya", "Лицензия"],
   joinTitle: ["Yuristmisiz? Katalogga qo‘shiling", "Вы юрист? Попадите в каталог"],
-  joinText: ["Yurist Pro kabinetida profilingizni to‘ldiring va arizani yuboring. Litsenziya tekshirilgach, profilingiz katalogda chiqadi.", "Заполните профиль в кабинете «Юрист Pro» и отправьте заявку. После проверки лицензии профиль появится в каталоге."],
-  joinBtn: ["Kabinetni ochish", "Открыть кабинет"],
+  joinText: ["Ro‘yxatdan o‘ting, profilingizni rasm, tajriba va narxlar bilan to‘ldiring. Litsenziya tekshirilgach va Yurist Pro faollashtirilgach, profilingiz katalogda chiqadi.", "Зарегистрируйтесь и заполните профиль: фото, опыт, цены. После проверки лицензии и активации «Юрист Pro» профиль появится в каталоге."],
+  joinBtn: ["Profilni to‘ldirish", "Заполнить профиль"],
   // Tariflar
   plTitle: ["Tariflar", "Тарифы"],
   plLead: ["Fuqarolar uchun HuquqYo‘l bepul. Yuristlar, advokatlik byurolari va tashkilotlar uchun — ish jarayonini tartibga soladigan Pro imkoniyatlari.", "Для граждан HuquqYo‘l бесплатен. Для юристов, адвокатских бюро и организаций — Pro-возможности для ведения работы."],
@@ -74,7 +75,10 @@ const T = {
   cmpTitle: ["Imkoniyatlarni solishtirish", "Сравнение возможностей"], cmpFeature: ["Imkoniyat", "Возможность"],
   // Kabinet
   cabTitle: ["Yurist kabineti", "Кабинет юриста"],
-  cabNoJs: ["Kabinet ishlashi uchun brauzerda JavaScript yoqilgan bo‘lishi kerak.", "Для работы кабинета нужен включённый JavaScript."]
+  cabNoJs: ["Kabinet ishlashi uchun brauzerda JavaScript yoqilgan bo‘lishi kerak.", "Для работы кабинета нужен включённый JavaScript."],
+  cabLead: ["Yurist va advokatlar uchun ish joyi. Kirish yoki ro‘yxatdan o‘tish kerak; 14 kun bepul sinov.", "Рабочее место юриста и адвоката. Нужно войти или зарегистрироваться; 14 дней бесплатно."],
+  cabNeedPro: ["Kabinet Yurist Pro obunachilari uchun. Obuna bo‘ling — barcha vositalar ochiladi.", "Кабинет — для подписчиков «Юрист Pro». Оформите подписку, и все инструменты откроются."],
+  cabRegister: ["Yurist sifatida ro‘yxatdan o‘tish", "Зарегистрироваться как юрист"], cabNoDb: ["Hisoblar hali ulanmagan.", "Аккаунты пока не подключены."]
 };
 const FEAT = {
   free: [["Vaziyat tahlili va huquqiy reja", "Анализ ситуации и правовой план"], ["{docs} ta hujjat shabloni: talabnoma, shikoyat, da’vo arizasi", "{docs} шаблонов: претензии, жалобы, иски"],
@@ -163,11 +167,15 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
 
 // ---------- Katalog ----------
 const initials = n => n.replace(/[«»"()]/g, "").split(/\s+/).filter(w => /^\p{L}/u.test(w)).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+// Avatar: yurist yuklagan rasm yoki bosh harflar
+const avatar = (l, big = false) => l.photo
+  ? `<img class="ava${big ? " big" : ""} photo" src="${esc(l.photo)}" alt="" width="${big ? 120 : 64}" height="${big ? 120 : 64}" loading="lazy" decoding="async">`
+  : `<div class="ava${big ? " big" : ""}" aria-hidden="true">${esc(initials(nm(l.name, "uz")))}</div>`;
 function lawyerCard(l, lang, qs){
   const t = tr(lang), areas = areaList(lang);
   const mp = minPrice(l);
   return `<article class="lawyer" aria-labelledby="lw_${l.id}">
-    <div class="ava" aria-hidden="true">${esc(initials(nm(l.name, "uz")))}</div>
+    ${avatar(l)}
     <div class="lwbody">
       <h2 id="lw_${l.id}"><a href="/yuristlar/${l.id}${qs}">${esc(nm(l.name, lang))}</a>${l.demo ? ` <span class="tag demo">${esc(t("demo"))}</span>` : ""}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h2>
       <p class="meta">${esc(t(l.kind))} · ${esc(t("years", { n: l.experience }))} · ${esc(regionName(l.region, lang))}, ${esc(districtName(l.district, l.region, lang))}</p>
@@ -202,7 +210,7 @@ export function lawyersPage({ lang, cssHref, fs, query = {}, user, accHref, extr
     </form>
     <p class="count" aria-live="polite">${esc(t("found", { n: list.length }))}</p>
     ${list.length ? `<div class="lawyers">${list.map(l => lawyerCard(l, lang, back)).join("")}</div>` : `<p class="card">${esc(t("none"))}</p>`}
-    <aside class="card join"><h2>${esc(t("joinTitle"))}</h2><p>${esc(t("joinText"))}</p><a class="btn ghost" href="/kabinet#profil">${esc(t("joinBtn"))}</a></aside>` });
+    <aside class="card join"><h2>${esc(t("joinTitle"))}</h2><p>${esc(t("joinText"))}</p><a class="btn ghost" href="/hisob/profil">${esc(t("joinBtn"))}</a></aside>` });
 }
 
 export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, extra = [] }){
@@ -212,12 +220,14 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
   const qs = new URLSearchParams(Object.entries(query).filter(([k, v]) => ["soha", "hudud", "shakl", "kim"].includes(k) && typeof v === "string" && v.length < 80)).toString();
   const svc = l.services.map(s => `<tr><th scope="row">${esc(pick(s.name, lang))}</th><td>${s.min ? esc(t("min", { n: s.min })) : "—"}</td><td>${esc(t(s.format))}</td><td class="numc">${s.price === 0 ? esc(t("free")) : esc(s.from ? t("from", { p: money(s.price, lang) }) : money(s.price, lang))}</td></tr>`).join("");
   const tel = l.contacts.phone ? `<li><span>${esc(t("phone"))}:</span> ${l.demo ? `<span class="mono">${esc(l.contacts.phone)}</span>` : `<a href="tel:${esc(l.contacts.phone.replace(/\s/g, ""))}">${esc(l.contacts.phone)}</a>`}</li>` : "";
+  const tg = l.contacts.telegram ? `<li><span>Telegram:</span> <a href="https://t.me/${esc(l.contacts.telegram)}" target="_blank" rel="noopener noreferrer">@${esc(l.contacts.telegram)}</a></li>` : "";
+  const web = l.contacts.website ? `<li><span>${esc(t("website"))}:</span> <a href="${esc(l.contacts.website)}" target="_blank" rel="noopener noreferrer nofollow">${esc(l.contacts.website.replace(/^https:\/\//, ""))}</a></li>` : "";
   const mail = l.contacts.email ? `<li><span>${esc(t("email"))}:</span> ${l.demo ? `<span class="mono">${esc(l.contacts.email)}</span>` : `<a href="mailto:${esc(l.contacts.email)}">${esc(l.contacts.email)}</a>`}</li>` : "";
   return page({ lang, cssHref, fs, user, accHref, path:`/yuristlar/${l.id}`, title:nm(l.name, lang), desc:pick(l.headline, lang), body:`
     <p><a href="/yuristlar${qs ? `?${esc(qs)}` : ""}">${esc(t("back"))}</a></p>
     ${l.demo ? `<p class="note warn" role="note">${esc(t("demoNote"))}</p>` : ""}
     <section class="card prof">
-      <div class="ava big" aria-hidden="true">${esc(initials(nm(l.name, "uz")))}</div>
+      ${avatar(l, true)}
       <div><h1>${esc(nm(l.name, lang))}${l.demo ? ` <span class="tag demo">${esc(t("demo"))}</span>` : ""}${l.plan !== "free" ? ` <span class="tag pro">${esc(t("pro"))}</span>` : ""}</h1>
         ${l.firm ? `<p class="meta">${esc(nm(l.firm, lang))}</p>` : ""}
         <p class="meta">${esc(t(l.kind))} · ${esc(t("years", { n: l.experience }))} · ${esc(l.langs.map(x => x.toUpperCase()).join(" / "))} · ${esc(l.license.verified ? t("verified") : t("notVerified"))}</p>
@@ -225,7 +235,10 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
     </section>
     <div class="profgrid">
       <div>
-        <h2 class="sec">${esc(t("about"))}</h2><p>${esc(pick(l.about, lang))}</p>
+        <h2 class="sec">${esc(t("about"))}</h2><p class="pre">${esc(pick(l.about, lang))}</p>
+        ${l.education ? `<h2 class="sec">${esc(t("education"))}</h2><p class="pre">${esc(l.education)}</p>` : ""}
+        ${l.achievements ? `<h2 class="sec">${esc(t("achievements"))}</h2><p class="pre">${esc(l.achievements)}</p>` : ""}
+        ${l.license?.number ? `<p class="small muted">${esc(t("licenseNo"))}: ${esc(l.license.number)}${l.license.issuer ? ` · ${esc(l.license.issuer)}` : ""}</p>` : ""}
         <h2 class="sec">${esc(t("areas"))}</h2><ul class="chips">${l.areas.map(a => `<li><a href="/yuristlar?soha=${a}">${esc(areas.find(x => x.id === a)?.title || a)}</a></li>`).join("")}</ul>
         <h2 class="sec">${esc(t("services"))}</h2>
         <div class="tscroll"><table class="svc"><thead><tr><th scope="col">${esc(t("svc"))}</th><th scope="col">${esc(t("dur"))}</th><th scope="col">${esc(t("fmt"))}</th><th scope="col" class="numc">${esc(t("price"))}</th></tr></thead><tbody>${svc}</tbody></table></div>
@@ -233,7 +246,7 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
         <p class="small muted">${esc(t("privacy"))}</p>
       </div>
       <aside class="card side">
-        <h2>${esc(t("contacts"))}</h2><ul class="contact">${tel}${mail}</ul>
+        <h2>${esc(t("contacts"))}</h2><ul class="contact">${tel}${tg}${mail}${web}</ul>
         <h2>${esc(t("where"))}</h2><p>${esc(regionName(l.region, lang))}, ${esc(pick(l.address, lang))}</p><p class="muted">${esc(pick(l.hours, lang))}</p>
         <p class="meta">${l.formats.map(f => esc(t(f))).join(" · ")}</p>
         ${l.demo ? "" : requestBox(l, lang, user, query)}
@@ -253,10 +266,21 @@ function requestBox(l, lang, user, query){
     <p class="small muted">${esc(t("reqNote"))}</p></form>`;
 }
 
-export function cabinetPage({ lang, cssHref, fs, jsHref, user, accHref }){
+// Kabinet faqat Yurist Pro (sinov yoki faol) obunachilari uchun; qolganlarga — imkoniyatlar va obuna yo‘li
+export function cabinetPage({ lang, cssHref, fs, jsHref, user, accHref, pro, db }){
   const t = tr(lang);
+  const open = user && (pro?.tools || user.role === "admin");
+  if (!open){
+    const list = FEAT.pro.map(f => `<li>${esc(pick(f, lang))}</li>`).join("");
+    const cta = !db ? `<p class="note warn">${esc(t("cabNoDb"))}</p>`
+      : !user ? `<p class="rowbtn"><a class="btn primary" href="/royxat?rol=lawyer&next=/kabinet">${esc(t("cabRegister"))}</a><a class="btn ghost" href="/kirish?next=/kabinet">${esc(t("navLogin"))}</a></p>`
+      : `<p class="rowbtn"><button class="btn primary" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: "pro" }))}'>${esc(t("plSubscribe"))}</button><a class="btn ghost" href="/tariflar">${esc(t("navPlans"))}</a></p><p class="err" data-err hidden></p>`;
+    return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"), body:`
+      <section class="cabgate"><h1>${esc(t("cabTitle"))}</h1><p class="lead">${esc(user ? t("cabNeedPro") : t("cabLead"))}</p>
+      <ul class="feat big">${list}</ul>${cta}</section>` });
+  }
   return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"),
-    body:`<div id="kab" class="kab" data-lang="${lang}"><h1>${esc(t("cabTitle"))}</h1><noscript><p class="card">${esc(t("cabNoJs"))}</p></noscript></div>`,
+    body:`<div id="kab" class="kab" data-lang="${lang}" data-sync="1"><h1>${esc(t("cabTitle"))}</h1><noscript><p class="card">${esc(t("cabNoJs"))}</p></noscript></div>`,
     scripts:`<script type="module" src="${jsHref}"></script>` });
 }
 

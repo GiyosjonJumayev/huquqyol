@@ -17,7 +17,25 @@ const showDate = s => LANG === "cyr" ? toCyr(dt(s)) : dt(s);
 const EMPTY = () => ({ v:1, plan:"pro", since: iso(), clients:[], cases:[], letterhead:{ on:false, lines:["", "", "", ""] }, templates:[], org:{ name:"", docs:[] }, profile:{} });
 function load(){ try { return { ...EMPTY(), ...(JSON.parse(localStorage.getItem(KEY)) || {}) }; } catch { return EMPTY(); } }
 let S = load();
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+// Saqlash: brauzerda (darhol) va hisobda (1,5 soniyadan keyin) — boshqa qurilmada ham ochiladi
+const SYNC = root.dataset.sync === "1";
+let syncT = null, syncState = "";
+function setSync(st){ syncState = st; const el = document.getElementById("syncState"); if (el) el.textContent = SYNC_TEXT[st] ? L(...SYNC_TEXT[st]) : ""; }
+const SYNC_TEXT = { saving:["Saqlanmoqda…", "Сохранение…"], saved:["✓ Hisobingizda saqlandi", "✓ Сохранено в аккаунте"], error:["Hisobga saqlanmadi — internetni tekshiring (ma’lumot brauzerda bor)", "Не сохранено в аккаунте — проверьте интернет (данные есть в браузере)"] };
+async function pushServer(){
+  try {
+    setSync("saving");
+    const r = await fetch("/api/cabinet", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ data: S }), credentials:"same-origin" });
+    if (!r.ok) throw 0;
+    S.syncedAt = (await r.json()).updatedAt; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {}
+    setSync("saved");
+  } catch { setSync("error"); }
+}
+const save = () => {
+  S.savedAt = new Date().toISOString();
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {}
+  if (SYNC){ clearTimeout(syncT); syncT = setTimeout(pushServer, 1500); }
+};
 if (new URLSearchParams(location.search).get("tarif") in { pro:1, firma:1, org:1 }){ S.plan = new URLSearchParams(location.search).get("tarif"); save(); }
 
 // Ma’lumotlar: holatlar va qonunlar (meta), hududlar (sudlar bazasi)
@@ -41,7 +59,7 @@ const name = (list, v) => { const x = list.find(i => i[0] === v); return x ? L(x
 // ---------- Qobiq ----------
 let tab = TABS.some(t => t[0] === location.hash.slice(1)) ? location.hash.slice(1) : "umumiy";
 root.innerHTML = `<h1>${esc(L("Yurist kabineti", "Кабинет юриста"))} <span class="tag pro" id="planTag"></span></h1>
-  <p class="note">${esc(L("Sinov rejimi: barcha Pro imkoniyatlari bepul. Ma’lumotlar faqat shu brauzerda saqlanadi — «Umumiy» bo‘limida zaxira nusxa oling.", "Пробный режим: все Pro-возможности бесплатны. Данные хранятся только в этом браузере — делайте резервную копию в разделе «Обзор»."))}</p>
+  <p class="note">${esc(L("Ma’lumotlar hisobingizda saqlanadi va boshqa qurilmalarda ham ochiladi. Zaxira nusxa — «Umumiy» bo‘limida.", "Данные хранятся в вашем аккаунте и открываются на других устройствах. Резервная копия — в разделе «Обзор»."))} <span class="syncstate" id="syncState" aria-live="polite"></span></p>
   <nav class="kabtabs" role="tablist" aria-label="${esc(L("Kabinet bo‘limlari", "Разделы кабинета"))}">${TABS.map(([id, uz, ru]) => `<a role="tab" href="#${id}" data-tab="${id}">${esc(L(uz, ru))}</a>`).join("")}</nav>
   <section id="panel" class="kabpanel" role="tabpanel" tabindex="-1"></section><div class="sr" aria-live="polite" id="kabLive"></div>`;
 const panel = document.getElementById("panel");
@@ -190,31 +208,9 @@ const VIEWS = {
         <div class="rowbtn">${S.org.docs.some(d => d.url === l.url) ? `<span class="small muted">✓ ${esc(L("Qo‘shilgan", "Добавлено"))}</span>` : `<button class="linkbtn" type="button" data-act="addLaw" data-k="${esc(k)}">${esc(L("Qo‘shish", "Добавить"))}</button>`}</div></li>`).join("")}</ul>` : ""}`;
   },
   profil(){
-    const p = S.profile, areas = META ? [...META.domains.map(d => [d.id, d.title, d.title]), ...EXTRA_AREAS] : EXTRA_AREAS;
-    const regions = COURTS ? COURTS.regions.map(r => [r.name, r.name, r.cyr]) : [];
-    const chk = (nm, list, cur = []) => list.map(([v, uz, ru]) => `<label class="check"><input type="checkbox" name="${nm}" value="${esc(v)}"${cur.includes(v) ? " checked" : ""}> ${esc(L(uz, ru))}</label>`).join("");
-    return `<form class="card kform" data-form="profile"><h2>${esc(L("Katalogdagi profilingiz", "Ваш профиль в каталоге"))}</h2>
-      <p class="muted">${esc(L("Ariza moderatsiyaga yuboriladi. Litsenziya yoki diplom tekshirilgach, profil katalogda chiqadi va fuqarolar sizga to‘g‘ridan-to‘g‘ri murojaat qiladi.", "Заявка уходит на модерацию. После проверки лицензии или диплома профиль появится в каталоге, и граждане будут обращаться к вам напрямую."))}</p>
-      <div class="grid2">
-      ${field("p_kind", L("Kim", "Кто"), `<select id="p_kind">${opt([["advokat", "Advokat", "Адвокат"], ["yurist", "Yurist", "Юрист"], ["firma", "Yuridik firma", "Юридическая фирма"], ["mediator", "Mediator", "Медиатор"]], p.kind || "yurist")}</select>`)}
-      ${field("p_name", L("F.I.Sh. yoki firma nomi", "ФИО или название фирмы"), inp("p_name", p.name, 'required maxlength="120" autocomplete="name"'))}
-      ${field("p_firm", L("Byuro yoki firma (ixtiyoriy)", "Бюро или фирма (необязательно)"), inp("p_firm", p.firm, 'maxlength="160"'))}
-      ${field("p_license", L("Litsenziya yoki guvohnoma raqami", "Номер лицензии или удостоверения"), inp("p_license", p.license, 'maxlength="60"'))}
-      ${field("p_region", L("Hudud", "Регион"), `<select id="p_region"><option value="">—</option>${opt(regions, p.region)}</select>`)}
-      ${field("p_district", L("Tuman yoki shahar", "Район или город"), inp("p_district", p.district, 'maxlength="80"'))}
-      ${field("p_phone", L("Telefon", "Телефон"), inp("p_phone", p.phone, 'type="tel" required maxlength="40" autocomplete="tel"'))}
-      ${field("p_email", L("E-pochta", "Эл. почта"), inp("p_email", p.email, 'type="email" maxlength="120" autocomplete="email"'))}
-      ${field("p_exp", L("Tajriba (yil)", "Опыт (лет)"), inp("p_exp", p.experience, 'inputmode="numeric" maxlength="2"'))}
-      ${field("p_price", L("Konsultatsiya narxi, so‘m (0 — bepul)", "Цена консультации, сум (0 — бесплатно)"), inp("p_price", p.price, 'inputmode="numeric" maxlength="12"'))}
-      </div>
-      ${field("p_head", L("Qisqa tavsif", "Кратко о себе"), inp("p_head", p.headline, 'maxlength="200"'), L("Masalan: Mehnat nizolari, ish haqi va ishga tiklash", "Например: Трудовые споры, зарплата и восстановление на работе"))}
-      ${field("p_about", L("Batafsil", "Подробнее"), `<textarea id="p_about" rows="5" maxlength="1500">${esc(p.about || "")}</textarea>`)}
-      <fieldset><legend>${esc(L("Faoliyat sohalari", "Сферы практики"))}</legend><div class="checks">${chk("areas", areas, p.areas)}</div></fieldset>
-      <fieldset><legend>${esc(L("Xizmat shakli va tillar", "Формат и языки"))}</legend><div class="checks">${chk("formats", [["online", "Onlayn", "Онлайн"], ["office", "Ofisda", "В офисе"]], p.formats)}${chk("langs", [["uz", "O‘zbek", "Узбекский"], ["ru", "Rus", "Русский"], ["en", "Ingliz", "Английский"]], p.langs)}</div></fieldset>
-      <label class="check"><input type="checkbox" id="p_consent"> ${esc(L("Ma’lumotlarim moderatsiya uchun ko‘rib chiqilishiga va tasdiqlangach katalogda e’lon qilinishiga roziman.", "Согласен(-на) на проверку данных модератором и их публикацию в каталоге после подтверждения."))}</label>
-      <div class="rowbtn"><button class="btn primary" type="submit">${esc(L("Katalogga ariza yuborish", "Отправить заявку в каталог"))}</button><button class="btn ghost" type="button" data-act="profSave">${esc(L("Faqat saqlash", "Только сохранить"))}</button></div>
-      <p class="err" id="p_err" role="alert" hidden></p>
-      ${p.sentAt ? `<p class="ok">✓ ${esc(L(`Ariza yuborilgan: ${showDate(p.sentAt)}. Moderator siz bilan bog‘lanadi.`, `Заявка отправлена: ${showDate(p.sentAt)}. Модератор свяжется с вами.`))}</p>` : ""}</form>`;
+    return `<section class="card"><h2>${esc(L("Katalogdagi profilingiz", "Ваш профиль в каталоге"))}</h2>
+      <p>${esc(L("Rasm, tajriba, ta’lim, xizmatlar va narxlar, aloqa ma’lumotlari — profil sahifasida. Litsenziya tekshirilgach va Yurist Pro faol bo‘lsa, profil katalogda fuqarolarga ko‘rinadi.", "Фото, опыт, образование, услуги и цены, контакты — на странице профиля. После проверки лицензии и при активном «Юрист Pro» профиль виден гражданам в каталоге."))}</p>
+      <p class="rowbtn"><a class="btn primary" href="/hisob/profil">${esc(L("Profilni tahrirlash", "Редактировать профиль"))}</a><a class="btn ghost" href="/hisob/statistika">${esc(L("Statistika", "Статистика"))}</a></p></section>`;
   }
 };
 let editing = "", orgFilter = {};
@@ -246,7 +242,6 @@ panel.addEventListener("submit", async e => {
     if (val("d_title")) S.org.docs.unshift({ id: uid(), type: val("d_type"), title: val("d_title"), number: val("d_num"), url: /^https?:\/\//.test(val("d_url")) ? val("d_url") : "", text: val("d_text") });
     say(L("Saqlandi", "Сохранено"));
   }
-  else if (f === "profile"){ await sendProfile(); return; }
   save(); go(tab);
 });
 function saveTpl(){
@@ -254,21 +249,6 @@ function saveTpl(){
   const i = S.templates.findIndex(x => x.id === t.id);
   if (i >= 0) S.templates[i] = t; else S.templates.unshift(t);
   editing = t.id;
-}
-function readProfile(){
-  const all = n => [...panel.querySelectorAll(`input[name="${n}"]:checked`)].map(x => x.value);
-  S.profile = { ...S.profile, kind: val("p_kind"), name: val("p_name"), firm: val("p_firm"), license: val("p_license"), region: val("p_region"), district: val("p_district"),
-    phone: val("p_phone"), email: val("p_email"), experience: val("p_exp"), price: val("p_price"), headline: val("p_head"), about: val("p_about"),
-    areas: all("areas"), formats: all("formats"), langs: all("langs") };
-}
-async function sendProfile(){
-  readProfile(); save();
-  const err = document.getElementById("p_err");
-  try {
-    const r = await fetch("/api/lawyers/apply", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ ...S.profile, consent: document.getElementById("p_consent").checked, lang: LANG }) });
-    if (!r.ok){ let m = L("Xatolik yuz berdi.", "Произошла ошибка."); try { m = (await r.json()).error || m; } catch {} throw new Error(m); }
-    S.profile.sentAt = iso(); save(); go("profil"); say(L("Ariza yuborildi", "Заявка отправлена"));
-  } catch (x){ err.textContent = x.message; err.hidden = false; err.focus?.(); }
 }
 panel.addEventListener("change", e => {
   const a = e.target.dataset.act;
@@ -298,7 +278,6 @@ panel.addEventListener("click", async e => {
   else if (a === "delDoc") del(S.org.docs, L("Hujjat o‘chirildi", "Документ удалён"));
   else if (a === "toTpl"){ const d = S.org.docs.find(x => x.id === id); if (d){ const t = { id: uid(), title: d.title, text: d.text }; S.templates.unshift(t); editing = t.id; save(); go("shablonlar"); say(L("Shablonga aylantirildi", "Превращено в шаблон")); } return; }
   else if (a === "addLaw"){ const l = META?.laws[b.dataset.k]; if (l) S.org.docs.push({ id: uid(), type: "qonun", title: l.name, number: "", url: l.url, text: "" }); }
-  else if (a === "profSave"){ readProfile(); say(L("Saqlandi", "Сохранено")); }
   else if (a === "export"){ download(new Blob([JSON.stringify(S, null, 1)], { type:"application/json" }), `huquqyol-kabinet-${iso()}.json`); return; }
   else if (a === "ics"){ download(new Blob([ics()], { type:"text/calendar" }), "huquqyol-muddatlar.ics"); return; }
   else return;
@@ -313,4 +292,10 @@ function ics(){
 }
 
 go(tab);
-Promise.all([getMeta(), getCourts()]).then(() => go(tab));
+const pull = !SYNC ? Promise.resolve() : fetch("/api/cabinet", { credentials:"same-origin" }).then(r => r.ok ? r.json() : null).then(d => {
+  if (!d) return;
+  const server = d.data, local = S.savedAt || "";
+  if (server && server.v === 1 && (!local || (server.savedAt || "") >= local)){ S = { ...EMPTY(), ...server, syncedAt: d.updatedAt }; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} setSync("saved"); }
+  else if (local && (S.clients.length || S.cases.length || S.templates.length || S.org.docs.length || S.letterhead.lines.some(Boolean))) pushServer();
+}).catch(() => setSync("error"));
+Promise.all([getMeta(), getCourts(), pull]).then(() => go(tab));

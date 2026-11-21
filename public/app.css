@@ -960,3 +960,87 @@ html[data-fs="2"] .navlinks+.navright,html[data-fs="3"] .navlinks+.navright{marg
 html[data-fs="2"] .navmenu .menupanel,html[data-fs="3"] .navmenu .menupanel{position:fixed;left:12px;right:12px;top:76px;width:auto;min-width:0;max-height:calc(100dvh - 92px);overflow:auto}
 @media (prefers-reduced-motion:reduce){.nav .brand .logo,.navcta,.navdd .chev{transition:none}.ddpanel{animation:none}}
 @media print{.nav{display:none!important}}
+
+/* ================= Mavzu tugmasi (yorug‘ / qorong‘i) ================= */
+.navbtn{display:inline-grid;place-items:center;min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s, transform .2s}
+.navbtn:hover{border-color:var(--accent)}
+.navbtn:active{transform:scale(.94)}
+.themebtn .ni{width:20px;height:20px}
+.themebtn .sun{display:none;color:#F2B84B}
+:root[data-theme="dark"] .themebtn .sun{display:block}
+:root[data-theme="dark"] .themebtn .moon{display:none}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .themebtn .sun{display:block} :root:not([data-theme="light"]) .themebtn .moon{display:none} }
+html{transition:background-color .2s}
+@media (prefers-reduced-motion:reduce){html{transition:none}}
+
+/* ================= Yurist paneli ================= */
+img.ava{object-fit:cover;background:var(--chip)}
+.ava.photo{border:2px solid var(--surface);box-shadow:0 0 0 2px var(--accent-soft)}
+.lwpanel{display:flex;gap:20px;align-items:center;margin:8px 0 14px}
+.lwpanel .ava.big{width:96px;height:96px}
+.lpbody{flex:1;min-width:0;display:grid;gap:8px}
+.lpbody h2{margin:0;font-family:var(--f-display);font-size:calc(24px * var(--fs));overflow-wrap:anywhere}
+.lpbody p{margin:0}
+@media (max-width:560px){.lwpanel{flex-direction:column;align-items:flex-start}}
+.chips2{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:calc(13.5px * var(--fs));font-weight:600}
+.chip.ok{background:color-mix(in srgb, var(--ok) 16%, var(--surface));color:var(--ok)}
+.chip.warn{background:color-mix(in srgb, var(--warn) 16%, var(--surface));color:var(--warn)}
+.chip.bad{background:color-mix(in srgb, var(--stamp) 14%, var(--surface));color:var(--stamp)}
+.meter svg{display:block}
+.meter .track,.hbar .track{fill:var(--chip)}
+.meter .fill,.hbar .fill{fill:var(--accent)}
+.procta{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 14px;
+  background:linear-gradient(135deg, var(--hero) 0%, color-mix(in srgb, var(--hero) 70%, var(--accent)) 100%);color:var(--hero-ink);border:0}
+.procta h2{margin:0 0 6px;font-family:var(--f-display);font-size:calc(21px * var(--fs))}
+.procta p{margin:0;color:var(--hero-muted)}
+.procta .btn.primary{background:var(--hero-ink);color:var(--hero);min-height:44px}
+.procta .chip.warn{background:rgba(255,255,255,.14);color:var(--hero-ink)}
+.procta .err{color:#FFD7D2}
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.tools{grid-template-columns:minmax(0,1fr)}}
+html[data-fs="3"] .tools{grid-template-columns:minmax(0,1fr)}
+.tool{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:start;padding:16px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s, transform .15s, box-shadow .15s;min-width:0}
+.tool:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+.tool .tic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.tool .tic svg{width:22px;height:22px}
+.tool .tbody{display:grid;gap:4px;min-width:0}
+.tool .tbody b{font-size:calc(15.5px * var(--fs));overflow-wrap:anywhere}
+.tool .tbody span{color:var(--muted);font-size:calc(13.5px * var(--fs))}
+.tool .tgo{grid-column:2;color:var(--accent);font-weight:600;font-size:calc(13.5px * var(--fs))}
+.tool.locked{opacity:.75}
+.tool.locked .tic{background:var(--chip);color:var(--muted)}
+.tool.locked .tgo{color:var(--muted)}
+.kabstats .stattile{min-width:0}
+.kabstats .stv{overflow-wrap:anywhere}
+
+/* Profil formasi */
+.photobox{margin-bottom:14px}
+.photobox h2,.profform legend{font-size:calc(17px * var(--fs));font-weight:700}
+.photobox h2{margin:0 0 10px}
+.phrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.phrow .ava.big{width:120px;height:120px;font-size:calc(34px * var(--fs))}
+.phrow>div{flex:1;min-width:220px}
+.profform{display:grid;gap:14px}
+.profform fieldset.card{display:grid;gap:12px;margin:0}
+.profform legend{padding:0 6px}
+.svcedit{min-width:640px}
+.svcedit td{padding:6px}
+.svcedit input,.svcedit select{width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--field-line, var(--line));border-radius:9px;background:var(--surface);color:var(--ink);font:inherit}
+.svcedit td.c{text-align:center}
+.svcedit input[type=checkbox]{width:22px;height:22px;min-height:0;accent-color:var(--accent)}
+.savebar{position:sticky;bottom:0;z-index:5;display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top, var(--bg) 70%, transparent)}
+.savebar .btn{min-height:48px;padding-inline:28px}
+.savebar p{margin:0}
+.ok{color:var(--ok);font-weight:600}
+.pre{white-space:pre-wrap}
+
+/* Kabinet: obunasiz holat */
+.cabgate{max-width:720px}
+.feat.big{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}
+.feat.big li{position:relative;padding:12px 14px 12px 44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600}
+.feat.big li::before{content:"✓";position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:13px}
+.syncstate{font-weight:600;color:var(--ok)}

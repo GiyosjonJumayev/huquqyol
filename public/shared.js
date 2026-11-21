@@ -64,7 +64,9 @@ const NI = {
   cabinet: '<rect x="3.5" y="6.5" width="17" height="13" rx="2.5"/><path d="M9 6.5V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v1.5"/><path d="M3.5 12h17"/>',
   globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5s1.2-6.1 3.5-8.5z"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
-  chev: '<path d="m7 10 5 5 5-5"/>'
+  chev: '<path d="m7 10 5 5 5-5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'
 };
 const ni = (k, cls = "") => `<svg class="ni ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${NI[k]}</svg>`;
 const LOGO = '<svg class="logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><circle cx="22" cy="22" r="20" fill="none" stroke="var(--accent)" stroke-width="2.2"/><path d="M12 31 C 16 22, 26 26, 30 13" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4"/><circle cx="12" cy="31" r="3" fill="var(--accent)"/><circle cx="30" cy="13" r="3.4" fill="var(--stamp)"/></svg>';
@@ -99,6 +101,7 @@ export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null
     ${brand}
     <nav class="navlinks" aria-label="${esc(t("navLabel"))}">${linksHTML}</nav>
     <div class="navright">
+      <a class="navbtn themebtn" href="/mavzu?to=toggle&amp;back=${encodeURIComponent(path)}" data-theme-toggle title="${esc(t("themeToggle"))}">${ni("moon", "moon")}${ni("sun", "sun")}<span class="sr">${esc(t("themeToggle"))}</span></a>
       ${a11yBtn}
       <details class="navdd langdd"><summary title="${esc(t("langGroup"))}">${ni("globe")}<span>${LANG_LABEL[lang][0]}</span>${ni("chev", "chev")}<span class="sr"> — ${esc(t("langGroup"))}</span></summary><div class="ddpanel">${langGroup}</div></details>
       <div class="acct" data-acct>${acctHTML(user, t)}</div>

@@ -14,6 +14,8 @@ import { initDb, migrate, dbEnabled } from "./db.js";
 import { attachUser, requireUser, requireRole, register, login, logout, changePassword } from "./auth.js";
 import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats } from "./market.js";
 import { loginPage, registerPage, accountPage, adminPage } from "./accountPages.js";
+import { proStatus, requirePro, myProfile, saveProfile, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
+import { lawyerPanel, profileEditPage, lawyerStatsPage } from "./lawyerPages.js";
 
 // PostgreSQL (DATABASE_URL bo‘lsa): hisoblar, obunalar, kelishuvlar. Migratsiyalar start() da qo‘llanadi.
 initDb();
@@ -50,6 +52,9 @@ app.use(securityHeaders);
 // Hujjat rasmi: alohida, kattaroq tana chegarasi (brauzer rasmni ~1600 px gacha kichraytirib yuboradi).
 // Umumiy /api chegarasi (32 KB) undan keyin ulanadi, shuning uchun bu marshrut undan oldin turadi.
 const apiLimit = rateLimit({ max: 600, name:"api" });
+// Tanlangan mavzu (cookie) — sahifa chizilishidan oldin <html data-theme="…"> sifatida (ekran «miltillamaydi»)
+const themeOf = req => /(?:^|;\s*)hy_theme=(light|dark)(?:;|$)/.exec(req.headers.cookie || "")?.[1] || "";
+const withTheme = (req, html) => { const th = themeOf(req); return th ? html.replace("<html", `<html data-theme="${th}"`) : html; };
 const wrapEarly = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin, requireJson, express.json({ limit: "8mb", strict: true }),
   (req, res, next) => { req.lang = resolveLang(req); next(); },
@@ -59,6 +64,12 @@ app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin
     stats.record("analyze", { scenario: r.scenario, ip: req.ip });
     res.json(out(req.lang, r));
   }));
+// Yurist rasmi va kabinet ma’lumotlari: kattaroq tana (rasm brauzerda 480 px ga kichraytiriladi)
+const langUser = [(req, res, next) => { req.lang = resolveLang(req); next(); }, attachUser,
+  (req, res, next) => dbEnabled() ? next() : res.status(503).json({ error: msg(req.lang, "dbOff") })];
+app.post("/api/lawyer/photo", apiLimit, rateLimit({ max: 20, name:"lphoto" }), sameOrigin, requireJson, express.json({ limit: "800kb", strict: true }), ...langUser,
+  (req, res, next) => req.user ? next() : res.status(401).json({ error: msg(req.lang, "auth") }), wrapEarly(savePhoto));
+app.post("/api/cabinet", apiLimit, rateLimit({ max: 120, name:"cab" }), sameOrigin, requireJson, express.json({ limit: "1mb", strict: true }), ...langUser, requirePro, wrapEarly(putCabinet));
 app.use("/api", apiLimit, sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
 app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 app.use(attachUser);
@@ -156,6 +167,9 @@ app.post("/api/consultations", needDb, requireUser, rateLimit({ max: 10, name:"c
 app.post("/api/consultations/:id/:act", needDb, requireUser, rateLimit({ max: 60, name:"consact" }), wrap(actConsultation));
 // Admin amallari
 app.post("/api/admin/:kind/:id/:act", needDb, requireRole("admin"), wrap(adminAct));
+// Yurist profili va Pro kabineti
+app.post("/api/lawyer/profile", needDb, requireUser, rateLimit({ max: 30, name:"lprof" }), wrap(saveProfile));
+app.get("/api/cabinet", needDb, requirePro, wrap(getCabinet));
 
 // Anonim statistika: faqat yig‘ma sanoqlar (holat → soha)
 const SCEN_DOMAIN = Object.fromEntries(SCENARIOS.map(s => [s.id, s.domain]));
@@ -206,14 +220,14 @@ app.get(["/", "/index.html"], (req, res) => {
   let html = fs ? INDEX[req.lang].replace("<html ", `<html data-fs="${fs}" `) : INDEX[req.lang];
   // Foydalanuvchi rasm panelini yopgan bo‘lsa (cookie), sahifa shu holatda chiziladi — panel «miltillamaydi»
   if (/(?:^|;\s*)hy_photo=0(?:;|$)/.test(req.headers.cookie || "")) html = html.replace('id="photoPanel"', 'id="photoPanel" hidden');
-  res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(html);
+  res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(withTheme(req, html));
 });
 app.get("/statistika", (req, res) => {
   const forced = parseLang(req.query.lang);
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
-    .send(statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user }));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
+    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
 });
 // ---------- Biznes: tariflar, yuristlar katalogi, Yurist Pro kabineti ----------
 const REDIRECTED = Symbol("redirected");
@@ -228,18 +242,43 @@ function bizPage(render){
       accHref: `/account.js?v=${VER["account.js"]}`, fs, query, id: req.params.id, user: req.user, extra, db: dbEnabled(), res });
     if (!html) return next();
     if (html === REDIRECTED) return;
-    res.set({ "Cache-Control": req.user ? "private, no-store" : "no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[forced || req.lang] }).type("html").send(html);
+    res.set({ "Cache-Control": req.user ? "private, no-store" : "no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[forced || req.lang] }).type("html").send(withTheme(req, html));
   })(req, res, next);
 }
 app.get("/tariflar", bizPage(plansPage));
 app.get("/yuristlar", bizPage(lawyersPage));
+app.get("/yuristlar/rasm/:id", (req, res, next) => dbEnabled() ? wrap(sendPhoto)(req, res, next) : next());
 app.get("/yuristlar/:id", bizPage(args => { const h = lawyerPage(args); if (h) recordView(args.id, args.query.soha); return h; }));
-app.get("/kabinet", bizPage(cabinetPage));
+app.get("/kabinet", bizPage(async a => cabinetPage({ ...a, pro: a.user && dbEnabled() ? await proStatus(a.user.id) : null })));
+// Mavzu (yorug‘ / qorong‘i): JavaScript’siz ham ishlaydi — cookie qo‘yib, sahifaga qaytaradi (to=toggle — almashtirish)
+app.get("/mavzu", (req, res) => {
+  const cur = themeOf(req);
+  const to = req.query.to === "toggle" ? (cur === "dark" ? "light" : "dark") : ["light", "dark"].includes(req.query.to) ? req.query.to : null;
+  if (to) res.cookie("hy_theme", to, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" }); else res.clearCookie("hy_theme", { path:"/" });
+  const back = typeof req.query.back === "string" && /^\/[a-z0-9/_?=&%.-]*$/i.test(req.query.back) && !req.query.back.startsWith("//") ? req.query.back : "/";
+  res.redirect(303, back);
+});
 app.get("/kirish", bizPage(a => a.user ? (a.res.redirect(303, a.user.role === "admin" ? "/admin" : "/hisob"), REDIRECTED) : loginPage(a)));
 app.get("/royxat", bizPage(a => a.user ? (a.res.redirect(303, "/hisob"), REDIRECTED) : registerPage(a)));
 app.get("/hisob", bizPage(async a => {
   if (!a.user){ a.res.redirect(303, "/kirish?next=/hisob"); return REDIRECTED; }
-  return accountPage({ ...a, subs: await mySubscriptions(a.user.id), cons: await consultationsFor(a.user) });
+  const subs = await mySubscriptions(a.user.id);
+  let panel = "";
+  if (a.user.role === "lawyer"){
+    const [profile, pro] = await Promise.all([myProfile(a.user.id), proStatus(a.user.id)]);
+    panel = lawyerPanel({ ...a, profile, pro, stats: profile ? await lawyerStats(profile.id) : null,
+      pendingSub: subs.some(s => s.status === "pending" && s.plan === "pro") });
+  }
+  return accountPage({ ...a, subs, cons: await consultationsFor(a.user), panel });
+}));
+const needLogin = (a, next) => { if (!a.user){ a.res.redirect(303, `/kirish?next=${encodeURIComponent(next)}`); return true; } return false; };
+app.get("/hisob/profil", bizPage(async a => needLogin(a, "/hisob/profil") ? REDIRECTED : profileEditPage({ ...a, profile: await myProfile(a.user.id) })));
+app.get("/hisob/statistika", bizPage(async a => {
+  if (needLogin(a, "/hisob/statistika")) return REDIRECTED;
+  const pro = await proStatus(a.user.id);
+  if (!pro.tools && a.user.role !== "admin"){ a.res.redirect(303, "/tariflar"); return REDIRECTED; }
+  const profile = await myProfile(a.user.id);
+  return lawyerStatsPage({ ...a, profile, stats: profile ? await lawyerStats(profile.id) : null });
 }));
 app.get("/admin", bizPage(async a => {
   if (!a.user){ a.res.redirect(303, "/kirish?next=/admin"); return REDIRECTED; }

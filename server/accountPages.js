@@ -127,7 +127,7 @@ const consRow = (c, lang, side) => {
     <div class="rowbtn">${actions}</div>${err}</li>`;
 };
 
-export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons }){
+export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons, panel = "" }){
   const t = L(lang);
   const subRows = subs.length ? `<ul class="klist">${subs.map(s => `<li><div><b>${esc(t("pl_" + s.plan))}</b> · <span class="tag">${esc(t("st_" + s.status))}</span>
       ${s.ends_at ? ` · ${esc(t("until", { d: date(s.ends_at, lang) }))}` : ""}<br><span class="muted">${esc(t("price"))}: ${s.plan === "org" && !Number(s.price) ? "—" : esc(money(s.price, lang))}</span></div></li>`).join("")}</ul>` : `<p class="empty">${esc(t("noSubs"))}</p>`;
@@ -136,10 +136,9 @@ export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons }){
     <div class="acchead"><h1>${esc(t("hello", { n: user.name }))}</h1><span class="tag">${esc(t("ro_" + user.role))}</span>
       <button class="btn ghost" type="button" data-post="/api/auth/logout">${esc(t("logout"))}</button></div>
     <p class="muted">${esc(user.email)}${user.org_name ? ` · ${esc(t("org"))}: ${esc(user.org_name)}` : ""}</p>
+    ${panel}
     ${user.role !== "citizen" ? `<h2 class="sec">${esc(t("subs"))}</h2>${subRows}<p class="small muted">${esc(t("payNote"))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("subscribe"))}</a> <a class="btn ghost" href="/kabinet">${esc(t("toCabinet"))}</a></p>` : ""}
-    ${user.role === "lawyer" ? `<h2 class="sec">${esc(t("profile"))}</h2>${lawyer ? `<p><span class="tag">${esc(t("prof_" + lawyer.status))}</span>${lawyer.status === "approved" ? ` <a href="/yuristlar/y${lawyer.id}">/yuristlar/y${lawyer.id}</a>` : ""}</p>` : `<p class="empty">${esc(t("profNone"))}</p>`}
-      <p><a class="btn ghost" href="/kabinet#profil">${esc(t("toCabinet"))}</a></p>
-      <h2 class="sec">${esc(t("inCons"))}</h2>${cons.asLawyer.length ? `<ul class="klist">${cons.asLawyer.map(c => consRow(c, lang, "lawyer")).join("")}</ul>` : `<p class="empty">${esc(t("noIn"))}</p>`}` : ""}
+    ${user.role === "lawyer" ? `<h2 class="sec">${esc(t("inCons"))}</h2>${cons.asLawyer.length ? `<ul class="klist">${cons.asLawyer.map(c => consRow(c, lang, "lawyer")).join("")}</ul>` : `<p class="empty">${esc(t("noIn"))}</p>`}` : ""}
     <h2 class="sec">${esc(t("myCons"))}</h2>${cons.asCitizen.length ? `<ul class="klist">${cons.asCitizen.map(c => consRow(c, lang, "citizen")).join("")}</ul>` : `<p class="empty">${esc(t("noCons"))} <a href="/yuristlar">${esc(btr(lang)("navLawyers"))}</a></p>`}
     <h2 class="sec">${esc(t("security"))}</h2>
     <form class="card kform narrow" data-api="/api/auth/password" data-ok="${esc(t("pwChanged"))}">
@@ -222,5 +221,6 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s }){
   return page({ lang, cssHref, fs, user, accHref, path: `/admin?b=${b}`, title: t("adTitle"), desc: "", body: `<h1>${esc(t("adTitle"))}</h1>${nav}${body}` });
 }
 export const pricesFor = () => PRICES;
+export { consRow, field, L, esc, money, date };
 export const regions = () => COURTS.regions.map(r => r.name);
 export { pick };

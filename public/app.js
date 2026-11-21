@@ -1187,3 +1187,13 @@ try {
 } catch (e){
   $("#cases").innerHTML = `<p class="error" role="alert">${esc(t("serverDown", { msg: e.message }))}</p>`;
 }
+
+// Mavzu: yorug‘ ↔ qorong‘i (sahifani qayta yuklamasdan); tanlov cookie da — server keyingi sahifani shu mavzuda chizadi
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-theme-toggle]"); if (!b) return;
+  e.preventDefault();
+  const root = document.documentElement, cur = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark";
+  root.dataset.theme = next;
+  document.cookie = `hy_theme=${next}; path=/; max-age=31536000; samesite=lax`;
+});

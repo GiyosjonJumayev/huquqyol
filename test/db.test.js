@@ -83,6 +83,13 @@ test("Biznes oqimi: yurist profili → moderatsiya → katalog → kelishuv → 
   assert.ok(!(await (await citizen.get("/yuristlar?soha=mehnat")).text()).includes("Karim Yurist"));
   assert.equal((await citizen.post(`/api/admin/lawyer/${prof.id}/approve`)).status, 403);
   assert.equal((await admin.post(`/api/admin/lawyer/${prof.id}/approve`)).status, 200);
+  // Tasdiqlangan, lekin faqat sinov obunasi — katalogda ko‘rinmaydi; Pro to‘lovi tasdiqlangach ko‘rinadi
+  assert.ok(!(await (await citizen.get("/yuristlar?soha=mehnat")).text()).includes("Karim Yurist"));
+  assert.equal((await citizen.get(`/yuristlar/y${prof.id}`)).status, 404);
+  assert.equal((await lawyer.post("/api/subscriptions", { plan: "pro" })).status, 201);
+  assert.equal((await lawyer.post("/api/subscriptions", { plan: "pro" })).status, 200);         // takror — yangi hisob-faktura yo‘q
+  const proPay = await db.one("select id from payments where kind = 'subscription' and amount = 149000 and status = 'pending'");
+  assert.equal((await admin.post(`/api/admin/payment/${proPay.id}/confirm`)).status, 200);
   const list = await (await citizen.get("/yuristlar?soha=mehnat")).text();
   assert.match(list, /Karim Yurist/);
   const page = await (await citizen.get(`/yuristlar/y${prof.id}?holat=ish_haqi`)).text();
@@ -100,14 +107,9 @@ test("Biznes oqimi: yurist profili → moderatsiya → katalog → kelishuv → 
   assert.equal(Number(comm.amount), 50000);                                     // 10% komissiya
   assert.equal((await lawyer.post(`/api/consultations/${cid}/complete`)).status, 200);
   assert.match(await (await lawyer.get("/hisob")).text(), /Bajarilgan/);
-  // Obunalar: yurist Pro, tashkilot (narx kelishuv bo‘yicha)
-  assert.equal((await lawyer.post("/api/subscriptions", { plan: "pro" })).status, 201);
+  // Tashkilot obunasi (narx kelishuv bo‘yicha)
   assert.equal((await org.post("/api/subscriptions", { plan: "org" })).status, 201);
-  const pend = (await db.q("select id, kind, amount, user_id from payments where status = 'pending' order by id")).rows;
-  const proPay = pend.find(p => p.kind === "subscription" && Number(p.amount) === 149000);
-  const orgPay = pend.find(p => p.kind === "subscription" && Number(p.amount) === 0);
-  assert.ok(proPay && orgPay);
-  assert.equal((await admin.post(`/api/admin/payment/${proPay.id}/confirm`)).status, 200);
+  const orgPay = await db.one("select id from payments where kind = 'subscription' and amount = 0 and status = 'pending'");
   assert.equal((await admin.post(`/api/admin/payment/${orgPay.id}/confirm`, { amount: "2000000" })).status, 200);
   assert.equal((await admin.post(`/api/admin/payment/${comm.id}/confirm`)).status, 200);
   assert.equal((await admin.post(`/api/admin/payment/${comm.id}/confirm`)).status, 409);  // ikki marta emas
@@ -126,3 +128,74 @@ test("Biznes oqimi: yurist profili → moderatsiya → katalog → kelishuv → 
   const me = await db.one("select id from users where email = 'admin@test.uz'");
   assert.equal((await admin.post(`/api/admin/user/${me.id}/role`, { role: "citizen" })).status, 400);
 });
+
+test("Yurist profili: tahrirlash, rasm, qayta moderatsiya; Pro vositalari, kabinet hisobda, statistika; mavzu", opts, async () => {
+  const lw = client(), cz = client(), admin = client();
+  await reg(lw, { name: "Nodira Advokat", email: "nodira@test.uz", role: "lawyer" });
+  await reg(cz, { name: "Fuqaro", email: "fuqaro2@test.uz" });
+  await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Parol1234" });
+  // Profil sahifasi va saqlash
+  assert.match(await (await lw.get("/hisob/profil")).text(), /data-api="\/api\/lawyer\/profile"/);
+  const pf = { name: "Nodira Advokat", kind: "advokat", phone: "+998 91 222 33 44", email: "nodira@test.uz", telegram: "@nodira_law", website: "https://nodira.example.com",
+    license: "L-777", licenseIssuer: "Adliya vazirligi, 2019", experience: "9", region: "Samarqand viloyati", district: "Urgut tumani", address: "Mustaqillik 5",
+    hours: "Du–Ju 09:00–18:00", headline: "Oila va meros nizolari", about: "Oilaviy nizolarda 9 yillik tajriba. Sudgacha kelishuvga e’tibor beraman, kerak bo‘lsa sudda vakillik qilaman.",
+    education: "TDYU, 2015", achievements: "200+ ish", areas: ["oila", "meros", "yoq"], formats: ["online", "office"], langs: ["uz", "ru"],
+    services: [{ name: "Konsultatsiya", min: "45", format: "online", price: "150 000" }, { name: "", price: "1" }, { name: "Sudda vakillik", format: "office", price: "2000000", from: true }] };
+  assert.equal((await lw.post("/api/lawyer/profile", { ...pf, telegram: "@x" })).status, 400);
+  assert.equal((await lw.post("/api/lawyer/profile", { ...pf, website: "http://ochiq" })).status, 400);
+  const r1 = await lw.post("/api/lawyer/profile", pf);
+  assert.equal(r1.status, 200);
+  const p = await db.one("select * from lawyer_profiles where user_id = (select id from users where email = 'nodira@test.uz')");
+  assert.equal(p.status, "pending");
+  assert.deepEqual(p.areas, ["oila", "meros"]);
+  assert.equal(p.services.length, 2);                                            // bo‘sh qator saqlanmaydi
+  assert.equal(Number(p.price), 150000);                                         // katalogda eng arzon xizmat
+  assert.equal(p.telegram, "nodira_law");
+  // Rasm: faqat haqiqiy rasm
+  const png = Buffer.from("89504E470D0A1A0A0000000D4948445200000001000000010806000000" + "1F15C4890000000D49444154789C6360000002000154A24F5D0000000049454E44AE426082", "hex");
+  assert.equal((await lw.post("/api/lawyer/photo", { data: "data:image/png;base64," + Buffer.from("salom dunyo, bu rasm emas — ".repeat(10)).toString("base64") })).status, 400);
+  const ph = await lw.post("/api/lawyer/photo", { data: "data:image/png;base64," + Buffer.concat([png, Buffer.alloc(200)]).toString("base64") });
+  assert.equal(ph.status, 200);
+  const img = await cz.get((await ph.json()).url);
+  assert.equal(img.status, 200);
+  assert.equal(img.headers.get("content-type"), "image/png");
+  // Tasdiq + Pro to‘lovi → katalogda rasm, Telegram, ta’lim, xizmatlar
+  await admin.post(`/api/admin/lawyer/${p.id}/approve`);
+  await lw.post("/api/subscriptions", { plan: "pro" });
+  const pay = await db.one("select p.id from payments p join users u on u.id = p.user_id where u.email = 'nodira@test.uz' and p.status = 'pending'");
+  await admin.post(`/api/admin/payment/${pay.id}/confirm`);
+  const prof = await (await cz.get(`/yuristlar/y${p.id}`)).text();
+  for (const s of ["Nodira Advokat", "@nodira_law", "TDYU, 2015", "Sudda vakillik", `/yuristlar/rasm/${p.id}`, "L-777"]) assert.ok(prof.includes(s), s);
+  // Faqat tavsif o‘zgarsa — tasdiq saqlanadi; litsenziya o‘zgarsa — qayta moderatsiya va katalogdan chiqadi
+  assert.equal((await (await lw.post("/api/lawyer/profile", { ...pf, headline: "Oila, meros va aliment" })).json()).recheck, false);
+  assert.equal((await db.one("select status from lawyer_profiles where id = $1", [p.id])).status, "approved");
+  assert.equal((await (await lw.post("/api/lawyer/profile", { ...pf, license: "L-778" })).json()).recheck, true);
+  assert.equal((await cz.get(`/yuristlar/y${p.id}`)).status, 404);
+  // Yurist paneli va statistika (Pro bilan)
+  const home = await (await lw.get("/hisob")).text();
+  for (const s of ["Yurist Pro faol", "Mijozlar va ishlar kartotekasi", "Barcha muddatlar bitta kalendarda", "O‘z blankasi, shablon tahriri", "Statistika va tahlil", "Katalogda profil"]) assert.ok(home.includes(s), s);
+  const st = await lw.get("/hisob/statistika");
+  assert.equal(st.status, 200);
+  assert.match(await st.text(), /Profil ko‘rishlari — so‘nggi 30 kun/);
+  // Kabinet: fuqaro (Pro yo‘q) — taklif sahifasi va API 402; yurist — ilova va hisobda saqlash
+  assert.ok(!(await (await cz.get("/kabinet")).text()).includes("kabinet.js"));
+  assert.equal((await cz.post("/api/cabinet", { data: { v: 1 } })).status, 402);
+  assert.equal(cz.cookie !== "", true);
+  assert.equal((await cz.get("/hisob/statistika")).status, 303);
+  assert.match(await (await lw.get("/kabinet")).text(), /data-sync="1"/);
+  const data = { v: 1, plan: "pro", clients: [{ id: "a", name: "Mijoz 1" }], cases: [{ id: "c", title: "Ish 1", deadlines: [{ id: "d", date: "2026-12-01", note: "Sud" }] }], templates: [], org: { name: "", docs: [] }, letterhead: { on: false, lines: [] }, savedAt: "2026-11-21T10:00:00Z" };
+  assert.equal((await lw.post("/api/cabinet", { data: { v: 2 } })).status, 400);
+  assert.equal((await lw.post("/api/cabinet", { data })).status, 200);
+  const back = await (await lw.get("/api/cabinet")).json();
+  assert.equal(back.data.clients[0].name, "Mijoz 1");
+  assert.equal(back.data.cases[0].deadlines[0].date, "2026-12-01");
+  // Mavzu: cookie → <html data-theme>, /mavzu almashtiradi va xavfsiz manzilga qaytaradi
+  const th = await fetch(base + "/mavzu?to=toggle&back=/tariflar", { redirect: "manual" });
+  assert.equal(th.status, 303);
+  assert.equal(th.headers.get("location"), "/tariflar");
+  assert.match(th.headers.get("set-cookie"), /hy_theme=dark/);
+  assert.equal((await fetch(base + "/mavzu?to=light&back=//yomon.example", { redirect: "manual" })).headers.get("location"), "/");
+  assert.match(await (await fetch(base + "/tariflar", { headers: { Cookie: "hy_theme=dark" } })).text(), /<html data-theme="dark"/);
+  assert.match(await (await fetch(base + "/", { headers: { Cookie: "hy_theme=light" } })).text(), /<html data-theme="light"/);
+});
+

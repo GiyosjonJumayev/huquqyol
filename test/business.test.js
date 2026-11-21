@@ -56,8 +56,9 @@ test("Sahifalar uch tilda: tariflar, katalog, profil, kabinet; inline skript va 
   assert.equal((await get("/yuristlar/yoq-profil")).status, 404);
   const plans = await (await get("/tariflar")).text();
   for (const s of ["Mijozlar va ishlar kartotekasi", "Barcha muddatlar bitta kalendarda", "O‘z blankasi", "Katalogda profil", "Tashkilot hujjatlari kutubxonasi"]) assert.ok(plans.includes(s), s);
-  const kab = await (await get("/kabinet")).text();
-  assert.match(kab, /<script type="module" src="\/kabinet\.js\?v=[0-9a-f]{10}"><\/script>/);
+  const kab = await (await get("/kabinet")).text();                          // kirmagan foydalanuvchi: imkoniyatlar va kirish yo‘li
+  assert.ok(!kab.includes("kabinet.js"));
+  assert.match(kab, /Mijozlar va ishlar kartotekasi/);
 });
 
 test("Holatdan katalogga: ?holat= sohani tanlaydi", async () => {

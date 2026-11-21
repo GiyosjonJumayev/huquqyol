@@ -15,19 +15,29 @@ const int = (v, max = 1e10) => { const n = Math.round(Number(String(v ?? "").rep
 const err = (key, status = 400) => Object.assign(new ValidationError(key), { status });
 
 // ---------- Yuristlar (bazadan) ----------
-const asCatalog = r => ({
-  id: `y${r.id}`, dbId: Number(r.id), demo: false, kind: r.kind, plan: r.paid ? "pro" : "free",
-  name: r.name, firm: r.firm || "", headline: [r.headline || "", r.headline || ""], about: [r.about || "", r.about || ""],
-  region: r.region || "", district: r.district || "", address: [r.district || "", r.district || ""],
-  experience: r.experience, langs: r.langs.length ? r.langs : ["uz"], areas: r.areas, formats: r.formats.length ? r.formats : ["online"],
-  hours: ["", ""], services: [{ name: ["Konsultatsiya", "Консультация"], min: 30, format: r.formats[0] || "online", price: Number(r.price) }],
-  contacts: { phone: r.phone, email: r.email || "" }, license: { verified: true }, userId: r.user_id ? Number(r.user_id) : null
-});
+const pair = v => [v || "", v || ""];
+const asCatalog = r => {
+  const services = Array.isArray(r.services) && r.services.length ? r.services
+    : [{ name: ["Konsultatsiya", "Консультация"], min: 30, format: r.formats[0] || "online", price: Number(r.price) }];
+  return {
+    id: `y${r.id}`, dbId: Number(r.id), demo: false, kind: r.kind, plan: "pro",
+    name: r.name, firm: r.firm || "", headline: pair(r.headline), about: pair(r.about), education: r.education || "", achievements: r.achievements || "",
+    region: r.region || "", district: r.district || "", address: pair(r.address || r.district), hours: pair(r.hours),
+    experience: r.experience, langs: r.langs.length ? r.langs : ["uz"], areas: r.areas, formats: r.formats.length ? r.formats : ["online"],
+    services, photo: r.photo_at ? `/yuristlar/rasm/${r.id}?v=${new Date(r.photo_at).getTime()}` : null,
+    contacts: { phone: r.phone, email: r.email || "", telegram: r.telegram || "", website: r.website || "" },
+    license: { verified: true, number: r.license || "", issuer: r.license_issuer || "" }, userId: r.user_id ? Number(r.user_id) : null
+  };
+};
+// Katalogda: admin tasdiqlagan (litsenziya tekshirilgan) VA Yurist Pro / Firma to‘lovi faol (sinov emas) profillar
+export const VISIBLE_SQL = `p.status = 'approved' and exists(select 1 from subscriptions s where s.user_id = p.user_id
+  and s.plan in ('pro','firma') and s.status = 'active' and (s.ends_at is null or s.ends_at > now()))`;
 export async function approvedLawyers(){
   if (!dbEnabled()) return [];
   try {
-    const rows = (await q(`select p.*, exists(select 1 from subscriptions s where s.user_id = p.user_id and s.status in ('trial','active')
-        and (s.ends_at is null or s.ends_at > now())) as paid from lawyer_profiles p where p.status = 'approved' order by p.id`)).rows;
+    const rows = (await q(`select p.id, p.user_id, p.kind, p.name, p.firm, p.headline, p.about, p.education, p.achievements, p.region, p.district, p.address, p.hours,
+        p.experience, p.langs, p.areas, p.formats, p.services, p.price, p.photo_at, p.phone, p.email, p.telegram, p.website, p.license, p.license_issuer
+        from lawyer_profiles p where ${VISIBLE_SQL} order by p.id`)).rows;
     return rows.map(asCatalog);
   } catch (e){ console.error("[market]", e.message); return []; }
 }
@@ -57,8 +67,9 @@ export async function subscribe(req, res){
   const plan = ["pro", "firma", "org"].includes(req.body?.plan) ? req.body.plan : null;
   if (!plan) throw err("option");
   if (req.user.role === "citizen") await q("update users set role = $2 where id = $1", [req.user.id, plan === "org" ? "org" : "lawyer"]);
-  const open = await one("select id from subscriptions where user_id = $1 and plan = $2 and status = 'pending'", [req.user.id, plan]);
-  if (open) return res.json({ ok: true, id: Number(open.id), next: "/hisob" });
+  const open = await one(`select id from subscriptions where user_id = $1 and plan = $2
+    and (status = 'pending' or (status = 'active' and (ends_at is null or ends_at > now() + interval '5 days')))`, [req.user.id, plan]);
+  if (open) return res.json({ ok: true, id: Number(open.id), next: "/hisob" });     // to‘lovi kutilayotgan yoki hali faol obuna — takror yaratilmaydi
   const r = await tx(async run => {
     const s = (await run("insert into subscriptions(user_id, org_id, plan, status, price) values ($1,$2,$3,'pending',$4) returning id",
       [req.user.id, req.user.org_id || null, plan, PRICES[plan]])).rows[0];

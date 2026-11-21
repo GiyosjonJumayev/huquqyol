@@ -96,7 +96,19 @@ const MIGRATIONS = [
      kind text not null check (kind in ('view','request')),
      domain text, scenario text,
      created_at timestamptz not null default now());
-   create index lawyer_events_ref on lawyer_events(lawyer_ref, kind);`
+   create index lawyer_events_ref on lawyer_events(lawyer_ref, kind);`,
+  // 2 — yurist profili (rasm, ta’lim, xizmatlar, aloqa) va Yurist Pro kabineti ma’lumotlari (hisobda saqlanadi)
+  `alter table lawyer_profiles
+     add column photo bytea, add column photo_type text, add column photo_at timestamptz,
+     add column education text, add column achievements text, add column address text, add column hours text,
+     add column telegram text, add column website text, add column license_issuer text,
+     add column services jsonb not null default '[]'::jsonb,
+     add column updated_at timestamptz not null default now();
+   create table cabinet_data(
+     user_id bigint primary key references users(id) on delete cascade,
+     data jsonb not null,
+     updated_at timestamptz not null default now());
+   create index lawyer_events_day on lawyer_events(lawyer_ref, created_at);`
 ];
 
 let pool = null;
