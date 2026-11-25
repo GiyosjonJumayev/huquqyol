@@ -200,13 +200,13 @@ app.post("/api/account/delete", needDb, authLimit, wrap(deleteAccount));
 // To‘lovlar va jamoa
 app.get("/api/payments/:id", needDb, rateLimit({ max: 120, name:"paystat" }), wrap(paymentStatus));
 app.post("/api/payments/:id/cancel", needDb, wrap(cancelOrder));
-app.post("/api/team/invite", needDb, rateLimit({ max: 20, name:"invite" }), wrap(invite));
+app.post("/api/team/invite", needDb, rateLimit({ max: Number(process.env.AUTH_RATE || 10) * 2, name:"invite" }), wrap(invite));
 app.post("/api/team/invite/:ref/cancel", needDb, wrap(cancelInvite));
 app.post("/api/team/accept", needDb, wrap(acceptInvite));
 app.post("/api/team/members/:id/remove", needDb, wrap(removeMember));
 app.get("/api/team/cabinet", needDb, wrap(getTeamCabinet));
 // Obuna va kelishuvlar
-app.post("/api/subscriptions", needDb, rateLimit({ max: 10, name:"sub" }), wrap(subscribe));
+app.post("/api/subscriptions", needDb, rateLimit({ max: Number(process.env.AUTH_RATE || 10) * 2, name:"sub" }), wrap(subscribe));
 app.post("/api/consultations", needDb, rateLimit({ max: 10, name:"cons" }), wrap(requestConsultation));
 app.post("/api/consultations/:id/:act", needDb, rateLimit({ max: 60, name:"consact" }), wrap(actConsultation));
 // Admin amallari
