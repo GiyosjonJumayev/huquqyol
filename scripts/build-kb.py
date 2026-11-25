@@ -1219,7 +1219,7 @@ for k, r in kb_offices.OFFICES_RU.items():
 RU["offices"] = kb_offices.OFFICES_RU
 RU["officesChecked"] = kb_offices.CHECKED
 assert set(RU["norms"]) == ids and set(RU["laws"]) == set(LAWS)
-import kb_courts
-for name, data in (("courts", kb_courts.build()), ("ru", RU), ("laws", LAWS), ("domains", DOMAINS), ("norms", N), ("scenarios", S), ("applicant", APPLICANT), ("offices", {"checked": kb_offices.CHECKED, "list": OFFICES})):
+import kb_courts, kb_practice
+for name, data in (("courts", kb_courts.build()), ("practice", kb_practice.build()), ("ru", RU), ("laws", LAWS), ("domains", DOMAINS), ("norms", N), ("scenarios", S), ("applicant", APPLICANT), ("offices", {"checked": kb_offices.CHECKED, "list": OFFICES})):
     with open(os.path.join(OUT, name + ".json"), "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=1)
 print(len(N), "norma;", len(S), "holat;", len(DOMAINS), "soha")

@@ -1,0 +1,377 @@
+# Yurist yo‘nalishlari bazasi: har bir soha uchun normativ hujjatlar, shablonlar va ish ro‘yxati (checklist).
+# Manba: lex.uz — har bir hujjatning nomi, raqami, sanasi va «amalda» holati 2026-11-25 kuni lex.uz qidiruvi orqali tekshirilgan.
+# id — lex.uz dagi hujjat raqami (https://lex.uz/docs/<id>). Modda raqamlari va muddatlar bu yerda YOZILMAYDI — faqat manba havolasi.
+# Shablonlar — protsessual skelet: yurist o‘zi moslaydi; huquqiy tekshiruvdan o‘tishi kerak (PR tavsifida belgilanadi).
+import re
+
+CHECKED = "2026-11-25"
+# Sohalar: kb domenlari (12) + katalogdagi qo‘shimcha sohalar (6). «*» — barcha sohalar.
+AREAS = ["mehnat", "istemol", "oila", "ijara", "kommunal", "bank", "transport", "nafaqa", "davlat", "jarima", "migrant", "fuqarolik",
+         "jinoyat", "soliq", "biznes", "shartnoma", "meros", "yer"]
+CIVIL = "mehnat istemol oila ijara kommunal bank transport migrant fuqarolik shartnoma meros yer"   # fuqarolik sudi yuritadigan nizolar
+TYPES = [["kodeks", "Kodekslar", "Кодексы"], ["qonun", "Qonunlar", "Законы"], ["qaror", "Farmon va qarorlar", "Указы и постановления"],
+         ["nizom", "Nizom va qoidalar", "Положения и правила"], ["buyruq", "Buyruqlar (vazirliklar)", "Приказы (министерства)"], ["plenum", "Oliy sud Plenumi qarorlari", "Постановления Пленума Верховного суда"]]
+
+# (lex id, turi, uz, ru, raqami, sanasi, sohalar)
+ACTS = [
+ # Advokatura va umumiy protsess
+ (54503, "qonun", "Advokatura to‘g‘risida", "Об адвокатуре", "349-I", "1996-12-27", "*"),
+ (29626, "qonun", "Advokatlik faoliyatining kafolatlari va advokatlarning ijtimoiy himoyasi to‘g‘risida", "О гарантиях адвокатской деятельности и социальной защите адвокатов", "721-I", "1998-12-25", "*"),
+ (6374846, "buyruq", "Advokat tomonidan ishni olib borishga order shaklini tasdiqlash to‘g‘risida", "Об утверждении формы ордера на ведение дела адвокатом", "3417", "2023-01-31", "*"),
+ (6478021, "nizom", "Advokatlik guvohnomasini berish tartibi to‘g‘risidagi nizom", "Положение о порядке выдачи удостоверения адвоката", "226", "2023-06-01", "*"),
+ (6143599, "nizom", "Advokatlik faoliyatini maxsus elektron tizim orqali litsenziyalash tartibi to‘g‘risidagi nizom", "Положение о порядке лицензирования адвокатской деятельности через специальную электронную систему", "432", "2022-08-05", "*"),
+ (6951674, "buyruq", "Advokat stajyori va yordamchisining faoliyatini tashkil etish tartibi to‘g‘risidagi nizom", "Положение о порядке организации деятельности стажёра и помощника адвоката", "3517", "2024-06-04", "*"),
+ (3805227, "qonun", "Mediatsiya to‘g‘risida", "О медиации", "O‘RQ-482", "2018-07-03", CIVIL + " biznes davlat"),
+ (7964665, "buyruq", "Mediatorlarning kasb etikasi qoidalari", "Правила профессиональной этики медиаторов", "3741", "2026-01-05", CIVIL + " biznes"),
+ (3517337, "kodeks", "Fuqarolik protsessual kodeksi", "Гражданский процессуальный кодекс", "", "", CIVIL),
+ (3523891, "kodeks", "Iqtisodiy protsessual kodeks", "Экономический процессуальный кодекс", "", "", "biznes shartnoma bank"),
+ (26477, "qonun", "Sud hujjatlari va boshqa organlar hujjatlarini ijro etish to‘g‘risida", "Об исполнении судебных актов и актов иных органов", "258-II", "2001-08-29", CIVIL + " biznes"),
+ (4680944, "qonun", "Davlat boji to‘g‘risida", "О государственной пошлине", "O‘RQ-600", "2020-01-06", CIVIL + " biznes davlat"),
+ (1072079, "qonun", "Hakamlik sudlari to‘g‘risida", "О третейских судах", "O‘RQ-64", "2006-10-16", "biznes shartnoma fuqarolik"),
+ (5294106, "qonun", "Xalqaro tijorat arbitraji to‘g‘risida", "О международном коммерческом арбитраже", "O‘RQ-674", "2021-02-16", "biznes shartnoma"),
+ (7305182, "plenum", "Fuqarolik ishlari bo‘yicha sud xarajatlarini undirish amaliyoti to‘g‘risida", "О практике взыскания судебных расходов по гражданским делам", "37", "2024-12-16", CIVIL),
+ (5194320, "plenum", "Iqtisodiy ishlar bo‘yicha sud xarajatlarini undirish amaliyoti to‘g‘risida", "О практике взыскания судебных расходов по экономическим делам", "36", "2020-12-19", "biznes shartnoma"),
+ (6881055, "plenum", "Fuqarolik ishlarini apellyatsiya, kassatsiya tartibida ko‘rishning ayrim masalalari to‘g‘risida", "О некоторых вопросах рассмотрения гражданских дел в апелляционном и кассационном порядке", "9", "2024-03-25", CIVIL),
+ (7004127, "plenum", "Fuqarolik ishlarini taftish tartibida ko‘rishning ayrim masalalari to‘g‘risida", "О некоторых вопросах рассмотрения гражданских дел в ревизионном порядке", "20", "2024-06-25", CIVIL),
+ (1591655, "plenum", "Fuqarolik ishlari bo‘yicha ekspertiza tayinlash, o‘tkazish va ekspert xulosasiga baho berish to‘g‘risida", "О назначении, проведении экспертизы и оценке заключения эксперта по гражданским делам", "24", "2008-12-12", CIVIL),
+ (1617964, "plenum", "Sud hujjatlarini ijro etishga oid qonun hujjatlarini qo‘llash bo‘yicha sud amaliyoti", "Судебная практика применения законодательства об исполнении судебных актов", "06/196", "2009-04-10", CIVIL + " biznes"),
+ (1449509, "plenum", "Ma’naviy zararni qoplash haqidagi qonunlarni qo‘llashning ayrim masalalari to‘g‘risida", "О некоторых вопросах применения законов о возмещении морального вреда", "7", "2000-04-28", "mehnat istemol fuqarolik transport bank"),
+ (7901164, "plenum", "Shaxsiy nomulkiy huquqlar va boshqa nomoddiy ne’matlarni himoya qilish to‘g‘risidagi qonunchilikni qo‘llash amaliyoti", "О практике применения законодательства о защите личных неимущественных прав и других нематериальных благ", "21", "2025-11-24", "fuqarolik"),
+ (4396419, "qonun", "Shaxsga doir ma’lumotlar to‘g‘risida", "О персональных данных", "O‘RQ-547", "2019-07-02", "bank biznes mehnat"),
+ # Mehnat
+ (6257288, "kodeks", "Mehnat kodeksi", "Трудовой кодекс", "O‘RQ-798", "2022-10-28", "mehnat"),
+ (4631281, "qonun", "Kasaba uyushmalari to‘g‘risida", "О профессиональных союзах", "O‘RQ-588", "2019-12-06", "mehnat"),
+ (5055690, "qonun", "Aholi bandligi to‘g‘risida", "О занятости населения", "O‘RQ-642", "2020-10-20", "mehnat migrant"),
+ (4574228, "qaror", "«Yagona milliy mehnat tizimi» idoralararo dasturiy-apparat kompleksini joriy qilish chora-tadbirlari to‘g‘risida", "О мерах по внедрению межведомственного комплекса «Единая национальная система труда»", "PQ-4502", "2019-10-31", "mehnat"),
+ (643007, "nizom", "Mehnat daftarchalarini yuritish tartibi to‘g‘risidagi yo‘riqnoma", "Инструкция о порядке ведения трудовых книжек", "402", "1998-01-29", "mehnat"),
+ (7942768, "nizom", "Mehnatni muhofaza qilish sohasiga oid nizomlar", "Положения в сфере охраны труда", "819", "2025-12-24", "mehnat"),
+ (6577267, "buyruq", "To‘liq moddiy javobgarlik to‘g‘risida shartnoma tuzilishi mumkin bo‘lgan lavozimlar va ishlarning namunaviy ro‘yxati", "Примерный перечень должностей и работ, по которым заключаются договоры о полной материальной ответственности", "3452", "2023-08-21", "mehnat"),
+ (6684613, "plenum", "Mehnat shartnomasini bekor qilishni tartibga soluvchi qonunchilikni qo‘llash amaliyoti to‘g‘risida", "О практике применения законодательства о прекращении трудового договора", "26", "2023-11-20", "mehnat"),
+ (1454007, "plenum", "Mehnat vazifalarini bajarish munosabati bilan xodim hayoti va sog‘lig‘iga yetkazilgan zararni qoplash bo‘yicha sud amaliyoti", "О судебной практике по возмещению вреда жизни и здоровью работника в связи с исполнением трудовых обязанностей", "18", "2003-12-19", "mehnat"),
+ # Iste’molchi
+ (4704, "qonun", "Iste’molchilarning huquqlarini himoya qilish to‘g‘risida", "О защите прав потребителей", "221-I", "1996-04-26", "istemol kommunal bank"),
+ (6213382, "qonun", "Elektron tijorat to‘g‘risida", "Об электронной коммерции", "O‘RQ-792", "2022-09-29", "istemol biznes shartnoma"),
+ (6052631, "qonun", "Reklama to‘g‘risida", "О рекламе", "O‘RQ-776", "2022-06-07", "istemol biznes"),
+ (243235, "nizom", "Chakana savdo qoidalari hamda umumiy ovqatlanish mahsulotlarini ishlab chiqarish va sotish qoidalari", "Правила розничной торговли и правила производства и реализации продукции общественного питания", "75", "2003-02-13", "istemol"),
+ (7757479, "qaror", "Iste’molchilar huquqlarini samarali himoya qilishni tashkil etish chora-tadbirlari to‘g‘risida", "О мерах по организации эффективной защиты прав потребителей", "PQ-296", "2025-10-06", "istemol"),
+ # Oila
+ (104720, "kodeks", "Oila kodeksi", "Семейный кодекс", "", "1998-04-30", "oila meros"),
+ (1297315, "qonun", "Bola huquqlarining kafolatlari to‘g‘risida", "О гарантиях прав ребёнка", "O‘RQ-139", "2008-01-07", "oila"),
+ (2307826, "qonun", "Vasiylik va homiylik to‘g‘risida", "Об опеке и попечительстве", "O‘RQ-364", "2014-01-02", "oila meros"),
+ (4494709, "qonun", "Xotin-qizlarni tazyiq va zo‘ravonlikdan himoya qilish to‘g‘risida", "О защите женщин от притеснения и насилия", "O‘RQ-561", "2019-09-02", "oila"),
+ (6141398, "qaror", "Aliment to‘lovlari jamg‘armasi faoliyatini tashkil etish to‘g‘risida", "Об организации деятельности Фонда алиментных платежей", "427", "2022-08-03", "oila"),
+ (3967908, "nizom", "Alimentlarni oldindan to‘lash va garov shartnomasini tuzish tartibi to‘g‘risidagi nizom", "Положение о порядке предварительной уплаты алиментов и заключения договора залога", "808", "2018-10-06", "oila"),
+ (7973712, "buyruq", "Notariuslar tomonidan nikoh shartnomalarini tasdiqlash tartibi to‘g‘risidagi nizom", "Положение о порядке удостоверения нотариусами брачных договоров", "3743", "2026-01-05", "oila"),
+ (3034913, "plenum", "Bolalar ta’minoti uchun aliment undirishga oid ishlar bo‘yicha qonunchilikni qo‘llash amaliyoti", "О практике применения законодательства по делам о взыскании алиментов на содержание детей", "11", "2016-07-29", "oila"),
+ (2414114, "plenum", "Nikohdan ajratishga oid ishlar bo‘yicha qonunchilikni qo‘llash amaliyoti", "О практике применения законодательства по делам о расторжении брака", "06", "2011-07-20", "oila"),
+ (6402541, "plenum", "Er va xotinning umumiy mol-mulkini bo‘lish haqidagi ishlar bo‘yicha amaliyot", "О практике по делам о разделе общего имущества супругов", "3", "2023-02-20", "oila"),
+ # Ijara va uy-joy
+ (106136, "kodeks", "Uy-joy kodeksi", "Жилищный кодекс", "", "", "ijara kommunal"),
+ (112328, "qonun", "Ijara to‘g‘risida", "Об аренде", "427-XII", "1991-11-19", "ijara shartnoma"),
+ (4586282, "qonun", "Ko‘p kvartirali uylarni boshqarish to‘g‘risida", "Об управлении многоквартирными домами", "O‘RQ-581", "2019-11-07", "ijara kommunal"),
+ (6835332, "nizom", "Davlat uy-joy fondidan foydalanish va uni tasarruf etish tartibi to‘g‘risidagi nizom", "Положение о порядке пользования и распоряжения государственным жилищным фондом", "124", "2024-03-11", "ijara"),
+ (1452371, "plenum", "Uy-joy nizolari bo‘yicha sud amaliyoti haqida", "О судебной практике по жилищным спорам", "22", "2001-09-14", "ijara"),
+ # Kommunal
+ (7051573, "qonun", "Elektr energetikasi to‘g‘risida", "Об электроэнергетике", "O‘RQ-939", "2024-08-07", "kommunal"),
+ (6126864, "qonun", "Ichimlik suvi ta’minoti va oqova suvlarni chiqarib yuborish to‘g‘risida", "О питьевом водоснабжении и водоотведении", "O‘RQ-784", "2022-07-22", "kommunal"),
+ (6954979, "nizom", "Elektr energiyasi va tabiiy gazdan foydalanish qoidalari", "Правила пользования электрической энергией и природным газом", "319", "2024-05-31", "kommunal"),
+ (6634783, "nizom", "Elektr, issiqlik energiyasi, gazdan foydalanish qoidalarini buzishga oid foto va videolarni ko‘rib chiqish tartibi haqidagi nizom", "Положение о порядке рассмотрения фото и видео о нарушениях правил пользования электро-, теплоэнергией и газом", "541", "2023-10-16", "kommunal jarima"),
+ (1771804, "nizom", "Issiqlik energiyasini va issiqlik eltuvchilarni hisobga olish qoidalari", "Правила учёта тепловой энергии и теплоносителей", "119", "2010-06-14", "kommunal"),
+ # Bank
+ (1004687, "qonun", "Iste’mol krediti to‘g‘risida", "О потребительском кредите", "O‘RQ-33", "2006-05-06", "bank"),
+ (4575786, "qonun", "To‘lovlar va to‘lov tizimlari to‘g‘risida", "О платежах и платёжных системах", "O‘RQ-578", "2019-11-01", "bank"),
+ (41760, "qonun", "Bank siri to‘g‘risida", "О банковской тайне", "530-II", "2003-08-30", "bank"),
+ (1878083, "qonun", "Kredit axboroti almashinuvi to‘g‘risida", "Об обмене кредитной информацией", "O‘RQ-301", "2011-10-04", "bank"),
+ (2258572, "qonun", "Garov reyestri to‘g‘risida", "О залоговом реестре", "O‘RQ-356", "2013-10-23", "bank shartnoma"),
+ (3804290, "nizom", "Bank xizmatlari iste’molchilari bilan munosabatlarda tijorat banklari faoliyatiga qo‘yiladigan minimal talablar to‘g‘risidagi nizom", "Положение о минимальных требованиях к деятельности коммерческих банков при взаимоотношениях с потребителями банковских услуг", "3030", "2018-07-02", "bank"),
+ (6185474, "nizom", "Moliyaviy xizmatlar iste’molchilari bilan munosabatlarda mikromoliya tashkilotlari va lombardlarga qo‘yiladigan minimal talablar to‘g‘risidagi nizom", "Положение о минимальных требованиях к микрофинансовым организациям и ломбардам при работе с потребителями финансовых услуг", "3384", "2022-09-06", "bank"),
+ (4654149, "nizom", "Mikroqarzlar bo‘yicha qarz oluvchi jismoniy shaxslarning qarz yukini tartibga solish to‘g‘risidagi nizom", "Положение о регулировании долговой нагрузки физических лиц по микрозаймам", "3205", "2019-12-19", "bank"),
+ # Transport
+ (6764454, "qonun", "Yo‘l harakati to‘g‘risida", "О дорожном движении", "O‘RQ-900", "2024-01-19", "transport jarima"),
+ (1342474, "qonun", "Transport vositalari egalarining fuqarolik javobgarligini majburiy sug‘urta qilish to‘g‘risida", "Об обязательном страховании гражданской ответственности владельцев транспортных средств", "O‘RQ-155", "2008-04-21", "transport"),
+ (7515959, "qaror", "Yo‘l harakati qoidabuzarliklarini jarima ballari asosida baholash tizimini joriy etish to‘g‘risida", "О внедрении системы оценки нарушений ПДД штрафными баллами", "296", "2025-05-06", "transport jarima"),
+ (8107338, "qaror", "Yo‘l harakati qoidalarini buzganlik bo‘yicha ma’muriy choralar ko‘rish tartibini takomillashtirish to‘g‘risida", "О совершенствовании порядка применения административных мер за нарушение ПДД", "125", "2026-03-30", "transport jarima"),
+ (2710284, "plenum", "Transport harakati va undan foydalanish xavfsizligiga qarshi jinoyatlar bo‘yicha sud amaliyoti", "О судебной практике по делам о преступлениях против безопасности движения и эксплуатации транспорта", "10", "2015-06-26", "transport jinoyat"),
+ # Pensiya va nafaqa
+ (112314, "qonun", "Fuqarolarning davlat pensiya ta’minoti to‘g‘risida", "О государственном пенсионном обеспечении граждан", "938-XII", "1993-09-03", "nafaqa"),
+ (7886679, "qonun", "Davlat ijtimoiy sug‘urtasi to‘g‘risida", "О государственном социальном страховании", "O‘RQ-1101", "2025-12-09", "nafaqa mehnat"),
+ (5049511, "qonun", "Nogironligi bo‘lgan shaxslarning huquqlari to‘g‘risida", "О правах лиц с инвалидностью", "O‘RQ-641", "2020-10-15", "nafaqa"),
+ (6236060, "nizom", "Davlat pensiyalarini tayinlash va to‘lash tartibi to‘g‘risidagi nizom", "Положение о порядке назначения и выплаты государственных пенсий", "592", "2022-10-13", "nafaqa"),
+ (6663873, "qaror", "«Ijtimoiy himoya yagona reyestri» orqali ijtimoiy nafaqalar tayinlash bo‘yicha elektron ariza berishni joriy etish to‘g‘risida", "О внедрении электронной подачи заявлений на социальные пособия через «Единый реестр социальной защиты»", "596", "2023-11-10", "nafaqa"),
+ # Davlat idoralari
+ (3492199, "qonun", "Ma’muriy tartib-taomillar to‘g‘risida", "Об административных процедурах", "O‘RQ-457", "2018-01-08", "davlat nafaqa yer soliq"),
+ (2381133, "qonun", "Davlat hokimiyati va boshqaruvi organlari faoliyatining ochiqligi to‘g‘risida", "Об открытости деятельности органов государственной власти и управления", "O‘RQ-369", "2014-05-05", "davlat"),
+ (3089924, "qaror", "Jismoniy va yuridik shaxslarning murojaatlari bilan ishlash tizimini tubdan takomillashtirish to‘g‘risida", "О мерах по коренному совершенствованию системы работы с обращениями физических и юридических лиц", "PF-4904", "2016-12-28", "davlat"),
+ (6877317, "plenum", "Ma’muriy ishlarni apellyatsiya, kassatsiya tartibida ko‘rishning ayrim masalalari to‘g‘risida", "О некоторых вопросах рассмотрения административных дел в апелляционном и кассационном порядке", "11", "2024-03-25", "davlat nafaqa yer soliq"),
+ (7002340, "plenum", "Ma’muriy ishlarni taftish tartibida ko‘rishning ayrim masalalari to‘g‘risida", "О некоторых вопросах рассмотрения административных дел в ревизионном порядке", "22", "2024-06-25", "davlat nafaqa yer soliq"),
+ # Jarimalar
+ (97664, "kodeks", "Ma’muriy javobgarlik to‘g‘risidagi kodeks", "Кодекс об административной ответственности", "", "", "jarima transport"),
+ (6411366, "qaror", "Aholiga ma’muriy jarimalarni to‘lashda qo‘shimcha qulayliklar yaratish chora-tadbirlari to‘g‘risida", "О мерах по созданию дополнительных удобств при уплате административных штрафов", "PQ-99", "2023-03-23", "jarima transport"),
+ (6881533, "plenum", "Ma’muriy huquqbuzarlik ishlarini apellyatsiya, kassatsiya tartibida ko‘rib chiqish to‘g‘risida", "О рассмотрении дел об административных правонарушениях в апелляционном и кассационном порядке", "8", "2024-03-25", "jarima transport"),
+ (7008443, "plenum", "Ma’muriy huquqbuzarlik ishlarini taftish tartibida ko‘rib chiqish to‘g‘risida", "О рассмотрении дел об административных правонарушениях в ревизионном порядке", "19", "2024-06-25", "jarima transport"),
+ # Migrant
+ (3992869, "qonun", "Xususiy bandlik agentliklari to‘g‘risida", "О частных агентствах занятости", "O‘RQ-501", "2018-10-16", "migrant mehnat"),
+ (1202812, "qaror", "Chet elga mehnat faoliyati uchun ketayotgan fuqarolarni hisobga olishni takomillashtirish to‘g‘risida", "О совершенствовании учёта граждан, выезжающих за рубеж для трудовой деятельности", "97", "2007-05-15", "migrant"),
+ (3920063, "buyruq", "Xorijda mehnat faoliyatini amalga oshiruvchi fuqarolarning ixtiyoriy ro‘yxatdan o‘tish tartibi to‘g‘risidagi nizom", "Положение о порядке добровольной регистрации граждан, работающих за рубежом", "3070", "2018-09-27", "migrant"),
+ # Fuqarolik
+ (111189, "kodeks", "Fuqarolik kodeksi (birinchi qism)", "Гражданский кодекс (часть первая)", "", "", "fuqarolik ijara bank biznes shartnoma yer transport istemol"),
+ (180552, "kodeks", "Fuqarolik kodeksi (ikkinchi qism)", "Гражданский кодекс (часть вторая)", "", "1996-08-29", "fuqarolik meros shartnoma ijara bank transport"),
+ (1448773, "plenum", "Fuqarolik kodeksini tatbiq qilishda sud amaliyotida vujudga keladigan ayrim masalalar to‘g‘risida", "О некоторых вопросах, возникающих в судебной практике при применении Гражданского кодекса", "16", "1999-09-24", "fuqarolik shartnoma"),
+ (1590543, "plenum", "Bitimlarni tartibga soluvchi qonunchilik normalarini tatbiq qilish masalalari to‘g‘risida", "О вопросах применения норм законодательства, регулирующих сделки", "17", "2006-12-22", "fuqarolik shartnoma yer"),
+ # Jinoyat
+ (111453, "kodeks", "Jinoyat kodeksi", "Уголовный кодекс", "", "1994-09-22", "jinoyat"),
+ (111460, "kodeks", "Jinoyat-protsessual kodeksi", "Уголовно-процессуальный кодекс", "", "", "jinoyat"),
+ (163629, "kodeks", "Jinoyat-ijroiya kodeksi", "Уголовно-исполнительный кодекс", "", "", "jinoyat"),
+ (2107763, "qonun", "Tezkor-qidiruv faoliyati to‘g‘risida", "Об оперативно-розыскной деятельности", "O‘RQ-344", "2012-12-25", "jinoyat"),
+ (4159913, "qonun", "Jabrlanuvchilarni, guvohlarni va jinoyat protsessining boshqa ishtirokchilarini himoya qilish to‘g‘risida", "О защите потерпевших, свидетелей и иных участников уголовного процесса", "O‘RQ-515", "2019-01-14", "jinoyat"),
+ (1633102, "qonun", "Sud ekspertizasi to‘g‘risida", "О судебной экспертизе", "O‘RQ-249", "2010-06-01", "jinoyat fuqarolik yer"),
+ (6502543, "qonun", "Davlat hisobidan yuridik yordam ko‘rsatish to‘g‘risida", "Об оказании юридической помощи за счёт государства", "O‘RQ-848", "2023-06-16", "jinoyat fuqarolik oila"),
+ (1595235, "plenum", "Sudga qadar ish yuritishda qamoqqa olish tarzidagi ehtiyot chorasining sudlar tomonidan qo‘llanilishi to‘g‘risida", "О применении судами меры пресечения в виде заключения под стражу на досудебной стадии", "16", "2007-11-14", "jinoyat"),
+ (6033146, "plenum", "Jinoyat ishlarini birinchi instansiyada ko‘rib chiqishga tayyorlash bo‘yicha sud amaliyoti", "О судебной практике подготовки уголовных дел к рассмотрению в первой инстанции", "6", "2022-05-14", "jinoyat"),
+ (6033155, "plenum", "Jinoyat ishlarini birinchi instansiya sudida muhokama qilish bo‘yicha sud amaliyoti", "О судебной практике разбирательства уголовных дел в суде первой инстанции", "7", "2022-05-14", "jinoyat"),
+ (6884042, "plenum", "Jinoyat ishlarini apellyatsiya, kassatsiya tartibida ko‘rish amaliyoti", "О практике рассмотрения уголовных дел в апелляционном и кассационном порядке", "7", "2024-03-25", "jinoyat"),
+ (7001552, "plenum", "Jinoyat ishlarini taftish tartibida ko‘rib chiqishning ayrim masalalari", "О некоторых вопросах рассмотрения уголовных дел в ревизионном порядке", "18", "2024-06-25", "jinoyat"),
+ (6523582, "plenum", "Firibgarlikka oid ishlar bo‘yicha sud amaliyoti to‘g‘risida", "О судебной практике по делам о мошенничестве", "17", "2023-06-23", "jinoyat"),
+ (6523569, "plenum", "Reabilitatsiya etilgan shaxsga yetkazilgan ziyonni qoplash bo‘yicha sud amaliyoti", "О судебной практике возмещения ущерба реабилитированному лицу", "18", "2023-06-23", "jinoyat"),
+ (3115385, "plenum", "Jinoyat natijasida yetkazilgan mulkiy ziyonni qoplash bo‘yicha sud amaliyoti", "О судебной практике возмещения имущественного ущерба, причинённого преступлением", "26", "2016-12-27", "jinoyat"),
+ # Soliq
+ (4674902, "kodeks", "Soliq kodeksi", "Налоговый кодекс", "", "", "soliq biznes"),
+ (5206072, "nizom", "Soliq xavfini boshqarish va soliq tekshiruvlarini tashkil etish hamda o‘tkazish to‘g‘risida", "Об управлении налоговым риском, организации и проведении налоговых проверок", "1", "2021-01-07", "soliq"),
+ (7962143, "qaror", "Qo‘shilgan qiymat solig‘i ma’muriyatchiligini takomillashtirish bo‘yicha qo‘shimcha chora-tadbirlar to‘g‘risida", "О дополнительных мерах по совершенствованию администрирования НДС", "830", "2025-12-26", "soliq"),
+ (4672409, "nizom", "Soliq nazorati tadbirini videotasvirga olish tartibi to‘g‘risidagi nizom", "Положение о порядке видеосъёмки мероприятий налогового контроля", "3207", "2019-12-30", "soliq"),
+ # Biznes
+ (8151376, "qonun", "Mas’uliyati cheklangan jamiyatlar to‘g‘risida", "Об обществах с ограниченной ответственностью", "O‘RQ-1137", "2026-04-21", "biznes"),
+ (5957612, "qonun", "To‘lovga qobiliyatsizlik to‘g‘risida", "О несостоятельности", "O‘RQ-763", "2022-04-12", "biznes"),
+ (6518381, "qonun", "Raqobat to‘g‘risida", "О конкуренции", "O‘RQ-850", "2023-07-03", "biznes"),
+ (5511879, "qonun", "Litsenziyalash, ruxsat berish va xabardor qilish tartib-taomillari to‘g‘risida", "О лицензировании, разрешительных и уведомительных процедурах", "O‘RQ-701", "2021-07-14", "biznes"),
+ (4664142, "qonun", "Investitsiyalar va investitsiya faoliyati to‘g‘risida", "Об инвестициях и инвестиционной деятельности", "O‘RQ-598", "2019-12-25", "biznes"),
+ (2004956, "qonun", "Oilaviy tadbirkorlik to‘g‘risida", "О семейном предпринимательстве", "O‘RQ-327", "2012-04-26", "biznes"),
+ (3063485, "qaror", "Tadbirkorlik subyektlarini davlat ro‘yxatidan o‘tkazish va hisobga qo‘yish tizimini takomillashtirish to‘g‘risida", "О совершенствовании системы государственной регистрации и постановки на учёт субъектов предпринимательства", "PQ-2646", "2016-10-28", "biznes"),
+ (2307198, "plenum", "Tadbirkorlik faoliyati bilan bog‘liq ishlar bo‘yicha sud amaliyoti", "О судебной практике по делам, связанным с предпринимательской деятельностью", "20", "2013-12-11", "biznes"),
+ (7613661, "plenum", "«To‘lovga qobiliyatsizlik to‘g‘risida»gi Qonun normalarini iqtisodiy sudlar tomonidan qo‘llash", "О применении экономическими судами норм Закона «О несостоятельности»", "13", "2025-06-23", "biznes"),
+ (6878556, "plenum", "Iqtisodiy ishlarni apellyatsiya, kassatsiya tartibida ko‘rishning ayrim masalalari", "О некоторых вопросах рассмотрения экономических дел в апелляционном и кассационном порядке", "10", "2024-03-25", "biznes shartnoma"),
+ # Shartnoma
+ (18942, "qonun", "Xo‘jalik yurituvchi subyektlar faoliyatining shartnomaviy-huquqiy bazasi to‘g‘risida", "О договорно-правовой базе деятельности хозяйствующих субъектов", "670-I", "1998-08-29", "shartnoma biznes"),
+ (5382974, "qonun", "Davlat xaridlari to‘g‘risida", "О государственных закупках", "O‘RQ-684", "2021-04-22", "shartnoma biznes"),
+ (6234904, "qonun", "Elektron raqamli imzo to‘g‘risida", "Об электронной цифровой подписи", "O‘RQ-793", "2022-10-12", "shartnoma biznes"),
+ (85259, "qonun", "Lizing to‘g‘risida", "О лизинге", "756-I", "1999-04-14", "shartnoma biznes"),
+ (1643248, "plenum", "Shartnomaviy-huquqiy baza to‘g‘risidagi Qonunni iqtisodiy sudlar amaliyotida qo‘llash", "О применении экономическими судами Закона о договорно-правовой базе", "103", "2002-03-04", "shartnoma biznes"),
+ # Meros
+ (54458, "qonun", "Notariat to‘g‘risida", "О нотариате", "343-I", "1996-12-26", "meros oila yer shartnoma"),
+ (4138215, "buyruq", "Notariuslar tomonidan notarial harakatlarni amalga oshirish tartibi to‘g‘risidagi yo‘riqnoma", "Инструкция о порядке совершения нотариальных действий нотариусами", "3113", "2019-01-04", "meros oila yer shartnoma"),
+ (7976742, "buyruq", "Notarial harakatlarni videokonferensaloqa orqali amalga oshirish tartibi to‘g‘risidagi nizom", "Положение о порядке совершения нотариальных действий в режиме видеоконференцсвязи", "3742", "2026-01-05", "meros shartnoma"),
+ (1809655, "buyruq", "Notarial tasdiqlanganga tenglashtiriladigan vasiyatnoma va ishonchnomalarni tasdiqlash tartibi to‘g‘risidagi yo‘riqnoma", "Инструкция о порядке удостоверения завещаний и доверенностей, приравненных к нотариальным", "2231", "2011-05-25", "meros"),
+ # Yer
+ (152653, "kodeks", "Yer kodeksi", "Земельный кодекс", "", "", "yer"),
+ (6297080, "qonun", "Ko‘chmas mulkka bo‘lgan huquqlarni davlat ro‘yxatidan o‘tkazish to‘g‘risida", "О государственной регистрации прав на недвижимое имущество", "O‘RQ-803", "2022-11-28", "yer meros shartnoma"),
+ (5729966, "qonun", "Qishloq xo‘jaligiga mo‘ljallanmagan yer uchastkalarini xususiylashtirish to‘g‘risida", "О приватизации земельных участков несельскохозяйственного назначения", "O‘RQ-728", "2021-11-15", "yer"),
+ (6087433, "qonun", "Yer uchastkalarini kompensatsiya evaziga jamoat ehtiyojlari uchun olib qo‘yish tartib-taomillari to‘g‘risida", "О процедурах изъятия земельных участков для общественных нужд с компенсацией", "O‘RQ-781", "2022-06-29", "yer"),
+ (7049383, "qonun", "O‘zboshimchalik bilan egallab olingan yer uchastkalari va ularda qurilgan binolarga huquqlarni e’tirof etish to‘g‘risida", "О признании прав на самовольно занятые земельные участки и возведённые на них строения", "O‘RQ-937", "2024-08-05", "yer"),
+ (29794, "qonun", "Davlat kadastrlari to‘g‘risida", "О государственных кадастрах", "171-II", "2000-12-15", "yer"),
+ (17036, "qonun", "Davlat yer kadastri to‘g‘risida", "О государственном земельном кадастре", "666-I", "1998-08-28", "yer"),
+ (6587680, "nizom", "Ko‘chmas mulkka huquqlarni ro‘yxatdan o‘tkazishdagi nizolarni sudga qadar hal qilish tartibi to‘g‘risidagi nizom", "Положение о досудебном урегулировании споров при регистрации прав на недвижимость", "426", "2023-08-29", "yer"),
+ (6687150, "plenum", "Sudlarda yerga oid nizolarni ko‘rishda qonunchilikni qo‘llashning ayrim masalalari", "О некоторых вопросах применения законодательства при рассмотрении земельных споров", "28", "2023-11-20", "yer"),
+]
+
+# ---------- Shablon maydonlari ----------
+# k: (uz, ru, turi, avtomatik manba) — manba: prof.* (profil), client.* (mijoz), case.* (ish), today
+FIELDS = {
+ "lawyer": ("Advokat / yurist F.I.Sh.", "ФИО адвоката / юриста", "text", "prof.name"), "firm": ("Byuro yoki firma", "Бюро или фирма", "text", "prof.firm"),
+ "license": ("Litsenziya / guvohnoma raqami", "Номер лицензии / удостоверения", "text", "prof.license"), "lphone": ("Advokat telefoni", "Телефон адвоката", "tel", "prof.phone"),
+ "order": ("Order raqami va sanasi", "Номер и дата ордера", "text", ""), "client": ("Mijoz (ishonch bildiruvchi)", "Клиент (доверитель)", "text", "client.name"),
+ "clientAddr": ("Mijoz manzili", "Адрес клиента", "text", ""), "other": ("Ikkinchi tomon", "Вторая сторона", "text", ""), "otherAddr": ("Ikkinchi tomon manzili", "Адрес второй стороны", "text", ""),
+ "court": ("Sud nomi", "Название суда", "text", "case.court"), "number": ("Ish raqami", "Номер дела", "text", "case.number"), "subject": ("Ish mazmuni (qisqa)", "Предмет дела (кратко)", "text", "case.title"),
+ "org": ("Tashkilot yoki organ", "Организация или орган", "text", ""), "facts": ("Holat bayoni", "Изложение обстоятельств", "area", ""), "grounds": ("Asoslar va dalillar", "Основания и доказательства", "area", ""),
+ "ask": ("So‘raladigan narsa", "Что просите", "area", ""), "docs": ("Hujjatlar ro‘yxati", "Перечень документов", "area", ""), "sum": ("Summa, so‘m", "Сумма, сум", "text", ""),
+ "term": ("Muddat", "Срок", "text", ""), "date": ("Sana", "Дата", "text", ""), "place": ("Joy", "Место", "text", ""), "decision": ("Qaror / hujjat (organ, sana, raqam)", "Решение / акт (орган, дата, номер)", "text", ""),
+ "person": ("Shaxs F.I.Sh.", "ФИО лица", "text", ""), "position": ("Lavozim", "Должность", "text", ""), "object": ("Obyekt (manzil, tavsif)", "Объект (адрес, описание)", "text", ""),
+ "inn": ("STIR", "ИНН", "text", ""), "investigator": ("Tergovchi va organ", "Следователь и орган", "text", ""),
+}
+COURT_UZ, COURT_RU = "{{court}}ga", "В {{court}}"
+LAW_UZ, LAW_RU = "{{client}} manfaatlarini himoya qiluvchi advokat {{lawyer}}dan (order: {{order}})", "от адвоката {{lawyer}}, представляющего интересы {{client}} (ордер: {{order}})"
+def T(id, areas, name, to, title, text): return dict(id=id, areas=areas, name=name, to=to, title=title, text=text)
+TEMPLATES = [
+ T("sorov", "*", ("Advokat so‘rovi", "Адвокатский запрос"), (["{{org}} rahbariga", "advokat {{lawyer}}dan, {{firm}}", "Litsenziya: {{license}}, tel.: {{lphone}}"], ["Руководителю {{org}}", "от адвоката {{lawyer}}, {{firm}}", "Лицензия: {{license}}, тел.: {{lphone}}"]),
+   ("ADVOKAT SO‘ROVI", "АДВОКАТСКИЙ ЗАПРОС"),
+   ("Men {{client}} bilan tuzilgan yuridik yordam ko‘rsatish to‘g‘risidagi bitim va {{order}} orderga asosan uning manfaatlarini himoya qilmoqdaman.\n\n{{facts}}\n\nYuqoridagilarga ko‘ra va «Advokatura to‘g‘risida»gi Qonun hamda «Advokatlik faoliyatining kafolatlari va advokatlarning ijtimoiy himoyasi to‘g‘risida»gi Qonunga asosan quyidagi hujjat va ma’lumotlarni taqdim etishingizni so‘rayman:\n\n{{docs}}\n\nJavobni {{lphone}} telefon raqami bo‘yicha xabar qilib, yozma shaklda yuborishingizni so‘rayman.\n\nIlova: order nusxasi.",
+    "Я представляю интересы {{client}} на основании соглашения об оказании юридической помощи и ордера {{order}}.\n\n{{facts}}\n\nНа основании Закона «Об адвокатуре» и Закона «О гарантиях адвокатской деятельности и социальной защите адвокатов» прошу предоставить следующие документы и сведения:\n\n{{docs}}\n\nПрошу направить письменный ответ, предварительно сообщив по телефону {{lphone}}.\n\nПриложение: копия ордера.")),
+ T("bitim", "*", ("Yuridik yordam ko‘rsatish bitimi", "Соглашение об оказании юридической помощи"), ([], []), ("YURIDIK YORDAM KO‘RSATISH TO‘G‘RISIDA BITIM", "СОГЛАШЕНИЕ ОБ ОКАЗАНИИ ЮРИДИЧЕСКОЙ ПОМОЩИ"),
+   ("{{place}}, {{date}}\n\nBir tomondan advokat {{lawyer}} ({{firm}}, litsenziya {{license}}), ikkinchi tomondan {{client}} (manzil: {{clientAddr}}) quyidagilar haqida ushbu bitimni tuzdilar.\n\n1. Bitim predmeti. Advokat quyidagi masala bo‘yicha yuridik yordam ko‘rsatadi: {{subject}}.\n\n2. Advokat malakali yordam ko‘rsatish, advokatlik sirini saqlash va ishning borishi haqida xabar berish majburiyatini oladi.\n\n3. Ishonch bildiruvchi ishga oid hujjat va ma’lumotlarni o‘z vaqtida taqdim etadi.\n\n4. Haq miqdori {{sum}} so‘m. To‘lov tartibi va muddati: {{term}}.\n\n5. Bitim tomonlar imzolagan paytdan kuchga kiradi. Nizolar muzokara, kelishilmasa qonunchilikda belgilangan tartibda hal etiladi.\n\nAdvokat: ____________ {{lawyer}}\n\nIshonch bildiruvchi: ____________ {{client}}",
+    "{{place}}, {{date}}\n\nАдвокат {{lawyer}} ({{firm}}, лицензия {{license}}), с одной стороны, и {{client}} (адрес: {{clientAddr}}), с другой стороны, заключили настоящее соглашение о нижеследующем.\n\n1. Предмет. Адвокат оказывает юридическую помощь по вопросу: {{subject}}.\n\n2. Адвокат обязуется оказывать квалифицированную помощь, хранить адвокатскую тайну и информировать о ходе дела.\n\n3. Доверитель своевременно предоставляет документы и сведения по делу.\n\n4. Размер вознаграждения {{sum}} сум. Порядок и срок оплаты: {{term}}.\n\n5. Соглашение вступает в силу с момента подписания. Споры решаются переговорами, а при недостижении согласия — в порядке, установленном законодательством.\n\nАдвокат: ____________ {{lawyer}}\n\nДоверитель: ____________ {{client}}")),
+ T("xulosa", "*", ("Yuridik xulosa", "Юридическое заключение"), ([], []), ("YURIDIK XULOSA", "ЮРИДИЧЕСКОЕ ЗАКЛЮЧЕНИЕ"),
+   ("Mijoz: {{client}}. Masala: {{subject}}.\n\nHolat. {{facts}}\n\nHuquqiy tahlil. {{grounds}}\n\nXulosa va tavsiyalar. {{ask}}\n\nXulosa taqdim etilgan hujjatlar va {{date}} holatiga ko‘ra amaldagi qonunchilik asosida berildi.\n\n{{lawyer}}, {{firm}}",
+    "Клиент: {{client}}. Вопрос: {{subject}}.\n\nОбстоятельства. {{facts}}\n\nПравовой анализ. {{grounds}}\n\nВыводы и рекомендации. {{ask}}\n\nЗаключение дано на основании представленных документов и законодательства, действующего на {{date}}.\n\n{{lawyer}}, {{firm}}")),
+ T("tanishish", "*", ("Ish materiallari bilan tanishish", "Ознакомление с материалами дела"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("ILTIMOSNOMA", "ХОДАТАЙСТВО"),
+   ("Ish yurituvingizda {{number}}-sonli ish ({{subject}}) ko‘rilmoqda.\n\nMijoz manfaatlarini to‘liq himoya qilish uchun ish materiallari bilan tanishish, ulardan ko‘chirma va nusxa olishga ruxsat berishingizni so‘rayman.\n\nIlova: order.",
+    "В вашем производстве находится дело № {{number}} ({{subject}}).\n\nДля полноценной защиты интересов клиента прошу разрешить ознакомиться с материалами дела, делать выписки и снимать копии.\n\nПриложение: ордер.")),
+ T("dalil", "*", ("Dalillarni talab qilib olish", "Истребование доказательств"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("DALILLARNI TALAB QILIB OLISH TO‘G‘RISIDA ILTIMOSNOMA", "ХОДАТАЙСТВО ОБ ИСТРЕБОВАНИИ ДОКАЗАТЕЛЬСТВ"),
+   ("{{number}}-sonli ish bo‘yicha quyidagi hujjat va ma’lumotlar ahamiyatli, lekin ularni mustaqil olish imkoni bo‘lmadi:\n\n{{docs}}\n\nUlar {{org}}da saqlanadi va quyidagi holatlarni tasdiqlaydi: {{facts}}\n\nShu munosabat bilan ko‘rsatilgan dalillarni talab qilib olishingizni so‘rayman.",
+    "По делу № {{number}} имеют значение следующие документы и сведения, получить которые самостоятельно не удалось:\n\n{{docs}}\n\nОни находятся в {{org}} и подтверждают следующие обстоятельства: {{facts}}\n\nВ связи с этим прошу истребовать указанные доказательства.")),
+ T("kechiktirish", "*", ("Sud majlisini boshqa kunga qoldirish", "Отложение судебного заседания"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("ILTIMOSNOMA", "ХОДАТАЙСТВО"),
+   ("{{number}}-sonli ish bo‘yicha sud majlisi {{date}} kuniga tayinlangan.\n\nQuyidagi uzrli sabablarga ko‘ra majlisda ishtirok eta olmayman: {{grounds}}\n\nSud majlisini boshqa kunga qoldirishingizni so‘rayman. Tasdiqlovchi hujjat ilova qilinadi.",
+    "По делу № {{number}} судебное заседание назначено на {{date}}.\n\nПо следующим уважительным причинам участвовать в нём не могу: {{grounds}}\n\nПрошу отложить судебное заседание. Подтверждающий документ прилагается.")),
+ T("apellyatsiya", "*", ("Apellyatsiya shikoyati", "Апелляционная жалоба"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("APELLYATSIYA SHIKOYATI", "АПЕЛЛЯЦИОННАЯ ЖАЛОБА"),
+   ("{{decision}} qabul qilindi. Ushbu qaror bilan quyidagi asoslarga ko‘ra rozi emasmiz.\n\nIsh holatlari. {{facts}}\n\nQarorning noto‘g‘riligi asoslari. {{grounds}}\n\nYuqoridagilarga ko‘ra so‘rayman: {{ask}}\n\nIlova: shikoyat nusxalari, order, davlat boji to‘langanligi haqida hujjat (agar to‘lanishi shart bo‘lsa).",
+    "Вынесено: {{decision}}. С указанным решением не согласны по следующим основаниям.\n\nОбстоятельства дела. {{facts}}\n\nОснования для отмены. {{grounds}}\n\nНа основании изложенного прошу: {{ask}}\n\nПриложение: копии жалобы, ордер, документ об уплате госпошлины (если она подлежит уплате).")),
+ T("etiroz", CIVIL + " biznes", ("Da’voga yozma e’tiroz", "Письменные возражения на иск"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("DA’VOGA YOZMA E’TIROZ", "ПИСЬМЕННЫЕ ВОЗРАЖЕНИЯ НА ИСК"),
+   ("{{other}} tomonidan {{number}}-sonli ish bo‘yicha {{subject}} haqida da’vo qo‘zg‘atilgan. Da’vo talablariga quyidagi asoslarga ko‘ra e’tiroz bildiramiz.\n\n{{facts}}\n\nE’tiroz asoslari: {{grounds}}\n\nDa’vo talablarini qanoatlantirishni rad etishingizni so‘rayman.",
+    "{{other}} предъявлен иск по делу № {{number}} ({{subject}}). Возражаем против исковых требований по следующим основаниям.\n\n{{facts}}\n\nОснования возражений: {{grounds}}\n\nПрошу отказать в удовлетворении иска.")),
+ T("kelishuv", CIVIL + " biznes", ("Kelishuv bitimi", "Мировое соглашение"), ([], []), ("KELISHUV BITIMI", "МИРОВОЕ СОГЛАШЕНИЕ"),
+   ("{{place}}, {{date}}\n\n{{client}} va {{other}} {{number}}-sonli ish ({{subject}}) bo‘yicha nizoni tinch yo‘l bilan hal etish maqsadida quyidagilarga kelishdilar.\n\n1. {{ask}}\n\n2. To‘lanadigan summa: {{sum}} so‘m. Muddati va tartibi: {{term}}.\n\n3. Sud xarajatlari tomonlar kelishuviga ko‘ra taqsimlanadi.\n\n4. Tomonlarga kelishuv bitimini tasdiqlash oqibatlari tushunarli. Bitimni tasdiqlashni so‘raymiz.\n\nTomonlar: ____________ {{client}}    ____________ {{other}}",
+    "{{place}}, {{date}}\n\n{{client}} и {{other}} в целях мирного урегулирования спора по делу № {{number}} ({{subject}}) договорились о нижеследующем.\n\n1. {{ask}}\n\n2. Сумма к уплате: {{sum}} сум. Срок и порядок: {{term}}.\n\n3. Судебные расходы распределяются по соглашению сторон.\n\n4. Последствия утверждения мирового соглашения сторонам понятны. Просим утвердить соглашение.\n\nСтороны: ____________ {{client}}    ____________ {{other}}")),
+ T("taminlash", CIVIL + " biznes", ("Da’voni ta’minlash arizasi", "Заявление об обеспечении иска"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("DA’VONI TA’MINLASH TO‘G‘RISIDA ARIZA", "ЗАЯВЛЕНИЕ ОБ ОБЕСПЕЧЕНИИ ИСКА"),
+   ("{{other}}ga nisbatan {{sum}} so‘m undirish haqidagi da’vo ({{subject}}) ko‘rilmoqda.\n\nChora ko‘rilmasa, hal qiluv qarorini ijro etish qiyinlashishi mumkin: {{grounds}}\n\nQuyidagi ta’minlash chorasini qo‘llashni so‘rayman: {{ask}}",
+    "Рассматривается иск к {{other}} о взыскании {{sum}} сум ({{subject}}).\n\nБез принятия мер исполнение решения может быть затруднено: {{grounds}}\n\nПрошу принять следующую обеспечительную меру: {{ask}}")),
+ # Mehnat
+ T("m_buyruq", "mehnat", ("Ishga qabul qilish buyrug‘i", "Приказ о приёме на работу"), ([], []), ("ISHGA QABUL QILISH TO‘G‘RISIDA BUYRUQ", "ПРИКАЗ О ПРИЁМЕ НА РАБОТУ"),
+   ("{{org}}, {{date}}\n\nMehnat shartnomasiga asosan buyuraman:\n\n1. {{person}} {{date}} kunidan boshlab {{position}} lavozimiga ishga qabul qilinsin.\n\n2. Ish haqi: oyiga {{sum}} so‘m.\n\n3. Dastlabki sinov (agar kelishilgan bo‘lsa): {{term}}.\n\nAsos: mehnat shartnomasi.\n\nRahbar: ____________\n\nBuyruq bilan tanishdim: ____________ {{person}}",
+    "{{org}}, {{date}}\n\nНа основании трудового договора приказываю:\n\n1. Принять {{person}} на должность {{position}} с {{date}}.\n\n2. Заработная плата: {{sum}} сум в месяц.\n\n3. Предварительное испытание (если согласовано): {{term}}.\n\nОснование: трудовой договор.\n\nРуководитель: ____________\n\nС приказом ознакомлен(а): ____________ {{person}}")),
+ T("m_izoh", "mehnat", ("Intizomiy jazoga e’tiroz", "Возражение на дисциплинарное взыскание"), (["{{org}} rahbariga", LAW_UZ], ["Руководителю {{org}}", LAW_RU]), ("INTIZOMIY JAZONI BEKOR QILISH TO‘G‘RISIDA ARIZA", "ЗАЯВЛЕНИЕ ОБ ОТМЕНЕ ДИСЦИПЛИНАРНОГО ВЗЫСКАНИЯ"),
+   ("{{decision}} bilan {{person}}ga ({{position}}) intizomiy jazo qo‘llanilgan. Jazo asossiz deb hisoblaymiz.\n\n{{facts}}\n\nAsoslar: {{grounds}}\n\nIntizomiy jazoni bekor qilishingizni va natijasi haqida yozma javob berishingizni so‘rayman.",
+    "Актом {{decision}} к {{person}} ({{position}}) применено дисциплинарное взыскание. Считаем его необоснованным.\n\n{{facts}}\n\nОснования: {{grounds}}\n\nПрошу отменить взыскание и письменно сообщить о результате.")),
+ T("i_eksp", "istemol transport", ("Tovar yoki zarar ekspertizasini tayinlash", "Назначение экспертизы товара или ущерба"), ([COURT_UZ, LAW_UZ], [COURT_RU, LAW_RU]), ("EKSPERTIZA TAYINLASH TO‘G‘RISIDA ILTIMOSNOMA", "ХОДАТАЙСТВО О НАЗНАЧЕНИИ ЭКСПЕРТИЗЫ"),
+   ("{{number}}-sonli ish bo‘yicha {{object}} bo‘yicha maxsus bilim talab etiladi.\n\n{{facts}}\n\nEkspertiza tayinlashni va uning oldiga quyidagi savollarni qo‘yishni so‘rayman:\n\n{{ask}}",
+    "По делу № {{number}} в отношении {{object}} требуются специальные знания.\n\n{{facts}}\n\nПрошу назначить экспертизу и поставить перед экспертом следующие вопросы:\n\n{{ask}}")),
+ T("o_ajrim", "oila", ("Nikohdan ajratish da’vosi", "Иск о расторжении брака"), ([COURT_UZ, "da’vogar: {{client}}, {{clientAddr}}", "javobgar: {{other}}, {{otherAddr}}"], [COURT_RU, "истец: {{client}}, {{clientAddr}}", "ответчик: {{other}}, {{otherAddr}}"]), ("NIKOHDAN AJRATISH TO‘G‘RISIDA DA’VO ARIZASI", "ИСКОВОЕ ЗАЯВЛЕНИЕ О РАСТОРЖЕНИИ БРАКА"),
+   ("Tomonlar {{date}} kuni nikohdan o‘tgan (FHDYo: {{org}}).\n\nOilaviy hayot va kelishmovchilik sabablari: {{facts}}\n\nVoyaga yetmagan bolalar va ular haqidagi kelishuv: {{grounds}}\n\nSo‘rayman: tomonlar o‘rtasidagi nikoh bekor qilinsin. {{ask}}\n\nIlova: nikoh guvohnomasi, bolalarning tug‘ilganlik guvohnomalari nusxasi, davlat boji to‘langanligi haqida hujjat, ariza nusxasi.",
+    "Стороны вступили в брак {{date}} (ЗАГС: {{org}}).\n\nОбстоятельства и причины разлада: {{facts}}\n\nНесовершеннолетние дети и соглашение о них: {{grounds}}\n\nПрошу расторгнуть брак между сторонами. {{ask}}\n\nПриложение: свидетельство о браке, копии свидетельств о рождении детей, документ об уплате госпошлины, копия заявления.")),
+ T("o_mulk", "oila", ("Umumiy mol-mulkni bo‘lish da’vosi", "Иск о разделе общего имущества"), ([COURT_UZ, "da’vogar: {{client}}, {{clientAddr}}", "javobgar: {{other}}, {{otherAddr}}"], [COURT_RU, "истец: {{client}}, {{clientAddr}}", "ответчик: {{other}}, {{otherAddr}}"]), ("UMUMIY MOL-MULKNI BO‘LISH TO‘G‘RISIDA DA’VO ARIZASI", "ИСКОВОЕ ЗАЯВЛЕНИЕ О РАЗДЕЛЕ ОБЩЕГО ИМУЩЕСТВА"),
+   ("Nikoh davrida quyidagi mol-mulk orttirilgan: {{object}}. Da’vo bahosi: {{sum}} so‘m.\n\n{{facts}}\n\nDalillar: {{grounds}}\n\nSo‘rayman: {{ask}}",
+    "В период брака приобретено следующее имущество: {{object}}. Цена иска: {{sum}} сум.\n\n{{facts}}\n\nДоказательства: {{grounds}}\n\nПрошу: {{ask}}")),
+ T("ij_shart", "ijara shartnoma", ("Turar joy ijara shartnomasi", "Договор аренды жилого помещения"), ([], []), ("TURAR JOY IJARA SHARTNOMASI", "ДОГОВОР АРЕНДЫ ЖИЛОГО ПОМЕЩЕНИЯ"),
+   ("{{place}}, {{date}}\n\nIjaraga beruvchi {{other}} va ijaraga oluvchi {{client}} quyidagilar haqida shartnoma tuzdilar.\n\n1. Ijaraga beruvchi {{object}} manzilidagi turar joyni {{term}} muddatga beradi.\n\n2. Ijara haqi oyiga {{sum}} so‘m; to‘lov tartibi: {{grounds}}\n\n3. Garov puli va uni qaytarish sharti: {{ask}}\n\n4. Turar joy topshirish-qabul qilish dalolatnomasi bilan topshiriladi.\n\n5. Nizolar muzokara, mediatsiya yoki sud tartibida hal etiladi.\n\nImzolar: ____________ {{other}}    ____________ {{client}}",
+    "{{place}}, {{date}}\n\nАрендодатель {{other}} и арендатор {{client}} заключили договор о нижеследующем.\n\n1. Арендодатель предоставляет жилое помещение по адресу {{object}} на срок {{term}}.\n\n2. Арендная плата {{sum}} сум в месяц; порядок оплаты: {{grounds}}\n\n3. Залог и условия его возврата: {{ask}}\n\n4. Помещение передаётся по акту приёма-передачи.\n\n5. Споры решаются переговорами, медиацией или в суде.\n\nПодписи: ____________ {{other}}    ____________ {{client}}")),
+ T("ij_dalolat", "ijara yer", ("Topshirish-qabul qilish dalolatnomasi", "Акт приёма-передачи"), ([], []), ("TOPSHIRISH-QABUL QILISH DALOLATNOMASI", "АКТ ПРИЁМА-ПЕРЕДАЧИ"),
+   ("{{place}}, {{date}}\n\n{{other}} topshirdi, {{client}} qabul qildi: {{object}}.\n\nHolati, hisoblagich ko‘rsatkichlari va jihozlar: {{facts}}\n\nE’tirozlar: {{grounds}}\n\nTopshirdi: ____________    Qabul qildi: ____________",
+    "{{place}}, {{date}}\n\n{{other}} передал(а), {{client}} принял(а): {{object}}.\n\nСостояние, показания счётчиков и имущество: {{facts}}\n\nЗамечания: {{grounds}}\n\nПередал(а): ____________    Принял(а): ____________")),
+ T("k_solish", "kommunal", ("Hisob-kitobni solishtirish talabnomasi", "Требование о сверке расчётов"), (["{{org}} rahbariga", LAW_UZ], ["Руководителю {{org}}", LAW_RU]), ("HISOB-KITOBLARNI SOLISHTIRISH TO‘G‘RISIDA TALABNOMA", "ТРЕБОВАНИЕ О СВЕРКЕ РАСЧЁТОВ"),
+   ("{{client}}ga {{object}} bo‘yicha {{sum}} so‘m qarzdorlik hisoblangan.\n\n{{facts}}\n\nHisob-kitob asoslari, tarif va hisoblagich ko‘rsatkichlari bilan solishtirma dalolatnomani taqdim etishingizni, asossiz hisoblangan summani qayta hisoblashingizni so‘rayman.",
+    "{{client}} по {{object}} начислена задолженность {{sum}} сум.\n\n{{facts}}\n\nПрошу предоставить акт сверки с основаниями расчёта, тарифом и показаниями счётчика и пересчитать необоснованно начисленную сумму.")),
+ T("b_restr", "bank", ("Kredit to‘lov grafigini qayta ko‘rish arizasi", "Заявление о пересмотре графика кредита"), (["{{org}} rahbariga", LAW_UZ], ["Руководителю {{org}}", LAW_RU]), ("ARIZA", "ЗАЯВЛЕНИЕ"),
+   ("{{client}} {{decision}} kredit shartnomasi bo‘yicha qarzdor. Qoldiq: {{sum}} so‘m.\n\nTo‘lovga ta’sir qilgan holatlar: {{facts}}\n\nTo‘lov grafigini quyidagicha qayta ko‘rishni va neustoykani kamaytirish masalasini ko‘rib chiqishni so‘rayman: {{ask}}\n\nTasdiqlovchi hujjatlar: {{docs}}",
+    "{{client}} является заёмщиком по кредитному договору {{decision}}. Остаток: {{sum}} сум.\n\nОбстоятельства, повлиявшие на оплату: {{facts}}\n\nПрошу пересмотреть график следующим образом и рассмотреть снижение неустойки: {{ask}}\n\nПодтверждающие документы: {{docs}}")),
+ T("t_zarar", "transport", ("YTH zarari bo‘yicha talabnoma", "Претензия по ущербу от ДТП"), (["{{other}}ga, {{otherAddr}}", LAW_UZ], ["{{other}}, {{otherAddr}}", LAW_RU]), ("TALABNOMA", "ПРЕТЕНЗИЯ"),
+   ("{{date}} kuni {{place}}da yo‘l-transport hodisasi sodir bo‘lgan. {{facts}}\n\n{{object}}ga yetkazilgan zarar {{sum}} so‘m: {{grounds}}\n\nSug‘urta to‘lovi bilan qoplanmagan zararni {{term}} ichida ixtiyoriy qoplashingizni so‘rayman. Aks holda sudga murojaat qilamiz.",
+    "{{date}} в {{place}} произошло ДТП. {{facts}}\n\nУщерб {{object}} составил {{sum}} сум: {{grounds}}\n\nПрошу добровольно в течение {{term}} возместить ущерб, не покрытый страховой выплатой. Иначе обратимся в суд.")),
+ T("n_staj", "nafaqa", ("Ish staji va ish haqi ma’lumotini so‘rash", "Запрос о стаже и заработке"), (["{{org}} rahbariga", LAW_UZ], ["Руководителю {{org}}", LAW_RU]), ("ISH STAJI VA ISH HAQI TO‘G‘RISIDA SO‘ROV", "ЗАПРОС О СТАЖЕ И ЗАРАБОТКЕ"),
+   ("{{person}} {{term}} davrida {{position}} bo‘lib ishlagan. Pensiyani to‘g‘ri tayinlash uchun ish staji va ish haqi to‘g‘risidagi arxiv ma’lumotnomasini taqdim etishingizni so‘rayman.\n\n{{facts}}",
+    "{{person}} работал(а) в период {{term}} в должности {{position}}. Для правильного назначения пенсии прошу предоставить архивную справку о стаже и заработке.\n\n{{facts}}")),
+ T("d_mamuriy", "davlat nafaqa yer", ("Ma’muriy shikoyat (yuqori organga)", "Административная жалоба (в вышестоящий орган)"), (["{{org}}ga", LAW_UZ], ["В {{org}}", LAW_RU]), ("MA’MURIY SHIKOYAT", "АДМИНИСТРАТИВНАЯ ЖАЛОБА"),
+   ("{{decision}} ustidan shikoyat qilaman.\n\nHolatlar: {{facts}}\n\nHujjatning qonunga xilofligi: {{grounds}}\n\nSo‘rayman: {{ask}}",
+    "Обжалую: {{decision}}.\n\nОбстоятельства: {{facts}}\n\nНезаконность акта: {{grounds}}\n\nПрошу: {{ask}}")),
+ T("j_tugat", "jarima transport", ("Ma’muriy ishni tugatish iltimosnomasi", "Ходатайство о прекращении административного дела"), (["{{org}}ga", LAW_UZ], ["В {{org}}", LAW_RU]), ("ISHNI TUGATISH TO‘G‘RISIDA ILTIMOSNOMA", "ХОДАТАЙСТВО О ПРЕКРАЩЕНИИ ДЕЛА"),
+   ("{{person}}ga nisbatan {{decision}} bo‘yicha ma’muriy huquqbuzarlik ishi yuritilmoqda.\n\n{{facts}}\n\nHuquqbuzarlik alomatlari yo‘qligi yoki ishni istisno etuvchi holatlar: {{grounds}}\n\nIshni tugatishingizni so‘rayman.",
+    "В отношении {{person}} ведётся дело об административном правонарушении ({{decision}}).\n\n{{facts}}\n\nОтсутствие состава или исключающие производство обстоятельства: {{grounds}}\n\nПрошу прекратить дело.")),
+ T("mg_shart", "migrant", ("Agentlikdan shartnoma va to‘lov hujjatlarini so‘rash", "Запрос договора и платёжных документов у агентства"), (["{{org}} rahbariga", LAW_UZ], ["Руководителю {{org}}", LAW_RU]), ("SO‘ROV", "ЗАПРОС"),
+   ("{{client}} {{date}} kuni xorijda ishga joylashtirish uchun {{sum}} so‘m to‘lagan.\n\n{{facts}}\n\nShartnoma, to‘lov hujjatlari, agentlik litsenziyasi va xorijiy ish beruvchi bilan bitim nusxalarini taqdim etishingizni so‘rayman.",
+    "{{client}} {{date}} оплатил(а) {{sum}} сум за трудоустройство за рубежом.\n\n{{facts}}\n\nПрошу предоставить копии договора, платёжных документов, лицензии агентства и соглашения с иностранным работодателем.")),
+ T("f_qarz", "fuqarolik shartnoma", ("Qarz shartnomasi", "Договор займа"), ([], []), ("QARZ SHARTNOMASI", "ДОГОВОР ЗАЙМА"),
+   ("{{place}}, {{date}}\n\nQarz beruvchi {{other}} qarz oluvchi {{client}}ga {{sum}} so‘m beradi, qarz oluvchi uni {{term}} muddatda qaytaradi.\n\nFoizlar va qaytarish tartibi: {{ask}}\n\nMuddat buzilganda oqibatlar: {{grounds}}\n\nNizolar muzokara yoki sud tartibida hal etiladi.\n\nImzolar: ____________ {{other}}    ____________ {{client}}",
+    "{{place}}, {{date}}\n\nЗаймодавец {{other}} передаёт заёмщику {{client}} {{sum}} сум, а заёмщик возвращает их в срок {{term}}.\n\nПроценты и порядок возврата: {{ask}}\n\nПоследствия просрочки: {{grounds}}\n\nСпоры решаются переговорами или в суде.\n\nПодписи: ____________ {{other}}    ____________ {{client}}")),
+ # Jinoyat
+ T("jn_kirish", "jinoyat", ("Himoyaga kirishish bildirishi", "Уведомление о вступлении в защиту"), (["{{investigator}}ga", LAW_UZ], ["{{investigator}}", LAW_RU]), ("HIMOYACHI SIFATIDA ISHGA KIRISHISH TO‘G‘RISIDA", "О ВСТУПЛЕНИИ В ДЕЛО В КАЧЕСТВЕ ЗАЩИТНИКА"),
+   ("{{number}}-sonli jinoyat ishi bo‘yicha {{person}}ning himoyachisi sifatida ishga kirishganimni ma’lum qilaman.\n\nHimoyalanuvchi ishtirokidagi barcha protsessual harakatlar haqida {{lphone}} raqami bo‘yicha oldindan xabar berishingizni, himoyalanuvchi bilan xoli uchrashish va qonunda belgilangan hujjatlar bilan tanishish imkonini berishingizni so‘rayman.\n\nIlova: order.",
+    "Сообщаю о вступлении в дело № {{number}} в качестве защитника {{person}}.\n\nПрошу заблаговременно уведомлять по телефону {{lphone}} обо всех процессуальных действиях с участием подзащитного, обеспечить свидание наедине и ознакомление с документами, предусмотренными законом.\n\nПриложение: ордер.")),
+ T("jn_harakat", "jinoyat", ("Tergov harakatini o‘tkazish iltimosnomasi", "Ходатайство о проведении следственного действия"), (["{{investigator}}ga", LAW_UZ], ["{{investigator}}", LAW_RU]), ("ILTIMOSNOMA", "ХОДАТАЙСТВО"),
+   ("{{number}}-sonli jinoyat ishi bo‘yicha {{person}} manfaatlarida quyidagi tergov harakatini o‘tkazishni so‘rayman: {{ask}}\n\nUning ish uchun ahamiyati: {{grounds}}\n\nNatijasi haqida yozma ma’lum qilishingizni so‘rayman.",
+    "По делу № {{number}} в интересах {{person}} прошу провести следующее следственное действие: {{ask}}\n\nЕго значение для дела: {{grounds}}\n\nПрошу письменно сообщить о результате.")),
+ T("jn_chora", "jinoyat", ("Ehtiyot chorasini o‘zgartirish iltimosnomasi", "Ходатайство об изменении меры пресечения"), (["{{org}}ga", LAW_UZ], ["В {{org}}", LAW_RU]), ("EHTIYOT CHORASINI O‘ZGARTIRISH TO‘G‘RISIDA ILTIMOSNOMA", "ХОДАТАЙСТВО ОБ ИЗМЕНЕНИИ МЕРЫ ПРЕСЕЧЕНИЯ"),
+   ("{{number}}-sonli ish bo‘yicha {{person}}ga nisbatan ehtiyot chorasi qo‘llanilgan: {{decision}}.\n\nShaxsga oid holatlar (oila, ish, sog‘liq, yashash joyi): {{facts}}\n\nChorani o‘zgartirish asoslari: {{grounds}}\n\nYengilroq ehtiyot chorasini qo‘llashni so‘rayman: {{ask}}",
+    "По делу № {{number}} в отношении {{person}} избрана мера пресечения: {{decision}}.\n\nДанные о личности (семья, работа, здоровье, место жительства): {{facts}}\n\nОснования для изменения: {{grounds}}\n\nПрошу избрать более мягкую меру: {{ask}}")),
+ T("jn_shikoyat", "jinoyat", ("Tergovchi harakati (qarori) ustidan shikoyat", "Жалоба на действия (решение) следователя"), (["{{org}}ga", LAW_UZ], ["В {{org}}", LAW_RU]), ("SHIKOYAT", "ЖАЛОБА"),
+   ("{{number}}-sonli ish bo‘yicha {{investigator}}ning quyidagi harakati (qarori) ustidan shikoyat qilaman: {{decision}}\n\n{{facts}}\n\nQonun talablari buzilishi: {{grounds}}\n\nSo‘rayman: {{ask}}",
+    "По делу № {{number}} обжалую действие (решение) {{investigator}}: {{decision}}\n\n{{facts}}\n\nНарушение требований закона: {{grounds}}\n\nПрошу: {{ask}}")),
+ # Soliq
+ T("s_etiroz", "soliq", ("Soliq tekshiruvi natijasiga e’tiroz", "Возражения по результатам налоговой проверки"), (["{{org}}ga", "{{client}}dan, STIR {{inn}}"], ["В {{org}}", "от {{client}}, ИНН {{inn}}"]), ("SOLIQ TEKSHIRUVI NATIJASI BO‘YICHA E’TIROZ", "ВОЗРАЖЕНИЯ ПО РЕЗУЛЬТАТАМ НАЛОГОВОЙ ПРОВЕРКИ"),
+   ("{{decision}} bo‘yicha xulosalarga quyidagi asoslarga ko‘ra rozi emasmiz.\n\nHolatlar: {{facts}}\n\nHar bir band bo‘yicha asoslar: {{grounds}}\n\nNizoli summa: {{sum}} so‘m.\n\nSo‘raymiz: {{ask}}\n\nIlova: {{docs}}",
+    "Не согласны с выводами {{decision}} по следующим основаниям.\n\nОбстоятельства: {{facts}}\n\nДоводы по каждому пункту: {{grounds}}\n\nСпорная сумма: {{sum}} сум.\n\nПросим: {{ask}}\n\nПриложение: {{docs}}")),
+ T("s_shikoyat", "soliq", ("Yuqori soliq organiga shikoyat", "Жалоба в вышестоящий налоговый орган"), (["{{org}}ga", "{{client}}dan, STIR {{inn}}"], ["В {{org}}", "от {{client}}, ИНН {{inn}}"]), ("SHIKOYAT", "ЖАЛОБА"),
+   ("{{decision}} ustidan shikoyat qilamiz.\n\n{{facts}}\n\nQarorning asossizligi: {{grounds}}\n\nQarorni bekor qilishni yoki o‘zgartirishni so‘raymiz: {{ask}}",
+    "Обжалуем: {{decision}}.\n\n{{facts}}\n\nНеобоснованность решения: {{grounds}}\n\nПросим отменить или изменить решение: {{ask}}")),
+ T("s_qaytar", "soliq", ("Ortiqcha to‘langan soliqni qaytarish arizasi", "Заявление о возврате излишне уплаченного налога"), (["{{org}}ga", "{{client}}dan, STIR {{inn}}"], ["В {{org}}", "от {{client}}, ИНН {{inn}}"]), ("ARIZA", "ЗАЯВЛЕНИЕ"),
+   ("{{term}} davri uchun {{sum}} so‘m ortiqcha to‘langan.\n\n{{facts}}\n\nUshbu summani qaytarishni (yoki hisobga olishni) so‘raymiz. Bank rekvizitlari: {{grounds}}\n\nIlova: {{docs}}",
+    "За период {{term}} излишне уплачено {{sum}} сум.\n\n{{facts}}\n\nПросим вернуть (зачесть) указанную сумму. Банковские реквизиты: {{grounds}}\n\nПриложение: {{docs}}")),
+ # Biznes
+ T("bz_qaror", "biznes", ("Yagona ta’sischi qarori", "Решение единственного участника"), ([], []), ("YAGONA ISHTIROKCHI QARORI", "РЕШЕНИЕ ЕДИНСТВЕННОГО УЧАСТНИКА"),
+   ("{{org}}, {{place}}, {{date}}\n\nJamiyatning yagona ishtirokchisi {{person}} quyidagilarni qaror qildi:\n\n{{ask}}\n\nIjrosini ta’minlash {{position}} zimmasiga yuklatilsin.\n\nIshtirokchi: ____________ {{person}}",
+    "{{org}}, {{place}}, {{date}}\n\nЕдинственный участник общества {{person}} решил(а):\n\n{{ask}}\n\nИсполнение возложить на: {{position}}.\n\nУчастник: ____________ {{person}}")),
+ T("bz_talab", "biznes shartnoma", ("Pretenziya (talabnoma)", "Претензия"), (["{{other}}ga, {{otherAddr}}", "{{client}}dan"], ["{{other}}, {{otherAddr}}", "от {{client}}"]), ("TALABNOMA", "ПРЕТЕНЗИЯ"),
+   ("{{decision}} shartnomasi bo‘yicha majburiyat bajarilmagan: {{facts}}\n\nQarzdorlik {{sum}} so‘m. Hisob-kitob: {{grounds}}\n\nQarzni {{term}} ichida to‘lashingizni so‘raymiz. Aks holda iqtisodiy sudga murojaat qilinadi, sud xarajatlari Sizning hisobingizdan undirilishi so‘raladi.",
+    "По договору {{decision}} не исполнено обязательство: {{facts}}\n\nЗадолженность {{sum}} сум. Расчёт: {{grounds}}\n\nПросим погасить долг в течение {{term}}. Иначе обратимся в экономический суд с требованием взыскать и судебные расходы.")),
+ T("bz_solish", "biznes shartnoma", ("O‘zaro hisob-kitob solishtirma dalolatnomasi", "Акт сверки взаиморасчётов"), ([], []), ("SOLISHTIRMA DALOLATNOMA", "АКТ СВЕРКИ"),
+   ("{{place}}, {{date}}\n\n{{client}} va {{other}} {{term}} davri uchun o‘zaro hisob-kitoblarni solishtirdilar.\n\n{{docs}}\n\n{{date}} holatiga qoldiq: {{sum}} so‘m, kimning foydasiga: {{ask}}\n\nImzolar: ____________ {{client}}    ____________ {{other}}",
+    "{{place}}, {{date}}\n\n{{client}} и {{other}} сверили взаимные расчёты за период {{term}}.\n\n{{docs}}\n\nСальдо на {{date}}: {{sum}} сум, в пользу: {{ask}}\n\nПодписи: ____________ {{client}}    ____________ {{other}}")),
+ T("bz_buyruq", "biznes mehnat", ("Asosiy faoliyat bo‘yicha buyruq", "Приказ по основной деятельности"), ([], []), ("BUYRUQ", "ПРИКАЗ"),
+   ("{{org}}, {{date}}, № {{number}}\n\n{{subject}} to‘g‘risida\n\n{{facts}}\n\nBUYURAMAN:\n\n{{ask}}\n\nBuyruq ijrosini nazorat qilish {{person}} zimmasiga yuklatilsin.\n\nRahbar: ____________",
+    "{{org}}, {{date}}, № {{number}}\n\nО: {{subject}}\n\n{{facts}}\n\nПРИКАЗЫВАЮ:\n\n{{ask}}\n\nКонтроль за исполнением возложить на {{person}}.\n\nРуководитель: ____________")),
+ # Shartnoma
+ T("sh_xizmat", "shartnoma biznes", ("Haq evaziga xizmat ko‘rsatish shartnomasi", "Договор возмездного оказания услуг"), ([], []), ("HAQ EVAZIGA XIZMAT KO‘RSATISH SHARTNOMASI", "ДОГОВОР ВОЗМЕЗДНОГО ОКАЗАНИЯ УСЛУГ"),
+   ("{{place}}, {{date}}\n\nIjrochi {{client}} va buyurtmachi {{other}} shartnoma tuzdilar.\n\n1. Predmet: {{subject}}. Xizmat tavsifi va natijasi: {{facts}}\n\n2. Narx {{sum}} so‘m. To‘lov tartibi: {{grounds}}\n\n3. Muddat: {{term}}. Xizmat dalolatnoma bilan qabul qilinadi.\n\n4. Javobgarlik, fors-major va maxfiylik: {{ask}}\n\n5. Nizolar talabnoma tartibida, so‘ng sudda hal etiladi.\n\nImzolar: ____________ {{client}}    ____________ {{other}}",
+    "{{place}}, {{date}}\n\nИсполнитель {{client}} и заказчик {{other}} заключили договор.\n\n1. Предмет: {{subject}}. Описание и результат услуги: {{facts}}\n\n2. Цена {{sum}} сум. Порядок оплаты: {{grounds}}\n\n3. Срок: {{term}}. Услуга принимается по акту.\n\n4. Ответственность, форс-мажор и конфиденциальность: {{ask}}\n\n5. Споры решаются в претензионном порядке, затем в суде.\n\nПодписи: ____________ {{client}}    ____________ {{other}}")),
+ T("sh_kelishmov", "shartnoma biznes", ("Kelishmovchiliklar bayonnomasi", "Протокол разногласий"), ([], []), ("KELISHMOVCHILIKLAR BAYONNOMASI", "ПРОТОКОЛ РАЗНОГЛАСИЙ"),
+   ("{{decision}} shartnomasiga, {{date}}\n\n{{client}} va {{other}} o‘rtasida.\n\nShartnoma bandi tahriri: {{facts}}\n\nTaklif etilayotgan tahrir: {{ask}}\n\nAsos: {{grounds}}\n\nImzolar: ____________ {{client}}    ____________ {{other}}",
+    "К договору {{decision}}, {{date}}\n\nМежду {{client}} и {{other}}.\n\nРедакция пункта договора: {{facts}}\n\nПредлагаемая редакция: {{ask}}\n\nОбоснование: {{grounds}}\n\nПодписи: ____________ {{client}}    ____________ {{other}}")),
+ T("sh_bekor", "shartnoma biznes ijara", ("Shartnomani bekor qilish xabarnomasi", "Уведомление о расторжении договора"), (["{{other}}ga, {{otherAddr}}", "{{client}}dan"], ["{{other}}, {{otherAddr}}", "от {{client}}"]), ("SHARTNOMANI BEKOR QILISH TO‘G‘RISIDA XABARNOMA", "УВЕДОМЛЕНИЕ О РАСТОРЖЕНИИ ДОГОВОРА"),
+   ("{{decision}} shartnomasini {{date}} dan bekor qilish haqida xabar beramiz.\n\nAsoslar: {{grounds}}\n\nYakuniy hisob-kitob: {{ask}}\n\nJavobingizni {{term}} ichida yuborishingizni so‘raymiz.",
+    "Уведомляем о расторжении договора {{decision}} с {{date}}.\n\nОснования: {{grounds}}\n\nОкончательный расчёт: {{ask}}\n\nПросим ответить в течение {{term}}.")),
+ # Meros
+ T("mr_qabul", "meros", ("Merosni qabul qilish arizasi (notariusga)", "Заявление о принятии наследства (нотариусу)"), (["Notarius {{org}}ga", "{{client}}dan, {{clientAddr}}"], ["Нотариусу {{org}}", "от {{client}}, {{clientAddr}}"]), ("MEROSNI QABUL QILISH TO‘G‘RISIDA ARIZA", "ЗАЯВЛЕНИЕ О ПРИНЯТИИ НАСЛЕДСТВА"),
+   ("{{date}} kuni {{person}} vafot etdi. Men uning merosxo‘riman: {{grounds}}\n\nMeros tarkibi: {{object}}. Boshqa merosxo‘rlar: {{other}}.\n\nMerosni qabul qilaman va merosga bo‘lgan huquq to‘g‘risida guvohnoma berishingizni so‘rayman.\n\nIlova: vafot etganlik guvohnomasi, qarindoshlikni tasdiqlovchi hujjatlar, mulk hujjatlari.",
+    "{{date}} умер(ла) {{person}}. Я являюсь наследником: {{grounds}}\n\nСостав наследства: {{object}}. Другие наследники: {{other}}.\n\nПринимаю наследство и прошу выдать свидетельство о праве на наследство.\n\nПриложение: свидетельство о смерти, документы о родстве, документы на имущество.")),
+ T("mr_muddat", "meros", ("Merosni qabul qilish muddatini tiklash da’vosi", "Иск о восстановлении срока принятия наследства"), ([COURT_UZ, "da’vogar: {{client}}, {{clientAddr}}", "javobgar: {{other}}, {{otherAddr}}"], [COURT_RU, "истец: {{client}}, {{clientAddr}}", "ответчик: {{other}}, {{otherAddr}}"]), ("DA’VO ARIZASI", "ИСКОВОЕ ЗАЯВЛЕНИЕ"),
+   ("{{date}} kuni {{person}} vafot etdi. Meros: {{object}}.\n\nMuddat quyidagi uzrli sabablarga ko‘ra o‘tkazib yuborilgan: {{grounds}}\n\n{{facts}}\n\nSo‘rayman: merosni qabul qilish muddati tiklansin va merosni qabul qilgan deb topilsin.",
+    "{{date}} умер(ла) {{person}}. Наследство: {{object}}.\n\nСрок пропущен по следующим уважительным причинам: {{grounds}}\n\n{{facts}}\n\nПрошу восстановить срок принятия наследства и признать принявшим наследство.")),
+ T("mr_bolish", "meros", ("Merosni bo‘lish to‘g‘risida bitim", "Соглашение о разделе наследства"), ([], []), ("MEROSNI BO‘LISH TO‘G‘RISIDA BITIM", "СОГЛАШЕНИЕ О РАЗДЕЛЕ НАСЛЕДСТВА"),
+   ("{{place}}, {{date}}\n\nMerosxo‘rlar {{client}} va {{other}} {{person}}dan qolgan merosni ({{object}}) quyidagicha bo‘lishga kelishdilar:\n\n{{ask}}\n\nBitim notarial tartibda rasmiylashtiriladi (qonunda talab qilingan hollarda).\n\nImzolar: ____________ {{client}}    ____________ {{other}}",
+    "{{place}}, {{date}}\n\nНаследники {{client}} и {{other}} договорились разделить наследство {{person}} ({{object}}) следующим образом:\n\n{{ask}}\n\nСоглашение оформляется нотариально (в случаях, требуемых законом).\n\nПодписи: ____________ {{client}}    ____________ {{other}}")),
+ # Yer
+ T("y_hokim", "yer davlat", ("Hokim qarorini haqiqiy emas deb topish arizasi", "Заявление о признании решения хокима недействительным"), ([COURT_UZ, "arizachi: {{client}}, {{clientAddr}}", "javobgar: {{other}}, {{otherAddr}}"], [COURT_RU, "заявитель: {{client}}, {{clientAddr}}", "ответчик: {{other}}, {{otherAddr}}"]), ("QARORNI HAQIQIY EMAS DEB TOPISH TO‘G‘RISIDA ARIZA", "ЗАЯВЛЕНИЕ О ПРИЗНАНИИ РЕШЕНИЯ НЕДЕЙСТВИТЕЛЬНЫМ"),
+   ("{{decision}} {{object}} yuzasidan qabul qilingan.\n\n{{facts}}\n\nQarorning qonunga xilofligi va huquqlar buzilishi: {{grounds}}\n\nSo‘rayman: {{ask}}\n\nIlova: {{docs}}",
+    "{{decision}} принято в отношении {{object}}.\n\n{{facts}}\n\nНезаконность решения и нарушение прав: {{grounds}}\n\nПрошу: {{ask}}\n\nПриложение: {{docs}}")),
+ T("y_chegara", "yer", ("Yer chegarasini belgilash da’vosi", "Иск об установлении границ участка"), ([COURT_UZ, "da’vogar: {{client}}, {{clientAddr}}", "javobgar: {{other}}, {{otherAddr}}"], [COURT_RU, "истец: {{client}}, {{clientAddr}}", "ответчик: {{other}}, {{otherAddr}}"]), ("DA’VO ARIZASI", "ИСКОВОЕ ЗАЯВЛЕНИЕ"),
+   ("{{client}}ga {{object}} yer uchastkasi tegishli. Javobgar chegarani buzgan: {{facts}}\n\nKadastr hujjatlari va dalillar: {{grounds}}\n\nSo‘rayman: {{ask}}",
+    "{{client}} принадлежит участок {{object}}. Ответчик нарушил границу: {{facts}}\n\nКадастровые документы и доказательства: {{grounds}}\n\nПрошу: {{ask}}")),
+]
+
+# Yangi ish ochilganda qo‘yiladigan ish ro‘yxati (tartib bo‘yicha; muddat va moddasiz)
+COMMON = [("Manfaatlar to‘qnashuvini tekshirish, bitim va order", "Проверить конфликт интересов, соглашение и ордер"), ("Muddatlarni aniqlash va kalendarga kiritish", "Определить сроки и внести в календарь")]
+CHECK = {
+ "mehnat": [("Mehnat shartnomasi, buyruqlar va ish haqi hujjatlarini yig‘ish", "Собрать трудовой договор, приказы, документы по зарплате"), ("Ish beruvchiga talabnoma yuborish", "Направить требование работодателю"), ("Mehnat inspeksiyasi va mediatsiya imkonini baholash", "Оценить обращение в инспекцию и медиацию")],
+ "istemol": [("Chek, kafolat va yozishmalarni yig‘ish", "Собрать чек, гарантию и переписку"), ("Sotuvchiga talabnoma", "Претензия продавцу"), ("Ekspertiza zarurligini baholash", "Оценить необходимость экспертизы")],
+ "oila": [("Nikoh va bolalar hujjatlarini olish", "Получить документы о браке и детях"), ("Mol-mulk va daromad ro‘yxati", "Список имущества и доходов"), ("Bolalar bo‘yicha kelishuv loyihasi", "Проект соглашения о детях")],
+ "ijara": [("Shartnoma, to‘lov va holat dalillari", "Договор, платежи, доказательства состояния"), ("Ikkinchi tomonga talabnoma", "Претензия второй стороне"), ("Mediatsiya taklifi", "Предложение медиации")],
+ "kommunal": [("Hisob-faktura va hisoblagich ma’lumotlari", "Счета и показания счётчика"), ("Solishtirma dalolatnoma so‘rash", "Запросить акт сверки"), ("Nazorat organiga murojaat", "Обращение в контролирующий орган")],
+ "bank": [("Shartnoma, ko‘chirma va to‘lov tarixi", "Договор, выписка, история платежей"), ("Bankka yozma murojaat", "Письменное обращение в банк"), ("Markaziy bankka shikoyat zarurligini baholash", "Оценить жалобу в Центральный банк")],
+ "transport": [("Protokol, sxema va video dalillar", "Протокол, схема, видео"), ("Sug‘urta polisi va baholash hisoboti", "Полис и отчёт об оценке"), ("Shikoyat yoki talabnoma tayyorlash", "Подготовить жалобу или претензию")],
+ "nafaqa": [("Staj va ish haqi hujjatlari", "Документы о стаже и заработке"), ("Rad javobini yozma olish", "Получить письменный отказ"), ("Yuqori organ yoki sudga shikoyat", "Жалоба в вышестоящий орган или суд")],
+ "davlat": [("Murojaat va javob nusxalari", "Копии обращения и ответа"), ("Ma’muriy shikoyat yo‘lini baholash", "Оценить административную жалобу"), ("Sud uchun dalillar", "Доказательства для суда")],
+ "jarima": [("Qaror va protokol nusxasi", "Копия постановления и протокола"), ("Ish materiallari bilan tanishish", "Ознакомиться с материалами"), ("Shikoyat tayyorlash", "Подготовить жалобу")],
+ "migrant": [("Shartnoma va to‘lov dalillari", "Договор и доказательства оплаты"), ("Agentlik litsenziyasini tekshirish", "Проверить лицензию агентства"), ("Elchixona yoki vakolatxonaga murojaat", "Обратиться в посольство или представительство")],
+ "fuqarolik": [("Tilxat, o‘tkazma va yozishmalar", "Расписка, переводы, переписка"), ("Talabnoma yuborish", "Направить претензию"), ("Da’voni ta’minlash zarurligini baholash", "Оценить обеспечение иска")],
+ "jinoyat": [("Himoyaga kirish va uchrashuv", "Вступить в дело и провести свидание"), ("Protsessual hujjatlar bilan tanishish", "Ознакомиться с процессуальными документами"), ("Iltimosnomalar rejasi va dalillar", "План ходатайств и доказательства"), ("Ehtiyot chorasini o‘zgartirish masalasi", "Вопрос об изменении меры пресечения")],
+ "soliq": [("Dalolatnoma, deklaratsiya va birlamchi hujjatlar", "Акт, декларации, первичные документы"), ("E’tiroz tayyorlash", "Подготовить возражения"), ("Yuqori organ yoki sudga shikoyat", "Жалоба в вышестоящий орган или суд")],
+ "biznes": [("Ustav, ta’sis hujjatlari va vakolatlar", "Устав, учредительные документы, полномочия"), ("Shartnoma va to‘lovlar tahlili", "Анализ договоров и платежей"), ("Talabnoma va solishtirma dalolatnoma", "Претензия и акт сверки")],
+ "shartnoma": [("Tomonlar vakolati va rekvizitlari", "Полномочия и реквизиты сторон"), ("Xavfli shartlar ro‘yxati", "Перечень рисковых условий"), ("Kelishmovchiliklar bayonnomasi", "Протокол разногласий")],
+ "meros": [("Vafot va qarindoshlik hujjatlari", "Документы о смерти и родстве"), ("Meros tarkibi va qarzlar", "Состав наследства и долги"), ("Notariusga murojaat", "Обращение к нотариусу")],
+ "yer": [("Kadastr hujjatlari va qarorlar", "Кадастровые документы и решения"), ("Joyni ko‘rik va o‘lchash", "Осмотр и замер участка"), ("Sudgacha hal qilish imkoni", "Возможность досудебного урегулирования")],
+}
+
+def areas_of(s): return AREAS if s.strip() == "*" else s.split()
+def build():
+    ids = set(); acts = []
+    for lid, typ, uz, ru, num, date, ar in ACTS:
+        assert lid not in ids, lid; ids.add(lid)
+        assert typ in {t[0] for t in TYPES} and (not date or re.fullmatch(r"\d{4}-\d\d-\d\d", date)), lid
+        assert set(areas_of(ar)) <= set(AREAS), (lid, ar)
+        acts.append({"id": f"lex{lid}", "type": typ, "t": [uz, ru], "num": num, "date": date, "url": f"https://lex.uz/docs/{lid}", "areas": areas_of(ar), "common": ar.strip() == "*"})
+    tpls = []
+    for t in TEMPLATES:
+        ar = areas_of(t["areas"]); assert set(ar) <= set(AREAS), t["id"]
+        keys = [set(re.findall(r"\{\{(\w+)\}\}", "\n".join([t["text"][i], *t["to"][i]]))) for i in (0, 1)]
+        assert keys[0] <= set(FIELDS) and keys[0] == keys[1], (t["id"], keys[0] ^ keys[1])
+        order = list(dict.fromkeys(re.findall(r"\{\{(\w+)\}\}", "\n".join([*t["to"][0], t["text"][0]]))))
+        tpls.append({"id": t["id"], "areas": ar, "common": t["areas"].strip() == "*", "name": list(t["name"]), "title": list(t["title"]), "to": [list(x) for x in t["to"]], "text": list(t["text"]), "fields": order})
+    assert len({t["id"] for t in tpls}) == len(tpls) and set(CHECK) == set(AREAS)
+    return {"checked": CHECKED, "areas": AREAS, "types": [{"id": a, "t": [b, c]} for a, b, c in TYPES], "acts": acts, "templates": tpls,
+            "fields": {k: {"t": [v[0], v[1]], "type": v[2], "src": v[3]} for k, v in FIELDS.items()},
+            "checklists": {a: [list(x) for x in COMMON + CHECK[a]] for a in AREAS}}
