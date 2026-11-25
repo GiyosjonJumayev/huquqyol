@@ -15,7 +15,8 @@ import { attachUser, register, login, logout, changePassword } from "./auth.js";
 import { accessMiddleware, HOME, navFor, roleOf } from "./access.js";
 import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue } from "./market.js";
 import { loginPage, registerPage, accountPage, adminPage, applyPage, forbiddenPage } from "./accountPages.js";
-import { proStatus, myProfile, saveProfile, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
+import { proStatus, myProfile, saveProfile, saveAreas, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
+import { getPractice, practiceCounts, customActs } from "./practice.js";
 import { lawyerPanel, profileEditPage, lawyerStatsPage } from "./lawyerPages.js";
 
 // PostgreSQL (DATABASE_URL bo‘lsa): hisoblar, obunalar, kelishuvlar. Migratsiyalar start() da qo‘llanadi.
@@ -176,6 +177,8 @@ app.post("/api/consultations/:id/:act", needDb, rateLimit({ max: 60, name:"consa
 app.post("/api/admin/:kind/:id/:act", needDb, wrap(adminAct));
 // Yurist profili va Pro kabineti
 app.post("/api/lawyer/profile", needDb, rateLimit({ max: 30, name:"lprof" }), wrap(saveProfile));
+app.post("/api/lawyer/areas", needDb, rateLimit({ max: 60, name:"lareas" }), wrap(saveAreas));
+app.get("/api/practice", needDb, wrap(getPractice));
 app.get("/api/cabinet", needDb, wrap(getCabinet));
 
 // Anonim statistika: faqat yig‘ma sanoqlar (holat → soha)
@@ -188,8 +191,8 @@ app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFo
 // Fayl nomiga kontent xeshi (?v=...) qo‘shiladi: brauzer faylni bir yil keshlaydi, yangi versiyada URL o‘zgaradi.
 const PUBLIC = join(here, "..", "public");
 const hashOf = f => createHash("sha256").update(readFileSync(join(PUBLIC, f))).digest("hex").slice(0, 10);
-const ASSETS = ["app.css", "boot.js", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
-const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "account.js"];
+const ASSETS = ["app.css", "boot.js", "app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "practice.js", "cropper.js", "account.js", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png"];
+const MODULES = ["app.js", "shared.js", "translit.js", "i18n.js", "a11y.js", "session.js", "courts.js", "kabinet.js", "practice.js", "cropper.js", "account.js"];
 const VER = Object.fromEntries(ASSETS.map(f => [f, hashOf(f)]));
 // Service worker keshi har yangi relizda avtomatik almashadi: versiya — barcha resurslar xeshidan
 const BUILD = createHash("sha256").update(Object.values(VER).join("") + hashOf("index.html")).digest("hex").slice(0, 12);
@@ -278,19 +281,19 @@ app.get("/hisob", bizPage(async a => {
   let panel = "";
   if (a.user.role === "lawyer"){
     const [profile, pro] = await Promise.all([myProfile(a.user.id), proStatus(a.user.id)]);
-    panel = lawyerPanel({ ...a, profile, pro, stats: profile ? await lawyerStats(profile.id) : null,
+    panel = lawyerPanel({ ...a, profile, pro, counts: practiceCounts(a.lang, await customActs()), stats: profile ? await lawyerStats(profile.id) : null,
       pendingSub: subs.some(s => s.status === "pending" && s.plan === "pro") });
   }
   const application = a.user.role === "citizen" ? await myProfile(a.user.id) : null;      // «Yurist bo‘lish» arizasi holati
   return accountPage({ ...a, subs, cons: await consultationsFor(a.user), panel, application });
 }));
 app.get("/yurist-bolish", bizPage(async a => applyPage({ ...a, application: await myProfile(a.user.id) })));
-app.get("/hisob/profil", bizPage(async a => profileEditPage({ ...a, profile: await myProfile(a.user.id) })));
+app.get("/hisob/profil", bizPage(async a => profileEditPage({ ...a, profile: await myProfile(a.user.id), counts: practiceCounts(a.lang, await customActs()) })));
 app.get("/hisob/statistika", bizPage(async a => {
   const profile = await myProfile(a.user.id);
   return lawyerStatsPage({ ...a, profile, stats: profile ? await lawyerStats(profile.id) : null });
 }));
-app.get("/admin", bizPage(async a => adminPage({ ...a, a: await adminStats(), s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), photos: await photoQueue() })));
+app.get("/admin", bizPage(async a => adminPage({ ...a, a: await adminStats(), s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), photos: await photoQueue(), acts: await customActs() })));
 
 // JS modullari ichidagi importlar ham versiyalanadi
 const rewriteImports = src => MODULES.reduce((h, f) => h.replaceAll(`"/${f}"`, `"/${f}?v=${VER[f]}"`).replaceAll(`"./${f}"`, `"/${f}?v=${VER[f]}"`), src);

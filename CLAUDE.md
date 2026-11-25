@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (154 tests; 4 DB tests skip without TEST_DATABASE_URL)
+npm test                 # node:test, must stay green (162 tests; 5 DB tests skip without TEST_DATABASE_URL)
 npm run test:e2e         # 15 browser tests incl. axe and navbar overlap per role; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
@@ -56,6 +56,11 @@ become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, 
   added to the matrix — `test/access.test.js` fails otherwise. The navbar only hides links (`navFor(role)`, `/api/me.nav`). `server/accountPages.js` — login, register, «Hisobim», admin dashboard.
 - Lawyers: `server/market.js` (catalog, consultations → agreement model, commission), `server/lawyer.js` (profile, photo,
   stats), `server/lawyerPages.js` (profile editor, lawyer stats). Catalog lists Pro lawyers + `demo:true` sample profiles.
+- Practice areas («Yo‘nalishim», `/kabinet#yonalish`): `scripts/kb_practice.py` → `server/kb/practice.json` (acts with lex.uz id, number, date;
+  pro document templates uz+ru with `{{key}}` fields; checklists) + admin-added acts (`practice_acts`, `/admin?b=baza`, official URLs only).
+  `server/practice.js` (`GET /api/practice`, counts), `public/practice.js` (dynamic UI, autofill, live preview), `POST /api/lawyer/areas`.
+  New acts: check title, number, date and «amalda» status on lex.uz first; templates must not contain article numbers.
+- Lawyer photo: `public/cropper.js` (drag/zoom/rotate → 480 px JPEG); works before the profile is filled (draft profile: empty phone, not in moderation).
 - Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Tashkilot). No payment gateway: admin confirms payment manually in `/admin`.
 - Courts by district: `server/kb/courts.json` (+ `public/courts.js`, `GET /api/courts`).
 - Photo/PDF reading: `server/photo.js` + `server/ocr.js` (Tesseract, no AI needed) + `server/docparse.js` (rules);

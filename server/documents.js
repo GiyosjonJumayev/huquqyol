@@ -115,15 +115,16 @@ export function documentModel({ scenario, recipient, form = {}, evidence = [], t
 const headBlock = lines => ({ t:"head", lines: lines.map(l => [{ v: l }]) });
 
 // Yurist Pro: o‘z shabloni — erkin matn (bo‘sh qator — yangi xatboshi), blanka, sana va imzo
-export function customModel({ title = "", text, letterhead = [], today = new Date(), lang = "uz" }){
+export function customModel({ title = "", text, letterhead = [], to = [], sign = true, today = new Date(), lang = "uz" }){
   const W = DOC[lang === "ru" ? "ru" : "uz"], B = [];
   if (letterhead.length) B.push(headBlock(letterhead));
+  if (to.length) B.push({ t:"addr", lines: to.map(l => [{ v: l }]) });
   if (title) B.push({ t:"title", text: title });
   for (const para of text.split(/\n{2,}/)){
     const lines = para.split("\n").map(s => s.trim()).filter(Boolean);
     if (lines.length) B.push({ t:"p", parts:[{ v: lines.join(" ") }] });
   }
-  B.push({ t:"sign", left: fmtDate(startOfDay(today), lang === "ru" ? "ru" : "uz"), right:[{ v: W.sign }] });
+  if (sign) B.push({ t:"sign", left: fmtDate(startOfDay(today), lang === "ru" ? "ru" : "uz"), right:[{ v: W.sign }] });
   return { scenario: null, recipient: "custom", lang, blocks: B, missing: [] };
 }
 

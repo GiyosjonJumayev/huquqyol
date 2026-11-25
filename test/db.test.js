@@ -245,3 +245,43 @@ test("Kirish huquqlari: har bir rol × har bir sahifa va API (200 / 303 / 401 / 
   assert.equal((await actors.citizen.post("/api/auth/logout")).status, 200);
   assert.equal((await actors.citizen.get("/hisob")).status, 303);
 });
+
+test("Yo‘nalish: profilsiz rasm va soha, /api/practice, admin bazasi — darhol ko‘rinadi", opts, async () => {
+  const lw = client(), admin = client();
+  await reg(lw, { name: "Yangi Yurist", email: "yangi@test.uz", role: "lawyer" });
+  await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Parol1234" });
+  const prof = () => db.one("select * from lawyer_profiles where user_id = (select id from users where email = 'yangi@test.uz')");
+  // Profil to‘ldirilmagan: rasm va yo‘nalish baribir saqlanadi, moderatsiya navbatiga tushmaydi
+  const png = Buffer.concat([Buffer.from("89504E470D0A1A0A", "hex"), Buffer.alloc(300)]).toString("base64");
+  assert.equal((await lw.post("/api/lawyer/photo", { data: "data:image/png;base64," + png })).status, 200);
+  assert.deepEqual((await (await lw.post("/api/lawyer/areas", { areas: ["soliq", "yoq", "meros"] })).json()).areas, ["soliq", "meros"]);
+  assert.equal((await lw.post("/api/lawyer/areas", { areas: "soliq" })).status, 400);
+  const p = await prof();
+  assert.ok(p.photo && p.phone === "");
+  assert.ok(!(await (await admin.get("/admin?b=yurist")).text()).includes(`/api/admin/lawyer/${p.id}/approve`));
+  const home = await (await lw.get("/hisob")).text();
+  assert.match(home, /Profil to‘ldirilmagan/);
+  assert.match(home, /kabinet#yonalish/);
+  // Baza: tanlangan sohalar va profil
+  const d = await (await lw.get("/api/practice")).json();
+  assert.deepEqual(d.mine, ["soliq", "meros"]);
+  assert.equal(d.profile.name, "Yangi Yurist");
+  assert.ok(d.acts.some(a => a.type === "buyruq" && a.areas.includes("meros")));
+  // Profil muharririda jonli ko‘rinish ma’lumoti
+  const edit = await (await lw.get("/hisob/profil")).text();
+  assert.equal(JSON.parse(/id="practice-data">(.*?)<\/script>/s.exec(edit)[1]).areas.soliq.law >= 2, true);
+  // Admin hujjat qo‘shadi → yuristda darhol ko‘rinadi; o‘chirilsa — yo‘qoladi
+  const act = { type: "buyruq", titleUz: "Sinov buyrug‘i", titleRu: "Тестовый приказ", num: "77", date: "2026-10-01", url: "https://lex.uz/docs/99999999", areas: ["soliq"] };
+  assert.equal((await admin.post("/api/admin/practice/0/add", { ...act, url: "https://example.com/" })).status, 400);
+  assert.equal((await admin.post("/api/admin/practice/0/add", act)).status, 200);
+  assert.equal((await admin.post("/api/admin/practice/0/add", act)).status, 409);
+  const one = (await (await lw.get("/api/practice")).json()).acts[0];
+  assert.equal(one.title, "Sinov buyrug‘i"); assert.equal(one.date, "2026-10-01"); assert.equal(one.custom, true);
+  assert.match(await (await admin.get("/admin?b=baza")).text(), /Sinov buyrug‘i/);
+  assert.equal((await admin.post(`/api/admin/practice/${one.id.slice(1)}/remove`)).status, 200);
+  assert.ok(!(await (await lw.get("/api/practice")).json()).acts.some(a => a.custom));
+  // Qoralama profil to‘ldirilganda moderatsiyaga tushadi
+  const r = await (await lw.post("/api/lawyer/profile", { name: "Yangi Yurist", phone: "+998 90 000 11 22", areas: ["soliq"], kind: "yurist" })).json();
+  assert.equal(r.recheck, true);
+  assert.ok((await (await admin.get("/admin?b=yurist")).text()).includes(`/api/admin/lawyer/${p.id}/approve`));
+});

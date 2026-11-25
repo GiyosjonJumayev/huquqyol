@@ -6,6 +6,7 @@ import { q, one } from "./db.js";
 import { clean, ValidationError } from "./validate.js";
 import { areaList } from "./business.js";
 import { COURTS } from "./kb.js";
+import { cleanAreas } from "./practice.js";
 
 const err = (key, status = 400, vars) => Object.assign(new ValidationError(key, vars), { status });
 const int = (v, min, max) => { const n = Math.round(Number(String(v ?? "").replace(/[^\d]/g, ""))); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min; };
@@ -24,8 +25,20 @@ export const requirePro = async (req, res, next) => {
 };
 
 // ---------- Profil ----------
-const FIELDS = "id, user_id, status, kind, name, firm, license, license_issuer, region, district, address, hours, phone, email, telegram, website, areas, formats, langs, experience, price, headline, about, education, achievements, services, photo_at, review_note, reviewed_at, created_at, updated_at";
+const FIELDS = "id, user_id, status, kind, name, firm, license, license_issuer, region, district, address, hours, phone, email, telegram, website, areas, formats, langs, experience, price, headline, about, education, achievements, services, photo_at, photo_reviewed_at, review_note, reviewed_at, created_at, updated_at";
 export const myProfile = userId => one(`select ${FIELDS} from lawyer_profiles where user_id = $1`, [userId]);
+// Rasm yoki yo‘nalish profil to‘ldirilishidan oldin tanlansa — qoralama profil (telefonsiz): moderatsiya navbatiga tushmaydi
+export async function ensureProfile(user){
+  await q("insert into lawyer_profiles(user_id, name, phone) values ($1, $2, '') on conflict (user_id) do nothing", [user.id, user.name]);
+  return myProfile(user.id);
+}
+// Yo‘nalishlar (kabinetdagi tugmalar): moderatsiyani talab qilmaydi — darhol saqlanadi
+export async function saveAreas(req, res){
+  if (!Array.isArray(req.body?.areas)) throw err("badJson");
+  const areas = cleanAreas(req.body.areas), p = await ensureProfile(req.user);
+  await q("update lawyer_profiles set areas = $2, updated_at = now() where id = $1", [p.id, areas]);
+  res.json({ ok: true, areas });
+}
 
 const KINDS = ["advokat", "yurist", "firma", "mediator"];
 export function vProfile(b){
@@ -55,7 +68,7 @@ export function vProfile(b){
 // Ism, turi va litsenziya — moderator tekshiradigan maydonlar: o‘zgarsa profil qayta moderatsiyaga tushadi
 export async function saveProfile(req, res){
   const v = vProfile(req.body), cur = await myProfile(req.user.id);
-  const recheck = !cur || cur.status === "rejected" || cur.name !== v.name || cur.kind !== v.kind || (cur.license || "") !== v.license;
+  const recheck = !cur || !cur.phone || cur.status === "rejected" || cur.name !== v.name || cur.kind !== v.kind || (cur.license || "") !== v.license;
   const cols = ["kind", "name", "firm", "license", "license_issuer", "region", "district", "address", "hours", "phone", "email", "telegram", "website",
     "areas", "formats", "langs", "experience", "price", "headline", "about", "education", "achievements", "services"];
   const vals = cols.map(c => c === "services" ? JSON.stringify(v[c]) : v[c]);
@@ -73,15 +86,14 @@ export async function saveProfile(req, res){
 const SIG = [["image/jpeg", b => b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF], ["image/png", b => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]))],
   ["image/webp", b => b.subarray(0, 4).toString("latin1") === "RIFF" && b.subarray(8, 12).toString("latin1") === "WEBP"]];
 export async function savePhoto(req, res){
-  const cur = await myProfile(req.user.id);
-  if (!cur) throw err("profileFirst");
-  if (req.body?.remove === true){ await q("update lawyer_profiles set photo = null, photo_type = null, photo_at = null where id = $1", [cur.id]); return res.json({ ok: true }); }
+  if (req.body?.remove === true){ const cur = await myProfile(req.user.id); if (!cur) throw err("profileFirst"); await q("update lawyer_profiles set photo = null, photo_type = null, photo_at = null where id = $1", [cur.id]); return res.json({ ok: true }); }
   const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(req.body?.data || ""));
   if (!m) throw err("photoType");
   const buf = Buffer.from(m[2], "base64");
   if (buf.length < 100 || buf.length > 512 * 1024) throw err("photoSize");
   const type = SIG.find(([, ok]) => ok(buf))?.[0];
   if (!type) throw err("photoType");
+  const cur = await ensureProfile(req.user);
   await q("update lawyer_profiles set photo = $2, photo_type = $3, photo_at = now() where id = $1", [cur.id, buf, type]);
   res.json({ ok: true, url: `/yuristlar/rasm/${cur.id}?v=${Date.now()}` });
 }

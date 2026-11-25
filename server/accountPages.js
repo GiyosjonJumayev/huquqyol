@@ -4,7 +4,8 @@ import { page, tr as btr, pick, areaList } from "./business.js";
 import { ADMIN_SECTIONS } from "./access.js";
 import { fmtSum, fmtDate } from "../public/i18n.js";
 import { toCyrillic } from "../public/translit.js";
-import { kbFor, COURTS } from "./kb.js";
+import { kbFor, COURTS, PRACTICE } from "./kb.js";
+import { actTypes } from "./practice.js";
 import { PRICES } from "./market.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -63,6 +64,10 @@ const T = {
   roles: ["Rollar bo‘yicha", "По ролям"], newUsers: ["Yangi foydalanuvchilar (oylar)", "Новые пользователи (по месяцам)"], recent: ["So‘nggi foydalanuvchilar", "Последние пользователи"],
   role: ["Rol", "Роль"], created: ["Ro‘yxatdan o‘tgan", "Зарегистрирован"], lastLogin: ["Oxirgi kirish", "Последний вход"], save: ["Saqlash", "Сохранить"],
   ro_citizen: ["Fuqaro", "Гражданин"], ro_lawyer: ["Yurist", "Юрист"], ro_org: ["Tashkilot", "Организация"], ro_admin: ["Admin", "Админ"], ro_moderator: ["Moderator", "Модератор"], ro_guest: ["Mehmon", "Гость"],
+  ad_baza: ["Huquqiy baza", "Правовая база"], bzTitle: ["Yo‘nalish bazasiga hujjat qo‘shish", "Добавить акт в базу направлений"],
+  bzLead: ["Qo‘shilgan hujjat shu yo‘nalishdagi yuristlarning kabinetida darhol paydo bo‘ladi. Faqat rasmiy havola (lex.uz, gov.uz, sud.uz).", "Добавленный акт сразу появится в кабинете юристов этого направления. Только официальная ссылка (lex.uz, gov.uz, sud.uz)."],
+  bzUz: ["Nomi (o‘zbekcha)", "Название (узб.)"], bzRu: ["Nomi (ruscha, ixtiyoriy)", "Название (рус., необязательно)"], bzType: ["Turi", "Тип"], bzNum: ["Raqami", "Номер"], bzDate: ["Sanasi", "Дата"], bzUrl: ["Havola", "Ссылка"], bzAreas: ["Yo‘nalishlar", "Направления"],
+  bzAdd: ["Bazaga qo‘shish", "Добавить в базу"], bzList: ["Qo‘lda qo‘shilganlar", "Добавленные вручную"], bzDel: ["O‘chirish", "Удалить"], bzBase: ["Asosiy bazada tekshirilgan hujjatlar: {n}", "Проверенных актов в основной базе: {n}"],
   ad_rasm: ["Rasmlar", "Фото"], ad_parol: ["Parol", "Пароль"],
   photoQueue: ["Tekshirilmagan rasmlar", "Непроверенные фото"], photoLead: ["Yuristlar katalog uchun yuklagan rasmlar. Rasmda odamning yuzi bo‘lishi kerak; reklama va nomaqbul tasvir bo‘lmasligi kerak.", "Фото, загруженные юристами для каталога. На фото должно быть лицо человека, без рекламы и недопустимых изображений."],
   photoOk: ["Tasdiqlash", "Одобрить"], photoDel: ["Rasmni o‘chirish", "Удалить фото"], photoOf: ["{n} rasmi", "Фото: {n}"], uploaded: ["Yuklangan", "Загружено"],
@@ -228,7 +233,7 @@ const bar = (n, max) => `<svg class="hbar" width="100%" height="12" aria-hidden=
 const table = (head, rows, cls = "") => rows.length ? `<div class="tscroll" tabindex="0"><table class="${cls}"><thead><tr>${head.map(h => /^@/.test(h) ? `<th scope="col"><span class="sr">${esc(h.slice(1))}</span></th>` : `<th scope="col"${/^#/.test(h) ? ` class="numc"` : ""}>${esc(h.replace(/^#/, ""))}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>` : "";
 const tile = (v, label) => `<div class="stattile"><div class="stv">${v}</div><div class="stl">${esc(label)}</div></div>`;
 
-export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s, photos = [] }){
+export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s, photos = [], acts = [] }){
   const allowed = ADMIN_SECTIONS[user.role] || [];                 // moderator: faqat yurist arizalari va rasmlar (server/access.js)
   const t = L(lang), b = allowed.includes(query.b) ? query.b : allowed[0];
   const kb = kbFor(lang === "ru" ? "ru" : "uz"), cy = x => lang === "cyr" ? toCyrillic(x) : x;
@@ -291,6 +296,19 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s, photo
         <div><b>${esc(p.name)}</b> · ${esc(p.kind)} · ${esc(t("prof_" + p.status))}<br><span class="small muted">${esc(t("uploaded"))}: ${esc(date(p.photo_at, lang))}</span></div>
         <div class="rowbtn"><button class="btn primary" type="button" data-post="/api/admin/photo/${p.id}/approve">${esc(t("photoOk"))}</button><button class="btn ghost" type="button" data-post="/api/admin/photo/${p.id}/remove">${esc(t("photoDel"))}</button></div>${err}</li>`).join("")}</ul>`
       : `<p class="empty">${esc(t("none"))}</p>`}`;
+  else if (b === "baza"){
+    const areas = areaList(lang), title = id => areas.find(x => x.id === id)?.title || id, types = actTypes(lang);
+    body = `<form class="card kform" data-api="/api/admin/practice/0/add" data-next="/admin?b=baza"><h2>${esc(t("bzTitle"))}</h2><p class="muted">${esc(t("bzLead"))}</p>
+        ${field("bz_uz", t("bzUz"), `<input id="bz_uz" name="titleUz" required maxlength="300">`)}${field("bz_ru", t("bzRu"), `<input id="bz_ru" name="titleRu" maxlength="300">`)}
+        <div class="grid2">${field("bz_type", t("bzType"), `<select id="bz_type" name="type">${types.map(x => `<option value="${x.id}">${esc(x.title)}</option>`).join("")}</select>`)}
+        ${field("bz_num", t("bzNum"), `<input id="bz_num" name="num" maxlength="40">`)}${field("bz_date", t("bzDate"), `<input id="bz_date" name="date" type="date">`)}
+        ${field("bz_url", t("bzUrl"), `<input id="bz_url" name="url" type="url" required maxlength="300" placeholder="https://lex.uz/docs/…">`)}</div>
+        <fieldset class="kab"><legend>${esc(t("bzAreas"))}</legend><div class="checks">${areas.map(x => `<label class="check"><input type="checkbox" name="areas[]" value="${esc(x.id)}"> ${esc(x.title)}</label>`).join("")}</div></fieldset>
+        <button class="btn primary" type="submit">${esc(t("bzAdd"))}</button>${err}</form>
+      <h2 class="sec">${esc(t("bzList"))} (${acts.length})</h2><p class="small muted">${esc(t("bzBase", { n: PRACTICE.acts.length }))}</p>
+      ${acts.length ? `<ul class="klist">${acts.map(x => `<li><div><span class="tag">${esc(types.find(y => y.id === x.type)?.title || x.type)}</span> <b>${esc(lang === "ru" ? x.t[1] : cy(x.t[0]))}</b><br><span class="small muted">${[x.num && `№ ${x.num}`, x.date && date(x.date, lang), x.areas.map(title).join(", ")].filter(Boolean).map(esc).join(" · ")}</span><br><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.url.replace(/^https:\/\//, ""))} ↗</a></div>
+        <button class="btn ghost" type="button" data-post="/api/admin/practice/${x.dbId}/remove">${esc(t("bzDel"))}</button>${err}</li>`).join("")}</ul>` : `<p class="empty">${esc(t("none"))}</p>`}`;
+  }
   else if (b === "parol") body = `<h2 class="sec">${esc(t("security"))}</h2>${passwordForm(t)}`;
   else if (b === "users"){
     const roles = ["citizen", "lawyer", "org", "moderator", "admin"];

@@ -43,6 +43,8 @@ export const API = [
   { method: "POST", path: "/api/lawyers/apply",          roles: ["citizen"] },
   { method: "POST", path: "/api/lawyer/profile",         roles: ["lawyer"] },
   { method: "POST", path: "/api/lawyer/photo",           roles: ["lawyer"] },
+  { method: "POST", path: "/api/lawyer/areas",           roles: ["lawyer"] },
+  { method: "GET",  path: "/api/practice",               roles: ["lawyer", "org"], need: "pro" },
   { method: "GET",  path: "/api/cabinet",                roles: ["lawyer", "org"], need: "pro" },
   { method: "POST", path: "/api/cabinet",                roles: ["lawyer", "org"], need: "pro" },
   { method: "POST", path: "/api/admin/:kind/:id/:act",   roles: ["admin", "moderator"] }        // moderator — faqat ADMIN_ACTS.moderator
@@ -50,11 +52,11 @@ export const API = [
 
 // Admin paneli bo‘limlari va amallari: moderator — faqat yurist arizalari va rasm moderatsiyasi (to‘lov, daromad, rollar yo‘q)
 export const ADMIN_SECTIONS = {
-  admin: ["umumiy", "murojaat", "daromad", "obuna", "yurist", "rasm", "kelishuv", "users", "parol"],
+  admin: ["umumiy", "murojaat", "daromad", "obuna", "yurist", "rasm", "kelishuv", "baza", "users", "parol"],
   moderator: ["yurist", "rasm"]
 };
 export const ADMIN_ACTS = {
-  admin: ["lawyer", "photo", "payment", "subscription", "user"],
+  admin: ["lawyer", "photo", "payment", "subscription", "user", "practice"],
   moderator: ["lawyer", "photo"]
 };
 

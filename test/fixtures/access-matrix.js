@@ -18,6 +18,7 @@ export const PAGES = {
   "/admin?b=rasm":       row(403, { guest: 303, moderator: 200, admin: 200 }),
   "/admin?b=daromad":    row(403, { guest: 303, admin: 200 }),                                  // moderator: to‘lov va daromad yo‘q
   "/admin?b=users":      row(403, { guest: 303, admin: 200 }),                                  // moderator: rollar yo‘q
+  "/admin?b=baza":       row(403, { guest: 303, admin: 200 }),
   "/admin?b=umumiy":     row(403, { guest: 303, admin: 200 }),
   // Ochiq sahifalar
   "/":                   row(200), "/yuristlar": row(200), "/yuristlar/namuna-1": row(200), "/tariflar": row(200),
@@ -32,11 +33,14 @@ export const API = {
   "POST /api/lawyers/apply":          row(403, { guest: 401, citizen: "ok" }),
   "POST /api/lawyer/profile":         row(403, { guest: 401, lawyer: "ok", lawyerNoPro: "ok" }),
   "POST /api/lawyer/photo":           row(403, { guest: 401, lawyer: "ok", lawyerNoPro: "ok" }),
+  "POST /api/lawyer/areas":          row(403, { guest: 401, lawyer: "ok", lawyerNoPro: "ok" }),
+  "GET /api/practice":               row(403, { guest: 401, lawyer: "ok", lawyerNoPro: 402, org: "ok", orgNoPro: 402 }),
   "GET /api/cabinet":                 row(403, { guest: 401, lawyer: "ok", lawyerNoPro: 402, org: "ok", orgNoPro: 402 }),
   "POST /api/cabinet":                row(403, { guest: 401, lawyer: "ok", lawyerNoPro: 402, org: "ok", orgNoPro: 402 }),
   "POST /api/admin/lawyer/999999/approve":  row(403, { guest: 401, moderator: "ok", admin: "ok" }),
   "POST /api/admin/photo/999999/approve":   row(403, { guest: 401, moderator: "ok", admin: "ok" }),
   "POST /api/admin/payment/999999/confirm": row(403, { guest: 401, admin: "ok" }),
+  "POST /api/admin/practice/0/add":        row(403, { guest: 401, admin: "ok" }),
   "POST /api/admin/user/999999/role":       row(403, { guest: 401, admin: "ok" }),
   // Ochiq API
   "GET /api/me": row("ok"), "GET /api/health": row("ok"), "POST /api/analyze": row("ok"), "POST /api/auth/logout": row("ok")

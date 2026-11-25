@@ -8,6 +8,7 @@ import { q, one, tx, dbEnabled } from "./db.js";
 import { clean, ValidationError } from "./validate.js";
 import { areaList } from "./business.js";
 import { COURTS, kbFor } from "./kb.js";
+import { adminPractice } from "./practice.js";
 
 export const PRICES = { pro: 149000, firma: 490000, org: 0 };
 export const COMMISSION_PCT = Number(process.env.COMMISSION_PCT || 10);
@@ -141,6 +142,8 @@ export async function consultationsFor(user){
 // ---------- Admin ----------
 export async function adminAct(req, res){
   const { kind, act } = req.params, id = int(req.params.id, 1e12);
+  if (kind === "practice" && ["add", "remove"].includes(act)) await adminPractice(act, id, req);
+  else
   if (kind === "lawyer" && ["approve", "reject"].includes(act)){
     const r = await q(`update lawyer_profiles set status = $2, reviewed_at = now(), reviewed_by = $3, review_note = $4 where id = $1`,
       [id, act === "approve" ? "approved" : "rejected", req.user.id, clean(req.body?.note, 300)]);
@@ -202,7 +205,7 @@ export async function adminStats(){
     q("select status, count(*)::int n, coalesce(sum(offer_price),0)::bigint value from consultations group by status"),
     q("select coalesce(domain,'—') domain, count(*)::int n from consultations group by 1 order by 2 desc"),
     q(`select l.lawyer_ref, sum((l.kind='view')::int)::int views, sum((l.kind='request')::int)::int requests from lawyer_events l group by 1`),
-    q("select * from lawyer_profiles where status = 'pending' order by created_at"),
+    q("select * from lawyer_profiles where status = 'pending' and phone <> '' order by created_at"),
     q(`select p.*, u.name, u.email from payments p left join users u on u.id = p.user_id where p.status = 'pending' order by p.created_at`),
     q("select id, name, email, role, created_at, last_login_at from users order by created_at desc limit 50"),
     q(`select s.id, s.plan, s.ends_at, u.name, u.email from subscriptions s join users u on u.id = s.user_id

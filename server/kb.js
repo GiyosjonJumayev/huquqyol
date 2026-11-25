@@ -45,6 +45,8 @@ function build(lang){
 
 // Sudlarning hududiy yurisdiksiyasi (PF-6034, 10-ilova) — ikki til uchun bitta ma’lumot (kirill nomlar ichida)
 export const COURTS = load("courts.json");
+// Yurist yo‘nalishlari: qonun, nizom, buyruqlar, shablonlar (ikki tilda bitta faylda)
+export const PRACTICE = load("practice.json");
 
 // uz — asosiy baza (kirill yozuvi chiqishda lotindan o‘giriladi), ru — tarjima
 const KB = { uz: build("uz"), ru: build("ru") };

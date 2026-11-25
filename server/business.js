@@ -86,7 +86,7 @@ const T = {
 const FEAT = {
   free: [["Vaziyat tahlili va huquqiy reja", "Анализ ситуации и правовой план"], ["{docs} ta hujjat shabloni: talabnoma, shikoyat, da’vo arizasi", "{docs} шаблонов: претензии, жалобы, иски"],
     ["PDF va DOCX, uch tilda", "PDF и DOCX на трёх языках"], ["Muddatlar kalendari va eslatma", "Календарь сроков и напоминание"], ["Yurist va advokatlar katalogi", "Каталог юристов и адвокатов"]],
-  pro: [["Mijozlar va ishlar kartotekasi", "Картотека клиентов и дел"], ["Barcha muddatlar bitta kalendarda (.ics eksport)", "Все сроки в одном календаре (экспорт .ics)"],
+  pro: [["Yo‘nalish kutubxonasi: sohangizning qonun, nizom, buyruqlari va to‘ldiriladigan shablonlari", "Библиотека направления: законы, положения, приказы и заполняемые шаблоны вашей сферы"], ["Mijozlar va ishlar kartotekasi", "Картотека клиентов и дел"], ["Barcha muddatlar bitta kalendarda (.ics eksport)", "Все сроки в одном календаре (экспорт .ics)"],
     ["O‘z blankasi: barcha hujjatlar sizning rekvizitlaringiz bilan", "Свой бланк: все документы с вашими реквизитами"], ["Shablon tahriri: o‘z shablonlaringiz, PDF va DOCX", "Редактор шаблонов: свои шаблоны, PDF и DOCX"],
     ["Katalogda profil — yangi mijozlar", "Профиль в каталоге — новые клиенты"], ["Pro belgisi va katalogda yuqori o‘rin", "Значок Pro и приоритет в каталоге"], ["Ma’lumotlar qurilmangizda, zaxira nusxa (JSON)", "Данные на вашем устройстве, резервная копия (JSON)"]],
   firma: [["Firma profili va jamoa a’zolari katalogda", "Профиль фирмы и сотрудников в каталоге"], ["Umumiy firma blankasi", "Общий бланк фирмы"], ["Umumiy kartoteka va vazifalar taqsimoti", "Общая картотека и распределение задач"]],
@@ -334,7 +334,8 @@ export function vLetterhead(v){
 export function vCustom(b){
   const title = clean(b?.title, 120), text = String(b?.text ?? "").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "").slice(0, 20000).trim();
   if (text.length < 2) throw new ValidationError("docText");
-  return { title, text, letterhead: vLetterhead(b?.letterhead) };
+  const to = Array.isArray(b?.to) ? b.to.slice(0, 8).map(x => clean(x, 240)).filter(Boolean) : [];
+  return { title, text, to, sign: b?.sign !== false, letterhead: vLetterhead(b?.letterhead) };
 }
 
 // ---------- Maxfiylik ----------

@@ -25,6 +25,11 @@ const T = {
   t_stats: ["Statistika va tahlil", "Статистика и аналитика"], d_stats: ["Ko‘rishlar, so‘rovlar, konversiya, daromad va sohalar bo‘yicha tahlil.", "Просмотры, запросы, конверсия, доход и разбивка по сферам."],
   t_catalog: ["Katalogda profil — yangi mijozlar", "Профиль в каталоге — новые клиенты"], d_catalog: ["Rasm, tajriba, narxlar; fuqarolar sizga to‘g‘ridan-to‘g‘ri murojaat qiladi.", "Фото, опыт, цены; граждане обращаются к вам напрямую."],
   t_org: ["Hujjatlar kutubxonasi", "Библиотека документов"], d_org: ["Nizomlar, qoidalar, buyruqlar va qonunlar havolalari bir joyda.", "Уставы, правила, приказы и ссылки на законы в одном месте."],
+  t_area: ["Yo‘nalishim: qonun, nizom, buyruq, shablon", "Моё направление: законы, приказы, шаблоны"], d_area: ["Tanlangan sohangiz bo‘yicha hujjatlar, to‘ldiriladigan shablonlar, muddatlar va ish ro‘yxati.", "Акты по вашей сфере, заполняемые шаблоны, сроки и чек-листы."],
+  myAreas: ["Yo‘nalishlarim", "Мои направления"], pickAreas: ["Yo‘nalish tanlang — shu sohaning hujjatlari paydo bo‘ladi.", "Выберите направление — появятся акты этой сферы."], pickBtn: ["Yo‘nalish tanlash", "Выбрать направление"],
+  prLead: ["Belgilashingiz bilan shu yo‘nalishda nimalar ochilishini ko‘rasiz. To‘liq kutubxona — kabinetning «Yo‘nalishim» bo‘limida (Yurist Pro).", "Отметьте сферу и сразу увидите, что откроется. Полная библиотека — в кабинете, раздел «Моё направление» (Юрист Pro)."],
+  prNone: ["Hali yo‘nalish tanlanmagan.", "Направления пока не выбраны."], n_law: ["Qonun va kodeks", "Законы и кодексы"], n_reg: ["Nizom va qaror", "Положения и постановления"], n_order: ["Buyruq", "Приказы"], n_plenum: ["Plenum qarori", "Пленум"], n_tpl: ["Shablon", "Шаблоны"],
+  photoWait: ["Rasm moderator tekshiruvida", "Фото на проверке модератора"], photoChecked: ["Rasm tasdiqlangan", "Фото подтверждено"], photoChange: ["Rasmni almashtirish", "Сменить фото"],
   open: ["Ochish", "Открыть"], locked: ["Pro kerak", "Нужен Pro"],
   ctaTitle: ["Yurist Pro ni faollashtiring", "Активируйте «Юрист Pro»"],
   ctaText: ["Katalogda ko‘rinish va yangi mijozlar, kartoteka, kalendar, blanka, shablonlar va statistika — oyiga {p}.", "Показ в каталоге и новые клиенты, картотека, календарь, бланк, шаблоны и статистика — {p} в месяц."],
@@ -34,8 +39,8 @@ const T = {
   // Profil formasi
   pfTitle: ["Profilni tahrirlash", "Редактирование профиля"],
   pfLead: ["Fuqarolar katalogda aynan shu ma’lumotlarni ko‘radi. Ism, turi yoki litsenziya o‘zgarsa, profil qayta moderatsiyaga tushadi.", "Граждане видят в каталоге именно эти данные. При изменении имени, типа или лицензии профиль снова проходит модерацию."],
-  sPhoto: ["Rasm", "Фото"], photoHint: ["Yuzingiz aniq ko‘ringan, yorug‘ rasm. Avtomatik 480×480 ga kichraytiriladi (JPEG, PNG yoki WEBP).", "Светлое фото, на котором хорошо видно лицо. Автоматически уменьшается до 480×480 (JPEG, PNG или WEBP)."],
-  photoPick: ["Rasm yuklash", "Загрузить фото"], photoDel: ["Rasmni o‘chirish", "Удалить фото"], photoFirst: ["Rasm yuklash uchun avval profilni saqlang.", "Чтобы загрузить фото, сначала сохраните профиль."],
+  sPhoto: ["Rasm", "Фото"], photoHint: ["Yuzingiz aniq ko‘ringan, yorug‘ rasm (JPEG, PNG yoki WEBP). Tanlagach kadrni o‘zingiz moslaysiz: surish, kattalashtirish, burish. Faylni shu yerga sudrab tashlash ham mumkin.", "Светлое фото, на котором хорошо видно лицо (JPEG, PNG или WEBP). После выбора настройте кадр: сдвиг, масштаб, поворот. Файл можно просто перетащить сюда."],
+  photoPick: ["Rasm yuklash", "Загрузить фото"], photoDel: ["Rasmni o‘chirish", "Удалить фото"],
   sMain: ["Asosiy ma’lumotlar", "Основные данные"], kind: ["Kim", "Кто"], name: ["F.I.Sh. yoki firma nomi", "ФИО или название фирмы"], firm: ["Byuro yoki firma (ixtiyoriy)", "Бюро или фирма (необязательно)"],
   experience: ["Tajriba (yil)", "Опыт (лет)"], license: ["Litsenziya yoki guvohnoma raqami", "Номер лицензии или удостоверения"], licenseIssuer: ["Kim bergan va qachon", "Кем и когда выдана"],
   headline: ["Qisqa tavsif (katalog kartasida)", "Кратко (в карточке каталога)"], headlineHint: ["Masalan: Mehnat nizolari, ish haqi va ishga tiklash", "Например: Трудовые споры, зарплата и восстановление на работе"],
@@ -74,13 +79,14 @@ const ICON = {
   blank: '<path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A1.5 1.5 0 0 1 6 19V5A1.5 1.5 0 0 1 7.5 3.5z"/><path d="M9 8h4M9 12h6M9 16h6"/>',
   stats: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   catalog: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/><path d="M8.5 11h5M11 8.5v5"/>',
+  area: '<path d="M4 5.5A2 2 0 0 1 6 3.5h5v16H6a2 2 0 0 0-2 2z"/><path d="M20 5.5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2z"/>',
   org: '<path d="M4 20V6l8-3 8 3v14"/><path d="M9 20v-5h6v5M8 9h2M14 9h2M8 12h2M14 12h2"/>'
 };
 const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICON[k]}</svg>`;
 
 // Katalog holati: qachon fuqarolarga ko‘rinadi
 export function catalogState(profile, pro){
-  if (!profile) return "none";
+  if (!profile || !profile.phone) return "none";                 // telefonsiz — qoralama (faqat rasm yoki yo‘nalish)
   if (profile.status === "rejected") return "rejected";
   if (profile.status !== "approved") return "pending";
   return pro.paid ? "visible" : "nopro";
@@ -92,12 +98,13 @@ function completeness(p){
   return { pct: Math.round(checks.filter(c => c[1]).length / checks.length * 100), missing: checks.filter(c => !c[1]).map(c => c[0]) };
 }
 
-export function lawyerPanel({ lang, user, profile, pro, stats, pendingSub }){
+export function lawyerPanel({ lang, user, profile, pro, stats, pendingSub, counts = {} }){
   const t = L(lang), cat = catalogState(profile, pro), c = completeness(profile);
   const proChip = pro.paid ? `<span class="chip ok">✓ ${esc(t("pro_paid"))}${pro.endsAt ? ` · ${esc(t("until", { d: date(pro.endsAt, lang) }))}` : ""}</span>`
     : pro.trial ? `<span class="chip warn">${esc(t("pro_trial"))} · ${esc(t("until", { d: date(pro.endsAt, lang) }))}</span>` : `<span class="chip">${esc(t("pro_none"))}</span>`;
   const catChip = `<span class="chip ${cat === "visible" ? "ok" : cat === "rejected" ? "bad" : "warn"}">${cat === "visible" ? "✓ " : ""}${esc(t("cat_" + cat))}${cat === "rejected" && profile.review_note ? `: ${esc(profile.review_note)}` : ""}</span>`;
-  const tools = [["clients", "t_clients", "d_clients", "/kabinet#mijozlar"], ["cal", "t_cal", "d_cal", "/kabinet#kalendar"], ["blank", "t_blank", "d_blank", "/kabinet#blanka"],
+  const mine = (profile?.areas || []).filter(a => counts[a]);
+  const tools = [["area", "t_area", "d_area", "/kabinet#yonalish"], ["clients", "t_clients", "d_clients", "/kabinet#mijozlar"], ["cal", "t_cal", "d_cal", "/kabinet#kalendar"], ["blank", "t_blank", "d_blank", "/kabinet#blanka"],
     ["stats", "t_stats", "d_stats", "/hisob/statistika"], ["catalog", "t_catalog", "d_catalog", "/hisob/profil"], ["org", "t_org", "d_org", "/kabinet#tashkilot"]];
   const free = k => k === "catalog";                     // profilni to‘ldirish Pro’siz ham mumkin (katalogda ko‘rinishi — Pro bilan)
   const toolHTML = tools.map(([ic, tt, dd, href]) => { const open = pro.tools || free(ic);
@@ -106,20 +113,25 @@ export function lawyerPanel({ lang, user, profile, pro, stats, pendingSub }){
   const cta = pro.paid ? "" : `<section class="card procta" aria-labelledby="ctaH"><div><h2 id="ctaH">${esc(t("ctaTitle"))}</h2>
       <p>${esc(t("ctaText", { p: money(PRICES.pro, lang) }))}</p>${pro.trial ? `<p class="small">${esc(t("ctaTrial"))}</p>` : ""}</div>
       ${pendingSub ? `<p class="chip warn">${esc(t("ctaPending"))}</p>` : `<button class="btn primary" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: "pro" }))}'>${esc(t("ctaBtn"))}</button>`}<p class="err" data-err hidden></p></section>`;
-  return `<section class="card lwpanel" aria-labelledby="lpH">
-      ${avatar(profile, profile?.name || user.name)}
+  const sum = c => c.law + c.reg + c.order + c.plenum;
+  const areaCard = `<section class="card myareas" aria-labelledby="maH"><h2 id="maH">${esc(t("myAreas"))}</h2>
+      ${mine.length ? `<p class="chips2">${mine.map(a => `<a class="chip" href="${pro.tools ? "/kabinet#yonalish" : "/tariflar"}">${esc(counts[a].title)} · ${sum(counts[a])} + ${counts[a].tpl} ${esc(t("n_tpl").toLowerCase())}</a>`).join("")}</p>` : `<p class="muted">${esc(t("pickAreas"))}</p>`}
+      <p class="rowbtn"><a class="btn ghost" href="${pro.tools ? "/kabinet#yonalish" : "/hisob/profil#sohalar"}">${esc(t("pickBtn"))}</a></p></section>`;
+  return `<section class="card lwpanel" aria-labelledby="lpH" data-photo-box>
+      <div class="avaedit">${avatar(profile, profile?.name || user.name)}<label class="avabtn"><span class="sr">${esc(profile?.photo_at ? t("photoChange") : t("photoPick"))}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 8.5h3l1.5-2.5h7L17 8.5h3a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.4"/></svg><input type="file" accept="image/jpeg,image/png,image/webp" class="sr" data-photo="/api/lawyer/photo"></label></div>
       <div class="lpbody"><h2 id="lpH">${esc(profile?.name || user.name)}</h2>
         <p class="chips2">${proChip}${catChip}</p>
         <div class="meter" role="img" aria-label="${esc(t("complete", { p: c.pct }))}"><svg width="100%" height="8" aria-hidden="true" focusable="false"><rect class="track" width="100%" height="8" rx="4"/><rect class="fill" width="${Math.max(2, c.pct)}%" height="8" rx="4"/></svg></div>
         <p class="small muted">${esc(t("complete", { p: c.pct }))}${c.missing.length ? ` · ${esc(t("missing", { list: c.missing.map(m => t(m)).join(", ") }))}` : ""}</p>
-        <p class="rowbtn"><a class="btn primary" href="/hisob/profil">${esc(t("editProfile"))}</a>${cat === "visible" ? `<a class="btn ghost" href="/yuristlar/y${profile.id}">${esc(t("viewProfile"))}</a>` : ""}</p></div>
+        <p class="rowbtn"><a class="btn primary" href="/hisob/profil">${esc(t("editProfile"))}</a>${cat === "visible" ? `<a class="btn ghost" href="/yuristlar/y${profile.id}">${esc(t("viewProfile"))}</a>` : ""}</p><p class="ok" data-photo-ok role="status"></p><p class="err" data-err role="alert" hidden></p></div>
     </section>
+    ${areaCard}
     ${cta}
     ${profile ? `<div class="kabstats">${tile(fmtSum(stats?.views.d30 || 0), t("kViews"))}${tile(fmtSum(stats?.cons.total || 0), t("kReq"))}${tile(fmtSum(stats?.cons.agreed || 0), t("kAgreed"))}${tile(esc(money(stats?.cons.value || 0, lang)), t("kValue"))}</div>` : ""}
     <h2 class="sec">${esc(t("toolsTitle"))}</h2><div class="tools">${toolHTML}</div>`;
 }
 
-export function profileEditPage({ lang, cssHref, fs, user, accHref, profile }){
+export function profileEditPage({ lang, cssHref, fs, user, accHref, profile, counts = {} }){
   const t = L(lang), p = profile || {}, areas = areaList(lang);
   const inp = (n, v, attrs = "") => `<input id="p_${n}" name="${n}" value="${esc(v ?? "")}" ${attrs}>`;
   const ta = (n, v, rows, max) => `<textarea id="p_${n}" name="${n}" rows="${rows}" maxlength="${max}">${esc(v || "")}</textarea>`;
@@ -135,12 +147,13 @@ export function profileEditPage({ lang, cssHref, fs, user, accHref, profile }){
   const regionOpts = [["", "—"], ...COURTS.regions.map(r => [r.name, lang === "ru" ? r.cyr : lang === "cyr" ? toCyrillic(r.name) : r.name])];
   return page({ lang, cssHref, fs, user, accHref, path: "/hisob/profil", title: t("pfTitle"), desc: t("pfLead"), body: `
     <p><a href="/hisob">${esc(t("back"))}</a></p><h1>${esc(t("pfTitle"))}</h1><p class="lead">${esc(t("pfLead"))}</p>
-    <section class="card photobox" aria-labelledby="phH"><h2 id="phH">${esc(t("sPhoto"))}</h2>
+    <section class="card photobox" aria-labelledby="phH" data-photo-box><h2 id="phH">${esc(t("sPhoto"))}</h2>
       <div class="phrow">${avatar(profile, p.name || user.name, 120)}
-        <div><p class="small muted">${esc(p.id ? t("photoHint") : t("photoFirst"))}</p>
-        ${p.id ? `<p class="rowbtn"><label class="btn primary filebtn">${esc(t("photoPick"))}<input type="file" accept="image/jpeg,image/png,image/webp" class="sr" data-photo="/api/lawyer/photo"></label>
-          ${p.photo_at ? `<button class="btn ghost" type="button" data-post="/api/lawyer/photo" data-body='{"remove":true}'>${esc(t("photoDel"))}</button>` : ""}</p>` : ""}
-        <p class="err" data-err role="alert" hidden></p></div></div></section>
+        <div><p class="small muted">${esc(t("photoHint"))}</p>
+        ${p.photo_at ? `<p data-photo-state><span class="chip ${p.photo_reviewed_at && p.photo_reviewed_at >= p.photo_at ? "ok" : "warn"}">${esc(t(p.photo_reviewed_at && p.photo_reviewed_at >= p.photo_at ? "photoChecked" : "photoWait"))}</span></p>` : ""}
+        <p class="rowbtn"><label class="btn primary filebtn">${esc(t("photoPick"))}<input type="file" accept="image/jpeg,image/png,image/webp" class="sr" data-photo="/api/lawyer/photo"></label>
+          <button class="btn ghost" type="button" data-photo-del${p.photo_at ? "" : " hidden"} data-post="/api/lawyer/photo" data-body='{"remove":true}'>${esc(t("photoDel"))}</button></p>
+        <p class="ok" data-photo-ok role="status"></p><p class="err" data-err role="alert" hidden></p></div></div></section>
     <form class="kform profform" data-api="/api/lawyer/profile" data-ok="${esc(t("saved"))}" data-reload>
       <fieldset class="card"><legend>${esc(t("sMain"))}</legend><div class="grid2">
         ${field("p_kind", t("kind"), sel("kind", [["advokat", t("k_advokat")], ["yurist", t("k_yurist")], ["firma", t("k_firma")], ["mediator", t("k_mediator")]], p.kind || "yurist"))}
@@ -154,8 +167,10 @@ export function profileEditPage({ lang, cssHref, fs, user, accHref, profile }){
         ${field("p_about", t("about"), ta("about", p.about, 6, 3000))}
         ${field("p_education", t("education"), ta("education", p.education, 3, 1500))}
         ${field("p_achievements", t("achievements"), ta("achievements", p.achievements, 3, 1500))}</fieldset>
-      <fieldset class="card"><legend>${esc(t("sAreas"))}</legend>${checks("areas", areas.map(a => [a.id, a.title]), p.areas)}</fieldset>
-      <fieldset class="card"><legend>${esc(t("sFormat"))}</legend>${checks("formats", [["online", t("online")], ["office", t("office")]], p.formats || ["online"])}${checks("langs", [["uz", t("l_uz")], ["ru", t("l_ru")], ["en", t("l_en")]], p.langs || ["uz"])}</fieldset>
+      <fieldset class="card" id="sohalar"><legend>${esc(t("sAreas"))}</legend>${checks("areas", areas.map(a => [a.id, a.title]), p.areas)}
+        <p class="hint">${esc(t("prLead"))}</p><div class="pcards" id="practicePrev" aria-live="polite"></div>
+        <script type="application/json" id="practice-data">${JSON.stringify({ areas: counts, labels: { law: t("n_law"), reg: t("n_reg"), order: t("n_order"), plenum: t("n_plenum"), tpl: t("n_tpl"), none: t("prNone") } }).replace(/</g, "\\u003c")}</script></fieldset>
+      <fieldset class="card"><legend>${esc(t("sFormat"))}</legend>${checks("formats", [["online", t("online")], ["office", t("office")]], p.formats?.length ? p.formats : ["online"])}${checks("langs", [["uz", t("l_uz")], ["ru", t("l_ru")], ["en", t("l_en")]], p.langs?.length ? p.langs : ["uz"])}</fieldset>
       <fieldset class="card"><legend>${esc(t("sServices"))}</legend>
         <div class="tscroll" tabindex="0"><table class="svcedit"><thead><tr><th scope="col">${esc(t("svcName"))}</th><th scope="col">${esc(t("svcMin"))}</th><th scope="col">${esc(t("svcFmt"))}</th><th scope="col">${esc(t("svcPrice"))}</th><th scope="col">${esc(t("svcFrom"))}</th></tr></thead><tbody>${svcRows}</tbody></table></div>
         <p class="hint">${esc(t("svcHint"))}</p></fieldset>

@@ -4,6 +4,7 @@
 import { esc } from "/shared.js";
 import { toCyrillic as toCyr } from "/translit.js";
 import { normLang, fmtDate } from "/i18n.js";
+import { createPractice } from "/practice.js";
 
 const root = document.getElementById("kab");
 const LANG = normLang(root.dataset.lang), RU = LANG === "ru";
@@ -14,7 +15,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const dt = s => s ? fmtDate(new Date(s + "T00:00:00"), RU ? "ru" : "uz") : "";
 const showDate = s => LANG === "cyr" ? toCyr(dt(s)) : dt(s);
 
-const EMPTY = () => ({ v:1, plan:"pro", since: iso(), clients:[], cases:[], letterhead:{ on:false, lines:["", "", "", ""] }, templates:[], org:{ name:"", docs:[] }, profile:{} });
+const EMPTY = () => ({ v:1, plan:"pro", since: iso(), clients:[], cases:[], letterhead:{ on:false, lines:["", "", "", ""] }, templates:[], org:{ name:"", docs:[] }, profile:{}, areas:[], saved:[] });
 function load(){ try { return { ...EMPTY(), ...(JSON.parse(localStorage.getItem(KEY)) || {}) }; } catch { return EMPTY(); } }
 let S = load();
 // Saqlash: brauzerda (darhol) va hisobda (1,5 soniyadan keyin) — boshqa qurilmada ham ochiladi
@@ -46,7 +47,7 @@ const EXTRA_AREAS = [["jinoyat", "Jinoyat ishlari", "Уголовные дела
   ["shartnoma", "Shartnomalar", "Договоры"], ["meros", "Meros", "Наследство"], ["yer", "Yer va ko‘chmas mulk", "Земля и недвижимость"]];
 
 const TABS = [
-  ["umumiy", "Umumiy", "Обзор"], ["mijozlar", "Mijozlar", "Клиенты"], ["ishlar", "Ishlar", "Дела"], ["kalendar", "Kalendar", "Календарь"],
+  ["umumiy", "Umumiy", "Обзор"], ["yonalish", "Yo‘nalishim", "Моё направление"], ["mijozlar", "Mijozlar", "Клиенты"], ["ishlar", "Ishlar", "Дела"], ["kalendar", "Kalendar", "Календарь"],
   ["blanka", "Blanka", "Бланк"], ["shablonlar", "Shablonlar", "Шаблоны"], ["tashkilot", "Tashkilot hujjatlari", "Документы организации"], ["profil", "Katalog profili", "Профиль в каталоге"]
 ];
 const PLAN_NAMES = { pro:["Yurist Pro", "Юрист Pro"], firma:["Firma", "Фирма"], org:["Tashkilot", "Организация"] };
@@ -82,8 +83,8 @@ const clientName = id => S.clients.find(c => c.id === id)?.name || "";
 const scnTitle = id => META?.scenarios.find(s => s.id === id)?.title || "";
 function download(blob, file){ const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
 const letterhead = () => S.letterhead.on ? S.letterhead.lines.map(s => s.trim()).filter(Boolean) : [];
-async function customDoc(title, text, fmt){
-  const r = await fetch(`/api/custom/${fmt}`, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ title, text, letterhead: letterhead(), lang: LANG }) });
+async function customDoc(title, text, fmt, extra = {}){
+  const r = await fetch(`/api/custom/${fmt}`, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ title, text, letterhead: letterhead(), lang: LANG, ...extra }) });
   if (!r.ok){ let m = L("Nimadir ishlamadi. Qayta urinib ko‘ring.", "Что-то пошло не так. Попробуйте ещё раз."); try { m = (await r.json()).error || m; } catch {} throw new Error(m); }
   download(await r.blob(), `${(title || "hujjat").replace(/[^\p{L}\p{N}]+/gu, "-").slice(0, 60)}.${fmt}`);
 }
@@ -92,7 +93,9 @@ const inp = (id, v = "", attrs = "") => `<input id="${id}" value="${esc(v)}" ${a
 const empty = t => `<p class="empty">${esc(t)}</p>`;
 
 // ---------- Bo‘limlar ----------
+const practice = createPractice({ L, LANG, state: () => S, save, say, go, showDate, iso, customDoc });
 const VIEWS = {
+  yonalish: () => practice.view(),
   umumiy(){
     const dl = deadlines().filter(d => !d.done), over = dl.filter(d => daysTo(d.date) < 0).length, week = dl.filter(d => daysTo(d.date) >= 0 && daysTo(d.date) <= 7).length;
     return `<div class="kabstats">
@@ -104,7 +107,7 @@ const VIEWS = {
       <fieldset class="plansel"><legend class="sr">${esc(L("Tarif", "Тариф"))}</legend>${Object.entries(PLAN_NAMES).map(([id, n]) => `<label><input type="radio" name="plan" value="${id}"${S.plan === id ? " checked" : ""}> ${esc(L(...n))}</label>`).join("")}</fieldset>
       <p class="small muted">${esc(L("To‘lov keyingi bosqichda ulanadi. Tariflarni solishtirish:", "Оплата подключится на следующем этапе. Сравнить тарифы:"))} <a href="/tariflar">${esc(L("Tariflar", "Тарифы"))}</a></p>
       <h2 class="sec">${esc(L("Zaxira nusxa", "Резервная копия"))}</h2>
-      <p>${esc(L("Ma’lumotlar serverga yuborilmaydi va faqat shu brauzerda turadi. Boshqa qurilmaga o‘tkazish yoki yo‘qotmaslik uchun faylga saqlang.", "Данные не отправляются на сервер и хранятся только в этом браузере. Сохраните их в файл, чтобы перенести на другое устройство или не потерять."))}</p>
+      <p>${esc(L("Ma’lumotlar hisobingizda va shu brauzerda saqlanadi. Yo‘qotmaslik uchun vaqti-vaqti bilan faylga ham saqlab qo‘ying.", "Данные хранятся в вашем аккаунте и в этом браузере. Для надёжности иногда сохраняйте их и в файл."))}</p>
       <div class="rowbtn"><button class="btn primary" type="button" data-act="export">${esc(L("Faylga saqlash (JSON)", "Сохранить в файл (JSON)"))}</button>
         <label class="btn ghost filebtn">${esc(L("Fayldan tiklash", "Восстановить из файла"))}<input type="file" accept="application/json,.json" id="importFile" class="sr"></label></div>`;
   },
@@ -141,6 +144,7 @@ const VIEWS = {
         <ul class="kdl">${(c.deadlines || []).map(d => `<li class="${d.done ? "done" : daysTo(d.date) < 0 ? "over" : daysTo(d.date) <= 7 ? "soon" : ""}">
           <label><input type="checkbox" data-act="dlDone" data-case="${c.id}" data-id="${d.id}"${d.done ? " checked" : ""}> <b>${esc(showDate(d.date))}</b> — ${esc(d.note || "")}</label>
           <button class="linkbtn" type="button" data-act="delDl" data-case="${c.id}" data-id="${d.id}">${esc(L("O‘chirish", "Удалить"))}</button></li>`).join("")}</ul>
+        ${c.tasks?.length ? `<details class="ktasks"${c.tasks.some(t => !t.done) ? " open" : ""}><summary>${esc(L("Ish ro‘yxati", "Чек-лист"))}: ${c.tasks.filter(t => t.done).length}/${c.tasks.length}</summary><ul class="kdl">${c.tasks.map(t => `<li class="${t.done ? "done" : ""}"><label><input type="checkbox" data-act="taskDone" data-case="${c.id}" data-id="${t.id}"${t.done ? " checked" : ""}> ${esc(t.text)}</label></li>`).join("")}</ul></details>` : ""}
         <form class="inline" data-form="dl" data-case="${c.id}"><input type="date" required aria-label="${esc(L("Muddat sanasi", "Дата срока"))}" name="date">
           <input name="note" maxlength="160" placeholder="${esc(L("Muddat nimaga", "Что за срок"))}" aria-label="${esc(L("Muddat nimaga", "Что за срок"))}">
           <button class="btn ghost" type="submit">${esc(L("Muddat qo‘shish", "Добавить срок"))}</button></form>
@@ -215,6 +219,7 @@ const VIEWS = {
 };
 let editing = "", orgFilter = {};
 const AFTER = {
+  yonalish: () => practice.after(),
   tashkilot(){
     const f = () => { orgFilter = { q: document.getElementById("o_q").value, type: document.getElementById("o_type").value }; const pos = document.getElementById("o_q").selectionStart; go("tashkilot"); const q = document.getElementById("o_q"); q.focus(); q.setSelectionRange(pos, pos); };
     document.getElementById("o_q").addEventListener("input", f);
@@ -224,8 +229,10 @@ const AFTER = {
 
 // ---------- Hodisalar ----------
 const val = id => document.getElementById(id)?.value.trim() ?? "";
+panel.addEventListener("input", e => { practice.input(e); });
 panel.addEventListener("submit", async e => {
   e.preventDefault();
+  if (practice.submit(e)) return;
   const f = e.target.dataset.form;
   if (f === "client"){ if (!val("c_name")) return; S.clients.push({ id: uid(), name: val("c_name"), phone: val("c_phone"), note: val("c_note") }); say(L("Mijoz qo‘shildi", "Клиент добавлен")); }
   else if (f === "case"){
@@ -251,16 +258,19 @@ function saveTpl(){
   editing = t.id;
 }
 panel.addEventListener("change", e => {
+  if (practice.change(e)) return;
   const a = e.target.dataset.act;
   if (e.target.name === "plan"){ S.plan = e.target.value; save(); go(tab); return; }
   if (a === "stage"){ const c = S.cases.find(x => x.id === e.target.dataset.id); if (c){ c.stage = e.target.value; save(); } return; }
   if (a === "dlDone"){ const c = S.cases.find(x => x.id === e.target.dataset.case), d = c?.deadlines.find(x => x.id === e.target.dataset.id); if (d){ d.done = e.target.checked; save(); go(tab); } return; }
+  if (a === "taskDone"){ const c = S.cases.find(x => x.id === e.target.dataset.case), d = c?.tasks?.find(x => x.id === e.target.dataset.id); if (d){ d.done = e.target.checked; save(); go(tab); } return; }
   if (e.target.id === "importFile" && e.target.files[0]){
     e.target.files[0].text().then(t => { const d = JSON.parse(t); if (!d || d.v !== 1 || !Array.isArray(d.cases)) throw 0; S = { ...EMPTY(), ...d }; save(); go("umumiy"); say(L("Ma’lumotlar tiklandi", "Данные восстановлены")); })
       .catch(() => say(L("Fayl mos emas", "Файл не подходит")));
   }
 });
 panel.addEventListener("click", async e => {
+  if (e.target.closest("[data-pact]")){ await practice.click(e); return; }
   const b = e.target.closest("[data-act]"); if (!b || b.tagName === "SELECT" || b.type === "checkbox") return;
   const a = b.dataset.act, id = b.dataset.id;
   const del = (list, msg) => { const i = list.findIndex(x => x.id === id); if (i >= 0) list.splice(i, 1); say(msg); };

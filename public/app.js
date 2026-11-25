@@ -1164,6 +1164,8 @@ try {
   } else {
     history.replaceState(null, "", "#vaziyat");
     renderResume(saved);
+    const direct = new URLSearchParams(location.search).get("holat");            // yurist kabinetidan: /?holat=ish_haqi
+    if (direct && scenarioMeta(direct)){ history.replaceState(null, "", location.pathname + "#vaziyat"); pickCase(direct); }
   }
 } catch (e){
   $("#cases").innerHTML = `<p class="error" role="alert">${esc(t("serverDown", { msg: e.message }))}</p>`;

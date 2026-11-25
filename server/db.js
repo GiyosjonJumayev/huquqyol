@@ -112,7 +112,14 @@ const MIGRATIONS = [
   // 3 — moderator roli (yurist arizalari va rasm moderatsiyasi) va rasm tekshirilgan vaqt
   `alter table users drop constraint if exists users_role_check;
    alter table users add constraint users_role_check check (role in ('citizen','lawyer','org','moderator','admin'));
-   alter table lawyer_profiles add column photo_reviewed_at timestamptz;`
+   alter table lawyer_profiles add column photo_reviewed_at timestamptz;`,
+  // 4 — admin qo‘shadigan normativ hujjatlar (yurist yo‘nalishlari kutubxonasi)
+  `create table practice_acts(
+     id bigserial primary key,
+     type text not null, title_uz text not null, title_ru text, num text, act_date date,
+     url text not null unique, areas text[] not null,
+     created_by bigint references users(id) on delete set null,
+     created_at timestamptz not null default now());`
 ];
 
 let pool = null;

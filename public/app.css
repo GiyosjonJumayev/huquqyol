@@ -1427,3 +1427,62 @@ html{background:var(--bg)}
 .flowstrip a{color:var(--accent);font-weight:600}
 .flowstrip .arr{color:var(--terra)}
 @media (max-width:640px){.flowstrip{border-radius:18px}}
+
+/* ================= Yurist yo‘nalishi (kabinet) va rasm muharriri ================= */
+.pareas{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:12px}
+.parea{display:grid;gap:2px;text-align:left;min-height:60px;padding:12px 14px;border:1.5px solid var(--line2);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;min-width:0;overflow-wrap:anywhere}
+.parea span{color:var(--muted);font-size:calc(13px * var(--fs))}
+.parea:hover{border-color:var(--accent)}
+.parea[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.parea[aria-pressed="true"] b::before{content:"✓ ";color:var(--accent)}
+.pedit{margin-bottom:12px}
+.pedit summary{cursor:pointer;min-height:44px;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.pedit summary .linkbtn{margin:0}
+.ptag{display:inline-block;padding:2px 9px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:calc(12.5px * var(--fs));font-weight:600}
+.pview{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.pview .chipbtn{min-height:44px;padding:8px 14px;border:1px solid var(--line2);border-radius:999px;background:var(--surface);color:var(--ink);font:inherit;font-size:calc(14px * var(--fs));cursor:pointer}
+.pview .chipbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.psecs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin:0 0 14px}
+.psecs button{min-height:44px;padding:8px 12px;border:0;border-bottom:3px solid transparent;background:none;color:var(--muted);font:inherit;font-weight:600;cursor:pointer}
+.psecs button[aria-current]{color:var(--accent);border-bottom-color:var(--accent)}
+.parea:focus-visible,.pview .chipbtn:focus-visible,.psecs button:focus-visible,.pstar:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.pn{font-weight:500;font-variant-numeric:tabular-nums}
+.tag.pnew{background:color-mix(in srgb, var(--ok) 16%, var(--surface));color:var(--ok)}
+.pstar{width:44px;height:44px;border:0;border-radius:50%;background:none;color:var(--terra);font-size:22px;line-height:1;cursor:pointer}
+.pstar:hover{background:var(--chip)}
+.pedgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.pprev{position:sticky;top:96px;min-width:0;max-height:calc(100vh - 108px);overflow:auto}
+.pprev .paper{padding:28px 28px 32px}
+@media (max-width:900px){.pedgrid{grid-template-columns:minmax(0,1fr)}.pprev{position:static;max-height:none}}
+.pterm{display:grid;gap:8px;margin-bottom:12px}
+.pterm h2{margin:0;font-size:calc(17px * var(--fs))}
+.pterm p,.pterm ol{margin:0}
+.pcalc{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:end}
+.pcalc output{min-height:44px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.klist details summary,.pterm details summary,.ktasks summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--accent);font-weight:600}
+.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.pcard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--bg);display:grid;gap:8px;align-content:start;min-width:0}
+.pcard h3,.pcard p,.pcard ul{margin:0}
+.pcard h3{font-size:calc(16px * var(--fs))}
+.pcard ul{padding-left:18px}
+.pcard .chip{font-size:calc(12.5px * var(--fs));padding:3px 9px}
+.myareas{display:grid;gap:8px;margin:0 0 14px}
+.myareas h2{margin:0;font-size:calc(18px * var(--fs))}
+.myareas p{margin:0}
+.myareas a.chip{min-height:44px;text-decoration:none}
+.avaedit{position:relative;flex:none}
+.avabtn{position:absolute;right:-6px;bottom:-6px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);border:3px solid var(--surface);cursor:pointer}
+.avabtn svg{width:20px;height:20px}
+.avabtn:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+[data-photo-box].dragover{outline:3px dashed var(--accent);outline-offset:4px}
+[data-photo-box].busyphoto .ava{opacity:.5}
+.lwpanel .ok:empty,.photobox .ok:empty{display:none}
+.photobox .ok,.lwpanel .ok{color:var(--ok);font-weight:600}
+.cropdlg{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);color:var(--ink);padding:20px;width:min(380px,calc(100vw - 32px));max-height:calc(100vh - 24px)}
+.cropdlg::backdrop{background:rgba(20,16,12,.6)}
+.cropdlg h2{margin:0 0 6px;font-size:calc(20px * var(--fs))}
+.cropview{display:block;width:min(300px,100%);aspect-ratio:1;margin:8px auto;border-radius:50%;background:var(--chip);touch-action:none;cursor:grab}
+.cropview:active{cursor:grabbing}
+.cropview:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.croprow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:6px 0 14px}
+.croprow input{flex:1 1 120px;min-height:44px;accent-color:var(--accent)}
