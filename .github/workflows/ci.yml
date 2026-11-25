@@ -68,6 +68,8 @@ jobs:
         run: $DC exec -T app node scripts/check-prod.mjs
       - name: Zaxira olinadi va undan tiklanadi
         run: |
+          exec > >(tee step.txt) 2>&1
+          set -x
           $DC exec -T backup sh /backup.sh once | grep zaxira
           sudo chmod -R a+rX backups
           echo HA | sh deploy/restore.sh "$(ls -t backups/*.dump | head -1)"
