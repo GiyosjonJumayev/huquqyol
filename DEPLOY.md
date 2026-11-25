@@ -53,7 +53,7 @@ To‘lov kalitlari — [docs/PAYMENTS.md](docs/PAYMENTS.md). Xat yuborish — `S
 
 - **Yangilash:** `git pull && dc up -d --build` (migratsiyalar o‘zi qo‘llanadi).
 - **Zaxira:** har kuni 03:30 da `backups/` ga, 14 kun saqlanadi; qo‘lda: `dc exec backup sh /backup.sh once`. Nusxani boshqa serverga ham ko‘chiring.
-- **Tiklash:** `sh deploy/restore.sh backups/….dump` — oyda bir marta sinab ko‘ring.
+- **Tiklash:** `sh deploy/restore.sh huquqyol-….dump` (yangi bazaga tiklaydi, muvaffaqiyatli bo‘lsa almashtiradi) — oyda bir marta sinab ko‘ring.
 - **Monitoring:** UptimeRobot kabi xizmatga `https://DOMEN/api/ready` ni qo‘ying (baza ham tekshiriladi). Loglar: `dc logs -f app`.
 - **Telegram bot:** `dc --profile bot up -d`.
 
