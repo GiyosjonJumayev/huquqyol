@@ -4,6 +4,8 @@ document.addEventListener("click", async e => {
   const b = e.target.closest("[data-logout]"); if (!b) return;
   e.preventDefault();
   b.disabled = true;
+  // Umumiy kompyuterda keyingi odam mijozlar ma’lumotini ko‘rmasin: kabinet nusxasi brauzerdan o‘chiriladi (serverda saqlangan)
+  try { for (const k of Object.keys(localStorage)) if (k.startsWith("huquqyol:pro")) localStorage.removeItem(k); } catch {}
   try { await fetch("/api/auth/logout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", credentials: "same-origin" }); } catch {}
   location.assign(b.dataset.next || "/");
 });

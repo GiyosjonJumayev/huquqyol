@@ -1486,3 +1486,35 @@ html{background:var(--bg)}
 .cropview:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .croprow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:6px 0 14px}
 .croprow input{flex:1 1 120px;min-height:44px;accent-color:var(--accent)}
+
+/* ================= To‘lov, xavfsizlik, jamoa ================= */
+.orderf{display:grid;gap:10px;margin-top:auto}
+.orderf select{min-height:44px;width:100%;padding:8px 10px;border:1px solid var(--field-line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+.orderf .btn{justify-content:center}
+.paybox{max-width:640px;margin:12px auto 0;display:grid;gap:10px;padding:26px}
+.paybox h1,.paybox p,.paybox .sec{margin:0}
+.paysum{margin:4px 0;display:grid;gap:0;border-block:1px solid var(--line)}
+.paysum div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;align-items:baseline}
+.paysum div+div{border-top:1px dashed var(--line)}
+.paysum dt{color:var(--muted)} .paysum dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.paytotal{font-size:calc(22px * var(--fs));font-variant-numeric:tabular-nums}
+.paymethods{display:grid;gap:10px}
+.paybtn{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;padding:12px 18px;border:1.5px solid var(--line2);border-radius:16px;background:var(--surface);color:var(--ink);text-decoration:none;flex-wrap:wrap}
+.paybtn b{font-size:calc(18px * var(--fs))} .paybtn span{color:var(--muted)}
+.paybtn:hover{border-color:var(--accent);background:var(--accent-soft)}
+.paybtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.paystate{font-weight:700;font-size:calc(18px * var(--fs))} .paystate.ok{color:var(--ok)}
+.secbox{display:grid;gap:10px;margin-bottom:14px}
+.secbox h2{margin:0;font-size:calc(19px * var(--fs));display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.secbox h3,.secbox p{margin:0}
+.secbox form{display:grid;gap:12px;justify-items:start}
+.secbox .kform .field{width:100%}
+.secbox details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--stamp);font-weight:600}
+.totpkey{display:inline-block;max-width:100%;padding:10px 14px;border-radius:10px;background:var(--chip);font-family:var(--f-mono);font-size:calc(15px * var(--fs));overflow-wrap:anywhere;user-select:all}
+.reccodes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;list-style:none;padding:0;margin:0;font-family:var(--f-mono)}
+.reccodes li{padding:8px 12px;border-radius:8px;background:var(--chip);user-select:all}
+.acclinks2{margin:28px 0 8px}
+.pview a.chipbtn{text-decoration:none;display:inline-flex;align-items:center}
+.pview a.chipbtn[aria-current]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.kassign{max-width:320px}
+.kassign select{min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:inherit;width:100%}

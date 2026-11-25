@@ -13,7 +13,7 @@ const int = (v, min, max) => { const n = Math.round(Number(String(v ?? "").repla
 
 // ---------- Pro holati ----------
 export async function proStatus(userId){
-  const s = await one(`select plan, status, ends_at from subscriptions where user_id = $1 and plan in ('pro','firma','org')
+  const s = await one(`select plan, status, ends_at from subscriptions where (user_id = $1 or (plan in ('firma','org') and org_id = (select org_id from users where id = $1))) and plan in ('pro','firma','org')
       and status in ('active','trial') and (ends_at is null or ends_at > now())
       order by (status = 'active') desc, ends_at desc nulls first limit 1`, [userId]);
   return { paid: s?.status === "active", trial: s?.status === "trial", tools: !!s, plan: s?.plan || null, endsAt: s?.ends_at || null };
@@ -118,6 +118,12 @@ export async function putCabinet(req, res){
   if (!d || typeof d !== "object" || Array.isArray(d) || d.v !== 1) throw err("badJson");
   const json = JSON.stringify(d);
   if (json.length > 900_000) throw err("tooLarge", 413);
+  // Boshqa qurilma undan keyin yozgan bo‘lsa — 409: brauzer yangisini olib, birlashtirib qayta yuboradi (eski ma’lumot ustiga yozilmaydi)
+  const base = req.body?.base;
+  if (base !== undefined){
+    const cur = await one("select updated_at from cabinet_data where user_id = $1", [req.user.id]);
+    if (cur && (base === null || new Date(cur.updated_at).getTime() !== new Date(base).getTime())) throw err("conflict", 409);
+  }
   const r = await one(`insert into cabinet_data(user_id, data) values ($1, $2::jsonb)
     on conflict (user_id) do update set data = excluded.data, updated_at = now() returning updated_at`, [req.user.id, json]);
   res.json({ ok: true, updatedAt: r.updated_at });

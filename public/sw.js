@@ -18,9 +18,11 @@ self.addEventListener("fetch", e => {
     e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); return res; })));
     return;
   }
-  // Qolganlari: avval tarmoq (yangi versiya), bo‘lmasa kesh
+  // Shaxsiy sahifalar (hisob, kabinet, admin, to‘lov…) va bir martalik havolalar: kesh yo‘q — umumiy kompyuterda chiqqandan keyin ko‘rinmaydi
+  if (/^\/(hisob|malumotlarim|kabinet|admin|tolov|jamoa|xavfsizlik|parol|tasdiqlash|kirish|royxat|yurist-bolish)/.test(url.pathname)) return;
+  // Qolganlari: avval tarmoq (yangi versiya), bo‘lmasa kesh. Server «no-store / private» degan javob saqlanmaydi.
   e.respondWith(fetch(e.request).then(res => {
-    if (res.ok){ const copy = res.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); }
+    if (res.ok && !/no-store|private/.test(res.headers.get("Cache-Control") || "")){ const copy = res.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); }
     return res;
   }).catch(() => caches.match(e.request).then(r => r || caches.match("/"))));
 });

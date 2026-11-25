@@ -9,8 +9,9 @@ import { clean, ValidationError } from "./validate.js";
 import { areaList } from "./business.js";
 import { COURTS, kbFor } from "./kb.js";
 import { adminPractice } from "./practice.js";
+import { adminPayment, audit } from "./billing.js";
 
-export const PRICES = { pro: 149000, firma: 490000, org: 0 };
+export { PRICES } from "./billing.js";
 export const COMMISSION_PCT = Number(process.env.COMMISSION_PCT || 10);
 const int = (v, max = 1e10) => { const n = Math.round(Number(String(v ?? "").replace(/[^\d]/g, ""))); return Number.isFinite(n) ? Math.min(max, Math.max(0, n)) : 0; };
 const err = (key, status = 400) => Object.assign(new ValidationError(key), { status });
@@ -27,16 +28,16 @@ const asCatalog = r => {
     experience: r.experience, langs: r.langs.length ? r.langs : ["uz"], areas: r.areas, formats: r.formats.length ? r.formats : ["online"],
     services, photo: r.photo_at ? `/yuristlar/rasm/${r.id}?v=${new Date(r.photo_at).getTime()}` : null,
     contacts: { phone: r.phone, email: r.email || "", telegram: r.telegram || "", website: r.website || "" },
-    license: { verified: false, number: r.license || "", issuer: r.license_issuer || "" }, userId: r.user_id ? Number(r.user_id) : null
+    license: { verified: false, number: r.license || "", issuer: r.license_issuer || "" }, userId: r.user_id ? Number(r.user_id) : null, orgId: r.org_id ? Number(r.org_id) : null
   };
 };
 // Katalogda: admin tasdiqlagan (litsenziya tekshirilgan) VA Yurist Pro / Firma to‘lovi faol (sinov emas) profillar
-export const VISIBLE_SQL = `p.status = 'approved' and exists(select 1 from subscriptions s where s.user_id = p.user_id
+export const VISIBLE_SQL = `p.status = 'approved' and exists(select 1 from subscriptions s where (s.user_id = p.user_id or (s.plan = 'firma' and s.org_id = (select org_id from users where id = p.user_id)))
   and s.plan in ('pro','firma') and s.status = 'active' and (s.ends_at is null or s.ends_at > now()))`;
 export async function approvedLawyers(){
   if (!dbEnabled()) return [];
   try {
-    const rows = (await q(`select p.id, p.user_id, p.kind, p.name, p.firm, p.headline, p.about, p.education, p.achievements, p.region, p.district, p.address, p.hours,
+    const rows = (await q(`select p.id, p.user_id, (select org_id from users u where u.id = p.user_id) as org_id, p.kind, p.name, p.firm, p.headline, p.about, p.education, p.achievements, p.region, p.district, p.address, p.hours,
         p.experience, p.langs, p.areas, p.formats, p.services, p.price, p.photo_at, p.phone, p.email, p.telegram, p.website, p.license, p.license_issuer
         from lawyer_profiles p where ${VISIBLE_SQL} order by p.id`)).rows;
     return rows.map(asCatalog);
@@ -61,27 +62,6 @@ export async function applyToDb(app, user){
   return (await one(`insert into lawyer_profiles(user_id, kind, name, firm, license, region, district, phone, email, areas, formats, langs, experience, price, headline, about)
     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning id`,
     [user?.id || null, app.kind, app.name, app.firm, app.license, app.region, app.district, app.phone, app.email, app.areas, app.formats, app.langs, app.experience, app.price, app.headline, app.about])).id;
-}
-
-// ---------- Obunalar ----------
-export async function subscribe(req, res){
-  const plan = ["pro", "firma", "org"].includes(req.body?.plan) ? req.body.plan : null;
-  if (!plan) throw err("option");
-  if (req.user.role === "citizen") await q("update users set role = $2 where id = $1", [req.user.id, plan === "org" ? "org" : "lawyer"]);
-  const open = await one(`select id from subscriptions where user_id = $1 and plan = $2
-    and (status = 'pending' or (status = 'active' and (ends_at is null or ends_at > now() + interval '5 days')))`, [req.user.id, plan]);
-  if (open) return res.json({ ok: true, id: Number(open.id), next: "/hisob" });     // to‘lovi kutilayotgan yoki hali faol obuna — takror yaratilmaydi
-  const r = await tx(async run => {
-    const s = (await run("insert into subscriptions(user_id, org_id, plan, status, price) values ($1,$2,$3,'pending',$4) returning id",
-      [req.user.id, req.user.org_id || null, plan, PRICES[plan]])).rows[0];
-    await run("insert into payments(user_id, subscription_id, kind, amount, status, note) values ($1,$2,'subscription',$3,'pending',$4)",
-      [req.user.id, s.id, PRICES[plan], plan === "org" ? "Narx kelishuv bo‘yicha belgilanadi" : "Hisob-faktura: 1 oy"]);
-    return s;
-  });
-  res.status(201).json({ ok: true, id: Number(r.id), next: "/hisob" });
-}
-export async function mySubscriptions(userId){
-  return (await q("select * from subscriptions where user_id = $1 order by created_at desc", [userId])).rows;
 }
 
 // ---------- Kelishuvlar (konsultatsiyalar) ----------
@@ -157,20 +137,7 @@ export async function adminAct(req, res){
       : await q("update lawyer_profiles set photo = null, photo_type = null, photo_at = null, photo_reviewed_at = now() where id = $1", [id]);
     if (!r.rowCount) throw err("notFound", 404);
   }
-  else if (kind === "payment" && act === "confirm"){
-    await tx(async run => {
-      const p = (await run("select * from payments where id = $1 for update", [id])).rows[0];
-      if (!p) throw err("notFound", 404);
-      if (p.status !== "pending") throw err("badState", 409);
-      const amount = p.kind === "subscription" && req.body?.amount != null ? int(req.body.amount) : Number(p.amount);
-      await run("update payments set status = 'paid', amount = $2, paid_at = now(), method = $3 where id = $1", [id, amount, clean(req.body?.method, 40) || "manual"]);
-      if (p.subscription_id) await run(`update subscriptions set status = 'active', price = greatest(price, $2), started_at = now(), ends_at = now() + interval '30 days' where id = $1`, [p.subscription_id, amount]);
-    });
-  }
-  else if (kind === "payment" && act === "cancel"){
-    const r = await q("update payments set status = 'cancelled' where id = $1 and status = 'pending'", [id]);
-    if (!r.rowCount) throw err("badState", 409);
-  }
+  else if (kind === "payment") await adminPayment(act, id, req);                // pul amallari: server/billing.js
   else if (kind === "subscription" && act === "cancel"){
     await q("update subscriptions set status = 'cancelled', ends_at = now() where id = $1", [id]);
   }
@@ -181,6 +148,7 @@ export async function adminAct(req, res){
     await q("update users set role = $2 where id = $1", [id, role]);
   }
   else throw err("option", 404);
+  if (kind !== "payment") await audit(q, { userId: req.user.id, action: `admin.${kind}.${act}`, target: `${kind}:${id}`, data: kind === "user" ? { role: req.body?.role } : null, ip: req.ip });
   res.json({ ok: true });
 }
 
@@ -207,10 +175,13 @@ export async function adminStats(){
     q(`select l.lawyer_ref, sum((l.kind='view')::int)::int views, sum((l.kind='request')::int)::int requests from lawyer_events l group by 1`),
     q("select * from lawyer_profiles where status = 'pending' and phone <> '' order by created_at"),
     q(`select p.*, u.name, u.email from payments p left join users u on u.id = p.user_id where p.status = 'pending' order by p.created_at`),
-    q("select id, name, email, role, created_at, last_login_at from users order by created_at desc limit 50"),
+    q("select id, name, email, role, created_at, last_login_at, email_verified_at, totp_enabled_at from users order by created_at desc limit 50"),
     q(`select s.id, s.plan, s.ends_at, u.name, u.email from subscriptions s join users u on u.id = s.user_id
        where s.status = 'trial' and s.ends_at between now() and now() + interval '7 days' order by s.ends_at`)
   ]);
+  const [lastPays, auditRows] = await Promise.all([
+    q(`select p.id, p.kind, p.amount, p.status, p.method, p.paid_at, p.created_at, u.name from payments p left join users u on u.id = p.user_id where p.status in ('paid','refunded') order by coalesce(p.paid_at, p.created_at) desc limit 50`),
+    q(`select l.at, l.action, l.target, l.data, u.email from audit_log l left join users u on u.id = l.user_id order by l.id desc limit 150`)]);
   const byLawyer = (await q(`select p.id, p.name, p.status, count(c.id)::int total,
       sum((c.status in ('agreed','completed'))::int)::int agreed, sum((c.status = 'completed')::int)::int completed,
       coalesce(sum(case when c.status in ('agreed','completed') then c.offer_price end),0)::bigint value,
@@ -218,7 +189,7 @@ export async function adminStats(){
       from lawyer_profiles p left join consultations c on c.lawyer_id = p.id group by p.id order by total desc, p.id limit 100`)).rows;
   return { roles: roles.rows, newUsers: newUsers.rows, subs: subs.rows, orgSubs: orgSubs.rows, revenue: revenue.rows, mrr: mrr.rows[0],
     cons: cons.rows, consDomain: consDomain.rows, events: lawyers.rows, byLawyer, pending: pending.rows, pendingPay: pendingPay.rows,
-    recentUsers: recentUsers.rows, trialEnding: trialEnding.rows };
+    recentUsers: recentUsers.rows, trialEnding: trialEnding.rows, lastPays: lastPays.rows, audit: auditRows.rows };
 }
 export const regionsList = () => COURTS.regions.map(r => r.name);
 export const areaIds = () => new Set(areaList("uz").map(a => a.id));

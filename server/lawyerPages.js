@@ -112,7 +112,7 @@ export function lawyerPanel({ lang, user, profile, pro, stats, pendingSub, count
       <span class="tgo">${open ? esc(t("open")) + " →" : `🔒 ${esc(t("locked"))}`}</span></a>`; }).join("");
   const cta = pro.paid ? "" : `<section class="card procta" aria-labelledby="ctaH"><div><h2 id="ctaH">${esc(t("ctaTitle"))}</h2>
       <p>${esc(t("ctaText", { p: money(PRICES.pro, lang) }))}</p>${pro.trial ? `<p class="small">${esc(t("ctaTrial"))}</p>` : ""}</div>
-      ${pendingSub ? `<p class="chip warn">${esc(t("ctaPending"))}</p>` : `<button class="btn primary" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: "pro" }))}'>${esc(t("ctaBtn"))}</button>`}<p class="err" data-err hidden></p></section>`;
+      ${pendingSub ? `<p><a class="chip warn" href="/hisob/tolovlar">${esc(t("ctaPending"))}</a></p>` : `<a class="btn primary" href="/tariflar">${esc(t("ctaBtn"))}</a>`}<p class="err" data-err hidden></p></section>`;
   const sum = c => c.law + c.reg + c.order + c.plenum;
   const areaCard = `<section class="card myareas" aria-labelledby="maH"><h2 id="maH">${esc(t("myAreas"))}</h2>
       ${mine.length ? `<p class="chips2">${mine.map(a => `<a class="chip" href="${pro.tools ? "/kabinet#yonalish" : "/tariflar"}">${esc(counts[a].title)} · ${sum(counts[a])} + ${counts[a].tpl} ${esc(t("n_tpl").toLowerCase())}</a>`).join("")}</p>` : `<p class="muted">${esc(t("pickAreas"))}</p>`}

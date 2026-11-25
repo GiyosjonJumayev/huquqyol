@@ -10,10 +10,13 @@ import { navFor, roleOf } from "./access.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS } from "./kb.js";
 import { clean, ValidationError } from "./validate.js";
+import { PRICES, SEATS } from "./billing.js";
+import { orderForm } from "./payPages.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const DATA = JSON.parse(readFileSync(join(here, "kb", "lawyers.json"), "utf8"));
-export const LAWYERS = DATA.list;
+// Namuna profillar: production’da ko‘rsatilmaydi (namoyish serverida SHOW_DEMO=1)
+export const LAWYERS = process.env.SHOW_DEMO === "1" || (process.env.NODE_ENV !== "production" && process.env.SHOW_DEMO !== "0") ? DATA.list : [];
 export const APPS_FILE = process.env.LAWYER_APPS_FILE || join(here, "..", "data", "lawyer-applications.jsonl");
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -66,7 +69,7 @@ const T = {
   // Tariflar
   plTitle: ["Tariflar", "Тарифы"],
   plLead: ["Fuqarolar uchun HuquqYo‘l bepul. Yuristlar, advokatlik byurolari va tashkilotlar uchun — ish jarayonini tartibga soladigan Pro imkoniyatlari.", "Для граждан HuquqYo‘l бесплатен. Для юристов, адвокатских бюро и организаций — Pro-возможности для ведения работы."],
-  plNote: ["Narxlar taxminiy. To‘lov tizimi va shartnoma shartlari keyingi bosqichda ulanadi; hozir barcha Pro imkoniyatlarini bepul sinab ko‘rish mumkin.", "Цены ориентировочные. Оплата и условия договора подключаются на следующем этапе; сейчас все Pro-возможности можно попробовать бесплатно."],
+  plNote: ["To‘lov Payme, Click yoki bank o‘tkazmasi orqali. Avtomatik yechib olish yo‘q: muddat tugagach o‘zingiz uzaytirasiz. Yangi hisobga 14 kun bepul sinov.", "Оплата через Payme, Click или банковский перевод. Автосписаний нет: продлеваете сами. Новым аккаунтам — 14 дней бесплатно."],
   perMonth: ["oyiga", "в месяц"], byDeal: ["Kelishuv asosida", "По договорённости"],
   soon: ["tez orada", "скоро"],
   plTry: ["Kabinetni bepul sinab ko‘rish", "Попробовать кабинет бесплатно"], plSubscribe: ["Obuna bo‘lish", "Оформить подписку"], plStart: ["Boshlash", "Начать"], plContact: ["Kabinetda sinab ko‘rish", "Попробовать в кабинете"],
@@ -88,17 +91,17 @@ const FEAT = {
     ["PDF va DOCX, uch tilda", "PDF и DOCX на трёх языках"], ["Muddatlar kalendari va eslatma", "Календарь сроков и напоминание"], ["Yurist va advokatlar katalogi", "Каталог юристов и адвокатов"]],
   pro: [["Yo‘nalish kutubxonasi: sohangizning qonun, nizom, buyruqlari va to‘ldiriladigan shablonlari", "Библиотека направления: законы, положения, приказы и заполняемые шаблоны вашей сферы"], ["Mijozlar va ishlar kartotekasi", "Картотека клиентов и дел"], ["Barcha muddatlar bitta kalendarda (.ics eksport)", "Все сроки в одном календаре (экспорт .ics)"],
     ["O‘z blankasi: barcha hujjatlar sizning rekvizitlaringiz bilan", "Свой бланк: все документы с вашими реквизитами"], ["Shablon tahriri: o‘z shablonlaringiz, PDF va DOCX", "Редактор шаблонов: свои шаблоны, PDF и DOCX"],
-    ["Katalogda profil — yangi mijozlar", "Профиль в каталоге — новые клиенты"], ["Pro belgisi va katalogda yuqori o‘rin", "Значок Pro и приоритет в каталоге"], ["Ma’lumotlar qurilmangizda, zaxira nusxa (JSON)", "Данные на вашем устройстве, резервная копия (JSON)"]],
-  firma: [["Firma profili va jamoa a’zolari katalogda", "Профиль фирмы и сотрудников в каталоге"], ["Umumiy firma blankasi", "Общий бланк фирмы"], ["Umumiy kartoteka va vazifalar taqsimoti", "Общая картотека и распределение задач"]],
+    ["Katalogda profil — yangi mijozlar", "Профиль в каталоге — новые клиенты"], ["Pro belgisi va katalogda yuqori o‘rin", "Значок Pro и приоритет в каталоге"], ["Ma’lumotlar barcha qurilmalaringizda, zaxira nusxa (JSON)", "Данные на всех ваших устройствах, резервная копия (JSON)"]],
+  firma: [["Firma profili va jamoa a’zolari katalogda", "Профиль фирмы и сотрудников в каталоге"], ["Umumiy firma blankasi", "Общий бланк фирмы"], ["Jamoa: {seats} tagacha a’zo, umumiy kartoteka va vazifalar taqsimoti", "Команда: до {seats} человек, общая картотека и распределение задач"]],
   org: [["Tashkilot hujjatlari kutubxonasi: nizomlar, ichki qoidalar, buyruqlar", "Библиотека документов организации: уставы, правила, приказы"],
     ["Faoliyatga oid qonunlar ro‘yxati (lex.uz havolalari)", "Список законов по деятельности (ссылки на lex.uz)"], ["Ichki shablonlar: shartnoma, buyruq, xat — tashkilot blankasida", "Внутренние шаблоны: договор, приказ, письмо — на бланке организации"],
     ["Bir nechta yurist uchun umumiy kutubxona", "Общая библиотека для нескольких юристов"]]
 };
-const SOON = new Set(["firma:2", "org:3"]);              // hali ishlab chiqilmagan — «tez orada» deb belgilanadi
+const SOON = new Set();                                 // hali ishlab chiqilmagan imkoniyatlar («tez orada»): hozircha yo‘q
 export const PLANS = [
   { id:"free", name:"pFree", for:"pFreeFor", price:0, cta:["plStart", "/"] },
-  { id:"pro", name:"pPro", for:"pProFor", price:149000, cta:["plTry", "/kabinet?tarif=pro"], best:true },
-  { id:"firma", name:"pFirm", for:"pFirmFor", price:490000, cta:["plTry", "/kabinet?tarif=firma"], base:"pro" },
+  { id:"pro", name:"pPro", for:"pProFor", price:PRICES.pro, cta:["plTry", "/kabinet?tarif=pro"], best:true },
+  { id:"firma", name:"pFirm", for:"pFirmFor", price:PRICES.firma, cta:["plTry", "/kabinet?tarif=firma"], base:"pro" },
   { id:"org", name:"pOrg", for:"pOrgFor", price:null, cta:["plContact", "/kabinet?tarif=org"], base:"pro" }
 ];
 
@@ -142,9 +145,9 @@ ${a11yDialogHTML(mt)}${accHref ? `<script type="module" src="${accHref}"></scrip
 }
 
 // ---------- Tariflar ----------
-export function plansPage({ lang, cssHref, fs, user, accHref }){
+export function plansPage({ lang, cssHref, fs, user, accHref, subs = [] }){
   const t = tr(lang), docs = kbFor("uz").SCENARIOS.reduce((n, s) => n + s.docs.length, 0);
-  const feat = (id, i, f) => `<li${SOON.has(`${id}:${i}`) ? ` class="soon"` : ""}>${esc(pick(f, lang).replace("{docs}", docs))}${SOON.has(`${id}:${i}`) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</li>`;
+  const feat = (id, i, f) => `<li${SOON.has(`${id}:${i}`) ? ` class="soon"` : ""}>${esc(pick(f, lang).replace("{docs}", docs).replace("{seats}", SEATS.firma))}${SOON.has(`${id}:${i}`) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</li>`;
   const cards = PLANS.map(p => {
     const list = (p.id === "firma" ? FEAT.firma : p.id === "org" ? FEAT.org : FEAT[p.id]).map((f, i) => feat(p.id === "org" ? "org" : p.id, i, f)).join("");
     const price = p.price === 0 ? t("free") : p.price ? `${money(p.price, lang)} <span class="per">/ ${esc(t("perMonth"))}</span>` : esc(t("byDeal"));
@@ -153,7 +156,7 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
       ${p.base ? `<p class="small muted">${esc(t("plAll", { p: t("pPro") }))}</p>` : ""}
       <ul class="feat">${list}</ul>
       ${p.id === "free" ? `<a class="btn ghost" href="/">${esc(t("plStart"))}</a>`
-        : user ? `<button class="btn ${p.best ? "primary" : "ghost"}" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: p.id }))}'>${esc(t("plSubscribe"))}</button><p class="err small" data-err hidden></p>`
+        : user ? (["citizen", "lawyer", "org"].includes(user.role) ? orderForm({ lang, plan: p.id, best: p.best, active: subs.some(s => s.plan === p.id && s.status === "active") }) : "")
         : `<a class="btn ${p.best ? "primary" : "ghost"}" href="/royxat?tarif=${p.id}">${esc(t("plSubscribe"))}</a>`}
       ${p.id !== "free" && (!user || ["lawyer", "org"].includes(user.role)) ? `<a class="small" href="${user ? p.cta[1] : `/royxat?tarif=${p.id}`}">${esc(t("plTry"))}</a>` : ""}</article>`;
   }).join("");
@@ -161,7 +164,7 @@ export function plansPage({ lang, cssHref, fs, user, accHref }){
   const rows = [...FEAT.free.map((f, i) => [f, ["free", "pro", "firma", "org"], `free:${i}`]), ...FEAT.pro.map((f, i) => [f, ["pro", "firma", "org"], `pro:${i}`]),
     ...FEAT.firma.map((f, i) => [f, ["firma"], `firma:${i}`]), ...FEAT.org.map((f, i) => [f, ["org"], `org:${i}`])];
   const table = `<div class="tscroll" tabindex="0"><table class="cmp"><thead><tr><th scope="col">${esc(t("cmpFeature"))}</th>${PLANS.map(p => `<th scope="col">${esc(t(p.name))}</th>`).join("")}</tr></thead><tbody>
-    ${rows.map(([f, has, key]) => `<tr><th scope="row">${esc(pick(f, lang).replace("{docs}", docs))}${SOON.has(key) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</th>${PLANS.map(p => `<td>${has.includes(p.id) ? `<span class="yes" aria-label="+">✓</span>` : `<span class="no" aria-label="—">—</span>`}</td>`).join("")}</tr>`).join("")}
+    ${rows.map(([f, has, key]) => `<tr><th scope="row">${esc(pick(f, lang).replace("{docs}", docs).replace("{seats}", SEATS.firma))}${SOON.has(key) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</th>${PLANS.map(p => `<td>${has.includes(p.id) ? `<span class="yes" aria-label="+">✓</span>` : `<span class="no" aria-label="—">—</span>`}</td>`).join("")}</tr>`).join("")}
   </tbody></table></div>`;
   return page({ lang, cssHref, fs, user, accHref, path:"/tariflar", title:t("plTitle"), desc:t("plLead"), body:`
     <h1>${esc(t("plTitle"))}</h1><p class="lead">${esc(t("plLead"))}</p>
@@ -293,13 +296,13 @@ export function cabinetPage({ lang, cssHref, fs, jsHref, user, accHref, pro, db 
     const list = FEAT.pro.map(f => `<li>${esc(pick(f, lang))}</li>`).join("");
     const cta = !db ? `<p class="note warn">${esc(t("cabNoDb"))}</p>`
       : !user ? `<p class="rowbtn"><a class="btn primary" href="/royxat?rol=lawyer&next=/kabinet">${esc(t("cabRegister"))}</a><a class="btn ghost" href="/kirish?next=/kabinet">${esc(t("navLogin"))}</a></p>`
-      : `<p class="rowbtn"><button class="btn primary" type="button" data-post="/api/subscriptions" data-body='${esc(JSON.stringify({ plan: "pro" }))}'>${esc(t("plSubscribe"))}</button><a class="btn ghost" href="/tariflar">${esc(t("navPlans"))}</a></p><p class="err" data-err hidden></p>`;
+      : `<p class="rowbtn"><a class="btn primary" href="/tariflar">${esc(t("plSubscribe"))}</a><a class="btn ghost" href="/tariflar">${esc(t("navPlans"))}</a></p><p class="err" data-err hidden></p>`;
     return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"), body:`
       <section class="cabgate"><h1>${esc(t("cabTitle"))}</h1><p class="lead">${esc(user ? t("cabNeedPro") : t("cabLead"))}</p>
       <ul class="feat featlist">${list}</ul>${cta}</section>` });
   }
   return page({ lang, cssHref, fs, user, accHref, path:"/kabinet", title:t("cabTitle"), desc:t("plLead"),
-    body:`<div id="kab" class="kab" data-lang="${lang}" data-sync="1"><h1>${esc(t("cabTitle"))}</h1><noscript><p class="card">${esc(t("cabNoJs"))}</p></noscript></div>`,
+    body:`<div id="kab" class="kab" data-lang="${lang}" data-sync="1" data-uid="${user.id}"${user.org_id ? " data-team" : ""}><h1>${esc(t("cabTitle"))}</h1><noscript><p class="card">${esc(t("cabNoJs"))}</p></noscript></div>`,
     scripts:`<script type="module" src="${jsHref}"></script>` });
 }
 

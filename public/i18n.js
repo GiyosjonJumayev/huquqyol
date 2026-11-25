@@ -310,7 +310,7 @@ const M = {
   footNav:{ uz:"Sayt bo‘limlari", ru:"Разделы сайта" }, footStats:{ uz:"Statistika", ru:"Статистика" },
   footMotto:{ uz:"huquqingizni biling — yo‘lni birga topamiz", ru:"знайте свои права — путь найдём вместе" },
   footHelp:{ uz:"Yordam", ru:"Помощь" }, footOfficial:{ uz:"Rasmiy manbalar", ru:"Официальные источники" }, footMediators:{ uz:"Mediatorlar", ru:"Медиаторы" },
-  footPrivacy:{ uz:"Maxfiylik", ru:"Конфиденциальность" }, footBot:{ uz:"Telegram bot", ru:"Telegram-бот" },
+  footPrivacy:{ uz:"Maxfiylik", ru:"Конфиденциальность" }, footOffer:{ uz:"Oferta", ru:"Оферта" }, footBot:{ uz:"Telegram bot", ru:"Telegram-бот" },
   // ---- Bosh sahifa v3 («iliq, insoniy») ----
   heroA:{ uz:"Qanday muammo bo‘ldi?", ru:"Что случилось?" }, heroB:{ uz:"Birga yo‘lini topamiz.", ru:"Вместе найдём выход." },
   chatHello:{ uz:"Assalomu alaykum! Muammongizni oddiy so‘z bilan yozing — men qonun, muddat va arizani topib beraman.", ru:"Здравствуйте! Опишите проблему простыми словами — я найду закон, срок и составлю заявление." },

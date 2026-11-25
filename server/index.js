@@ -13,10 +13,17 @@ import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerAp
 import { initDb, migrate, dbEnabled } from "./db.js";
 import { attachUser, register, login, logout, changePassword } from "./auth.js";
 import { accessMiddleware, HOME, navFor, roleOf } from "./access.js";
-import { approvedLawyers, recordView, applyToDb, subscribe, mySubscriptions, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue } from "./market.js";
+import { approvedLawyers, recordView, applyToDb, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue } from "./market.js";
 import { loginPage, registerPage, accountPage, adminPage, applyPage, forbiddenPage } from "./accountPages.js";
 import { proStatus, myProfile, saveProfile, saveAreas, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
 import { getPractice, practiceCounts, customActs } from "./practice.js";
+import { subscribe, mySubscriptions, myPayments, getPayment, paymentStatus, cancelOrder, bankTransfer } from "./billing.js";
+import { paymeWebhook, clickWebhook } from "./payGateways.js";
+import { resendVerify, confirmEmail, forgot, resetPassword, totpStart, totpEnable, totpDisable, sessionsOf, endSession, exportData, deleteAccount, peekToken } from "./account.js";
+import { invite, cancelInvite, acceptInvite, removeMember, teamInfo, inviteView, getTeamCabinet, putTeamCabinet } from "./team.js";
+import { checkoutPage, paymentsPage, invoicePdf, securityPage, forgotPage, resetPage, confirmPage, teamPage, invitePage, offerPage } from "./payPages.js";
+import { startJobs, stopJobs } from "./jobs.js";
+import { one } from "./db.js";
 import { lawyerPanel, profileEditPage, lawyerStatsPage } from "./lawyerPages.js";
 
 // PostgreSQL (DATABASE_URL bo‘lsa): hisoblar, obunalar, kelishuvlar. Migratsiyalar start() da qo‘llanadi.
@@ -75,8 +82,15 @@ app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin
 // Yurist rasmi va kabinet ma’lumotlari: kattaroq tana (rasm brauzerda 480 px ga kichraytiriladi)
 const langUser = [(req, res, next) => { req.lang = resolveLang(req); next(); }, attachUser, guard,
   (req, res, next) => dbEnabled() ? next() : res.status(503).json({ error: msg(req.lang, "dbOff") })];
+// To‘lov tizimlari serverlari: brauzer emas — Origin/JSON talabi yo‘q, o‘z imzosi bilan tekshiriladi (payGateways.js). Umumiy /api qatlamidan oldin.
+const payLimit = rateLimit({ max: 600, name:"pay" });
+const payDb = (req, res, next) => dbEnabled() ? next() : res.status(503).json({ error: "db" });
+app.post("/api/pay/payme", payLimit, payDb, express.text({ type: () => true, limit: "32kb" }), (req, res, next) => paymeWebhook(req, res).catch(next));
+for (const [step, complete] of [["prepare", false], ["complete", true]])
+  app.post(`/api/pay/click/${step}`, payLimit, payDb, express.urlencoded({ extended: false, limit: "16kb", parameterLimit: 40 }), (req, res, next) => clickWebhook(complete)(req, res).catch(next));
 app.post("/api/lawyer/photo", apiLimit, rateLimit({ max: 20, name:"lphoto" }), sameOrigin, requireJson, express.json({ limit: "800kb", strict: true }), ...langUser, wrapEarly(savePhoto));
 app.post("/api/cabinet", apiLimit, rateLimit({ max: 120, name:"cab" }), sameOrigin, requireJson, express.json({ limit: "1mb", strict: true }), ...langUser, wrapEarly(putCabinet));
+app.post("/api/team/cabinet", apiLimit, rateLimit({ max: 120, name:"tcab" }), sameOrigin, requireJson, express.json({ limit: "1mb", strict: true }), ...langUser, wrapEarly(putTeamCabinet));
 app.use("/api", apiLimit, sameOrigin, requireJson, express.json({ limit: "32kb", strict: true }));
 app.use((req, res, next) => { req.lang = resolveLang(req); next(); });
 app.use(attachUser);
@@ -93,6 +107,11 @@ app.get("/api/courts", (req, res) => {
   if (req.get("If-None-Match") === COURTS_ETAG) return res.status(304).end();
   res.type("json").send(COURTS_JSON);
 });
+// Tayyorlik: baza ham javob beradimi (balanslovchi va monitoring uchun)
+app.get("/api/ready", wrap(async (req, res) => {
+  if (!dbEnabled()) return res.status(503).json({ ok: false, db: false });
+  try { await one("select 1 as ok"); res.json({ ok: true, db: true }); } catch { res.status(503).json({ ok: false, db: false }); }
+}));
 app.get("/api/health", (req, res) => res.json({ ok:true, ai: aiEnabled(), aiProvider: aiProvider(), aiLastError: aiLastError(), ocr: ocrEnabled(), norms: NORMS.length, scenarios: SCENARIOS.length }));
 
 // Ommaviy spetsifikatsiya: shablon matnlari va kalit so‘zlar yuborilmaydi
@@ -169,6 +188,23 @@ app.post("/api/auth/register", needDb, authLimit, wrap(register));
 app.post("/api/auth/login", needDb, authLimit, wrap(login));
 app.post("/api/auth/logout", wrap(logout));
 app.post("/api/auth/password", needDb, authLimit, wrap(changePassword));
+app.post("/api/auth/forgot", needDb, rateLimit({ max: 5, windowMs: 10 * 60_000, name:"forgot" }), wrap(forgot));
+app.post("/api/auth/reset", needDb, authLimit, wrap(resetPassword));
+app.post("/api/auth/confirm", needDb, authLimit, wrap(confirmEmail));
+app.post("/api/auth/verify", needDb, rateLimit({ max: 3, windowMs: 10 * 60_000, name:"verify" }), wrap(resendVerify));
+app.post("/api/auth/2fa/start", needDb, authLimit, wrap(totpStart));
+app.post("/api/auth/2fa/enable", needDb, authLimit, wrap(totpEnable));
+app.post("/api/auth/2fa/disable", needDb, authLimit, wrap(totpDisable));
+app.post("/api/auth/sessions/:ref/end", needDb, wrap(endSession));
+app.post("/api/account/delete", needDb, authLimit, wrap(deleteAccount));
+// To‘lovlar va jamoa
+app.get("/api/payments/:id", needDb, rateLimit({ max: 120, name:"paystat" }), wrap(paymentStatus));
+app.post("/api/payments/:id/cancel", needDb, wrap(cancelOrder));
+app.post("/api/team/invite", needDb, rateLimit({ max: 20, name:"invite" }), wrap(invite));
+app.post("/api/team/invite/:ref/cancel", needDb, wrap(cancelInvite));
+app.post("/api/team/accept", needDb, wrap(acceptInvite));
+app.post("/api/team/members/:id/remove", needDb, wrap(removeMember));
+app.get("/api/team/cabinet", needDb, wrap(getTeamCabinet));
 // Obuna va kelishuvlar
 app.post("/api/subscriptions", needDb, rateLimit({ max: 10, name:"sub" }), wrap(subscribe));
 app.post("/api/consultations", needDb, rateLimit({ max: 10, name:"cons" }), wrap(requestConsultation));
@@ -259,7 +295,7 @@ function bizPage(render){
     res.set({ "Cache-Control": req.user ? "private, no-store" : "no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[forced || req.lang] }).type("html").send(withTheme(req, html));
   })(req, res, next);
 }
-app.get("/tariflar", bizPage(plansPage));
+app.get("/tariflar", bizPage(async a => plansPage({ ...a, subs: a.user ? await mySubscriptions(a.user.id) : [] })));
 app.get("/maxfiylik", bizPage(a => privacyPage({ ...a, ai: aiEnabled(), provider: aiProvider(), botUrl: process.env.TELEGRAM_BOT_URL })));
 app.get("/yuristlar", bizPage(lawyersPage));
 app.get("/yuristlar/rasm/:id", (req, res, next) => dbEnabled() ? wrap(sendPhoto)(req, res, next) : next());
@@ -288,6 +324,37 @@ app.get("/hisob", bizPage(async a => {
   return accountPage({ ...a, subs, cons: await consultationsFor(a.user), panel, application });
 }));
 app.get("/yurist-bolish", bizPage(async a => applyPage({ ...a, application: await myProfile(a.user.id) })));
+// ---------- To‘lov, xavfsizlik, jamoa ----------
+app.get("/oferta", bizPage(offerPage));
+app.get("/parol-unutdim", bizPage(forgotPage));
+const tokenPage = (kind, render) => bizPage(async a => { a.res.set("Referrer-Policy", "no-referrer"); return render({ ...a, token: String(a.query.t || ""), valid: dbEnabled() && !!await peekToken(kind, a.query.t) }); });
+app.get("/parol-tiklash", tokenPage("reset", resetPage));
+app.get("/tasdiqlash", tokenPage("verify", confirmPage));
+app.get("/xavfsizlik", bizPage(async a => securityPage({ ...a, sessions: await sessionsOf(a.req) })));
+app.get("/malumotlarim", rateLimit({ max: 5, name:"export" }), wrap(exportData));
+app.get("/hisob/tolovlar", bizPage(async a => paymentsPage({ ...a, list: await myPayments(a.user.id) })));
+app.get("/tolov/:id", bizPage(async a => {
+  const p = await getPayment(a.id, a.user.id);
+  if (!p) return null;
+  const t = await one("select state, fiscal from pay_tx where payment_id = $1 order by id desc limit 1", [p.id]);
+  return checkoutPage({ ...a, p, tx: t, fiscal: t?.fiscal?.perform?.url || "" });
+}));
+app.get("/tolov/:id/hisob-faktura", rateLimit({ max: 20, name:"invoice" }), (req, res, next) => wrap(async () => {
+  const p = await getPayment(req.params.id, req.user.id);
+  if (!p || !bankTransfer() || !(Number(p.amount) > 0)) return next();
+  const org = req.user.org_id ? await one("select name, inn from organizations where id = $1", [req.user.org_id]) : null;
+  const pdf = await invoicePdf({ lang: req.lang, p, user: req.user, org });
+  res.set({ "Content-Type": "application/pdf", "Cache-Control": "private, no-store", "Content-Disposition": `attachment; filename="HuquqYol-hisob-faktura-${p.id}.pdf"` }).send(pdf);
+})(req, res, next));
+app.get("/jamoa", bizPage(async a => teamPage({ ...a, team: await teamInfo(a.user) })));
+app.get("/jamoa/taklif", bizPage(async a => invitePage({ ...a, token: String(a.query.t || ""), inv: await inviteView(a.query.t) })));
+app.get("/sitemap.xml", (req, res) => {
+  if (!OG_BASE) return res.status(404).type("text").send("");
+  const urls = ["/", "/yuristlar", "/tariflar", "/statistika", "/maxfiylik", "/oferta"];
+  res.set("Cache-Control", "public, max-age=3600").type("application/xml").send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${OG_BASE}${u}</loc></url>`).join("")}</urlset>`);
+});
+app.get("/robots.txt", (req, res) => res.set("Cache-Control", "public, max-age=3600").type("text/plain").send(
+  `User-agent: *\nAllow: /\n${["/api/", "/hisob", "/admin", "/kabinet", "/tolov", "/jamoa", "/xavfsizlik", "/parol-", "/tasdiqlash"].map(p => `Disallow: ${p}`).join("\n")}\n${OG_BASE ? `Sitemap: ${OG_BASE}/sitemap.xml\n` : ""}`));
 app.get("/hisob/profil", bizPage(async a => profileEditPage({ ...a, profile: await myProfile(a.user.id), counts: practiceCounts(a.lang, await customActs()) })));
 app.get("/hisob/statistika", bizPage(async a => {
   const profile = await myProfile(a.user.id);
@@ -342,13 +409,13 @@ app.use((err, req, res, next) => {
 // faqat Nginx orqali ochiladi. Passenger’da port raqam emas, soket yo‘li bo‘lishi mumkin.
 export function start({ port = process.env.PORT || 3000, host = process.env.HOST } = {}){
   stats.attachFile(STATS_FILE);                                   // anonim statistika faqat haqiqiy ishga tushirishda diskka yoziladi
-  if (dbEnabled()) migrate().then(n => n && console.log(`[db] ${n} ta migratsiya qo‘llandi`)).catch(e => console.error("[db] migratsiya:", e.message));
+  if (dbEnabled()) migrate().then(n => { if (n) console.log(`[db] ${n} ta migratsiya qo‘llandi`); startJobs(); }).catch(e => console.error("[db] migratsiya:", e.message));
   ocrWarmUp();                                                    // OCR til fayllari oldindan yuklanadi (birinchi rasm tezroq o‘qiladi)
   const p = /^\d+$/.test(String(port)) ? Number(port) : port;
   const onListen = () => console.log(`HuquqYo‘l ishga tushdi: ${typeof p === "number" ? `http://${host || "localhost"}:${p}` : p}  (AI: ${aiEnabled() ? aiProvider() : "o‘chiq — qidiruv rejimi"})`);
   const server = host && typeof p === "number" ? app.listen(p, host, onListen) : app.listen(p, onListen);
   server.requestTimeout = 30_000; server.headersTimeout = 15_000; server.keepAliveTimeout = 65_000;
-  const stop = () => { stats.close(); ocrShutdown(); server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 8000).unref(); };   // statistika diskka yoziladi
+  const stop = () => { stopJobs(); stats.close(); ocrShutdown(); server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 8000).unref(); };   // statistika diskka yoziladi
   process.once("SIGTERM", stop); process.once("SIGINT", stop);
   return server;
 }

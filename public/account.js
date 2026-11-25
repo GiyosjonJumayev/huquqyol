@@ -61,13 +61,14 @@ if (prData && prBox){
   draw();
 }
 
+const SURE = { uz:"Aniqmi? Yana bosing", cyr:"Аниқми? Яна босинг", ru:"Точно? Нажмите ещё раз" };
 async function send(url, body){
   let r;
   try { r = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ ...body, lang }), credentials:"same-origin" }); }
   catch { throw new Error(NET[lang] || NET.uz); }
   let data = {};
   try { data = await r.json(); } catch {}
-  if (!r.ok) throw new Error(data.error || ERR[lang] || ERR.uz);
+  if (!r.ok) throw Object.assign(new Error(data.error || ERR[lang] || ERR.uz), { data });
   return data;
 }
 const showErr = (scope, msg) => { const e = scope.querySelector("[data-err]") || scope.parentElement?.querySelector("[data-err]"); if (e){ e.textContent = msg; e.hidden = !msg; } };
@@ -79,7 +80,7 @@ document.addEventListener("submit", async e => {
   // Maydonlar: «areas[]» — belgilanganlar ro‘yxati; «services[0][name]» — jadval qatorlari; checkbox — true/false
   const body = {};
   for (const el of f.elements){
-    if (!el.name || el.disabled || el.closest("[hidden]")) continue;
+    if (!el.name || el.disabled || (el.type !== "hidden" && el.closest("[hidden]"))) continue;
     const arr = /^(\w+)\[\]$/.exec(el.name), row = /^(\w+)\[(\d+)\]\[(\w+)\]$/.exec(el.name);
     const val = el.type === "checkbox" && !arr ? el.checked : el.value;
     if (arr){ (body[arr[1]] ||= []); if (el.checked) body[arr[1]].push(el.value); }
@@ -93,14 +94,41 @@ document.addEventListener("submit", async e => {
   if (btn) btn.disabled = true;
   try {
     const d = await send(f.dataset.api, body);
-    if (f.dataset.ok){ if (okEl){ okEl.textContent = f.dataset.ok + (d.recheck ? ` ${MOD[lang] || MOD.uz}` : ""); okEl.hidden = false; } if (!("reload" in f.dataset)) f.reset(); }
+    if (f.dataset.result) showResult(document.getElementById(f.dataset.result), d, f);
+    else if (f.dataset.ok){ if (okEl){ okEl.textContent = f.dataset.ok + (d.recheck ? ` ${MOD[lang] || MOD.uz}` : ""); okEl.hidden = false; } if (!("reload" in f.dataset)) f.reset(); }
     else go(f.dataset.next || d.next);
-  } catch (x){ showErr(f, x.message); }
+  } catch (x){
+    showErr(f, x.message);
+    if (x.data?.need === "code"){ const c = f.querySelector("[data-code]"); if (c){ c.hidden = false; const i = c.querySelector("input"); i.required = true; i.value = ""; i.focus(); } }
+  }
   finally { if (btn) btn.disabled = false; }
 });
+// Server javobini sahifadagi yashirin blokka joylash (2FA kaliti, zaxira kodlar, taklif havolasi)
+function showResult(box, d, f){
+  if (!box) return;
+  for (const el of box.querySelectorAll("[data-fill]")){ const v = d[el.dataset.fill] || ""; el.textContent = "abs" in el.dataset ? location.origin + v : v; }
+  for (const el of box.querySelectorAll("[data-fill-href]")) if (/^otpauth:\/\//.test(d[el.dataset.fillHref] || "")) el.href = d[el.dataset.fillHref];
+  for (const el of box.querySelectorAll("[data-fill-list]")) el.replaceChildren(...(d[el.dataset.fillList] || []).map(x => { const li = document.createElement("li"); li.textContent = x; return li; }));
+  box.hidden = false;
+  if (!box.contains(f) && !f.contains(box)) f.hidden = true;
+  else f.reset();
+  box.querySelector("input, a, h3")?.focus?.();
+}
+// To‘lov holati: provayderdan qaytgach sahifa o‘zi yangilanadi (10 daqiqagacha, faqat oyna ochiq bo‘lganda)
+const pay = document.querySelector("[data-pay-status]");
+if (pay){
+  const until = Date.now() + 10 * 60e3;
+  const tick = async () => {
+    if (Date.now() > until) return;
+    if (!document.hidden) try { const d = await (await fetch(pay.dataset.payStatus, { credentials:"same-origin", cache:"no-store" })).json(); if (d.status && d.status !== "pending") return location.reload(); } catch {}
+    setTimeout(tick, 4000);
+  };
+  setTimeout(tick, 4000);
+}
 
 document.addEventListener("click", async e => {
   const b = e.target.closest("button[data-post]"); if (!b) return;
+  if ("confirm" in b.dataset && b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = SURE[lang] || SURE.uz; setTimeout(() => { b.dataset.armed = ""; }, 5000); return; }
   let body = {}; try { body = b.dataset.body ? JSON.parse(b.dataset.body) : {}; } catch {}
   b.disabled = true;
   try { const d = await send(b.dataset.post, body); go(d.next); }

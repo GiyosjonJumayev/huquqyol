@@ -6,7 +6,7 @@ import { fmtSum, fmtDate } from "../public/i18n.js";
 import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS, PRACTICE } from "./kb.js";
 import { actTypes } from "./practice.js";
-import { PRICES } from "./market.js";
+import { PRICES, providers } from "./billing.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const T = {
@@ -64,6 +64,11 @@ const T = {
   roles: ["Rollar bo‘yicha", "По ролям"], newUsers: ["Yangi foydalanuvchilar (oylar)", "Новые пользователи (по месяцам)"], recent: ["So‘nggi foydalanuvchilar", "Последние пользователи"],
   role: ["Rol", "Роль"], created: ["Ro‘yxatdan o‘tgan", "Зарегистрирован"], lastLogin: ["Oxirgi kirish", "Последний вход"], save: ["Saqlash", "Сохранить"],
   ro_citizen: ["Fuqaro", "Гражданин"], ro_lawyer: ["Yurist", "Юрист"], ro_org: ["Tashkilot", "Организация"], ro_admin: ["Admin", "Админ"], ro_moderator: ["Moderator", "Модератор"], ro_guest: ["Mehmon", "Гость"],
+  forgot: ["Parolni unutdingizmi?", "Забыли пароль?"], code2: ["Autentifikator kodi (yoki zaxira kod)", "Код из приложения (или резервный)"],
+  lnkPays: ["To‘lovlarim", "Мои платежи"], lnkTeam: ["Jamoa", "Команда"], lnkSec: ["Xavfsizlik va ma’lumotlarim", "Безопасность и данные"],
+  ad_jurnal: ["Jurnal", "Журнал"], jrLead: ["Kim, qachon, nima qildi: pul, rol va moderatsiya amallari. Shaxsiy matnlar yozilmaydi.", "Кто, когда и что сделал: деньги, роли, модерация. Личные тексты не записываются."], jrAct: ["Amal", "Действие"], jrTarget: ["Obyekt", "Объект"], jrWhen: ["Vaqt", "Время"],
+  txH: ["To‘lovlar", "Платежи"], setPrice: ["Narx belgilash", "Назначить цену"], refund: ["Qaytarish", "Вернуть"], provOn: ["Ulangan to‘lov usullari: {l}", "Подключённые способы оплаты: {l}"], provOff: ["To‘lov tizimi ulanmagan (.env: PAYME_*, CLICK_*, COMPANY_*)", "Платёжные системы не подключены (.env: PAYME_*, CLICK_*, COMPANY_*)"], markPaid: ["Bank orqali tushdi", "Поступил через банк"],
+  ps_pending: ["Kutilmoqda", "Ожидает"], ps_paid: ["To‘langan", "Оплачен"], ps_refunded: ["Qaytarilgan", "Возвращён"], ps_cancelled: ["Bekor", "Отменён"],
   ad_baza: ["Huquqiy baza", "Правовая база"], bzTitle: ["Yo‘nalish bazasiga hujjat qo‘shish", "Добавить акт в базу направлений"],
   bzLead: ["Qo‘shilgan hujjat shu yo‘nalishdagi yuristlarning kabinetida darhol paydo bo‘ladi. Faqat rasmiy havola (lex.uz, gov.uz, sud.uz).", "Добавленный акт сразу появится в кабинете юристов этого направления. Только официальная ссылка (lex.uz, gov.uz, sud.uz)."],
   bzUz: ["Nomi (o‘zbekcha)", "Название (узб.)"], bzRu: ["Nomi (ruscha, ixtiyoriy)", "Название (рус., необязательно)"], bzType: ["Turi", "Тип"], bzNum: ["Raqami", "Номер"], bzDate: ["Sanasi", "Дата"], bzUrl: ["Havola", "Ссылка"], bzAreas: ["Yo‘nalishlar", "Направления"],
@@ -108,7 +113,9 @@ export function loginPage({ lang, cssHref, fs, user, accHref, query, db }){
     ${!db ? `<p class="note warn">${esc(t("dbOff"))}</p>` : `<form class="card kform" data-api="/api/auth/login"${next ? ` data-next="${esc(next)}"` : ""}>
       ${field("l_email", t("email"), `<input id="l_email" name="email" type="email" required autocomplete="username" maxlength="254">`)}
       ${field("l_pw", t("password"), `<input id="l_pw" name="password" type="password" required autocomplete="current-password" maxlength="200">`)}
+      <div data-code hidden>${field("l_code", t("code2"), `<input id="l_code" name="code" inputmode="text" autocomplete="one-time-code" maxlength="20">`)}</div>
       <button class="btn primary" type="submit">${esc(t("login"))}</button>${err}</form>
+    <p><a href="/parol-unutdim">${esc(t("forgot"))}</a></p>
     <p>${esc(t("noAcc"))} <a href="/royxat${next ? `?next=${encodeURIComponent(next)}` : ""}">${esc(t("register"))}</a></p>`}</div>` });
 }
 
@@ -171,14 +178,8 @@ export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons, pane
     ${["lawyer", "org"].includes(user.role) ? `<h2 class="sec">${esc(t("subs"))}</h2>${subRows}<p class="small muted">${esc(t("payNote"))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("subscribe"))}</a> <a class="btn ghost" href="/kabinet">${esc(t("toCabinet"))}</a></p>` : ""}
     ${user.role === "lawyer" ? `<h2 class="sec">${esc(t("inCons"))}</h2>${cons.asLawyer.length ? `<ul class="klist">${cons.asLawyer.map(c => consRow(c, lang, "lawyer")).join("")}</ul>` : `<p class="empty">${esc(t("noIn"))}</p>`}` : ""}
     <h2 class="sec">${esc(t("myCons"))}</h2>${cons.asCitizen.length ? `<ul class="klist">${cons.asCitizen.map(c => consRow(c, lang, "citizen")).join("")}</ul>` : `<p class="empty">${esc(t("noCons"))} <a href="/yuristlar">${esc(btr(lang)("navLawyers"))}</a></p>`}
-    <h2 class="sec">${esc(t("security"))}</h2>
-    ${passwordForm(t)}` });
+    <p class="rowbtn acclinks2">${user.role === "moderator" ? "" : `<a class="btn ghost" href="/hisob/tolovlar">${esc(t("lnkPays"))}</a>`}${["lawyer", "org"].includes(user.role) ? `<a class="btn ghost" href="/jamoa">${esc(t("lnkTeam"))}</a>` : ""}<a class="btn ghost" href="/xavfsizlik">${esc(t("lnkSec"))}</a></p>` });
 }
-const passwordForm = t => `<form class="card kform narrow" data-api="/api/auth/password" data-ok="${esc(t("pwChanged"))}">
-      ${field("a_cur", t("curPw"), `<input id="a_cur" name="current" type="password" required autocomplete="current-password">`)}
-      ${field("a_new", t("newPw"), `<input id="a_new" name="password" type="password" required minlength="8" autocomplete="new-password">`, t("pwHint"))}
-      <button class="btn primary" type="submit">${esc(t("changePw"))}</button>${err}<p class="ok" data-ok-msg hidden></p></form>`;
-
 // Fuqaro «Hisobim»: «Yurist bo‘lish» arizasi holati yoki taklif
 function applyBox(app, lang){
   const t = L(lang);
@@ -271,8 +272,12 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s, photo
     <h2 class="sec">${esc(t("revMonth"))}</h2>${revTable || `<p class="empty">${esc(t("none"))}</p>`}
     <h2 class="sec">${esc(t("pendingPay"))}</h2>${a.pendingPay.length ? `<ul class="klist">${a.pendingPay.map(p => `<li><div><b>${esc(p.name || "—")}</b> · ${esc(p.email || "")}<br>
         <span class="muted">${esc(p.kind === "subscription" ? t("fromSubs") : t("fromComm"))} · ${esc(p.note || "")} · ${esc(date(p.created_at, lang))}</span></div>
+        <div class="rowbtn">${p.kind === "subscription" && !Number(p.amount) ? `<form class="inline" data-api="/api/admin/payment/${p.id}/price"><input name="amount" inputmode="numeric" required aria-label="${esc(t("amount"))}" placeholder="${esc(t("amount"))}"><button class="btn primary sm" type="submit">${esc(t("setPrice"))}</button></form>` : ""}
         <form class="inline" data-api="/api/admin/payment/${p.id}/confirm"><input name="amount" inputmode="numeric" aria-label="${esc(t("amount"))}" value="${Number(p.amount) || ""}" placeholder="${esc(t("amount"))}">
-        <button class="btn primary" type="submit">${esc(t("confirm"))}</button></form><button class="btn ghost" type="button" data-post="/api/admin/payment/${p.id}/cancel">${esc(t("cancel"))}</button>${err}</li>`).join("")}</ul>` : `<p class="empty">${esc(t("none"))}</p>`}`;
+        <button class="btn ghost sm" type="submit">${esc(t("markPaid"))}</button></form><button class="btn ghost sm" type="button" data-post="/api/admin/payment/${p.id}/cancel">${esc(t("cancel"))}</button></div>${err}</li>`).join("")}</ul>` : `<p class="empty">${esc(t("none"))}</p>`}
+    <p class="note">${esc(providers().length ? t("provOn", { l: providers().join(", ") }) : t("provOff"))}</p>
+    <h2 class="sec">${esc(t("txH"))}</h2>${a.lastPays.length ? `<ul class="klist">${a.lastPays.map(p => `<li><div><b>№ ${p.id}</b> · ${esc(p.name || "—")} · ${esc(p.kind === "subscription" ? t("fromSubs") : t("fromComm"))}<br><span class="small muted">${esc(date(p.paid_at || p.created_at, lang))} · ${esc(p.method || "")}</span></div>
+      <div class="rowbtn"><b>${esc(money(p.amount, lang))}</b><span class="chip ${p.status === "paid" ? "ok" : ""}">${esc(t("ps_" + p.status))}</span>${p.status === "paid" ? `<button class="linkbtn" type="button" data-post="/api/admin/payment/${p.id}/refund" data-confirm>${esc(t("refund"))}<span class="sr"> № ${p.id}</span></button>` : ""}</div>${err}</li>`).join("")}</ul>` : `<p class="empty">${esc(t("none"))}</p>`}`;
   else if (b === "obuna") body = `<h2 class="sec">${esc(t("subsBy"))}</h2>${table([t("plan"), t("status"), "#" + t("count"), "#" + t("price")], a.subs.map(r => `<tr><th scope="row">${esc(t("pl_" + r.plan))}</th><td>${esc(t("st_" + r.status))}</td><td class="numc">${r.n}</td><td class="numc">${esc(money(r.sum, lang))}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}
     <h2 class="sec">${esc(t("orgSubs"))}</h2>${table([t("org"), t("plan"), t("status"), t("who"), "#" + t("price"), t("created")], a.orgSubs.map(r => `<tr><th scope="row">${esc(r.org_name || "—")}${r.org_kind ? ` <span class="small muted">(${esc(r.org_kind)}${r.inn ? `, ${esc(r.inn)}` : ""})</span>` : ""}</th><td>${esc(t("pl_" + r.plan))}</td><td>${esc(t("st_" + r.status))}${r.ends_at ? `<br><span class="small muted">${esc(t("until", { d: date(r.ends_at, lang) }))}</span>` : ""}</td><td>${esc(r.name)}<br><span class="small muted">${esc(r.email)}</span></td><td class="numc">${esc(money(r.price, lang))}</td><td>${esc(date(r.created_at, lang))}${["active", "trial", "pending"].includes(r.status) ? `<br><button class="linkbtn" type="button" data-post="/api/admin/subscription/${r.id}/cancel">${esc(t("cancel"))}</button>` : ""}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}
     <h2 class="sec">${esc(t("trialEnd"))}</h2>${table([t("who"), t("plan"), t("until", { d: "" }).trim() || "—"], a.trialEnding.map(r => `<tr><th scope="row">${esc(r.name)} <span class="small muted">${esc(r.email)}</span></th><td>${esc(t("pl_" + r.plan))}</td><td>${esc(date(r.ends_at, lang))}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}`;
@@ -309,7 +314,8 @@ export function adminPage({ lang, cssHref, fs, user, accHref, query, a, s, photo
       ${acts.length ? `<ul class="klist">${acts.map(x => `<li><div><span class="tag">${esc(types.find(y => y.id === x.type)?.title || x.type)}</span> <b>${esc(lang === "ru" ? x.t[1] : cy(x.t[0]))}</b><br><span class="small muted">${[x.num && `№ ${x.num}`, x.date && date(x.date, lang), x.areas.map(title).join(", ")].filter(Boolean).map(esc).join(" · ")}</span><br><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.url.replace(/^https:\/\//, ""))} ↗</a></div>
         <button class="btn ghost" type="button" data-post="/api/admin/practice/${x.dbId}/remove">${esc(t("bzDel"))}</button>${err}</li>`).join("")}</ul>` : `<p class="empty">${esc(t("none"))}</p>`}`;
   }
-  else if (b === "parol") body = `<h2 class="sec">${esc(t("security"))}</h2>${passwordForm(t)}`;
+  else if (b === "parol") body = `<p><a class="btn primary" href="/xavfsizlik">${esc(t("lnkSec"))}</a></p>`;
+  else if (b === "jurnal") body = `<p class="muted">${esc(t("jrLead"))}</p>${table([t("jrWhen"), t("who"), t("jrAct"), t("jrTarget")], a.audit.map(r => `<tr><th scope="row">${esc(date(r.at, lang))} ${esc(new Date(r.at).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tashkent" }))}</th><td>${esc(r.email || "—")}</td><td>${esc(r.action)}${r.data?.amount ? ` · ${esc(money(r.data.amount, lang))}` : ""}${r.data?.role ? ` · ${esc(r.data.role)}` : ""}</td><td>${esc(r.target || "")}</td></tr>`)) || `<p class="empty">${esc(t("none"))}</p>`}`;
   else if (b === "users"){
     const roles = ["citizen", "lawyer", "org", "moderator", "admin"];
     body = `<div class="kabstats">${roles.map(r => tile(fmtSum(a.roles.find(x => x.role === r)?.n || 0), t("ro_" + r))).join("")}</div>

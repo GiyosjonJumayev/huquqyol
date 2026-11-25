@@ -119,7 +119,51 @@ const MIGRATIONS = [
      type text not null, title_uz text not null, title_ru text, num text, act_date date,
      url text not null unique, areas text[] not null,
      created_by bigint references users(id) on delete set null,
-     created_at timestamptz not null default now());`
+     created_at timestamptz not null default now());`,
+  // 5 — onlayn to‘lov (Payme, Click), jamoalar, hisob xavfsizligi (e-pochta, 2FA), jurnal
+  `alter table payments add column months int not null default 1 check (months between 1 and 36), add column refunded_at timestamptz;
+   create index payments_user on payments(user_id);
+   create table pay_tx(
+     id bigserial primary key,
+     provider text not null check (provider in ('payme','click')),
+     ext_id text not null,
+     paydoc_id text,                             -- Click: to‘lov hujjati raqami (qaytarish uchun)
+     payment_id bigint not null references payments(id),
+     amount bigint not null check (amount > 0),  -- so‘m
+     state int not null check (state in (1, 2, -1, -2)),
+     reason int,
+     ext_time bigint not null, create_time bigint not null, perform_time bigint, cancel_time bigint,
+     fiscal jsonb,
+     unique (provider, ext_id));
+   create index pay_tx_payment on pay_tx(payment_id);
+   create unique index pay_tx_one_open on pay_tx(payment_id) where state = 1;     -- bitta buyurtma — bitta ochiq tranzaksiya
+   create unique index pay_tx_one_paid on pay_tx(payment_id) where state = 2;     -- va bitta to‘langan tranzaksiya
+   alter table subscriptions add column reminded_at timestamptz;
+
+   alter table users add column org_role text check (org_role in ('owner','member')),
+     add column email_verified_at timestamptz,
+     add column totp_secret text, add column totp_enabled_at timestamptz, add column totp_last bigint not null default 0, add column totp_recovery text[] not null default '{}';
+   update users u set org_role = 'owner' where org_id is not null;
+   create index users_org on users(org_id) where org_id is not null;
+   create table user_tokens(
+     id text primary key,                        -- sha256(havola kaliti)
+     kind text not null check (kind in ('verify','reset','invite')),
+     user_id bigint references users(id) on delete cascade,
+     data jsonb,
+     created_at timestamptz not null default now(),
+     expires_at timestamptz not null);
+   create index user_tokens_user on user_tokens(user_id, kind);
+   create table org_cabinet(
+     org_id bigint primary key references organizations(id) on delete cascade,
+     data jsonb not null, version int not null default 1,
+     updated_by bigint references users(id) on delete set null,
+     updated_at timestamptz not null default now());
+   create table audit_log(
+     id bigserial primary key,
+     at timestamptz not null default now(),
+     user_id bigint references users(id) on delete set null,
+     action text not null, target text, data jsonb, ip text);
+   create index audit_log_at on audit_log(at desc);`
 ];
 
 let pool = null;

@@ -18,6 +18,19 @@ export const PAGES = [
   { path: "/tariflar",         roles: ALL },
   { path: "/statistika",       roles: ALL },
   { path: "/maxfiylik",        roles: ALL },
+  { path: "/oferta",           roles: ALL },          // ommaviy oferta, to‘lov va qaytarish shartlari
+  { path: "/parol-unutdim",    roles: ALL },
+  { path: "/parol-tiklash",    roles: ALL },          // xatdagi bir martalik havola
+  { path: "/tasdiqlash",       roles: ALL },
+  { path: "/robots.txt",       roles: ALL },
+  { path: "/sitemap.xml",      roles: ALL },
+  { path: "/xavfsizlik",       roles: USERS },        // parol, 2FA, qurilmalar, ma’lumotlarim
+  { path: "/hisob/tolovlar",   roles: ["citizen", "lawyer", "org"] },
+  { path: "/malumotlarim", roles: USERS },
+  { path: "/tolov/:id",        roles: ["citizen", "lawyer", "org"] },   // egasi — handler ichida
+  { path: "/tolov/:id/hisob-faktura", roles: ["citizen", "lawyer", "org"] },
+  { path: "/jamoa",            roles: ["citizen", "lawyer", "org"] },
+  { path: "/jamoa/taklif",     roles: ["citizen", "lawyer", "org"] },
   { path: "/kirish",           roles: ALL },          // kirgan foydalanuvchi o‘z bosh sahifasiga yo‘naltiriladi
   { path: "/royxat",           roles: ALL },
   { path: "/mavzu",            roles: ALL },          // yorug‘/qorong‘i mavzu (JavaScript’siz)
@@ -34,8 +47,17 @@ export const API = [
   // Fuqaro oqimi va ochiq ma’lumot — hamma uchun (hisobsiz ham)
   ...["/api/health", "/api/meta", "/api/stats", "/api/courts", "/api/me"].map(path => ({ method: "GET", path, roles: ALL })),
   ...["/api/analyze", "/api/plan", "/api/document/preview", "/api/document/:format", "/api/custom/:format", "/api/photo",
-      "/api/auth/register", "/api/auth/login", "/api/auth/logout"].map(path => ({ method: "POST", path, roles: ALL })),
+      "/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/forgot", "/api/auth/reset", "/api/auth/confirm"].map(path => ({ method: "POST", path, roles: ALL })),
+  { method: "GET", path: "/api/ready", roles: ALL },
+  // Provayder serverlari chaqiradi: imzo / Basic kalit handler ichida tekshiriladi (server/payGateways.js)
+  ...["/api/pay/payme", "/api/pay/click/prepare", "/api/pay/click/complete"].map(path => ({ method: "POST", path, roles: ALL })),
   // Hisob talab qilinadi
+  ...["/api/auth/verify", "/api/auth/2fa/start", "/api/auth/2fa/enable", "/api/auth/2fa/disable", "/api/auth/sessions/:ref/end", "/api/account/delete"].map(path => ({ method: "POST", path, roles: USERS })),
+  { method: "GET",  path: "/api/payments/:id",           roles: ["citizen", "lawyer", "org"] },
+  { method: "POST", path: "/api/payments/:id/cancel",    roles: ["citizen", "lawyer", "org"] },
+  ...["/api/team/invite", "/api/team/invite/:ref/cancel", "/api/team/accept", "/api/team/members/:id/remove"].map(path => ({ method: "POST", path, roles: ["citizen", "lawyer", "org"] })),
+  { method: "GET",  path: "/api/team/cabinet",           roles: ["lawyer", "org"], need: "pro" },
+  { method: "POST", path: "/api/team/cabinet",           roles: ["lawyer", "org"], need: "pro" },
   { method: "POST", path: "/api/auth/password",          roles: USERS },
   { method: "POST", path: "/api/subscriptions",          roles: ["citizen", "lawyer", "org"] },
   { method: "POST", path: "/api/consultations",          roles: ["citizen", "lawyer", "org"] },
@@ -52,7 +74,7 @@ export const API = [
 
 // Admin paneli bo‘limlari va amallari: moderator — faqat yurist arizalari va rasm moderatsiyasi (to‘lov, daromad, rollar yo‘q)
 export const ADMIN_SECTIONS = {
-  admin: ["umumiy", "murojaat", "daromad", "obuna", "yurist", "rasm", "kelishuv", "baza", "users", "parol"],
+  admin: ["umumiy", "murojaat", "daromad", "obuna", "yurist", "rasm", "kelishuv", "baza", "users", "jurnal", "parol"],
   moderator: ["yurist", "rasm"]
 };
 export const ADMIN_ACTS = {
@@ -90,6 +112,9 @@ export async function decide(role, rule, ctx = {}){
     if (role === "guest") return api ? { status: 401, reason: "auth" } : { status: 303, location: `/kirish?next=${encodeURIComponent(ctx.url || rule.path)}`, reason: "auth" };
     return { status: 403, reason: "role" };
   }
+  // Production: admin va moderator uchun ikki bosqichli kirish majburiy (REQUIRE_ADMIN_2FA=0 — o‘chirish)
+  if (ctx.second && ["admin", "moderator"].includes(role) && (rule.path === "/admin" || rule.path.startsWith("/api/admin/")))
+    return api ? { status: 403, reason: "2fa" } : { status: 303, location: "/xavfsizlik?majburiy=1", reason: "2fa" };
   if (rule.path === "/admin"){
     const b = ctx.query?.b;
     if (b && !ADMIN_SECTIONS[role].includes(b)) return { status: 403, reason: "section" };
@@ -106,14 +131,14 @@ export function accessMiddleware({ proStatus, forbidden }){
     if (!rule) return next();
     const role = roleOf(req.user);
     let pro = null;
-    const ctx = { url: req.originalUrl, query: req.query,
+    const ctx = { url: req.originalUrl, query: req.query, second: !!req.user && !req.user.totp && process.env.REQUIRE_ADMIN_2FA !== "0" && process.env.NODE_ENV === "production",
       pro: async () => { if (!req.user) return false; pro ??= await proStatus(req.user.id); req.pro = pro; return pro.tools; } };
     decide(role, rule, ctx).then(d => {
       req.role = role;
       if (d.ok) return next();
       const api = rule.path.startsWith("/api/");
       if (api){
-        const key = { 401: "auth", 402: "needPro", 403: "forbidden" }[d.status];
+        const key = d.reason === "2fa" ? "need2fa" : { 401: "auth", 402: "needPro", 403: "forbidden" }[d.status];
         return res.status(d.status).json({ error: key, key });
       }
       if (d.status === 303) return res.redirect(303, d.location);

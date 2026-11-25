@@ -9,35 +9,74 @@ import { createPractice } from "/practice.js";
 const root = document.getElementById("kab");
 const LANG = normLang(root.dataset.lang), RU = LANG === "ru";
 const L = (uz, ru) => RU ? ru : LANG === "cyr" ? toCyr(uz) : uz;
-const KEY = "huquqyol:pro";
+// Ikki joy: shaxsiy kabinet va jamoa kartotekasi (/kabinet?joy=jamoa) — alohida saqlanadi
+const UID = root.dataset.uid || "", TEAM = "team" in root.dataset && new URLSearchParams(location.search).get("joy") === "jamoa";
+const KEY = TEAM ? "huquqyol:pro:jamoa" : "huquqyol:pro", API_CAB = TEAM ? "/api/team/cabinet" : "/api/cabinet";
+let MEMBERS = [];
 const iso = (d = new Date()) => { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
 const uid = () => Math.random().toString(36).slice(2, 10);
 const dt = s => s ? fmtDate(new Date(s + "T00:00:00"), RU ? "ru" : "uz") : "";
 const showDate = s => LANG === "cyr" ? toCyr(dt(s)) : dt(s);
 
 const EMPTY = () => ({ v:1, plan:"pro", since: iso(), clients:[], cases:[], letterhead:{ on:false, lines:["", "", "", ""] }, templates:[], org:{ name:"", docs:[] }, profile:{}, areas:[], saved:[] });
-function load(){ try { return { ...EMPTY(), ...(JSON.parse(localStorage.getItem(KEY)) || {}) }; } catch { return EMPTY(); } }
+// Boshqa hisobning shu brauzerda qolgan nusxasi hech qachon ishlatilmaydi
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); return d && (!d.uid || d.uid === UID) ? { ...EMPTY(), ...d, uid: UID } : { ...EMPTY(), uid: UID }; } catch { return { ...EMPTY(), uid: UID }; } }
 let S = load();
 // Saqlash: brauzerda (darhol) va hisobda (1,5 soniyadan keyin) — boshqa qurilmada ham ochiladi
 const SYNC = root.dataset.sync === "1";
 let syncT = null, syncState = "";
 function setSync(st){ syncState = st; const el = document.getElementById("syncState"); if (el) el.textContent = SYNC_TEXT[st] ? L(...SYNC_TEXT[st]) : ""; }
 const SYNC_TEXT = { saving:["Saqlanmoqda…", "Сохранение…"], saved:["✓ Hisobingizda saqlandi", "✓ Сохранено в аккаунте"], error:["Hisobga saqlanmadi — internetni tekshiring (ma’lumot brauzerda bor)", "Не сохранено в аккаунте — проверьте интернет (данные есть в браузере)"] };
+// Oxirgi server holati (BASE): ikki qurilma yoki hamkasb bir vaqtda yozsa, 409 keladi — uch tomonlama birlashtirib qayta yuboramiz
+let BASE = null, VERSION = 0, STAMP = null, pushing = false, again = false;
+const copy = x => JSON.parse(JSON.stringify(x));
+function merge3(base, mine, theirs){
+  const list = (b = [], m = [], t = []) => {
+    const key = x => JSON.stringify(x), B = new Map(b.map(x => [x.id, key(x)])), M = new Map(m.map(x => [x.id, x])), T = new Set(t.map(x => x.id));
+    const out = t.filter(x => M.has(x.id) || !B.has(x.id) || key(x) !== B.get(x.id))               // men o‘chirgan va boshqalar tegmagan — o‘chadi
+      .map(x => M.has(x.id) && key(M.get(x.id)) !== B.get(x.id) ? M.get(x.id) : x);               // men o‘zgartirgan — meniki
+    return [...m.filter(x => !T.has(x.id) && (!B.has(x.id) || key(x) !== B.get(x.id))), ...out];  // men qo‘shgan yoki tahrirlagan — qoladi
+  };
+  const b = base || {};
+  return { ...theirs, ...mine, clients: list(b.clients, mine.clients, theirs.clients), cases: list(b.cases, mine.cases, theirs.cases), templates: list(b.templates, mine.templates, theirs.templates),
+    org: { name: mine.org?.name || theirs.org?.name || "", docs: list(b.org?.docs, mine.org?.docs, theirs.org?.docs) } };
+}
+async function getServer(){
+  const r = await fetch(API_CAB, { credentials:"same-origin" });
+  if (!r.ok) throw Object.assign(new Error("get"), { status: r.status });
+  const d = await r.json();
+  if (d.members) MEMBERS = d.members;
+  return d;
+}
 async function pushServer(){
+  if (pushing){ again = true; return; }
+  pushing = true;
   try {
     setSync("saving");
-    const r = await fetch("/api/cabinet", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ data: S }), credentials:"same-origin" });
-    if (!r.ok) throw 0;
-    S.syncedAt = (await r.json()).updatedAt; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {}
+    for (let i = 0; ; i++){
+      const sent = copy(S);
+      const r = await fetch(API_CAB, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(TEAM ? { data: sent, version: VERSION } : { data: sent, base: STAMP }), credentials:"same-origin" });
+      if (r.status === 409 && i < 4){
+        const d = await getServer();
+        S = { ...EMPTY(), ...merge3(BASE, S, { ...EMPTY(), ...(d.data || {}) }), uid: UID };
+        BASE = copy(d.data || EMPTY()); VERSION = d.version || 0; STAMP = d.updatedAt;
+        if (!panel.contains(document.activeElement) || document.activeElement === panel) go(tab);   // yozayotgan odamga xalaqit bermaymiz
+        continue;
+      }
+      if (!r.ok) throw 0;
+      const d = await r.json(); BASE = sent; VERSION = d.version || 0; STAMP = d.updatedAt;
+      break;
+    }
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {}
     setSync("saved");
   } catch { setSync("error"); }
+  finally { pushing = false; if (again){ again = false; pushServer(); } }
 }
 const save = () => {
   S.savedAt = new Date().toISOString();
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {}
   if (SYNC){ clearTimeout(syncT); syncT = setTimeout(pushServer, 1500); }
 };
-if (new URLSearchParams(location.search).get("tarif") in { pro:1, firma:1, org:1 }){ S.plan = new URLSearchParams(location.search).get("tarif"); save(); }
 
 // Ma’lumotlar: holatlar va qonunlar (meta), hududlar (sudlar bazasi)
 let META = null, COURTS = null;
@@ -50,7 +89,6 @@ const TABS = [
   ["umumiy", "Umumiy", "Обзор"], ["yonalish", "Yo‘nalishim", "Моё направление"], ["mijozlar", "Mijozlar", "Клиенты"], ["ishlar", "Ishlar", "Дела"], ["kalendar", "Kalendar", "Календарь"],
   ["blanka", "Blanka", "Бланк"], ["shablonlar", "Shablonlar", "Шаблоны"], ["tashkilot", "Tashkilot hujjatlari", "Документы организации"], ["profil", "Katalog profili", "Профиль в каталоге"]
 ];
-const PLAN_NAMES = { pro:["Yurist Pro", "Юрист Pro"], firma:["Firma", "Фирма"], org:["Tashkilot", "Организация"] };
 const STAGES = [["prep", "Tayyorgarlik", "Подготовка"], ["pre", "Sudgacha", "Досудебная стадия"], ["court", "Sudda", "В суде"], ["exec", "Ijroda", "Исполнение"], ["closed", "Yopilgan", "Закрыто"]];
 const DOC_TYPES = [["nizom", "Nizom (ustav)", "Устав (положение)"], ["qoida", "Ichki qoida", "Внутреннее правило"], ["buyruq", "Buyruq", "Приказ"],
   ["yoriqnoma", "Lavozim yo‘riqnomasi", "Должностная инструкция"], ["shablon", "Ichki shablon", "Внутренний шаблон"], ["qonun", "Qonun yoki normativ hujjat", "Закон или нормативный акт"]];
@@ -59,7 +97,8 @@ const name = (list, v) => { const x = list.find(i => i[0] === v); return x ? L(x
 
 // ---------- Qobiq ----------
 let tab = TABS.some(t => t[0] === location.hash.slice(1)) ? location.hash.slice(1) : "umumiy";
-root.innerHTML = `<h1>${esc(L("Yurist kabineti", "Кабинет юриста"))} <span class="tag pro" id="planTag"></span></h1>
+root.innerHTML = `<h1>${esc(L("Yurist kabineti", "Кабинет юриста"))} ${TEAM ? `<span class="tag pro">${esc(L("Jamoa", "Команда"))}</span>` : `<span class="tag pro">Pro</span>`}</h1>
+  ${"team" in root.dataset ? `<p class="pview" role="group" aria-label="${esc(L("Qaysi kartoteka", "Какая картотека"))}"><a class="chipbtn" href="/kabinet"${TEAM ? "" : ` aria-current="page"`}>${esc(L("Shaxsiy", "Личная"))}</a><a class="chipbtn" href="/kabinet?joy=jamoa"${TEAM ? ` aria-current="page"` : ""}>${esc(L("Jamoa", "Команда"))}</a></p>` : ""}
   <p class="note">${esc(L("Ma’lumotlar hisobingizda saqlanadi va boshqa qurilmalarda ham ochiladi. Zaxira nusxa — «Umumiy» bo‘limida.", "Данные хранятся в вашем аккаунте и открываются на других устройствах. Резервная копия — в разделе «Обзор»."))} <span class="syncstate" id="syncState" aria-live="polite"></span></p>
   <nav class="kabtabs" role="tablist" aria-label="${esc(L("Kabinet bo‘limlari", "Разделы кабинета"))}">${TABS.map(([id, uz, ru]) => `<a role="tab" href="#${id}" data-tab="${id}">${esc(L(uz, ru))}</a>`).join("")}</nav>
   <section id="panel" class="kabpanel" role="tabpanel" tabindex="-1"></section><div class="sr" aria-live="polite" id="kabLive"></div>`;
@@ -69,7 +108,6 @@ function go(id, focus){
   tab = id;
   if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
   document.querySelectorAll(".kabtabs a").forEach(a => a.setAttribute("aria-selected", String(a.dataset.tab === id)));
-  document.getElementById("planTag").textContent = L(...PLAN_NAMES[S.plan] || PLAN_NAMES.pro);
   panel.innerHTML = (VIEWS[id] || VIEWS.umumiy)();
   AFTER[id]?.();
   if (focus) panel.focus();
@@ -103,9 +141,7 @@ const VIEWS = {
         <div class="stattile"><div class="stv">${S.cases.filter(c => c.stage !== "closed").length}</div><div class="stl">${esc(L("Faol ishlar", "Активные дела"))}</div></div>
         <div class="stattile${week ? " warnt" : ""}"><div class="stv">${week}</div><div class="stl">${esc(L("7 kun ichidagi muddatlar", "Сроки в ближайшие 7 дней"))}</div></div>
         <div class="stattile${over ? " badt" : ""}"><div class="stv">${over}</div><div class="stl">${esc(L("O‘tib ketgan muddatlar", "Просроченные сроки"))}</div></div></div>
-      <h2 class="sec">${esc(L("Tarif", "Тариф"))}</h2>
-      <fieldset class="plansel"><legend class="sr">${esc(L("Tarif", "Тариф"))}</legend>${Object.entries(PLAN_NAMES).map(([id, n]) => `<label><input type="radio" name="plan" value="${id}"${S.plan === id ? " checked" : ""}> ${esc(L(...n))}</label>`).join("")}</fieldset>
-      <p class="small muted">${esc(L("To‘lov keyingi bosqichda ulanadi. Tariflarni solishtirish:", "Оплата подключится на следующем этапе. Сравнить тарифы:"))} <a href="/tariflar">${esc(L("Tariflar", "Тарифы"))}</a></p>
+      <p class="rowbtn"><a class="btn ghost" href="/hisob/tolovlar">${esc(L("Obuna va to‘lovlar", "Подписка и оплата"))}</a>${"team" in root.dataset ? `<a class="btn ghost" href="/jamoa">${esc(L("Jamoa a’zolari", "Участники команды"))}</a>` : ""}</p>
       <h2 class="sec">${esc(L("Zaxira nusxa", "Резервная копия"))}</h2>
       <p>${esc(L("Ma’lumotlar hisobingizda va shu brauzerda saqlanadi. Yo‘qotmaslik uchun vaqti-vaqti bilan faylga ham saqlab qo‘ying.", "Данные хранятся в вашем аккаунте и в этом браузере. Для надёжности иногда сохраняйте их и в файл."))}</p>
       <div class="rowbtn"><button class="btn primary" type="button" data-act="export">${esc(L("Faylga saqlash (JSON)", "Сохранить в файл (JSON)"))}</button>
@@ -141,6 +177,7 @@ const VIEWS = {
       ${S.cases.length ? S.cases.map(c => `<article class="card kcase" aria-labelledby="h_${c.id}">
         <div class="kchead"><h3 id="h_${c.id}">${esc(c.title)}</h3><select data-act="stage" data-id="${c.id}" aria-label="${esc(L("Bosqich", "Стадия"))}">${opt(STAGES, c.stage)}</select></div>
         <p class="muted">${[clientName(c.clientId), scnTitle(c.scenario), c.court, c.number && `№ ${c.number}`].filter(Boolean).map(esc).join(" · ")}</p>
+        ${TEAM && MEMBERS.length ? `<div class="field kassign"><label for="as_${c.id}">${esc(L("Mas’ul", "Ответственный"))}</label><select id="as_${c.id}" data-act="assign" data-id="${c.id}"><option value="">—</option>${MEMBERS.map(m => `<option value="${esc(m.id)}"${m.id === c.assignee ? " selected" : ""}>${esc(m.name)}</option>`).join("")}</select></div>` : ""}
         <ul class="kdl">${(c.deadlines || []).map(d => `<li class="${d.done ? "done" : daysTo(d.date) < 0 ? "over" : daysTo(d.date) <= 7 ? "soon" : ""}">
           <label><input type="checkbox" data-act="dlDone" data-case="${c.id}" data-id="${d.id}"${d.done ? " checked" : ""}> <b>${esc(showDate(d.date))}</b> — ${esc(d.note || "")}</label>
           <button class="linkbtn" type="button" data-act="delDl" data-case="${c.id}" data-id="${d.id}">${esc(L("O‘chirish", "Удалить"))}</button></li>`).join("")}</ul>
@@ -260,12 +297,12 @@ function saveTpl(){
 panel.addEventListener("change", e => {
   if (practice.change(e)) return;
   const a = e.target.dataset.act;
-  if (e.target.name === "plan"){ S.plan = e.target.value; save(); go(tab); return; }
+  if (a === "assign"){ const c = S.cases.find(x => x.id === e.target.dataset.id); if (c){ c.assignee = e.target.value; save(); } return; }
   if (a === "stage"){ const c = S.cases.find(x => x.id === e.target.dataset.id); if (c){ c.stage = e.target.value; save(); } return; }
   if (a === "dlDone"){ const c = S.cases.find(x => x.id === e.target.dataset.case), d = c?.deadlines.find(x => x.id === e.target.dataset.id); if (d){ d.done = e.target.checked; save(); go(tab); } return; }
   if (a === "taskDone"){ const c = S.cases.find(x => x.id === e.target.dataset.case), d = c?.tasks?.find(x => x.id === e.target.dataset.id); if (d){ d.done = e.target.checked; save(); go(tab); } return; }
   if (e.target.id === "importFile" && e.target.files[0]){
-    e.target.files[0].text().then(t => { const d = JSON.parse(t); if (!d || d.v !== 1 || !Array.isArray(d.cases)) throw 0; S = { ...EMPTY(), ...d }; save(); go("umumiy"); say(L("Ma’lumotlar tiklandi", "Данные восстановлены")); })
+    e.target.files[0].text().then(t => { const d = JSON.parse(t); if (!d || d.v !== 1 || !Array.isArray(d.cases)) throw 0; S = { ...EMPTY(), ...d, uid: UID }; save(); go("umumiy"); say(L("Ma’lumotlar tiklandi", "Данные восстановлены")); })
       .catch(() => say(L("Fayl mos emas", "Файл не подходит")));
   }
 });
@@ -302,10 +339,10 @@ function ics(){
 }
 
 go(tab);
-const pull = !SYNC ? Promise.resolve() : fetch("/api/cabinet", { credentials:"same-origin" }).then(r => r.ok ? r.json() : null).then(d => {
-  if (!d) return;
-  const server = d.data, local = S.savedAt || "";
-  if (server && server.v === 1 && (!local || (server.savedAt || "") >= local)){ S = { ...EMPTY(), ...server, syncedAt: d.updatedAt }; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} setSync("saved"); }
-  else if (local && (S.clients.length || S.cases.length || S.templates.length || S.org.docs.length || S.letterhead.lines.some(Boolean))) pushServer();
-}).catch(() => setSync("error"));
+const pull = !SYNC ? Promise.resolve() : getServer().then(d => {
+  const server = d.data && d.data.v === 1 ? { ...EMPTY(), ...d.data } : null, dirty = S.savedAt && (S.clients.length || S.cases.length || S.templates.length || S.org.docs.length || S.letterhead.lines.some(Boolean));
+  BASE = server ? copy(server) : null; VERSION = d.version || 0; STAMP = d.updatedAt;
+  if (server && (!dirty || (server.savedAt || "") >= (S.savedAt || ""))){ S = { ...server, uid: UID }; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} setSync("saved"); }
+  else if (dirty){ if (server) S = { ...merge3(null, S, server), uid: UID }; pushServer(); }          // oflayn yozilgan ma’lumot yo‘qolmaydi
+}).catch(x => { if (TEAM && x.status === 402) location.replace("/jamoa"); else setSync("error"); });
 Promise.all([getMeta(), getCourts(), pull]).then(() => go(tab));
