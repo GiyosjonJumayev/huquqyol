@@ -74,7 +74,7 @@ export async function resetPassword(req, res){
 // ---------- Ikki bosqichli kirish ----------
 async function needPassword(req){
   const u = await one("select password_hash, totp_secret, totp_enabled_at, totp_last from users where id = $1", [req.user.id]);
-  if (!await verifyPassword(String(req.body?.password ?? "").slice(0, 200), u.password_hash)) throw err("badPassword", 401);
+  if (!await verifyPassword(String(req.body?.password ?? "").slice(0, 200), u.password_hash)) throw err("badPassword", 400);
   return u;
 }
 export async function totpStart(req, res){

@@ -1,18 +1,70 @@
 # HuquqYo‘lni hostingga joylashtirish
 
-Ilova — bitta Node.js server. Ma’lumotlar bazasi kerak emas: bilim bazasi, shriftlar va sahifalar loyiha ichida. Talablar:
+Ilova — bitta Node.js server. Fuqaro oqimi bazasiz ham ishlaydi; **hisoblar, obuna va to‘lovlar uchun PostgreSQL kerak**. Pullik ishchi tizim uchun — pastdagi «Ishchi tizim (tavsiya)» bo‘limi. Talablar:
 - **Node.js 18.18+** (tavsiya: 20 yoki 22);
 - taxminan 150 MB RAM;
 - 60 MB disk.
 
 | Usul | Qachon mos | Vaqt |
 |---|---|---|
+| [**Ishchi tizim: VPS + Docker Compose**](#ishchi-tizim-tavsiya) | **Pul qabul qiladigan haqiqiy sayt** (baza, HTTPS, zaxira bilan) | 30 daqiqa |
 | [A. cPanel hosting (Node.js App)](#a-cpanel-hosting) | Oddiy pullik hosting (ahost, hostinger, timeweb va h.k.) | 10 daqiqa |
 | [B. VPS (Ubuntu + Nginx)](#b-vps-ubuntu--nginx) | O‘z serveringiz, to‘liq nazorat | 20 daqiqa |
 | [C. Docker](#c-docker) | Docker bor server | 5 daqiqa |
 | [D. Render (bepul)](#d-render-bepul) | Hakaton uchun tezkor demo havola | 5 daqiqa |
 
 > **Muhim:** ilova domen yoki subdomen ildizida ishlaydi (`huquqyol.uz`, `app.sayt.uz`). `sayt.uz/huquqyol` kabi papka manzili qo‘llanmaydi — subdomen oching.
+
+---
+
+## Ishchi tizim (tavsiya)
+
+O‘zbekistondagi VPS (2 vCPU, 2 GB RAM, 20 GB disk, Ubuntu 24.04) va domen kerak. Server joyi muhim: shaxsiy ma’lumotlar qonunchiligi fuqarolar ma’lumotini O‘zbekistonda saqlashni talab qiladi — mahalliy data-markazni tanlang.
+
+```bash
+# 1) Domen DNS: A yozuv → server IP (www ham). Serverda Docker:
+curl -fsSL https://get.docker.com | sudo sh
+sudo ufw allow OpenSSH && sudo ufw allow 80,443/tcp && sudo ufw allow 443/udp && sudo ufw enable
+
+# 2) Kod va sozlama
+git clone https://github.com/GiyosjonJumayev/huquqyol.git && cd huquqyol
+cp .env.example .env && chmod 600 .env && nano .env     # quyidagi jadval
+
+# 3) Tekshiruv va ishga tushirish
+alias dc='docker compose -f deploy/compose.yml --env-file .env'
+dc run --rm app node scripts/check-prod.mjs
+dc up -d --build
+curl -s https://DOMEN/api/ready                          # {"ok":true,"db":true}
+
+# 4) Birinchi admin: saytda ro‘yxatdan o‘ting, so‘ng
+dc exec app node scripts/make-admin.mjs siz@domen.uz     # keyin /xavfsizlik da 2FA ni yoqing
+```
+
+| `.env` da majburiy | Qiymat |
+|---|---|
+| `NODE_ENV` | `production` |
+| `PUBLIC_HOST` | domen, masalan `huquqyol.uz` (https:// siz) |
+| `FORCE_HTTPS`, `TRUST_PROXY` | `1` |
+| `POSTGRES_PASSWORD` | `openssl rand -hex 24` |
+| `APP_SECRET` | `openssl rand -hex 32` |
+| `DATABASE_URL` | `postgres://huquqyol:PAROL@db:5432/huquqyol` (Compose o‘zi qo‘yadi) |
+
+To‘lov kalitlari — [docs/PAYMENTS.md](docs/PAYMENTS.md). Xat yuborish — `SMTP_URL`.
+
+- **Yangilash:** `git pull && dc up -d --build` (migratsiyalar o‘zi qo‘llanadi).
+- **Zaxira:** har kuni 03:30 da `backups/` ga, 14 kun saqlanadi; qo‘lda: `dc exec backup sh /backup.sh once`. Nusxani boshqa serverga ham ko‘chiring.
+- **Tiklash:** `sh deploy/restore.sh backups/….dump` — oyda bir marta sinab ko‘ring.
+- **Monitoring:** UptimeRobot kabi xizmatga `https://DOMEN/api/ready` ni qo‘ying (baza ham tekshiriladi). Loglar: `dc logs -f app`.
+- **Telegram bot:** `dc --profile bot up -d`.
+
+### Ochishdan oldin (sizning zimmangizda)
+
+- [ ] Yuridik shaxs / YaTT, Payme va Click shartnomalari, bank rekvizitlari `.env` da.
+- [ ] `/oferta`, `/maxfiylik` va hujjat shablonlarini yurist ko‘rib chiqqan.
+- [ ] IKPU va soliq rejimi buxgalter bilan kelishilgan.
+- [ ] Shaxsiy ma’lumotlar bazasini ro‘yxatdan o‘tkazish zarurligi tekshirilgan.
+- [ ] Katalogda haqiqiy yuristlar bor (namuna profillar production’da yashirin).
+- [ ] Kichik summa bilan haqiqiy to‘lov va qaytarish sinovdan o‘tgan.
 
 ---
 

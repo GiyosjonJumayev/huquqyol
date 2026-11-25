@@ -1,5 +1,12 @@
 # O‘zgarishlar tarixi
 
+## 4.0.0 — 2026-11-25 · Ishchi tizim: onlayn to‘lov, jamoalar, xavfsizlik, joylashtirish
+- **To‘lov:** Payme (Merchant API), Click (SHOP API), bank o‘tkazmasi (hisob-faktura PDF); 1/3/12 oylik davr, muddatidan oldin uzaytirish, qaytarish, fiskal chek havolasi, to‘lovlar tarixi, oferta.
+- **Jamoa** (Firma, Tashkilot): taklif, o‘rinlar, umumiy kartoteka, mas’ul tayinlash, bir vaqtda tahrirlashni birlashtirish.
+- **Hisob:** e-pochtani tasdiqlash, parolni tiklash, 2FA, qurilmalar, ma’lumotlarni yuklab olish, hisobni o‘chirish, admin jurnali.
+- **Tuzatildi:** admin e-pochtasi bilan ro‘yxatdan o‘tib admin bo‘lish; shaxsiy sahifalarning service worker keshi; umumiy kompyuterda kabinet nusxasi qolishi va boshqa hisobga o‘tib ketishi; uzaytirganda qolgan kunlarning yo‘qolishi; nginx 64 KB chegarasi rasm yuklashni to‘sishi; ikki qurilmada kabinet ma’lumoti ustiga yozilishi.
+- **Joylashtirish:** Docker Compose (Caddy HTTPS, PostgreSQL, kunlik zaxira, tiklash), `npm run check`, `npm run admin`, `/api/ready`.
+
 ## 3.14.0 — 2026-11-20 · PDF yuklash
 - Jarima qarori, chek yoki buyruqni **PDF** sifatida ham yuklash mumkin (panel, sudrab tashlash, Ctrl+V).
 - PDF brauzerning o‘zida pdf.js bilan ochiladi (o‘z serverimizdan, CDN yo‘q); PDF fayl serverga yuborilmaydi.

@@ -1,0 +1,82 @@
+# Production: ilova + PostgreSQL + Caddy (avtomatik HTTPS) + kunlik zaxira nusxa.
+#   cp .env.example .env   # to‘ldiring (DEPLOY.md, A bo‘lim)
+#   docker compose -f deploy/compose.yml --env-file .env run --rm app node scripts/check-prod.mjs
+#   docker compose -f deploy/compose.yml --env-file .env up -d --build
+name: huquqyol
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: huquqyol
+      POSTGRES_DB: huquqyol
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env da kerak}
+      TZ: Asia/Tashkent
+    volumes: [db:/var/lib/postgresql/data]
+    networks: [inner]                          # tashqariga port ochilmaydi
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U huquqyol"], interval: 5s, timeout: 5s, retries: 20 }
+    security_opt: ["no-new-privileges:true"]
+
+  app:
+    build: { context: .., dockerfile: Dockerfile }
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3000"
+      TRUST_PROXY: "1"
+      FORCE_HTTPS: "1"
+      DATABASE_URL: postgres://huquqyol:${POSTGRES_PASSWORD}@db:5432/huquqyol
+    depends_on: { db: { condition: service_healthy } }
+    volumes: [data:/app/data]
+    networks: [inner, outer]                   # outer: SMTP, AI va Click API uchun chiquvchi aloqa
+    read_only: true
+    tmpfs: ["/tmp:size=256m"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 900m
+    stop_grace_period: 15s
+    logging: &log { driver: json-file, options: { max-size: 10m, max-file: "5" } }
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment: { PUBLIC_HOST: "${PUBLIC_HOST:?PUBLIC_HOST .env da kerak}" }
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile:ro", "caddy:/data"]
+    depends_on: [app]
+    networks: [outer]
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+    logging: *log
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment: { PGHOST: db, PGUSER: huquqyol, PGDATABASE: huquqyol, PGPASSWORD: "${POSTGRES_PASSWORD}", KEEP_DAYS: "${BACKUP_KEEP_DAYS:-14}", TZ: Asia/Tashkent }
+    volumes: ["./backup.sh:/backup.sh:ro", "${BACKUP_DIR:-../backups}:/backups"]
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    depends_on: { db: { condition: service_healthy } }
+    networks: [inner]
+    security_opt: ["no-new-privileges:true"]
+
+  bot:                                         # docker compose --profile bot up -d
+    profiles: [bot]
+    build: { context: .., dockerfile: Dockerfile }
+    command: ["node", "bot/index.js"]
+    restart: unless-stopped
+    env_file: ../.env
+    environment: { NODE_ENV: production }
+    networks: [outer]
+    read_only: true
+    tmpfs: ["/tmp:size=64m"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    logging: *log
+
+volumes: { db: {}, data: {}, caddy: {} }
+networks:
+  inner: { internal: true }
+  outer: {}

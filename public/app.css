@@ -1517,4 +1517,6 @@ html{background:var(--bg)}
 .pview a.chipbtn{text-decoration:none;display:inline-flex;align-items:center}
 .pview a.chipbtn[aria-current]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .kassign{max-width:320px}
+.narrow{max-width:560px}
+.klist+.kform,.klist+.err+.kform{margin-top:16px}
 .kassign select{min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:inherit;width:100%}

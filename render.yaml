@@ -1,18 +1,32 @@
-# Render.com: repo ulanganda xizmat avtomatik yaratiladi (Blueprint)
+# Render.com (Blueprint): web xizmat + PostgreSQL. Namoyish yoki tez start uchun.
+# ESLATMA: server O‘zbekistondan tashqarida — fuqarolar shaxsiy ma’lumotini yig‘adigan ishchi tizim uchun mahalliy VPS tavsiya etiladi (DEPLOY.md, A).
+databases:
+  - name: huquqyol-db
+    plan: basic-256mb
 services:
   - type: web
     name: huquqyol
     runtime: node
-    plan: free
+    plan: starter            # free tarif uxlab qoladi: to‘lov xabarlari (webhook) kechikadi
     buildCommand: npm ci --omit=dev
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: TRUST_PROXY
-        value: "1"
+      - { key: NODE_ENV, value: production }
+      - { key: TRUST_PROXY, value: "1" }
+      - { key: FORCE_HTTPS, value: "1" }
       - key: TZ
-        value: Asia/Tashkent   # Render serverlari UTC da: aks holda 00:00–05:00 da bugungi sana «kelajak» bo‘lib qoladi
-      - key: ANTHROPIC_API_KEY
-        sync: false          # Render panelida kiritiladi; bo‘lmasa ilova qidiruv rejimida ishlaydi
+        value: Asia/Tashkent
+      - { key: APP_SECRET, generateValue: true }
+      - { key: DATABASE_URL, fromDatabase: { name: huquqyol-db, property: connectionString } }
+      - { key: PUBLIC_HOST, sync: false }        # domen, https:// siz
+      - { key: ADMIN_EMAILS, sync: false }
+      - { key: SMTP_URL, sync: false }
+      - { key: MAIL_FROM, sync: false }
+      - { key: PAYME_MERCHANT_ID, sync: false }
+      - { key: PAYME_KEY, sync: false }
+      - { key: CLICK_SERVICE_ID, sync: false }
+      - { key: CLICK_MERCHANT_ID, sync: false }
+      - { key: CLICK_MERCHANT_USER_ID, sync: false }
+      - { key: CLICK_SECRET_KEY, sync: false }
+      - { key: ANTHROPIC_API_KEY, sync: false }  # bo‘sh — qidiruv rejimi

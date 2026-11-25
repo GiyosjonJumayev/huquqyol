@@ -43,6 +43,22 @@ jobs:
         with:
           name: huquqyol-hosting
           path: dist/huquqyol-hosting.zip
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose stack starts, becomes ready, backs up
+        run: |
+          printf 'NODE_ENV=production\nPUBLIC_HOST=localhost\nPOSTGRES_PASSWORD=ci0123456789abcdef\nAPP_SECRET=0123456789abcdef0123456789abcdef\n' > .env
+          docker compose -f deploy/compose.yml --env-file .env config -q
+          docker compose -f deploy/compose.yml --env-file .env up -d --build db app backup
+          for i in $(seq 1 40); do docker compose -f deploy/compose.yml --env-file .env exec -T app wget -qO- http://127.0.0.1:3000/api/ready && break; sleep 2; done
+          docker compose -f deploy/compose.yml --env-file .env exec -T app wget -qO- http://127.0.0.1:3000/api/ready | grep '"db":true'
+          docker compose -f deploy/compose.yml --env-file .env exec -T app node scripts/check-prod.mjs
+          docker compose -f deploy/compose.yml --env-file .env exec -T backup sh /backup.sh once | grep zaxira
+          docker run --rm -e PUBLIC_HOST=localhost -v "$PWD/deploy/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile
+      - if: failure()
+        run: docker compose -f deploy/compose.yml --env-file .env logs --no-color | tail -80
   e2e:
     runs-on: ubuntu-latest
     steps:

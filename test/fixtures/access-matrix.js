@@ -20,7 +20,11 @@ export const PAGES = {
   "/admin?b=users":      row(403, { guest: 303, admin: 200 }),                                  // moderator: rollar yo‘q
   "/admin?b=baza":       row(403, { guest: 303, admin: 200 }),
   "/admin?b=umumiy":     row(403, { guest: 303, admin: 200 }),
+  "/xavfsizlik":         row(200, { guest: 303 }),
+  "/hisob/tolovlar":     row(200, { guest: 303, moderator: 403, admin: 403 }), "/jamoa": row(200, { guest: 303, moderator: 403, admin: 403 }),
+  "/admin?b=jurnal":     row(403, { guest: 303, admin: 200 }),                                  // moderator: pul va rol jurnali yo‘q
   // Ochiq sahifalar
+  "/oferta": row(200), "/parol-unutdim": row(200),
   "/":                   row(200), "/yuristlar": row(200), "/yuristlar/namuna-1": row(200), "/tariflar": row(200),
   "/statistika":         row(200), "/maxfiylik": row(200)
 };
@@ -33,6 +37,11 @@ export const API = {
   "POST /api/lawyers/apply":          row(403, { guest: 401, citizen: "ok" }),
   "POST /api/lawyer/profile":         row(403, { guest: 401, lawyer: "ok", lawyerNoPro: "ok" }),
   "POST /api/lawyer/photo":           row(403, { guest: 401, lawyer: "ok", lawyerNoPro: "ok" }),
+  "GET /api/payments/999999":         row("ok", { guest: 401, moderator: 403, admin: 403 }),
+  "POST /api/payments/999999/cancel": row("ok", { guest: 401, moderator: 403, admin: 403 }),
+  "POST /api/account/delete":         row("ok", { guest: 401 }),
+  "POST /api/auth/2fa/start":         row("ok", { guest: 401 }),
+  "POST /api/admin/payment/999999/refund": row(403, { guest: 401, admin: "ok" }),
   "POST /api/lawyer/areas":          row(403, { guest: 401, lawyer: "ok", lawyerNoPro: "ok" }),
   "GET /api/practice":               row(403, { guest: 401, lawyer: "ok", lawyerNoPro: 402, org: "ok", orgNoPro: 402 }),
   "GET /api/cabinet":                 row(403, { guest: 401, lawyer: "ok", lawyerNoPro: 402, org: "ok", orgNoPro: 402 }),

@@ -1,0 +1,31 @@
+# HTTPS sertifikati avtomatik olinadi va yangilanadi (domen DNS A yozuvi shu serverga qaragan bo‘lishi kerak)
+{$PUBLIC_HOST} {
+	encode zstd gzip
+	request_body {
+		max_size 9MB
+	}
+	header -Server
+	reverse_proxy app:3000 {
+		health_uri /api/health
+		health_interval 15s
+	}
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				# Maxfiylik: IP qisqartiriladi; cookie, kalit va bir martalik havola tokenlari logga yozilmaydi
+				request>remote_ip ip_mask 24 48
+				request>client_ip ip_mask 24 48
+				request>headers delete
+				request>uri query {
+					delete t
+				}
+			}
+		}
+	}
+}
+
+www.{$PUBLIC_HOST} {
+	redir https://{$PUBLIC_HOST}{uri} permanent
+}

@@ -58,7 +58,8 @@ export async function acceptInvite(req, res){
       if (u.org_role === "owner" && n > 0) throw err("ownTeam", 409);                  // jamoasi bor egani ko‘chirib bo‘lmaydi
     }
     if ((await run("select count(*)::int n from users where org_id = $1 and id <> $2", [org.id, req.user.id])).rows[0].n >= SEATS[plan.plan]) throw err("seats", 409, { n: SEATS[plan.plan] });
-    await run("update users set org_id = $2, org_role = 'member', email_verified_at = coalesce(email_verified_at, now()), role = case when role = 'citizen' then $3 else role end where id = $1", [req.user.id, org.id, plan.plan === "org" ? "org" : "lawyer"]);
+    // E-pochta bu yerda tasdiqlanmaydi: taklif havolasi egasiga ham ko‘rinadi, demak pochta egaligini isbotlamaydi (ADMIN_EMAILS himoyasi)
+    await run("update users set org_id = $2, org_role = 'member', role = case when role = 'citizen' then $3 else role end where id = $1", [req.user.id, org.id, plan.plan === "org" ? "org" : "lawyer"]);
     await audit(run, { userId: req.user.id, action: "team.join", target: `org:${org.id}`, ip: req.ip });
   });
   res.json({ ok: true, next: "/jamoa" });

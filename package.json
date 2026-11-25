@@ -1,6 +1,6 @@
 {
   "name": "huquqyol",
-  "version": "3.14.0",
+  "version": "4.0.0",
   "description": "HuquqYo‘l — fuqarolar uchun AI huquqiy yo‘l xaritasi (mehnat, iste’molchi, oila, davlat idoralari, jarimalar, qarz — O‘zbekiston)",
   "type": "module",
   "main": "app.cjs",
@@ -8,6 +8,8 @@
     "start": "node app.cjs",
     "dev": "node --watch app.cjs",
     "bot": "node bot/index.js",
+    "admin": "node scripts/make-admin.mjs",
+    "check": "node scripts/check-prod.mjs",
     "test": "node --test test/*.test.js",
     "test:e2e": "node --test --test-concurrency=1 test/e2e/*.e2e.js",
     "ingest": "node scripts/ingest-lex.js",

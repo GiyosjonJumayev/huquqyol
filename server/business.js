@@ -361,6 +361,8 @@ const PV = {
   p5: ["hy_lang — til, hy_fs — shrift o‘lchami, hy_theme — mavzu, hy_photo — rasm paneli yopilgani. Hisobga kirsangiz — kirish uchun sessiya cookie (HttpOnly).", "hy_lang — язык, hy_fs — размер шрифта, hy_theme — тема, hy_photo — закрыта ли панель фото. Если вы вошли в аккаунт — cookie сессии (HttpOnly, только для входа)."],
   h6: ["Hisob", "Аккаунт"],
   p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист."],
+  h8: ["To‘lov", "Оплата"],
+  p8: ["To‘lov Payme yoki Click sahifasida amalga oshiriladi; karta ma’lumotlari bizga kelmaydi. Biz buyurtma raqami, summa, sana va holatni saqlaymiz; hisob o‘chirilsa, bu yozuvlar shaxssiz qoladi. Yurist va jamoa kabinetidagi ma’lumotlar bazada saqlanadi va faqat egasi (jamoada — a’zolar) ko‘radi. Xavfsizlik uchun kirishlar (IP, brauzer) va muhim amallar jurnali yuritiladi.", "Оплата проходит на странице Payme или Click; данные карты к нам не попадают. Мы храним номер заказа, сумму, дату и статус; при удалении аккаунта записи обезличиваются. Данные кабинета юриста и команды хранятся в базе и видны только владельцу (в команде — участникам). Для безопасности ведётся журнал входов (IP, браузер) и важных действий."],
   h7: ["Telegram bot", "Telegram-бот"],
   p7: ["Bot suhbat holatini faqat xotirada, 1 soatgacha saqlaydi; /delete buyrug‘i uni darhol o‘chiradi. Xabarlar matni logga yozilmaydi.", "Бот хранит состояние диалога только в памяти, до 1 часа; команда /delete сразу его удаляет. Текст сообщений не пишется в журнал."],
   botSoon: ["Bot havolasi tez orada shu yerda bo‘ladi.", "Ссылка на бота скоро появится здесь."],
@@ -368,14 +370,14 @@ const PV = {
 };
 export function privacyPage({ lang, cssHref, fs, user, accHref, ai = false, provider = null, botUrl = "" }){
   // Texnik nomlar (cookie nomlari, buyruqlar, fayl turlari) kirillga o‘girilmaydi
-  const keep = /(hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|Google|Gemini|DOCX|PDF|AI|Telegram)/;
+  const keep = /(Payme|Click|IP|hy_\w+|HttpOnly|[Cc]ookie|\/delete|Anthropic|Claude|Google|Gemini|DOCX|PDF|AI|Telegram)/;
   const p = k => { const s = PV[k][idx(lang)]; return lang === "cyr" ? s.split(keep).map((x, i) => i % 2 ? x : toCyrillic(x)).join("") : s; };
   const mt = makeT(lang);
   const bot = botUrlOf(botUrl) || botUrlOf(TELEGRAM_BOT_URL);
   const sec = (h, ...ps) => `<section class="pvsec"><h2 class="sec">${esc(p(h))}</h2>${ps.map(x => `<p>${esc(p(x))}</p>`).join("")}</section>`;
   return page({ lang, cssHref, fs, user, accHref, path: "/maxfiylik", title: p("title"), desc: p("lead"), body: `
     <h1>${esc(p("title"))}</h1><p class="lead">${esc(p("lead"))}</p>
-    ${sec("h1", "p1")}${sec("h2", "p2", !ai ? "pNoAi" : provider === "gemini" ? "pAiG" : "pAi")}${sec("h3", "p3")}${sec("h4", "p4")}${sec("h5", "p5")}${sec("h6", "p6")}
+    ${sec("h1", "p1")}${sec("h2", "p2", !ai ? "pNoAi" : provider === "gemini" ? "pAiG" : "pAi")}${sec("h3", "p3")}${sec("h4", "p4")}${sec("h5", "p5")}${sec("h6", "p6")}${sec("h8", "p8")}
     <section class="pvsec" id="bot"><h2 class="sec">${esc(p("h7"))}</h2><p>${esc(p("p7"))}</p>
       <p>${bot ? `<a class="btn ghost" href="${esc(bot)}" target="_blank" rel="noopener noreferrer">${esc(p("botOpen"))}<span class="sr"> ${esc(mt("newTab"))}</span></a>` : esc(p("botSoon"))}</p></section>` });
 }

@@ -32,7 +32,7 @@ export const validHost = h => typeof h === "string" && h.length <= 260 && HOST_R
 
 // FORCE_HTTPS=1 — http so‘rovlarni https ga yo‘naltirish (health check bundan mustasno)
 export function httpsRedirect(req, res, next){
-  if (!FORCE_HTTPS || req.secure || req.path === "/api/health") return next();
+  if (!FORCE_HTTPS || req.secure || req.path === "/api/health" || req.path === "/api/ready") return next();
   if (req.method !== "GET" && req.method !== "HEAD") return res.status(403).json({ error:"HTTPS required" });
   const host = PUBLIC_HOST || req.headers.host;
   if (!validHost(host)) return res.status(400).type("text").send("Bad Request");

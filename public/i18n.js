@@ -50,7 +50,7 @@ const M = {
   disclaimer:{ uz:"HuquqYo‘l ma’lumot beradi va hujjat loyihasini tayyorlaydi. Murakkab ishda yuristga murojaat qiling.", ru:"HuquqYo‘l даёт информацию и готовит проект документа. В сложном деле обратитесь к юристу." },
   sources:{ uz:"Manbalar: Mehnat, Oila, Fuqarolik va Ma’muriy javobgarlik kodekslari; iste’molchilar, murojaatlar, banklar, mikromoliya, OSGO, pensiya ta’minoti, xususiy bandlik agentliklari va mediatsiya to‘g‘risidagi qonunlar —", ru:"Источники: Трудовой, Семейный, Гражданский кодексы, Кодекс об административной ответственности; законы о защите прав потребителей, об обращениях, о банках, о микрофинансовой деятельности, об ОСГО, о пенсионном обеспечении, о частных агентствах занятости и о медиации —" },
   checked:{ uz:"Normalar 2026-yil noyabr holatiga tekshirilgan.", ru:"Нормы проверены по состоянию на ноябрь 2026 г." },
-  local:{ uz:"Kiritgan ma’lumotlaringiz faqat shu qurilmada saqlanadi.", ru:"Введённые данные хранятся только на этом устройстве." },
+  local:{ uz:"Ariza uchun kiritgan ma’lumotlaringiz faqat shu qurilmada saqlanadi.", ru:"Данные для заявления хранятся только на этом устройстве." },
   wipe:{ uz:"Ma’lumotlarimni o‘chirish", ru:"Удалить мои данные" },
   wiped:{ uz:"Ma’lumotlaringiz o‘chirildi", ru:"Ваши данные удалены" },
   cancel:{ uz:"Bekor qilish", ru:"Отмена" },

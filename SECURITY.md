@@ -10,6 +10,19 @@
 | Til va shrift tanlovi | Cookie `hy_lang`, `hy_fs` | Yo‘q (faqat sahifani to‘g‘ri chizish uchun o‘qiladi). |
 | Anonim statistika | `data/stats.json` | Faqat sanoqlar: holat nomi, kun, son. Matn, IP, cookie, brauzer ma’lumoti yo‘q. Takroriy sanashning oldini olish izi (HMAC, kunlik tasodifiy kalit) faqat xotirada va har kuni o‘chiriladi. `STATS=0` — o‘chirish. |
 
+## Hisob va to‘lov
+
+| Ma’lumot | Qanday saqlanadi |
+|---|---|
+| Parol | scrypt xeshi; 5 xato urinish — 15 daqiqa blok |
+| Sessiya, tiklash va taklif havolalari | tasodifiy 256 bit; bazada faqat SHA-256 xeshi; tiklash havolasi 1 soat va bir marta |
+| 2FA kaliti | AES-256-GCM (`APP_SECRET`); kod va zaxira kod bir martalik; production’da admin va moderator uchun majburiy |
+| Karta ma’lumoti | hech qachon — faqat Payme / Click sahifasida kiritiladi |
+| To‘lov yozuvi | summa, holat, provayder raqami; hisob o‘chirilsa shaxssiz qoladi |
+| Pul, rol va moderatsiya amallari | `audit_log` (3 yil) |
+
+Admin roli `ADMIN_EMAILS` bo‘yicha production’da faqat e-pochta egaligi tasdiqlangandan keyin beriladi. Shaxsiy sahifalar service worker keshiga tushmaydi; chiqishda kabinet nusxasi brauzerdan o‘chiriladi. To‘lov himoyasi: docs/PAYMENTS.md.
+
 ## Himoya choralari
 
 - **CSP**: `script-src 'self'`, `script-src-attr 'none'`, `style-src-attr 'none'`, `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'none'`, `form-action 'none'`; HTTPS’da `upgrade-insecure-requests` va HSTS.

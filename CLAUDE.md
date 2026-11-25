@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (162 tests; 5 DB tests skip without TEST_DATABASE_URL)
+npm test                 # node:test, must stay green (175 tests; 17 DB tests skip without TEST_DATABASE_URL)
 npm run test:e2e         # 15 browser tests incl. axe and navbar overlap per role; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
@@ -61,7 +61,12 @@ become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, 
   `server/practice.js` (`GET /api/practice`, counts), `public/practice.js` (dynamic UI, autofill, live preview), `POST /api/lawyer/areas`.
   New acts: check title, number, date and «amalda» status on lex.uz first; templates must not contain article numbers.
 - Lawyer photo: `public/cropper.js` (drag/zoom/rotate → 480 px JPEG); works before the profile is filled (draft profile: empty phone, not in moderation).
-- Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Tashkilot). No payment gateway: admin confirms payment manually in `/admin`.
+- **Payments (v4): `server/billing.js`** is the only place that changes money state (`settle` / `reverse`, row-locked, idempotent, audited);
+  `server/payGateways.js` = Payme Merchant API + Click SHOP API webhooks (`/api/pay/*`, mounted before the JSON/same-origin layer). Protocol tests: `test/payments.test.js`.
+  Never trust amounts from the browser; never log keys. Setup guide: `docs/PAYMENTS.md`. Prices/discounts/seats come from env.
+- Account security: `server/account.js`, `server/totp.js` (2FA), `server/mail.js` (SMTP; off without `SMTP_URL`), page `/xavfsizlik`. Teams: `server/team.js` (`/jamoa`, shared cabinet with versions). Hourly jobs: `server/jobs.js`.
+- Production: `deploy/compose.yml` (Caddy, PostgreSQL, backups), `npm run check`, `npm run admin`. Demo lawyers are hidden when NODE_ENV=production unless `SHOW_DEMO=1`.
+- Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Tashkilot). Checkout `/tolov/:id`; admin can also confirm bank transfers.
 - Courts by district: `server/kb/courts.json` (+ `public/courts.js`, `GET /api/courts`).
 - Photo/PDF reading: `server/photo.js` + `server/ocr.js` (Tesseract, no AI needed) + `server/docparse.js` (rules);
   PDFs parsed in the browser with pdf.js (self-hosted). Claude vision is used only when an API key is set.
@@ -93,7 +98,7 @@ Done and verified: MK 333 literal calculator, public holidays (MK 9), MK 558/560
 3. Fact extraction misses USD amounts ("500 dollar") — common for rent deposits and migrant agency fees.
 4. Data: AI mode sends citizen text to Anthropic (US). Uzbek personal-data law has localization rules and the Ministry of
    Justice registered AI ethics rules (No. 3787, 14.03.2026). Position rules-only mode (+ local OCR) as the government deployment default.
-5. Payments: no Click/Payme yet — subscriptions are confirmed manually by an admin.
+5. Payments need real merchant contracts and keys (owner). `/oferta` text and templates need a lawyer's review before launch.
 6. Sample lawyers (`demo:true`) must always be visibly marked DEMO; remove them before a real launch.
 
 Verified still correct: CB rate 14% (kept 2026-11-04; next meeting 2026-12-16), minimum alimony 360 400 so‘m from 2026-09-01.

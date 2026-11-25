@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/dist"; APP="$OUT/huquqyol"
 rm -rf "$OUT"; mkdir -p "$APP"
 cd "$ROOT"
-cp -r app.cjs package.json package-lock.json server public scripts deploy README.md DEPLOY.md DEMO.md LICENSE SECURITY.md CHANGELOG.md Dockerfile .dockerignore render.yaml .env.example "$APP"/
+cp -r app.cjs bot package.json package-lock.json server public scripts deploy README.md DEPLOY.md DEMO.md LICENSE SECURITY.md CHANGELOG.md Dockerfile .dockerignore render.yaml .env.example docs/PAYMENTS.md "$APP"/
 rm -f "$APP/deploy/package.sh"
 cd "$APP"
 npm ci --omit=dev --no-audit --no-fund --ignore-scripts >/dev/null

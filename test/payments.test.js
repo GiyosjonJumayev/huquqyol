@@ -217,7 +217,7 @@ test("E-pochta va parol: havola bir martalik, sessiyalar yopiladi, mavjud bo‘l
 
 test("2FA: yoqish, kirishda kod talab qilinadi, kod va zaxira kod bir martalik, o‘chirish", opts, async () => {
   const c = await reg("t1@test.uz", "citizen");
-  assert.equal((await c.post("/api/auth/2fa/start", { password: "xato" })).status, 401);
+  assert.equal((await c.post("/api/auth/2fa/start", { password: "xato" })).status, 400);
   const { secret, uri } = await c.json("/api/auth/2fa/start", { password: PW });
   assert.match(uri, /^otpauth:\/\/totp\//); assert.match((await db.one("select totp_secret from users where email = 't1@test.uz'")).totp_secret, /^g:/);     // bazada shifrlangan
   assert.equal((await c.post("/api/auth/2fa/enable", { code: "000000" })).status, 400);
@@ -260,6 +260,7 @@ test("Jamoa: taklif, o‘rin chegarasi, umumiy kartoteka (409), a’zo chiqishi,
   const tok = new URLSearchParams(inv.link.split("?")[1]).get("t");
   assert.equal((await x.post("/api/team/accept", { token: tok })).status, 403);                                       // boshqa e-pochta
   assert.equal((await m.post("/api/team/accept", { token: tok })).status, 200); assert.equal((await m.post("/api/team/accept", { token: tok })).status, 400);
+  assert.equal((await db.one("select email_verified_at from users where email = 'mem@test.uz'")).email_verified_at, null);      // taklif e-pochtani tasdiqlamaydi (admin roliga yo‘l yo‘q)
   await db.q("delete from subscriptions where user_id = (select id from users where email = 'mem@test.uz')");
   assert.equal((await m.get("/kabinet")).status, 200);                                                                  // egasining Firma tarifi a’zoga ham Pro beradi
   assert.equal((await m.post("/api/subscriptions", { plan: "firma" })).status, 403);
@@ -287,7 +288,7 @@ test("Davriy vazifalar va hisobni o‘chirish", opts, async () => {
   const r = await jobs.runJobs(); assert.ok(r.subs >= 1 && r.orders >= 1);
   assert.equal((await sub(id)).status, "expired"); assert.equal((await pay(id2)).status, "cancelled"); assert.equal((await sub(id2)).status, "cancelled");
   const ex = await (await c.get("/malumotlarim")).json(); assert.equal(ex.payments.length, 1); assert.ok(!JSON.stringify(ex).includes("scrypt"));
-  assert.equal((await c.post("/api/account/delete", { password: "xato" })).status, 401); assert.equal((await c.post("/api/account/delete", { password: PW })).status, 200);
+  assert.equal((await c.post("/api/account/delete", { password: "xato" })).status, 400); assert.equal((await c.post("/api/account/delete", { password: PW })).status, 200);
   assert.equal((await c.get("/hisob")).status, 303); const p = await pay(id); assert.equal(p.user_id, null); assert.equal(p.status, "paid");      // moliya yozuvi shaxssiz qoladi
 });
 

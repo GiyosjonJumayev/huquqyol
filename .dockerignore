@@ -1,5 +1,14 @@
 node_modules
 .git
+.github
+.claude
 .env
+.env.*
+!.env.example
 *.log
 dist
+data
+backups
+test
+docs
+*.pdf
