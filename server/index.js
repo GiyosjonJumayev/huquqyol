@@ -13,7 +13,10 @@ import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerAp
 import { initDb, migrate, dbEnabled } from "./db.js";
 import { attachUser, register, login, logout, changePassword } from "./auth.js";
 import { accessMiddleware, HOME, navFor, roleOf } from "./access.js";
-import { approvedLawyers, recordView, applyToDb, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue } from "./market.js";
+import { approvedLawyers, recordView, applyToDb, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue, platformStats, caseFor } from "./market.js";
+import { casePage } from "./casePage.js";
+import { audit } from "./billing.js";
+import { regionOfForm, REGIONS } from "./regions.js";
 import { loginPage, registerPage, accountPage, adminPage, applyPage, forbiddenPage } from "./accountPages.js";
 import { proStatus, myProfile, saveProfile, saveAreas, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
 import { getPractice, practiceCounts, customActs } from "./practice.js";
@@ -23,7 +26,7 @@ import { resendVerify, confirmEmail, forgot, resetPassword, totpStart, totpEnabl
 import { invite, cancelInvite, acceptInvite, removeMember, teamInfo, inviteView, getTeamCabinet, putTeamCabinet } from "./team.js";
 import { checkoutPage, paymentsPage, invoicePdf, securityPage, forgotPage, resetPage, confirmPage, teamPage, invitePage, offerPage } from "./payPages.js";
 import { startJobs, stopJobs } from "./jobs.js";
-import { one } from "./db.js";
+import { one, q } from "./db.js";
 import { lawyerPanel, profileEditPage, lawyerStatsPage } from "./lawyerPages.js";
 
 // PostgreSQL (DATABASE_URL bo‘lsa): hisoblar, obunalar, kelishuvlar. Migratsiyalar start() da qo‘llanadi.
@@ -34,7 +37,7 @@ import { cyrillicModel } from "../public/translit.js";
 import { domainCardsHTML, examplesHTML, siteNav, siteFooter, a11yDialogHTML } from "../public/shared.js";
 import { makeT, LANGS, HTML_LANG } from "../public/i18n.js";
 import { resolveLang, parseLang, deepCyr, msg, LANG_COOKIE } from "./i18n.js";
-import { stats, DEFAULT_FILE as STATS_FILE } from "./stats.js";
+import { stats, DEFAULT_FILE as STATS_FILE, PERIODS } from "./stats.js";
 import { statsPage } from "./statsPage.js";
 import { vPhoto, readPhoto } from "./photo.js";
 import { warmUp as ocrWarmUp, shutdown as ocrShutdown, ocrEnabled } from "./ocr.js";
@@ -77,6 +80,7 @@ app.post("/api/photo", apiLimit, rateLimit({ max: 8, name:"photo" }), sameOrigin
     const v = vPhoto(req.body);
     const r = await readPhoto(v, base(req.lang));
     stats.record("analyze", { scenario: r.scenario, ip: req.ip });
+    stats.record("photo", { scenario: r.scenario, ip: req.ip });     // hujjat rasmi/PDF o‘qildi (faqat sanoq)
     res.json(out(req.lang, r));
   }));
 // Yurist rasmi va kabinet ma’lumotlari: kattaroq tana (rasm brauzerda 480 px ga kichraytiriladi)
@@ -151,7 +155,8 @@ app.post("/api/document/:format", rateLimit({ max: 30, name:"file" }), wrap(asyn
   if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error: msg(req.lang, "format") });
   const model = buildModel(req);
   const buf = fmt === "docx" ? await toDocx(model) : await toPdf(model);
-  stats.record("doc", { scenario: model.scenario, ip: req.ip });
+  // Hudud — formadagi tuman/manzildan faqat viloyat nomi; manzilning o‘zi sanalmaydi ham, saqlanmaydi ham
+  stats.record("doc", { scenario: model.scenario, domain: SCEN_DOMAIN[model.scenario], region: regionOfForm(req.body?.form), ip: req.ip });
   res.set({
     "Content-Type": fmt === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf",
     "Content-Disposition": `attachment; filename="${safeName(`HuquqYol-${model.scenario}-${model.recipient}.${fmt}`)}"`
@@ -219,7 +224,23 @@ app.get("/api/cabinet", needDb, wrap(getCabinet));
 
 // Anonim statistika: faqat yig‘ma sanoqlar (holat → soha)
 const SCEN_DOMAIN = Object.fromEntries(SCENARIOS.map(s => [s.id, s.domain]));
-app.get("/api/stats", (req, res) => res.json(stats.summary({ scenarioDomain: SCEN_DOMAIN })));
+const periodOf = q => PERIODS.includes(Number(q?.davr)) ? Number(q.davr) : 30;
+app.get("/api/stats", (req, res) => res.json({ ...stats.summary({ scenarioDomain: SCEN_DOMAIN }), report: stats.report({ scenarioDomain: SCEN_DOMAIN, period: periodOf(req.query) }) }));
+// Davr ma’lumoti CSV: sohalar, hududlar, holatlar va dinamika (Excel’da ochiladi: UTF-8 BOM, nuqtali vergul emas — vergul)
+app.get("/api/stats.csv", (req, res) => {
+  const r = stats.report({ scenarioDomain: SCEN_DOMAIN, period: periodOf(req.query) }), c = r.current, p = r.previous;
+  const cell = v => /[",\n\r]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
+  const rows = [["bo‘lim", "kalit", "nom", "joriy davr", "oldingi davr"]];
+  const kb = kbFor("uz");
+  for (const k of ["users", "opens", "docs", "lawyer", "photo", "analyzed", "outOfScope"]) rows.push(["jami", k, k, c[k], p[k]]);
+  for (const d of kb.DOMAINS) rows.push(["soha", d.id, d.title, c.byDomain[d.id] || 0, p.byDomain[d.id] || 0]);
+  for (const d of kb.DOMAINS) rows.push(["soha_hujjat", d.id, d.title, c.docsByDomain[d.id] || 0, p.docsByDomain[d.id] || 0]);
+  for (const g of REGIONS) rows.push(["hudud_hujjat", g.id, g.name, c.byRegion[g.id] || 0, p.byRegion[g.id] || 0]);
+  for (const s of kb.SCENARIOS) rows.push(["holat", s.id, s.title, c.byScenario[s.id] || 0, p.byScenario[s.id] || 0]);
+  for (const x of r.series) rows.push(["dinamika", `${x.from}..${x.to}`, "murojaatlar/hujjatlar/foydalanuvchilar", x.opens, `${x.docs}/${x.users}`]);
+  res.set({ "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="huquqyol-statistika-${r.from}-${r.to}.csv"`, "Cache-Control": "no-store" })
+    .send("\ufeff" + rows.map(x => x.map(cell).join(",")).join("\r\n") + "\r\n");
+});
 
 app.use("/api", (req, res) => res.status(404).json({ error: msg(req.lang, "notFound") }));
 
@@ -272,13 +293,14 @@ app.get(["/", "/index.html"], (req, res) => {
   if (/(?:^|;\s*)hy_photo=1(?:;|$)/.test(req.headers.cookie || "")) html = html.replace('aria-labelledby="photoPanelT" hidden>', 'aria-labelledby="photoPanelT">');
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html").send(withTheme(req, html));
 });
-app.get("/statistika", (req, res) => {
+app.get("/statistika", wrap(async (req, res) => {
   const forced = parseLang(req.query.lang);
   if (forced) res.cookie(LANG_COOKIE, forced, { maxAge: 365 * 864e5, sameSite:"lax", path:"/" });
   const fs = /(?:^|;\s*)hy_fs=([1-3])(?:;|$)/.exec(req.headers.cookie || "")?.[1];
   res.set({ "Cache-Control":"no-cache", "Vary":"Cookie, Accept-Language", "Content-Language": HTML_LANG[req.lang] }).type("html")
-    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user, accHref: `/account.js?v=${VER["account.js"]}` })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
-});
+    .send(withTheme(req, statsPage({ lang: req.lang, s: stats.summary({ scenarioDomain: SCEN_DOMAIN }), r: stats.report({ scenarioDomain: SCEN_DOMAIN, period: periodOf(req.query) }),
+      plat: await platformStats(periodOf(req.query)), cssHref: `/app.css?v=${VER["app.css"]}`, fs, user: req.user, accHref: `/account.js?v=${VER["account.js"]}` })));   // sahifa JavaScript’siz: navbar menyulari <details> bilan ishlaydi
+}));
 // ---------- Biznes: tariflar, yuristlar katalogi, Yurist Pro kabineti ----------
 const REDIRECTED = Symbol("redirected");
 function bizPage(render){
@@ -299,6 +321,26 @@ app.get("/tariflar", bizPage(async a => plansPage({ ...a, subs: a.user ? await m
 app.get("/maxfiylik", bizPage(a => privacyPage({ ...a, ai: aiEnabled(), provider: aiProvider(), botUrl: process.env.TELEGRAM_BOT_URL })));
 app.get("/yuristlar", bizPage(lawyersPage));
 app.get("/yuristlar/rasm/:id", (req, res, next) => dbEnabled() ? wrap(sendPhoto)(req, res, next) : next());
+// Ish (fuqaro yuristga yuborgan reja va ariza): faqat ikki ishtirokchi; begona kishi uchun 404 (mavjudligi ham bilinmaydi)
+app.get("/hisob/ish/:id", (req, res, next) => dbEnabled() ? next() : res.status(503).type("text").send("DB"), bizPage(async a => {
+  const c = await caseFor(a.user, a.id);
+  if (!c) return null;
+  if (c.side === "lawyer" && c.case_data) await audit(q, { userId: a.user.id, action: "case.view", target: `consultation:${c.id}`, ip: a.req.ip });
+  return casePage({ ...a, c });
+}));
+app.get("/hisob/ish/:id/:fmt", (req, res, next) => (async () => {
+  const fmt = req.params.fmt;
+  if (!dbEnabled() || (fmt !== "docx" && fmt !== "pdf")) return next();
+  const c = await caseFor(req.user, req.params.id);
+  if (!c?.case_data) return next();
+  const d = c.case_data, m = documentModel({ ...d, lang: base(d.lang) }), model = d.lang === "cyr" ? cyrillicModel(m) : m;
+  const buf = fmt === "docx" ? await toDocx(model) : await toPdf(model);
+  if (c.side === "lawyer") await audit(q, { userId: req.user.id, action: "case.download", target: `consultation:${c.id}`, data: { fmt }, ip: req.ip });
+  res.set({
+    "Content-Type": fmt === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf",
+    "Content-Disposition": `attachment; filename="${safeName(`HuquqYol-ish-${c.id}-${model.scenario}.${fmt}`)}"`, "Cache-Control": "private, no-store"
+  }).send(buf);
+})().catch(next));
 app.get("/yuristlar/:id", bizPage(args => { const h = lawyerPage(args); if (h) recordView(args.id, args.query.soha); return h; }));
 app.get("/kabinet", bizPage(async a => cabinetPage({ ...a, pro: a.req.pro || await proStatus(a.user.id) })));
 // Mavzu (yorug‘ / qorong‘i): JavaScript’siz ham ishlaydi — cookie qo‘yib, sahifaga qaytaradi (to=toggle — almashtirish)

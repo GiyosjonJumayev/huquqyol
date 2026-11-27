@@ -132,7 +132,7 @@ export async function exportData(req, res){
     one("select id, email, name, phone, role, created_at, email_verified_at, last_login_at from users where id = $1", [id]),
     one("select kind, name, firm, license, license_issuer, region, district, address, hours, phone, email, telegram, website, areas, formats, langs, experience, price, headline, about, education, achievements, services, status, created_at from lawyer_profiles where user_id = $1", [id]),
     rows("select plan, status, price, started_at, ends_at from subscriptions where user_id = $1"), rows("select id, kind, amount, months, status, method, created_at, paid_at from payments where user_id = $1"),
-    rows("select id, scenario, format, message, status, offer_price, created_at from consultations where citizen_id = $1"),
+    rows("select id, scenario, format, message, status, offer_price, created_at, case_data, case_at, case_withdrawn_at from consultations where citizen_id = $1"),
     one("select data, updated_at from cabinet_data where user_id = $1", [id]), rows("select created_at, ip, ua from sessions where user_id = $1")]);
   res.set({ "Cache-Control": "private, no-store", "Content-Disposition": 'attachment; filename="huquqyol-malumotlarim.json"' }).json({ exportedAt: new Date().toISOString(), user, profile, subscriptions: subs, payments: pays, consultations: cons, cabinet, sessions });
 }

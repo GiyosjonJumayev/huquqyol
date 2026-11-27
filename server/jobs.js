@@ -26,6 +26,9 @@ export async function runJobs(now = Date.now()){
       remind.push(...(await run(`update subscriptions s set reminded_at = now() from users u where u.id = s.user_id and s.status = 'active' and s.reminded_at is null
         and s.ends_at between now() and now() + interval '5 days' returning u.email, s.ends_at, s.plan`)).rows);
     }
+    // Ish paketi (reja + ariza) yopilgan kelishuvlarda 90 kundan keyin o‘chiriladi (maxfiylik siyosatidagi va’da)
+    r.cases = await n(`update consultations set case_data = null, case_withdrawn_at = now() where case_data is not null
+      and status in ('completed','declined','cancelled') and updated_at < now() - interval '90 days'`);
     await run("delete from audit_log where at < now() - interval '3 years'");
     return r;
   });

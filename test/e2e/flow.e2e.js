@@ -348,7 +348,21 @@ test("Anonim statistika: holat ochilganda sanaladi, sahifa footer’dan ochiladi
   const m = await page({ viewport:{ width:320, height:640 } });
   await m.goto(base + "statistika?lang=ru");
   assert.equal(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
-  assert.deepEqual([...p.errors, ...m.errors], []);
+  // Davrlar: 7 kun / 30 kun / 3 oy / 1 yil — havola bilan, JavaScript’siz; har birida axe 0 xato, tor ekranda siljish yo‘q
+  for (const [d, word] of [["7", "7 kun"], ["90", "3 oy"], ["365", "1 yil"]]){
+    await p.click(`.pertabs a[href^="/statistika?davr=${d}"]`);
+    await p.waitForURL(new RegExp(`davr=${d}`));
+    assert.equal(await p.innerText(".pertabs [aria-current=page]"), word);
+    assert.equal(await p.locator(".stattiles.six .stattile").count(), 6);
+    assert.equal(await p.locator("section[aria-labelledby=stR] tbody tr").count(), 14);   // 14 hudud
+    assert.deepEqual(await audit(p), [], d);
+    await m.goto(base + `statistika?davr=${d}`);
+    assert.equal(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, d);
+  }
+  const dark = await page({ colorScheme:"dark" });
+  await dark.goto(base + "statistika?davr=30");
+  assert.deepEqual(await audit(dark), []);
+  assert.deepEqual([...p.errors, ...m.errors, ...dark.errors], []);
 });
 
 test("Hujjat rasmi: «Hujjat rasmini yuklang» tugmasi, AI kalitisiz OCR o‘qiydi, muddat va ariza to‘ladi; panel yopiladi va qayta ochiladi", { skip }, async () => {
@@ -358,7 +372,8 @@ test("Hujjat rasmi: «Hujjat rasmini yuklang» tugmasi, AI kalitisiz OCR o‘qiy
   assert.ok(await p.isVisible("#photoBtn"));
   assert.deepEqual(await audit(p), []);
   await p.setInputFiles("#photoIn", fileURLToPath(new URL("../fixtures/yhxx-qaror-foto.jpg", import.meta.url)));
-  await p.waitForSelector("#photoCard", { timeout: 30_000 });
+  // OCR birinchi marta ishga tushganda (til fayllari yuklanadi) og‘ir yuk ostida sekinroq bo‘lishi mumkin
+  await p.waitForSelector("#photoCard", { timeout: 60_000 }).catch(async e => { throw new Error(`photoCard yo‘q; xato: ${await p.evaluate(() => document.getElementById("askErr")?.textContent)}`); });
   const card = await p.innerText("#photoCard");
   assert.match(card, /AB 1234567/);
   assert.match(card, /375\s000/);
@@ -394,7 +409,8 @@ test("PDF: matnli PDF (OCR’siz) va skanerlangan PDF (OCR) — tur, holat, mudd
   assert.match(await p.getAttribute("#photoIn", "accept"), /application\/pdf/);
   // 1) Matnli PDF — ishdan bo‘shatish buyrug‘i
   await p.setInputFiles("#photoIn", fx("buyruq-matnli.pdf"));
-  await p.waitForSelector("#photoCard", { timeout: 30_000 });
+  // OCR birinchi marta ishga tushganda (til fayllari yuklanadi) og‘ir yuk ostida sekinroq bo‘lishi mumkin
+  await p.waitForSelector("#photoCard", { timeout: 60_000 }).catch(async e => { throw new Error(`photoCard yo‘q; xato: ${await p.evaluate(() => document.getElementById("askErr")?.textContent)}`); });
   const card = await p.innerText("#photoCard");
   assert.match(card, /PDF matni/);
   assert.match(card, /112-k/);

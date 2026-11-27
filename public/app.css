@@ -1520,3 +1520,52 @@ html{background:var(--bg)}
 .narrow{max-width:560px}
 .klist+.kform,.klist+.err+.kform{margin-top:16px}
 .kassign select{min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:inherit;width:100%}
+
+/* ---------- Statistika: davr tanlovi, o‘zgarish belgilari, 6 ta ko‘rsatkich ---------- */
+.sthead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin:18px 0 4px}
+.pertabs{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px}
+.pertabs a{display:inline-flex;align-items:center;min-height:40px;padding:6px 16px;border-radius:999px;color:var(--muted);font-weight:600;text-decoration:none;font-size:calc(14.5px * var(--fs))}
+.pertabs a:hover{color:var(--ink);background:var(--surface)}
+.pertabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.strange{margin:0}
+.stattiles.six{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:860px){.stattiles.six{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.stattiles.six{grid-template-columns:minmax(0,1fr)}}
+.stdelta{margin:4px 0 2px;font-size:calc(14px * var(--fs))}
+.delta{font-weight:700;font-variant-numeric:tabular-nums}
+.delta.up{color:var(--ok)} .delta.down{color:var(--stamp)} .delta.flat{color:var(--muted)}
+.delta.new{color:var(--accent)}
+.stt .chg{font-size:calc(13.5px * var(--fs))}
+.tag.top{background:var(--sand);color:var(--ink);border:1px solid var(--line2);font-size:calc(11.5px * var(--fs));vertical-align:middle}
+.stt.need tbody tr:nth-child(-n+3) th{font-weight:700}
+@media (max-width:560px){.stt.need .chg{display:none}}
+@media (forced-colors:active){.pertabs a[aria-current="page"]{outline:2px solid CanvasText}}
+
+/* ---------- Yuristga yuborilgan ish (/hisob/ish/:id) va so‘rov formasidagi ish paketi ---------- */
+.casepage{display:grid;gap:14px}
+.casepage h1{font-family:var(--f-display);font-size:calc(clamp(26px,4vw,36px) * var(--fs));margin:4px 0 0}
+.casemeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0}
+.casegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:720px){.casegrid{grid-template-columns:minmax(0,1fr)}}
+.casepage .card{padding:18px 20px}
+.sec2{font-family:var(--f-body);font-size:calc(13px * var(--fs));font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.casedl .big{font-family:var(--f-display);font-size:calc(34px * var(--fs));line-height:1.1;margin:4px 0}
+.casesteps,.caselaws,.caseev{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.casesteps{counter-reset:st}
+.casesteps li{position:relative;padding:12px 14px 12px 48px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.casesteps li::before{counter-increment:st;content:counter(st);position:absolute;left:12px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:calc(13px * var(--fs))}
+.casesteps p{margin:4px 0 0;color:var(--muted)}
+.caselaws li,.caseev li{padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.caseev li.have .tag{background:var(--accent-soft);color:var(--accent)}
+.caseev li.need .tag{background:var(--chip);color:var(--warn)}
+.casefields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;margin:0}
+@media (max-width:620px){.casefields{grid-template-columns:minmax(0,1fr)}}
+.casefields div{padding:10px 0;border-bottom:1px dashed var(--line)}
+.casefields dt{font-size:calc(13px * var(--fs));color:var(--muted)}
+.casefields dd{margin:2px 0 0;font-weight:600;overflow-wrap:anywhere}
+.casedoc .rowbtn{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn.danger-o{border-color:var(--stamp);color:var(--stamp)}
+.btn.danger-o:hover{background:var(--danger-bg)}
+.casebox{border:1px solid var(--accent);background:var(--accent-soft);border-radius:16px;padding:12px 14px;margin:0 0 12px;display:grid;gap:8px}
+.casebox legend{font-weight:700;padding:0 6px}
+.casesum{margin:0;padding-left:1.2em;display:grid;gap:2px}
