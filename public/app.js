@@ -588,7 +588,7 @@ function renderDocView(){
     <details class="more" ${extra ? "open" : ""}><summary>${t("extraSummary")}</summary>
       <div class="field"><label for="f_extra">${t("extraLabel")}</label><textarea id="f_extra" data-k="extra" maxlength="1500">${esc(extra)}</textarea></div></details>`;
   dateWords($("#docForm"));
-  $("#lawLink").href = lawyersHref();
+  $("#lawLink").href = lawyersHref(true);
   $("#lhNote").hidden = !letterhead().length;
   renderHowto();
   if (COURTS) syncCourt(null); else renderCourt();
@@ -762,7 +762,7 @@ function cleanForm(){
 // Yurist Pro: kabinetda yoqilgan blanka barcha hujjatlarga qo‘shiladi (ma’lumot shu brauzerda)
 const letterhead = () => { try { const lh = JSON.parse(localStorage.getItem("huquqyol:pro"))?.letterhead; return lh?.on ? lh.lines.map(s => String(s).trim()).filter(Boolean).slice(0, 4) : []; } catch { return []; } };
 const docRequest = () => ({ scenario: state.scn, recipient: state.recipient, triggerDate: state.trigger, form: cleanForm(), evidence: state.evidence, letterhead: letterhead() });
-const lawyersHref = () => `/yuristlar?holat=${encodeURIComponent(state.scn || "")}`;
+const lawyersHref = (send = false) => `/yuristlar?holat=${encodeURIComponent(state.scn || "")}${send ? "&yuborish=1" : ""}`;   // send — reja va arizani yuristga yuborish oqimi
 
 let previewSeq = 0;
 async function previewDoc(){

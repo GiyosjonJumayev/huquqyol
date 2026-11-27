@@ -36,6 +36,8 @@ export const PAGES = [
   { path: "/mavzu",            roles: ALL },          // yorug‘/qorong‘i mavzu (JavaScript’siz)
   { path: "/hisob",            roles: ["citizen", "lawyer", "org", "moderator"] },   // hujjatlar, kelishuvlar, obunalar; tashkilot hisobi
   { path: "/yurist-bolish",    roles: ["citizen"] },                                 // «Yurist bo‘lish» arizasi (profil muharriridan alohida)
+  { path: "/hisob/ish/:id",    roles: ["citizen", "lawyer", "org"] },               // yuristga yuborilgan ish — faqat ikki ishtirokchi (handler ichida)
+  { path: "/hisob/ish/:id/:fmt", roles: ["citizen", "lawyer", "org"] },             // ish arizasi DOCX / PDF
   { path: "/hisob/profil",     roles: ["lawyer"] },
   { path: "/hisob/statistika", roles: ["lawyer"], need: "pro" },
   { path: "/kabinet",          roles: ["lawyer", "org"], need: "pro" },
@@ -45,7 +47,7 @@ export const PAGES = [
 // ---------- API ----------
 export const API = [
   // Fuqaro oqimi va ochiq ma’lumot — hamma uchun (hisobsiz ham)
-  ...["/api/health", "/api/meta", "/api/stats", "/api/courts", "/api/me"].map(path => ({ method: "GET", path, roles: ALL })),
+  ...["/api/health", "/api/meta", "/api/stats", "/api/stats.csv", "/api/courts", "/api/me"].map(path => ({ method: "GET", path, roles: ALL })),
   ...["/api/analyze", "/api/plan", "/api/document/preview", "/api/document/:format", "/api/custom/:format", "/api/photo",
       "/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/forgot", "/api/auth/reset", "/api/auth/confirm"].map(path => ({ method: "POST", path, roles: ALL })),
   { method: "GET", path: "/api/ready", roles: ALL },

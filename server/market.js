@@ -5,7 +5,8 @@
 //    yurist bajarilganini belgilaydi. Platforma komissiyasi (COMMISSION_PCT, standart 10%) yuristdan undiriladi.
 //  • Katalog: admin tasdiqlagan yuristlar (litsenziya tekshirilgan) namuna profillar bilan birga chiqadi.
 import { q, one, tx, dbEnabled } from "./db.js";
-import { clean, ValidationError } from "./validate.js";
+import { clean, ValidationError, vDocument, vForm } from "./validate.js";
+import { stats } from "./stats.js";
 import { areaList } from "./business.js";
 import { COURTS, kbFor } from "./kb.js";
 import { adminPractice } from "./practice.js";
@@ -65,18 +66,50 @@ export async function applyToDb(app, user){
 }
 
 // ---------- Kelishuvlar (konsultatsiyalar) ----------
+// Ish paketi: fuqaro roziligi bilan reja va ariza ma’lumotlari (holat, kimga, sana, ariza maydonlari, dalillar).
+// Hujjat matni saqlanmaydi — yurist ochganda shu ma’lumotlardan serverdagi tekshirilgan shablon bilan qayta yasaladi.
+// Ariza bilan bir xil tekshiruvdan o‘tadi (vDocument): noma’lum maydonlar tashlanadi, uzunlik va sana tekshiriladi.
+export function vCase(body){
+  if (body?.shareCase !== true || !body?.case || typeof body.case !== "object" || Array.isArray(body.case)) return null;
+  const lang = ["uz", "cyr", "ru"].includes(body.case.lang) ? body.case.lang : "uz";
+  const s = kbFor(lang === "ru" ? "ru" : "uz").SCENARIO_BY_ID[body.case.scenario];
+  if (!s) throw err("scenario");
+  // Har bir maydon alohida tekshiriladi: noto‘g‘ri yoki noma’lum maydon tashlanadi, qolganlari yuboriladi
+  const form = {}, src = body.case.form && typeof body.case.form === "object" ? body.case.form : {};
+  for (const [k, v] of Object.entries(src).slice(0, 80)) { try { Object.assign(form, vForm(s, { [k]: v }, lang)); } catch {} }
+  let trigger = body.case.triggerDate;
+  try { vDocument({ scenario: s.id, triggerDate: trigger, lang }); } catch { trigger = undefined; }
+  const v = vDocument({ ...body.case, form, triggerDate: trigger, lang, letterhead: [] });
+  return { scenario: v.scenario, recipient: v.recipient, form: v.form, evidence: v.evidence, triggerDate: v.triggerDate || null, lang: v.lang };
+}
 export async function requestConsultation(req, res){
   const lawyerId = int(req.body?.lawyer, 1e12), message = clean(req.body?.message, 1500);
-  if (message.length < 10) throw err("message");
+  const caseData = vCase(req.body);
+  if (message.length < 10 && !caseData) throw err("message");
   const p = await one("select id, user_id from lawyer_profiles where id = $1 and status = 'approved'", [lawyerId]);
   if (!p) throw err("lawyerNotFound", 404);
   if (p.user_id && Number(p.user_id) === req.user.id) throw err("ownProfile");
-  const kb = kbFor("uz"), sc = typeof req.body?.scenario === "string" && kb.SCENARIO_BY_ID[req.body.scenario];
+  const kb = kbFor("uz"), sc = caseData ? kb.SCENARIO_BY_ID[caseData.scenario] : typeof req.body?.scenario === "string" && kb.SCENARIO_BY_ID[req.body.scenario];
   const format = req.body?.format === "office" ? "office" : "online";
-  const c = await one(`insert into consultations(lawyer_id, citizen_id, scenario, domain, format, message, commission_pct) values ($1,$2,$3,$4,$5,$6,$7) returning id`,
-    [p.id, req.user.id, sc?.id || null, sc?.domain || null, format, message, COMMISSION_PCT]);
+  const c = await one(`insert into consultations(lawyer_id, citizen_id, scenario, domain, format, message, commission_pct, case_data, case_at)
+      values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb, case when $8::jsonb is null then null else now() end) returning id`,
+    [p.id, req.user.id, sc?.id || null, sc?.domain || null, format, message || "—", COMMISSION_PCT, caseData ? JSON.stringify(caseData) : null]);
   await q("insert into lawyer_events(lawyer_ref, kind, domain, scenario) values ($1, 'request', $2, $3)", [`y${p.id}`, sc?.domain || null, sc?.id || null]);
-  res.status(201).json({ ok: true, id: Number(c.id), next: "/hisob" });
+  if (caseData){
+    await audit(q, { userId: req.user.id, action: "case.share", target: `consultation:${c.id}`, data: { lawyer: Number(p.id), scenario: caseData.scenario }, ip: req.ip });
+    stats.record("lawyer", { scenario: sc.id, domain: sc.domain, ip: req.ip });      // ochiq statistika: faqat soha sanog‘i
+  }
+  res.status(201).json({ ok: true, id: Number(c.id), next: caseData ? `/hisob/ish/${c.id}` : "/hisob" });
+}
+
+// Ish paketini faqat ishtirokchilar ko‘radi: fuqaro (egasi) yoki shu profilning yuristi. Admin va moderator — yo‘q (maxfiylik).
+export async function caseFor(user, id){
+  const c = await one(`select c.*, p.user_id as lawyer_user, p.name as lawyer_name, p.phone as lawyer_phone, p.email as lawyer_email,
+      u.name as citizen_name, u.phone as citizen_phone, u.email as citizen_email
+      from consultations c join lawyer_profiles p on p.id = c.lawyer_id join users u on u.id = c.citizen_id where c.id = $1`, [int(id, 1e12)]);
+  if (!c) return null;
+  const side = Number(c.citizen_id) === user.id ? "citizen" : Number(c.lawyer_user) === user.id ? "lawyer" : null;
+  return side ? { ...c, side } : null;
 }
 // Holatlar oqimi: kim, qaysi holatdan, qaysi holatga o‘tkaza oladi
 const FLOW = {
@@ -88,6 +121,17 @@ const FLOW = {
 };
 export async function actConsultation(req, res){
   const act = req.params.act, f = FLOW[act];
+  // Fuqaro ish paketini istalgan vaqtda qaytarib oladi: ma’lumot bazadan o‘chiriladi, so‘rov o‘zi qoladi
+  if (act === "withdraw"){
+    const id = int(req.params.id, 1e12);
+    const r = await q("update consultations set case_data = null, case_withdrawn_at = now(), updated_at = now() where id = $1 and citizen_id = $2 and case_data is not null", [id, req.user.id]);
+    if (!r.rowCount){
+      const c = await one("select citizen_id from consultations where id = $1", [id]);
+      throw c && Number(c.citizen_id) === req.user.id ? err("badState", 409) : err(c ? "forbidden" : "notFound", c ? 403 : 404);
+    }
+    await audit(q, { userId: req.user.id, action: "case.withdraw", target: `consultation:${id}`, ip: req.ip });
+    return res.json({ ok: true });
+  }
   if (!f) throw err("option", 404);
   const id = int(req.params.id, 1e12);
   await tx(async run => {
@@ -105,16 +149,20 @@ export async function actConsultation(req, res){
       if (act === "agree" && Number(c.offer_price) > 0)
         await run("insert into payments(user_id, consultation_id, kind, amount, status, note) values ($1,$2,'commission',$3,'pending',$4)",
           [c.lawyer_user, id, Math.round(Number(c.offer_price) * Number(c.commission_pct) / 100), `Komissiya ${c.commission_pct}%`]);
-      if (act === "cancel" || act === "decline") await run("update payments set status = 'cancelled' where consultation_id = $1 and status = 'pending'", [id]);
+      if (act === "cancel" || act === "decline"){
+        await run("update payments set status = 'cancelled' where consultation_id = $1 and status = 'pending'", [id]);
+        // Kelishuv bo‘lmadi — fuqaroning ish ma’lumotlari yuristda qolmaydi
+        await run("update consultations set case_data = null, case_withdrawn_at = coalesce(case_withdrawn_at, now()) where id = $1 and case_data is not null", [id]);
+      }
     }
   });
   res.json({ ok: true });
 }
 export async function consultationsFor(user){
   const lawyer = await one("select id, status from lawyer_profiles where user_id = $1", [user.id]);
-  const asCitizen = (await q(`select c.*, p.name as lawyer_name, p.phone as lawyer_phone, p.email as lawyer_email from consultations c
+  const asCitizen = (await q(`select c.*, (c.case_data is not null) as has_case, p.name as lawyer_name, p.phone as lawyer_phone, p.email as lawyer_email from consultations c
     join lawyer_profiles p on p.id = c.lawyer_id where c.citizen_id = $1 order by c.created_at desc limit 100`, [user.id])).rows;
-  const asLawyer = lawyer ? (await q(`select c.*, u.name as citizen_name, u.phone as citizen_phone, u.email as citizen_email from consultations c
+  const asLawyer = lawyer ? (await q(`select c.*, (c.case_data is not null) as has_case, u.name as citizen_name, u.phone as citizen_phone, u.email as citizen_email from consultations c
     join users u on u.id = c.citizen_id where c.lawyer_id = $1 order by c.created_at desc limit 200`, [lawyer.id])).rows : [];
   return { lawyer, asCitizen, asLawyer };
 }
@@ -193,3 +241,18 @@ export async function adminStats(){
 }
 export const regionsList = () => COURTS.regions.map(r => r.name);
 export const areaIds = () => new Set(areaList("uz").map(a => a.id));
+
+// Ochiq statistika uchun platforma ko‘rsatkichlari: faqat sanoqlar (ism, aloqa yoki matn yo‘q)
+export async function platformStats(period = 30){
+  if (!dbEnabled()) return null;
+  try {
+    const days = [7, 30, 90, 365].includes(Number(period)) ? Number(period) : 30;
+    const r = await one(`select
+        (select count(*)::int from users) users,
+        (select count(*)::int from users where created_at > now() - make_interval(days => $1)) "newUsers",
+        (select count(*)::int from lawyer_profiles p where ${VISIBLE_SQL}) lawyers,
+        (select count(*)::int from consultations where created_at > now() - make_interval(days => $1)) cons,
+        (select count(*)::int from consultations where created_at > now() - make_interval(days => $1) and status in ('agreed','completed')) agreed`, [days]);
+    return r;
+  } catch (e){ console.error("[stats] platforma:", e.message); return null; }
+}

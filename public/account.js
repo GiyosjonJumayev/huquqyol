@@ -89,6 +89,8 @@ document.addEventListener("submit", async e => {
     else body[el.name] = val;
   }
   for (const k of Object.keys(body)) if (Array.isArray(body[k])) body[k] = body[k].filter(x => x !== undefined);
+  // Yuristga so‘rov: fuqaro belgilagan bo‘lsa, shu brauzerdagi reja va ariza ma’lumotlari qo‘shiladi
+  if ("case" in f.dataset && body.shareCase === true){ const s = savedCase(); if (s) body.case = caseBody(s); else body.shareCase = false; }
   const btn = f.querySelector('[type="submit"]');
   showErr(f, ""); const okEl = f.querySelector("[data-ok-msg]"); if (okEl) okEl.hidden = true;
   if (btn) btn.disabled = true;
@@ -146,3 +148,32 @@ document.addEventListener("change", e => {
   if (g) g.hidden = r.dataset.show !== "true";
 });
 
+
+// ---------- Ish paketi: bosh sahifada tayyorlangan reja va ariza (faqat shu brauzerda) → tanlangan yuristga ----------
+const CASE_T = {
+  fields: { uz:"To‘ldirilgan ariza maydonlari: {n}", cyr:"Тўлдирилган ариза майдонлари: {n}", ru:"Заполнено полей заявления: {n}" },
+  ev: { uz:"Belgilangan dalillar: {n}", cyr:"Белгиланган далиллар: {n}", ru:"Отмечено доказательств: {n}" },
+  date: { uz:"Muddat hisoblanadigan sana: {d}", cyr:"Муддат ҳисобланадиган сана: {d}", ru:"Дата начала отсчёта срока: {d}" },
+  saved: { uz:"Saqlangan: {d}", cyr:"Сақланган: {d}", ru:"Сохранено: {d}" }
+};
+const ct = (k, v) => (CASE_T[k][lang] || CASE_T[k].uz).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? "");
+function savedCase(){ try { const s = JSON.parse(localStorage.getItem("huquqyol:v2")); return s?.scn ? s : null; } catch { return null; } }
+function caseBody(s){
+  const form = {};
+  for (const [k, v] of Object.entries({ ...(s.applicant || {}), ...(s.formByScn?.[s.scn] || {}) })) if (!k.startsWith("_") && v !== "" && v != null) form[k] = v;
+  return { scenario: s.scn, recipient: s.recipient, triggerDate: s.trigger, form, evidence: Array.isArray(s.evidence) ? s.evidence : [], lang };
+}
+for (const f of document.querySelectorAll("form[data-case]")){
+  const s = savedCase(), want = f.dataset.case;
+  const box = f.querySelector("[data-case-box]"), none = f.querySelector("[data-case-none]");
+  if (!s || (want && want !== s.scn)){ if (none) none.hidden = false; continue; }
+  const b = caseBody(s), list = box.querySelector("[data-case-sum]");
+  const items = [ct("fields", { n: Object.keys(b.form).length }), ct("ev", { n: b.evidence.length })];
+  if (b.triggerDate) items.push(ct("date", { d: b.triggerDate.split("-").reverse().join(".") }));
+  if (s.at){ const d = new Date(s.at), z = n => String(n).padStart(2, "0"); items.push(ct("saved", { d: `${z(d.getDate())}.${z(d.getMonth() + 1)}.${d.getFullYear()}` })); }
+  list.replaceChildren(...items.map(x => Object.assign(document.createElement("li"), { textContent: x })));
+  box.hidden = false;
+  const cb = box.querySelector('[name="shareCase"]'), msg = f.querySelector("[data-case-optional]");
+  const sync = () => { if (msg){ msg.required = !cb.checked; msg.minLength = cb.checked ? 0 : 10; } };
+  cb.addEventListener("change", sync); sync();
+}

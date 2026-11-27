@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (175 tests; 17 DB tests skip without TEST_DATABASE_URL)
+npm test                 # node:test, must stay green (178 tests; 18 DB tests skip without TEST_DATABASE_URL). With a DB run files sequentially: node --test --test-concurrency=1 test/*.test.js
 npm run test:e2e         # 15 browser tests incl. axe and navbar overlap per role; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
@@ -68,6 +68,8 @@ become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, 
 - Production: `deploy/compose.yml` (Caddy, PostgreSQL, backups), `npm run check`, `npm run admin`. Demo lawyers are hidden when NODE_ENV=production unless `SHOW_DEMO=1`.
 - Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Tashkilot). Checkout `/tolov/:id`; admin can also confirm bank transfers.
 - Courts by district: `server/kb/courts.json` (+ `public/courts.js`, `GET /api/courts`).
+- Statistics: `server/stats.js` (counts only; per-day: active users, domains, scenarios, region from the form's district via `server/regions.js`, photo reads, cases sent to lawyers) → `report({ period })` for 7/30/90/365 days vs the previous period. Page `server/statsPage.js` (`/statistika?davr=`), `GET /api/stats?davr=`, `GET /api/stats.csv`. Never store text, IP, or addresses.
+- Case handoff: citizen sends plan + application data to a chosen lawyer (`POST /api/consultations` with `shareCase:true, case:{…}` built in `public/account.js` from localStorage). Stored in `consultations.case_data` (validated per field), visible only to the two parties at `/hisob/ish/:id` (`server/casePage.js`, DOCX/PDF at `/hisob/ish/:id/:fmt`). Withdraw: `/api/consultations/:id/withdraw`; wiped on decline/cancel and 90 days after closing (`server/jobs.js`).
 - Photo/PDF reading: `server/photo.js` + `server/ocr.js` (Tesseract, no AI needed) + `server/docparse.js` (rules);
   PDFs parsed in the browser with pdf.js (self-hosted). Claude vision is used only when an API key is set.
 - Telegram bot: `bot/` (grammY, long polling, imports the engine directly, sessions in memory, never logs user text).

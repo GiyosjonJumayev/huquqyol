@@ -102,3 +102,61 @@ test("Ilovani import qilish diskka yozmaydi: fayl faqat attachFile() bilan ulana
   assert.equal(JSON.parse(readFileSync(file, "utf8")).opens.aliment, 1);
   s.close(); rmSync(dir, { recursive:true, force:true });
 });
+
+test("Davr hisoboti: 7/30/90/365 kun, oldingi davr bilan solishtirish, faol foydalanuvchilar, hudud, rasm va yuristga yuborish", () => {
+  let now = Date.UTC(2026, 10, 20, 6);
+  const s = createStats({ file:null, now: () => now, flushMs:0 });
+  const sd = { ish_haqi:"mehnat", aliment:"oila" };
+  // 40 kun oldin (30 kunlik davrdan tashqari, oldingi davrda): 1 ta reja
+  now -= 40 * 864e5;
+  s.record("open", { scenario:"ish_haqi", domain:"mehnat", ip:"old" });
+  now += 40 * 864e5;
+  // Bugun: 2 kishi, 3 reja, 1 hujjat (Samarqand), 1 rasm, 1 yuristga
+  s.record("open", { scenario:"ish_haqi", domain:"mehnat", ip:"a" });
+  s.record("open", { scenario:"aliment", domain:"oila", ip:"a" });
+  s.record("open", { scenario:"ish_haqi", domain:"mehnat", ip:"b" });
+  s.record("doc", { scenario:"ish_haqi", domain:"mehnat", region:"samarqand", ip:"a" });
+  s.record("photo", { scenario:"ish_haqi", ip:"b" });
+  s.record("lawyer", { scenario:"ish_haqi", domain:"mehnat", ip:"a" });
+  assert.equal(s.record("doc", { scenario:"aliment", domain:"oila", region:"../x", ip:"c" }), true);   // noto‘g‘ri hudud — sanalmaydi, hujjat sanaladi
+  const r = s.report({ scenarioDomain: sd, period: 30 });
+  assert.equal(r.period, 30);
+  assert.deepEqual([r.current.users, r.current.opens, r.current.docs, r.current.photo, r.current.lawyer], [3, 3, 2, 1, 1]);
+  assert.deepEqual(r.current.byDomain, { mehnat:2, oila:1 });
+  assert.deepEqual(r.current.byRegion, { samarqand:1 });
+  assert.deepEqual(r.current.byScenario, { ish_haqi:2, aliment:1 });
+  assert.deepEqual(r.current.lawByDomain, { mehnat:1 });
+  assert.equal(r.previous.opens, 1);                                 // 40 kun oldingisi — oldingi 30 kunlik davrda
+  assert.equal(r.series.length, 30);
+  assert.equal(r.series.at(-1).opens, 3);
+  // 90 kun — 13 ta haftalik bo‘lak; 365 kun — oylar; noto‘g‘ri davr — 30
+  assert.equal(s.report({ scenarioDomain: sd, period: 90 }).series.length, 13);
+  const y = s.report({ scenarioDomain: sd, period: 365 });
+  assert.ok(y.series.length >= 12 && y.series.length <= 13 && y.series.every(b => /^\d{4}-\d{2}$/.test(b.month)));
+  assert.equal(y.current.opens, 4);
+  assert.equal(s.report({ period: 45 }).period, 30);
+  assert.equal(s.report({ scenarioDomain: sd, period: 7 }).previous.opens, 0);
+});
+
+test("API va sahifa: davrlar, CSV (UTF-8 BOM), hudud faqat viloyat nomi; inline uslub va skript yo‘q", async () => {
+  const r = await post("/api/document/docx", { scenario:"ish_haqi", form:{ district:"Chilonzor tumani", fio:"Maxfiy Odam" } });
+  assert.equal(r.status, 200);
+  const j = await (await fetch(base + "/api/stats?davr=7")).json();
+  assert.equal(j.report.period, 7);
+  assert.ok(j.report.current.byRegion.toshkent_shahri >= 1);
+  assert.ok(!JSON.stringify(j).includes("Chilonzor") && !JSON.stringify(j).includes("Maxfiy"));
+  const c = await fetch(base + "/api/stats.csv?davr=365");
+  assert.equal(c.status, 200);
+  assert.match(c.headers.get("content-type"), /text\/csv/);
+  const bytes = new Uint8Array(await c.arrayBuffer());
+  assert.deepEqual([...bytes.slice(0, 3)], [0xef, 0xbb, 0xbf]);      // Excel UTF-8 ni to‘g‘ri ochishi uchun BOM
+  const csv = new TextDecoder().decode(bytes);
+  assert.match(csv, /hudud_hujjat,toshkent_shahri,Toshkent shahri,\d+,\d+/);
+  for (const [p, word] of [["7", "7 kun"], ["30", "30 kun"], ["90", "3 oy"], ["365", "1 yil"]]){
+    const h = await (await fetch(base + "/statistika?davr=" + p)).text();
+    assert.match(h, new RegExp(`aria-current="page">${word}<`), p);
+    assert.ok(!/\sstyle=/.test(h) && !/<script(?![^>]*\ssrc=)/.test(h), p);
+    assert.equal((h.match(/<th scope="row" role="rowheader">/g) || []).length >= 12 + 14, true, p);   // 12 soha + 14 hudud
+  }
+  assert.match(await (await fetch(base + "/statistika?davr=30&lang=ru")).text(), /город Ташкент/);
+});

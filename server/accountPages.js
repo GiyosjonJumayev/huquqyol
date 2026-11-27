@@ -29,7 +29,8 @@ const T = {
   st_trial: ["Sinov", "Пробный"], st_pending: ["To‘lov kutilmoqda", "Ожидает оплаты"], st_active: ["Faol", "Активна"], st_cancelled: ["Bekor qilingan", "Отменена"], st_expired: ["Muddati tugagan", "Истекла"],
   pl_pro: ["Yurist Pro", "Юрист Pro"], pl_firma: ["Firma", "Фирма"], pl_org: ["Tashkilot", "Организация"],
   payNote: ["To‘lov tizimi ulanmaguncha hisob-faktura bo‘yicha to‘lanadi; to‘lov tasdiqlangach obuna 30 kunga faollashadi.", "Пока платёжная система не подключена, оплата по счёту; после подтверждения подписка активна 30 дней."],
-  myCons: ["Mening so‘rovlarim va kelishuvlarim", "Мои запросы и договорённости"], noCons: ["Hali so‘rov yo‘q. Katalogdan yurist tanlang.", "Запросов пока нет. Выберите юриста в каталоге."],
+  myCons: ["Mening so‘rovlarim va kelishuvlarim", "Мои запросы и договорённости"],
+  caseOpen: ["Reja va ariza (ish)", "План и заявление (дело)"], caseGone: ["Ish ma’lumotlari o‘chirilgan.", "Данные дела удалены."], noCons: ["Hali so‘rov yo‘q. Katalogdan yurist tanlang.", "Запросов пока нет. Выберите юриста в каталоге."],
   inCons: ["Mijozlardan so‘rovlar", "Запросы клиентов"], noIn: ["Hozircha mijozlardan so‘rov yo‘q. Profilingiz to‘liq bo‘lsa, ular tezroq keladi.", "Запросов от клиентов пока нет. С заполненным профилем они приходят быстрее."],
   c_requested: ["So‘rov yuborilgan", "Запрос отправлен"], c_offered: ["Narx taklif qilingan", "Предложена цена"], c_agreed: ["Kelishuv tuzilgan", "Договорённость заключена"],
   c_completed: ["Bajarilgan", "Выполнено"], c_declined: ["Rad etilgan", "Отклонено"], c_cancelled: ["Bekor qilingan", "Отменено"],
@@ -159,7 +160,8 @@ const consRow = (c, lang, side) => {
   const showContacts = ["agreed", "completed"].includes(c.status) || side === "citizen";
   return `<li class="cons st-${c.status}"><div><span class="tag">${esc(t("c_" + c.status))}</span> <b>${esc(who)}</b> · ${esc(date(c.created_at, lang))}
       ${sc ? `<br><span class="muted">${esc(lang === "cyr" ? toCyrillic(sc.title) : sc.title)}</span>` : ""}
-      <p class="pre">${esc(c.message)}</p>
+      ${c.message && c.message !== "—" ? `<p class="pre">${esc(c.message)}</p>` : ""}
+      ${c.has_case ? `<p><a class="btn ghost sm" href="/hisob/ish/${c.id}">📎 ${esc(t("caseOpen"))}</a></p>` : c.case_withdrawn_at ? `<p class="small muted">${esc(t("caseGone"))}</p>` : ""}
       ${c.offer_price != null ? `<p><b>${esc(t("price"))}: ${esc(money(c.offer_price, lang))}</b>${c.offer_note ? ` — ${esc(c.offer_note)}` : ""}${side === "lawyer" ? ` <span class="small muted">(${esc(t("commission", { p: Number(c.commission_pct) }))})</span>` : ""}</p>` : ""}
       ${showContacts ? `<p class="small">${esc(t("contactsOf"))}: ${contacts.filter(Boolean).map(esc).join(" · ") || "—"}</p>` : ""}</div>
     <div class="rowbtn">${actions}</div>${err}</li>`;

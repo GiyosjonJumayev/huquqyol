@@ -163,7 +163,9 @@ const MIGRATIONS = [
      at timestamptz not null default now(),
      user_id bigint references users(id) on delete set null,
      action text not null, target text, data jsonb, ip text);
-   create index audit_log_at on audit_log(at desc);`
+   create index audit_log_at on audit_log(at desc);`,
+  // Fuqaro tanlagan yuristga ish paketi: reja va ariza ma’lumotlari (faqat rozilik bilan; qaytarib olinadi, rad/bekor qilinganda o‘chadi)
+  `alter table consultations add column case_data jsonb, add column case_at timestamptz, add column case_withdrawn_at timestamptz;`
 ];
 
 let pool = null;

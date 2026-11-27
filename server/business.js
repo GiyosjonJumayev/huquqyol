@@ -54,13 +54,19 @@ const T = {
   where: ["Manzil va ish vaqti", "Адрес и часы работы"], contacts: ["Aloqa", "Контакты"], phone: ["Telefon", "Телефон"], email: ["E-pochta", "Эл. почта"],
   howTitle: ["Qanday murojaat qilinadi", "Как обратиться"],
   how1: ["Telefon yoki e-pochta orqali bog‘laning va konsultatsiya vaqtini kelishib oling.", "Свяжитесь по телефону или почте и договоритесь о времени консультации."],
-  how2: ["HuquqYo‘lda tayyorlagan rejangiz va arizangizni (PDF yoki DOCX) o‘zingiz bilan olib boring yoki yuboring — yurist vaziyatni tezroq tushunadi.", "Возьмите с собой или отправьте план и заявление из HuquqYo‘l (PDF или DOCX) — юрист быстрее разберётся."],
+  how2: ["HuquqYo‘lda tayyorlagan reja va arizangizni shu sahifadagi so‘rov bilan yuboring yoki o‘zingiz bilan olib boring — yurist vaziyatni tezroq tushunadi.", "Отправьте план и заявление из HuquqYo‘l вместе с запросом на этой странице или возьмите с собой — юрист быстрее разберётся."],
   how3: ["Narx va xizmat hajmini oldindan yozma kelishib oling. Advokat bilan shartnoma tuziladi.", "Заранее письменно согласуйте цену и объём услуг. С адвокатом заключается договор."],
-  privacy: ["HuquqYo‘l sizning arizangiz yoki ma’lumotlaringizni yuristga yubormaydi: kimga va nimani yuborishni o‘zingiz hal qilasiz.", "HuquqYo‘l не передаёт юристу ваше заявление или данные: что и кому отправить, решаете вы."],
+  privacy: ["HuquqYo‘l reja va arizangizni yuristga faqat siz «Tayyorlagan reja va arizamni ham yuborish»ni belgilasangiz yuboradi — va faqat shu yuristga. Belgilamasangiz, hech narsa yuborilmaydi.", "HuquqYo‘l передаёт юристу план и заявление, только если вы отметите «Отправить также подготовленные план и заявление», — и только этому юристу. Без отметки ничего не передаётся."],
   back: ["← Katalogga qaytish", "← Назад к каталогу"],
   verified: ["Litsenziya tekshirilgan", "Лицензия проверена"], notVerified: ["Litsenziya tekshirilmagan", "Лицензия не проверена"],
   reqTitle: ["Konsultatsiyaga yozilish", "Записаться на консультацию"], reqLogin: ["So‘rov yuborish va kelishuv tuzish uchun hisobingizga kiring.", "Чтобы отправить запрос и заключить договорённость, войдите в аккаунт."],
   reqMsg: ["Vaziyatingizni qisqacha yozing", "Кратко опишите ситуацию"], reqSend: ["So‘rov yuborish", "Отправить запрос"],
+  reqLoginCase: ["Reja va arizangizni shu yuristga yuborish uchun hisobingizga kiring. Tayyorlagan ma’lumotlaringiz shu brauzerda saqlanib qoladi.", "Чтобы отправить план и заявление этому юристу, войдите в аккаунт. Подготовленные данные останутся в этом браузере."],
+  caseLegend: ["Reja va ariza", "План и заявление"],
+  caseShare: ["Tayyorlagan reja va arizamni ham yuborish", "Отправить также подготовленные план и заявление"],
+  caseNote: ["Yurist ariza maydonlarini (ism, manzil, telefon va holat tafsilotlari), muddatni, qadamlar va dalillar ro‘yxatini ko‘radi hamda arizani Word/PDF qilib yuklab oladi. Ma’lumotni «Hisobim» sahifasida istalgan vaqtda qaytarib olasiz.", "Юрист увидит поля заявления (ФИО, адрес, телефон и детали), срок, шаги и список доказательств и сможет скачать заявление в Word/PDF. Данные можно отозвать в любое время на странице «Мой аккаунт»."],
+  caseNone: ["Reja va ariza tayyorlasangiz, ularni ham yuristga yuborish mumkin.", "Если подготовить план и заявление, их тоже можно отправить юристу."],
+  caseMake: ["Ariza tayyorlash", "Подготовить заявление"],
   reqNote: ["Yurist narx taklif qiladi; rozi bo‘lsangiz, kelishuv tuziladi. Holatini «Hisobim» sahifasida kuzatasiz.", "Юрист предложит цену; если согласитесь — договорённость заключена. Статус — на странице «Мой аккаунт»."],
   website: ["Veb-sayt", "Сайт"], education: ["Ta’lim va malaka", "Образование и квалификация"], achievements: ["Yutuqlar va tajriba", "Достижения и опыт"], licenseNo: ["Litsenziya", "Лицензия"],
   joinTitle: ["Yuristmisiz? Katalogga qo‘shiling", "Вы юрист? Попадите в каталог"],
@@ -206,12 +212,15 @@ export function lawyersPage({ lang, cssHref, fs, query = {}, user, accHref, extr
   const sel = (name, label, opts) => `<label class="ff"><span>${esc(label)}</span><select name="${name}"><option value="">${esc(t("fAny"))}</option>${opts.map(([v, n]) => `<option value="${esc(v)}"${q[name] === v ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`;
   const qs = Object.entries(q).filter(([, v]) => v).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&");
   const path = "/yuristlar" + (qs ? `?${qs}` : "");
-  const back = qs ? `?${qs.replace(/&/g, "&amp;")}` : "";
+  // Holat va «yuristga yuborish» niyati profil sahifasiga ham o‘tadi (u yerda ish paketi taklif qilinadi)
+  const carry = [sc ? `holat=${encodeURIComponent(sc.id)}` : "", query.yuborish === "1" ? "yuborish=1" : ""].filter(Boolean);
+  const all = [qs, ...carry].filter(Boolean).join("&");
+  const back = all ? `?${all.replace(/&/g, "&amp;")}` : "";
   return page({ lang, cssHref, fs, user, accHref, path, title:t("lwTitle"), desc:t("lwLead"), body:`
     <h1>${esc(t("lwTitle"))}</h1><p class="lead">${esc(t("lwLead"))}</p>
     ${sc ? `<p class="note ok">${esc(t("lwCase", { t: cy(sc.title, lang) }))}</p>` : ""}
     <p class="note warn" role="note">${esc(t("demoList"))}</p>
-    <form class="filters" method="get" action="/yuristlar">
+    <form class="filters" method="get" action="/yuristlar">${sc ? `<input type="hidden" name="holat" value="${esc(sc.id)}">` : ""}${query.yuborish === "1" ? `<input type="hidden" name="yuborish" value="1">` : ""}
       ${sel("soha", t("fArea"), areas.map(a => [a.id, a.title]))}
       ${sel("hudud", t("fRegion"), COURTS.regions.map(r => [r.name, regionName(r.name, lang)]))}
       ${sel("shakl", t("fFormat"), [["online", t("online")], ["office", t("office")]])}
@@ -278,12 +287,19 @@ export function lawyerPage({ lang, cssHref, fs, id, query = {}, user, accHref, e
 
 function requestBox(l, lang, user, query){
   const t = tr(lang), sc = typeof query.holat === "string" && kbFor(lang === "ru" ? "ru" : "uz").SCENARIO_BY_ID[query.holat];
-  if (!user) return `<h2>${esc(t("reqTitle"))}</h2><p>${esc(t("reqLogin"))}</p><a class="btn primary" href="/kirish?next=${encodeURIComponent(`/yuristlar/${l.id}`)}">${esc(t("navLogin"))}</a>`;
+  const back = `/yuristlar/${l.id}${sc || query.yuborish === "1" ? `?${[sc ? `holat=${sc.id}` : "", query.yuborish === "1" ? "yuborish=1" : ""].filter(Boolean).join("&")}` : ""}`;
+  if (!user) return `<h2>${esc(t("reqTitle"))}</h2><p>${esc(t(query.yuborish === "1" ? "reqLoginCase" : "reqLogin"))}</p><a class="btn primary" href="/kirish?next=${encodeURIComponent(back)}">${esc(t("navLogin"))}</a>`;
   if (l.userId === user.id) return "";
-  return `<h2 id="reqH">${esc(t("reqTitle"))}</h2><form class="kform" data-api="/api/consultations" data-next="/hisob" aria-labelledby="reqH">
+  // Ish paketi (reja + ariza) brauzerdagi ma’lumotdan yig‘iladi (public/account.js) — faqat fuqaro belgilasa yuboriladi
+  return `<h2 id="reqH">${esc(t("reqTitle"))}</h2><form class="kform" data-api="/api/consultations" data-case="${sc ? esc(sc.id) : ""}" aria-labelledby="reqH">
     <input type="hidden" name="lawyer" value="${l.dbId}">${sc ? `<input type="hidden" name="scenario" value="${esc(sc.id)}"><p class="small">${esc(cy(sc.title, lang))}</p>` : ""}
+    <fieldset class="casebox" data-case-box hidden><legend>${esc(t("caseLegend"))}</legend>
+      <label class="check"><input type="checkbox" name="shareCase"${query.yuborish === "1" ? " checked" : ""}> ${esc(t("caseShare"))}</label>
+      <ul class="casesum small" data-case-sum></ul>
+      <p class="small muted">${esc(t("caseNote"))}</p></fieldset>
+    <p class="small muted" data-case-none hidden>${esc(t("caseNone"))} <a href="/">${esc(t("caseMake"))}</a></p>
     <div class="field"><label for="rq_fmt">${esc(t("fmt"))}</label><select id="rq_fmt" name="format">${l.formats.map(f => `<option value="${f}">${esc(t(f))}</option>`).join("")}</select></div>
-    <div class="field"><label for="rq_msg">${esc(t("reqMsg"))}</label><textarea id="rq_msg" name="message" required minlength="10" maxlength="1500" rows="5"></textarea></div>
+    <div class="field"><label for="rq_msg">${esc(t("reqMsg"))}</label><textarea id="rq_msg" name="message" required minlength="10" maxlength="1500" rows="5" data-case-optional></textarea></div>
     <button class="btn primary" type="submit">${esc(t("reqSend"))}</button><p class="err" data-err hidden></p>
     <p class="small muted">${esc(t("reqNote"))}</p></form>`;
 }
@@ -347,7 +363,7 @@ const PV = {
   title: ["Maxfiylik", "Конфиденциальность"],
   lead: ["HuquqYo‘l qaysi ma’lumotlarni ishlatadi, qayerda saqlaydi va ularni qanday o‘chirish mumkin.", "Какие данные использует HuquqYo‘l, где хранит и как их удалить."],
   h1: ["Hisobsiz foydalanish", "Без аккаунта"],
-  p1: ["Ariza uchun kiritgan ma’lumotlaringiz (ism, manzil, holat tafsilotlari) faqat shu brauzerda saqlanadi. Ularni istalgan vaqtda pastdagi «Ma’lumotlarimni o‘chirish» havolasi bilan o‘chirishingiz mumkin.", "Данные для заявления (ФИО, адрес, детали ситуации) хранятся только в этом браузере. Их можно в любой момент удалить по ссылке «Удалить мои данные» внизу страницы."],
+  p1: ["Ariza uchun kiritgan ma’lumotlaringiz (ism, manzil, holat tafsilotlari) shu brauzerda saqlanadi. Ularni istalgan vaqtda pastdagi «Ma’lumotlarimni o‘chirish» havolasi bilan o‘chirishingiz mumkin. Serverga ular faqat ikki holatda boradi: hujjat yasash uchun (saqlanmaydi) va siz o‘zingiz «reja va arizamni yuristga yuborish»ni belgilasangiz.", "Данные для заявления (ФИО, адрес, детали ситуации) хранятся в этом браузере. Их можно в любой момент удалить по ссылке «Удалить мои данные» внизу страницы. На сервер они попадают только в двух случаях: для создания документа (не сохраняются) и если вы сами отметите «отправить план и заявление юристу»."],
   h2: ["Tahlil va hujjat", "Анализ и документ"],
   p2: ["Holat matni tahlil uchun serverga yuboriladi va saqlanmaydi. Ariza ma’lumotlari faqat DOCX yoki PDF fayl yasash uchun ishlatiladi.", "Текст ситуации отправляется на сервер для анализа и не сохраняется. Данные заявления используются только для создания файла DOCX или PDF."],
   pAi: ["Hozir AI rejimi yoqilgan: tahlil uchun matn Anthropic (Claude, AQSH) ga uzatiladi.", "Сейчас включён режим AI: для анализа текст передаётся в Anthropic (Claude, США)."],
@@ -356,11 +372,11 @@ const PV = {
   h3: ["Hujjat rasmi va PDF", "Фото документа и PDF"],
   p3: ["Rasm o‘qish uchun serverga yuboriladi: faqat so‘rov davomida xotirada turadi, saqlanmaydi va logga yozilmaydi. PDF faylning o‘zi serverga yuborilmaydi — brauzer undan matn yoki sahifa rasmlarini oladi.", "Фото отправляется на сервер для распознавания: находится в памяти только во время запроса, не сохраняется и не пишется в журнал. Сам PDF-файл на сервер не отправляется — браузер извлекает из него текст или изображения страниц."],
   h4: ["Anonim statistika", "Анонимная статистика"],
-  p4: ["Faqat sonlar saqlanadi: qaysi soha va holat ochilgani, nechta hujjat yasalgani. Matn, ariza ma’lumotlari, IP manzil va cookie saqlanmaydi.", "Сохраняются только числа: какие области и ситуации открывались, сколько документов создано. Текст, данные заявлений, IP-адрес и cookie не сохраняются."],
+  p4: ["Statistika uchun faqat sonlar saqlanadi: qaysi soha va holat ochilgani, nechta hujjat yasalgani, nechta ish yuristga yuborilgani, kuniga nechta faol foydalanuvchi bo‘lgani va ariza qaysi viloyat bo‘yicha tayyorlangani (manzilning o‘zi emas, faqat viloyat nomi). Matn, ariza ma’lumotlari, IP manzil va cookie saqlanmaydi.", "Для статистики хранятся только числа: какие сферы и ситуации открывались, сколько документов создано, сколько дел отправлено юристам, сколько активных пользователей было за день и по какой области подготовлено заявление (только название области, не сам адрес). Текст, данные заявлений, IP-адрес и cookie не сохраняются."],
   h5: ["Cookie", "Cookie"],
   p5: ["hy_lang — til, hy_fs — shrift o‘lchami, hy_theme — mavzu, hy_photo — rasm paneli yopilgani. Hisobga kirsangiz — kirish uchun sessiya cookie (HttpOnly).", "hy_lang — язык, hy_fs — размер шрифта, hy_theme — тема, hy_photo — закрыта ли панель фото. Если вы вошли в аккаунт — cookie сессии (HttpOnly, только для входа)."],
   h6: ["Hisob", "Аккаунт"],
-  p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист."],
+  p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi. «Reja va arizamni yuborish»ni belgilasangiz, ariza maydonlari, sana va dalillar ro‘yxati bazada saqlanadi va faqat siz hamda o‘sha yurist ko‘radi; siz ularni istalgan vaqtda qaytarib olasiz, so‘rov rad etilsa yoki bekor qilinsa darhol, yopilgan ishlarda 90 kundan keyin o‘chiriladi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист. Если отметить «отправить план и заявление», поля заявления, дата и список доказательств хранятся в базе и видны только вам и этому юристу; их можно отозвать в любой момент, при отклонении или отмене запроса они удаляются сразу, по закрытым делам — через 90 дней."],
   h8: ["To‘lov", "Оплата"],
   p8: ["To‘lov Payme yoki Click sahifasida amalga oshiriladi; karta ma’lumotlari bizga kelmaydi. Biz buyurtma raqami, summa, sana va holatni saqlaymiz; hisob o‘chirilsa, bu yozuvlar shaxssiz qoladi. Yurist va jamoa kabinetidagi ma’lumotlar bazada saqlanadi va faqat egasi (jamoada — a’zolar) ko‘radi. Xavfsizlik uchun kirishlar (IP, brauzer) va muhim amallar jurnali yuritiladi.", "Оплата проходит на странице Payme или Click; данные карты к нам не попадают. Мы храним номер заказа, сумму, дату и статус; при удалении аккаунта записи обезличиваются. Данные кабинета юриста и команды хранятся в базе и видны только владельцу (в команде — участникам). Для безопасности ведётся журнал входов (IP, браузер) и важных действий."],
   h7: ["Telegram bot", "Telegram-бот"],

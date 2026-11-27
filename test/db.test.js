@@ -285,3 +285,95 @@ test("Yo‘nalish: profilsiz rasm va soha, /api/practice, admin bazasi — darho
   assert.equal(r.recheck, true);
   assert.ok((await (await admin.get("/admin?b=yurist")).text()).includes(`/api/admin/lawyer/${p.id}/approve`));
 });
+
+test("Ish paketi: fuqaro reja va arizani tanlagan yuristga yuboradi; faqat ikki ishtirokchi ko‘radi; qaytarib olish va rad etilganda o‘chadi", opts, async () => {
+  const lawyer = client(), citizen = client(), other = client(), admin = client(), guest = client();
+  assert.equal((await reg(lawyer, { name: "Dilnoza Ishonch", email: "dilnoza@test.uz", role: "lawyer" })).status, 201);
+  assert.equal((await reg(citizen, { name: "Aziz Fuqaro", email: "aziz@test.uz" })).status, 201);
+  assert.equal((await reg(other, { name: "Begona Odam", email: "begona@test.uz" })).status, 201);
+  assert.equal((await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Parol1234" })).status, 200);
+  assert.equal((await lawyer.post("/api/lawyer/profile", { name: "Dilnoza Ishonch", phone: "+998 90 111 22 33", kind: "advokat", areas: ["mehnat"], region: "Samarqand viloyati", formats: ["online"], price: "300000", license: "A-777" })).status, 200);
+  const prof = await db.one("select id from lawyer_profiles where name = 'Dilnoza Ishonch'");
+  assert.equal((await admin.post(`/api/admin/lawyer/${prof.id}/approve`)).status, 200);
+  assert.equal((await lawyer.post("/api/subscriptions", { plan: "pro" })).status, 201);
+  const pay = await db.one("select p.id from payments p join users u on u.id = p.user_id where u.email = 'dilnoza@test.uz' and p.status = 'pending'");
+  assert.equal((await admin.post(`/api/admin/payment/${pay.id}/confirm`)).status, 200);
+  // Katalog → profil: holat va «yuborish» niyati saqlanadi; so‘rov formasida ish paketi bloki bor
+  const list = await (await citizen.get("/yuristlar?holat=ish_haqi&yuborish=1")).text();
+  assert.match(list, new RegExp(`/yuristlar/y${prof.id}\\?soha=mehnat&amp;holat=ish_haqi&amp;yuborish=1`));
+  const pg = await (await citizen.get(`/yuristlar/y${prof.id}?holat=ish_haqi&yuborish=1`)).text();
+  assert.match(pg, /data-case="ish_haqi"/);
+  assert.match(pg, /name="shareCase" checked/);
+  assert.match(await (await guest.get(`/yuristlar/y${prof.id}?holat=ish_haqi&yuborish=1`)).text(), /kirish\?next=%2Fyuristlar%2Fy\d+%3Fholat%3Dish_haqi%26yuborish%3D1/);
+  // Yuborish: noto‘g‘ri va noma’lum maydonlar tashlanadi, qolganlari saqlanadi; xabar ixtiyoriy
+  const statsBefore = (await (await fetch(base + "/api/stats?davr=7")).json()).report.current.lawyer;
+  const caseIn = { scenario: "ish_haqi", recipient: "court", triggerDate: "2026-09-01", evidence: [0, 2, 99], lang: "uz",
+    form: { fio: "Karimov Aziz Botirovich", employer: "«Bog‘bon Agro» MChJ", amount: "9 000 000", months: "3", phone: "telefonim yo‘q!!", district: "Samarqand shahri", hack: "<script>" } };
+  assert.equal((await citizen.post("/api/consultations", { lawyer: prof.id, shareCase: true, case: { ...caseIn, scenario: "yoq_holat" } })).status, 400);
+  const rq = await citizen.post("/api/consultations", { lawyer: prof.id, format: "online", message: "", shareCase: true, case: caseIn });
+  assert.equal(rq.status, 201);
+  const { id, next } = await rq.json();
+  assert.equal(next, `/hisob/ish/${id}`);
+  const row = await db.one("select scenario, domain, case_data, case_at from consultations where id = $1", [id]);
+  assert.equal(row.scenario, "ish_haqi");
+  assert.equal(row.case_data.form.fio, "Karimov Aziz Botirovich");
+  assert.equal(row.case_data.form.amount, "9000000");
+  assert.equal(row.case_data.form.phone, undefined);                       // noto‘g‘ri telefon — tashlandi
+  assert.equal(row.case_data.form.hack, undefined);                        // noma’lum maydon — tashlandi
+  assert.deepEqual(row.case_data.evidence, [0, 2]);
+  assert.ok(row.case_at);
+  assert.equal((await (await fetch(base + "/api/stats?davr=7")).json()).report.current.lawyer, statsBefore + 1);
+  // Fuqaro va yurist ko‘radi; reja serverda qayta hisoblanadi (muddat, lex.uz normalari, dalillar)
+  for (const who of [citizen, lawyer]){
+    const r = await who.get(`/hisob/ish/${id}`);
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get("cache-control"), "private, no-store");
+    const h = await r.text();
+    assert.match(h, /Karimov Aziz Botirovich/);
+    assert.match(h, /lex\.uz/);
+    assert.match(h, new RegExp(`/hisob/ish/${id}/docx`));
+    assert.ok(!/\sstyle=/.test(h) && !/<script(?![^>]*\bsrc=)/.test(h));
+  }
+  assert.match(await (await citizen.get(`/hisob/ish/${id}`)).text(), /data-post="\/api\/consultations\/\d+\/withdraw"/);
+  assert.doesNotMatch(await (await lawyer.get(`/hisob/ish/${id}`)).text(), /withdraw/);
+  const docx = await lawyer.get(`/hisob/ish/${id}/docx`);
+  assert.equal(docx.status, 200);
+  assert.match(docx.headers.get("content-type"), /wordprocessingml/);
+  assert.ok((await docx.arrayBuffer()).byteLength > 5000);
+  const pdf = await citizen.get(`/hisob/ish/${id}/pdf`);
+  assert.equal(new TextDecoder().decode((await pdf.arrayBuffer()).slice(0, 4)), "%PDF");
+  assert.equal((await lawyer.get(`/hisob/ish/${id}/exe`)).status, 404);
+  // Begona fuqaro — 404 (ish borligi ham bilinmaydi); admin — 403; kirmagan — kirishga yo‘naltiriladi
+  assert.equal((await other.get(`/hisob/ish/${id}`)).status, 404);
+  assert.equal((await other.get(`/hisob/ish/${id}/docx`)).status, 404);
+  assert.equal((await admin.get(`/hisob/ish/${id}`)).status, 403);
+  assert.equal((await guest.get(`/hisob/ish/${id}`)).status, 303);
+  // Hisobim: ikkala tomonda ish havolasi
+  assert.match(await (await citizen.get("/hisob")).text(), new RegExp(`href="/hisob/ish/${id}"`));
+  assert.match(await (await lawyer.get("/hisob")).text(), new RegExp(`href="/hisob/ish/${id}"`));
+  // Jurnal: yuborish, yurist ko‘rgani va yuklab olgani yoziladi
+  const logs = (await db.q("select action from audit_log where target = $1 order by id", [`consultation:${id}`])).rows.map(r => r.action);
+  assert.ok(logs.includes("case.share") && logs.includes("case.view") && logs.includes("case.download"), logs.join(","));
+  // Faqat fuqaro qaytarib oladi; keyin yurist ham ma’lumotni ko‘rmaydi
+  assert.equal((await lawyer.post(`/api/consultations/${id}/withdraw`)).status, 403);
+  assert.equal((await other.post(`/api/consultations/${id}/withdraw`)).status, 403);
+  assert.equal((await citizen.post(`/api/consultations/${id}/withdraw`)).status, 200);
+  assert.equal((await citizen.post(`/api/consultations/${id}/withdraw`)).status, 409);
+  assert.equal((await db.one("select case_data from consultations where id = $1", [id])).case_data, null);
+  assert.doesNotMatch(await (await lawyer.get(`/hisob/ish/${id}`)).text(), /Karimov Aziz/);
+  assert.equal((await lawyer.get(`/hisob/ish/${id}/docx`)).status, 404);
+  // Yurist rad etsa — ish ma’lumoti darhol o‘chadi
+  const rq2 = await citizen.post("/api/consultations", { lawyer: prof.id, message: "Ikkinchi ish: aliment bo‘yicha savol bor.", shareCase: true, case: { ...caseIn, scenario: "aliment", form: { fio: "Karimov Aziz" } } });
+  assert.equal(rq2.status, 201);
+  const id2 = (await rq2.json()).id;
+  assert.ok((await db.one("select case_data from consultations where id = $1", [id2])).case_data);
+  assert.equal((await lawyer.post(`/api/consultations/${id2}/decline`)).status, 200);
+  assert.equal((await db.one("select case_data from consultations where id = $1", [id2])).case_data, null);
+  // shareCase belgilanmasa — ish paketi yuborilmaydi (faqat xabar)
+  const rq3 = await citizen.post("/api/consultations", { lawyer: prof.id, message: "Faqat savol: maslahat kerak.", shareCase: false, case: caseIn });
+  assert.equal(rq3.status, 201);
+  assert.equal((await db.one("select case_data from consultations where id = $1", [(await rq3.json()).id])).case_data, null);
+  // Shaxsiy ma’lumotlar eksportida ish paketi ustuni bor
+  const ex = await (await citizen.get("/malumotlarim")).json();
+  assert.ok(ex.consultations.length >= 3 && ex.consultations.every(c => "case_data" in c));
+});

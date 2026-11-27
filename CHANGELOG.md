@@ -1,5 +1,18 @@
 # O‘zgarishlar tarixi
 
+## 4.1.0 — 2026-11-26 · Mamlakat statistikasi va ishni yuristga yuborish
+- **Statistika (/statistika):** davr tanlovi — 7 kun, 30 kun, 3 oy, 1 yil — va har bir ko‘rsatkich oldingi shunday davr bilan solishtiriladi.
+  Ko‘rsatkichlar: faol foydalanuvchilar (kun ichida noyob), ochilgan rejalar, tayyorlangan arizalar (konversiya bilan), yuristga yuborilgan ishlar,
+  hujjat rasmi/PDF’dan o‘qish, qamrovdan tashqari so‘rovlar. «Qaysi sohada huquqiy yordam ko‘proq kerak» (ulush, o‘zgarish, hujjatlar, yuristga),
+  14 hudud bo‘yicha arizalar (faqat viloyat nomi — formadagi tumandan), dinamika (kun / hafta / oy), eng ko‘p holatlar, platforma ko‘rsatkichlari (bazadan, faqat sanoqlar).
+- **Ochiq ma’lumot:** `GET /api/stats?davr=7|30|90|365` (davr hisoboti bilan) va `GET /api/stats.csv` (Excel uchun UTF-8 BOM).
+- **Ishni yuristga yuborish:** ariza ekranida «Ishni yuristga yuboring» → katalog (holat saqlanadi) → yurist profili → «Tayyorlagan reja va arizamni ham yuborish».
+  Yurist `/hisob/ish/:id` sahifasida muddat (MK 9-modda bo‘yicha qayta hisoblanadi), qadamlar, lex.uz normalari, dalillar, ariza maydonlarini ko‘radi va arizani DOCX/PDF qilib yuklab oladi.
+- **Maxfiylik va xavfsizlik:** ish paketi faqat fuqaro belgilasa yuboriladi va faqat ikki ishtirokchiga ko‘rinadi (begona — 404, admin — 403);
+  har bir maydon ariza kabi tekshiriladi (noto‘g‘risi tashlanadi); fuqaro istalgan vaqtda qaytarib oladi; rad/bekor qilinganda darhol, yopilgan ishlarda 90 kundan keyin o‘chiriladi;
+  yuborish, ko‘rish va yuklab olish jurnalga yoziladi; shaxsiy ma’lumotlar eksportiga qo‘shildi. Maxfiylik siyosati yangilandi.
+- Testlar: 178 unit/DB + 15 brauzer testi.
+
 ## 4.0.0 — 2026-11-25 · Ishchi tizim: onlayn to‘lov, jamoalar, xavfsizlik, joylashtirish
 - **To‘lov:** Payme (Merchant API), Click (SHOP API), bank o‘tkazmasi (hisob-faktura PDF); 1/3/12 oylik davr, muddatidan oldin uzaytirish, qaytarish, fiskal chek havolasi, to‘lovlar tarixi, oferta.
 - **Jamoa** (Firma, Tashkilot): taklif, o‘rinlar, umumiy kartoteka, mas’ul tayinlash, bir vaqtda tahrirlashni birlashtirish.
