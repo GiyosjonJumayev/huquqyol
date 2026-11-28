@@ -46,7 +46,7 @@ const M = {
   lawyerNotFound:{ uz:"Yurist topilmadi yoki hali tasdiqlanmagan.", ru:"Юрист не найден или ещё не подтверждён." },
   ownProfile:{ uz:"O‘zingizga so‘rov yubora olmaysiz.", ru:"Нельзя отправить запрос самому себе." },
   badState:{ uz:"Holat o‘zgargan. Sahifani yangilab, qayta urinib ko‘ring.", ru:"Статус изменился. Обновите страницу и попробуйте снова." },
-  needPro:{ uz:"Bu imkoniyat Yurist Pro obunachilari uchun. «Tariflar» sahifasida obuna bo‘ling.", ru:"Эта возможность для подписчиков «Юрист Pro». Оформите подписку на странице «Тарифы»." },
+  needPro:{ uz:"Bu imkoniyat obunachilar uchun (Yurist Pro, Firma, Kompaniya yoki Tashkilot). «Tariflar» sahifasida obuna bo‘ling — ma’lumotlaringiz saqlanib qoladi.", ru:"Эта возможность для подписчиков («Юрист Pro», «Фирма», «Компания» или «Организация»). Оформите подписку на странице «Тарифы» — ваши данные сохранятся." },
   areas:{ uz:"Kamida bitta yo‘nalish tanlang.", ru:"Выберите хотя бы одно направление." },
   officialUrl:{ uz:"Havola rasmiy manbadan bo‘lsin: lex.uz, gov.uz yoki sud.uz (https://).", ru:"Ссылка должна вести на официальный источник: lex.uz, gov.uz или sud.uz (https://)." },
   actExists:{ uz:"Bu hujjat bazada bor.", ru:"Этот документ уже есть в базе." },
@@ -59,7 +59,17 @@ const M = {
   badCode:{ uz:"Kod noto‘g‘ri yoki eskirgan.", ru:"Код неверный или устарел." },
   badPassword:{ uz:"Parol noto‘g‘ri.", ru:"Неверный пароль." },
   need2fa:{ uz:"Admin paneli uchun avval ikki bosqichli kirishni yoqing.", ru:"Для админ-панели сначала включите двухэтапный вход." },
-  needTeam:{ uz:"Jamoa uchun faol Firma yoki Tashkilot obunasi kerak.", ru:"Для команды нужна активная подписка «Фирма» или «Организация»." },
+  needTeam:{ uz:"Jamoa uchun faol Firma, Kompaniya yoki Tashkilot obunasi kerak.", ru:"Для команды нужна активная подписка «Фирма», «Компания» или «Организация»." },
+  amount:{ uz:"Summani raqam bilan yozing, masalan: 15 000 000 yoki 1250,50.", ru:"Укажите сумму цифрами, например: 15 000 000 или 1250,50." },
+  innOrPinfl:{ uz:"STIR 9 ta raqam (yuridik shaxs) yoki JSHSHIR 14 ta raqam (jismoniy shaxs) bo‘lsin.", ru:"ИНН — 9 цифр (юрлицо) или ПИНФЛ — 14 цифр (физлицо)." },
+  url:{ uz:"Havola https:// bilan boshlansin.", ru:"Ссылка должна начинаться с https://." },
+  dateOrder:{ uz:"Tugash sanasi boshlanish sanasidan oldin bo‘lishi mumkin emas.", ru:"Дата окончания не может быть раньше даты начала." },
+  account:{ uz:"Hisob raqami 20 ta raqamdan iborat bo‘lsin.", ru:"Расчётный счёт — 20 цифр." },
+  mfo:{ uz:"MFO 5 ta raqamdan iborat bo‘lsin.", ru:"МФО — 5 цифр." },
+  tooMany:{ uz:"Yozuvlar soni chegaraga yetdi. Eskilarini eksport qilib o‘chiring yoki bizga yozing.", ru:"Достигнут предел записей. Выгрузите и удалите старые или напишите нам." },
+  commonPassword:{ uz:"Bu parol juda keng tarqalgan va oson topiladi. Boshqa, uzunroq parol tanlang — masalan, 3–4 so‘zdan iborat ibora.", ru:"Этот пароль слишком распространён и легко подбирается. Выберите другой, длиннее — например, фразу из 3–4 слов." },
+  pwPersonal:{ uz:"Parolda e-pochta yoki ismingiz bo‘lmasin.", ru:"Пароль не должен содержать почту или имя." },
+  linkSent:{ uz:"Agar bu e-pochta bilan hisob bo‘lsa, kirish havolasi yuborildi. U 15 daqiqa ishlaydi.", ru:"Если аккаунт с этой почтой существует, мы отправили ссылку для входа. Она действует 15 минут." },
   seats:{ uz:"Jamoadagi o‘rinlar to‘lgan ({n} ta).", ru:"Места в команде закончились ({n})." },
   alreadyMember:{ uz:"Bu odam allaqachon jamoada.", ru:"Этот человек уже в команде." },
   inviteEmail:{ uz:"Taklif boshqa e-pochtaga yuborilgan. Shu e-pochta bilan kiring.", ru:"Приглашение отправлено на другую почту. Войдите с ней." },
@@ -96,7 +106,7 @@ const M = {
 };
 export function msg(lang, key, vars = {}){
   const m = M[key]; if (!m) return key;
-  const s = m[lang === "ru" ? "ru" : "uz"].replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
+  const i = lang === "ru" ? 1 : 0, s = m[lang === "ru" ? "ru" : "uz"].replace(/\{(\w+)\}/g, (_, k) => Array.isArray(vars[k]) ? vars[k][i] : vars[k] ?? "");   // [uz, ru] yorliqlar
   return lang === "cyr" ? toCyrillic(s) : s;
 }
 

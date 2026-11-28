@@ -58,11 +58,11 @@ test("Express’dagi har bir sahifa va /api yo‘li server/access.js jadvalida b
 });
 
 test("Rol «uyi», navbar ro‘yxati va admin bo‘limlari", () => {
-  assert.deepEqual(HOME, { guest: "/", citizen: "/hisob", lawyer: "/hisob", org: "/hisob", moderator: "/admin", admin: "/admin" });
+  assert.deepEqual(HOME, { guest: "/", citizen: "/hisob", lawyer: "/hisob", org: "/kompaniya", moderator: "/admin", admin: "/admin" });
   assert.deepEqual(navFor("guest"), ["/", "/yuristlar", "/tariflar"]);
   assert.deepEqual(navFor("citizen"), ["/", "/yuristlar", "/tariflar", "/hisob", "/yurist-bolish"]);
   assert.deepEqual(navFor("lawyer"), ["/", "/yuristlar", "/tariflar", "/kabinet", "/hisob", "/hisob/profil"]);
-  assert.deepEqual(navFor("org"), ["/", "/yuristlar", "/tariflar", "/kabinet", "/hisob"]);
+  assert.deepEqual(navFor("org"), ["/", "/yuristlar", "/tariflar", "/kompaniya", "/hisob"]);          // kabinet manzil orqali ochiq, navbarda — Kompaniya
   assert.deepEqual(navFor("moderator"), ["/", "/yuristlar", "/tariflar", "/hisob", "/admin"]);
   assert.deepEqual(navFor("admin"), ["/", "/yuristlar", "/tariflar", "/admin"]);              // profil muharriri, kabinet, fuqaro kabineti yo‘q
   assert.deepEqual(ADMIN_SECTIONS.moderator, ["yurist", "rasm"]);

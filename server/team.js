@@ -7,7 +7,7 @@ import { sendMail, siteUrl } from "./mail.js";
 
 const err = (key, status = 400, vars) => Object.assign(new ValidationError(key, vars), { status });
 /** Jamoaning faol tarifi (egasi to‘lagan Firma / Tashkilot obunasi). */
-export const teamPlan = (orgId, run = q) => orgId ? run(`select plan, status, ends_at from subscriptions where org_id = $1 and plan in ('firma','org') and status in ('active','trial')
+export const teamPlan = (orgId, run = q) => orgId ? run(`select plan, status, ends_at from subscriptions where org_id = $1 and plan in ('firma','biznes','org') and status in ('active','trial')
   and (ends_at is null or ends_at > now()) order by (status = 'active') desc limit 1`, [orgId]).then(r => r.rows[0] || null) : null;
 export async function teamInfo(user){
   if (!user.org_id) return null;
@@ -59,7 +59,7 @@ export async function acceptInvite(req, res){
     }
     if ((await run("select count(*)::int n from users where org_id = $1 and id <> $2", [org.id, req.user.id])).rows[0].n >= SEATS[plan.plan]) throw err("seats", 409, { n: SEATS[plan.plan] });
     // E-pochta bu yerda tasdiqlanmaydi: taklif havolasi egasiga ham ko‘rinadi, demak pochta egaligini isbotlamaydi (ADMIN_EMAILS himoyasi)
-    await run("update users set org_id = $2, org_role = 'member', role = case when role = 'citizen' then $3 else role end where id = $1", [req.user.id, org.id, plan.plan === "org" ? "org" : "lawyer"]);
+    await run("update users set org_id = $2, org_role = 'member', role = case when role = 'citizen' then $3 else role end where id = $1", [req.user.id, org.id, ["org", "biznes"].includes(plan.plan) ? "org" : "lawyer"]);
     await audit(run, { userId: req.user.id, action: "team.join", target: `org:${org.id}`, ip: req.ip });
   });
   res.json({ ok: true, next: "/jamoa" });

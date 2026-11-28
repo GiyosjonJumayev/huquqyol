@@ -33,7 +33,7 @@ function client(){
     get cookie(){ return cookie; }
   };
 }
-const reg = (c, b) => c.post("/api/auth/register", { password: "Parol1234", consent: true, ...b });
+const reg = (c, b) => c.post("/api/auth/register", { password: "Sinov-Kalit-2468", consent: true, ...b });
 
 test("Ro‘yxat va kirish: parol talabi, email bandligi, sessiya, xato urinishlar bloki", opts, async () => {
   const c = client();
@@ -51,10 +51,10 @@ test("Ro‘yxat va kirish: parol talabi, email bandligi, sessiya, xato urinishla
   assert.equal((await c.post("/api/auth/logout")).status, 200);
   assert.equal((await c.get("/hisob")).status, 303);
   assert.equal((await c.post("/api/auth/login", { email: "ali@test.uz", password: "xato12345" })).status, 401);
-  assert.equal((await c.post("/api/auth/login", { email: "ali@test.uz", password: "Parol1234" })).status, 200);
+  assert.equal((await c.post("/api/auth/login", { email: "ali@test.uz", password: "Sinov-Kalit-2468" })).status, 200);
   // Parolni almashtirish
   assert.equal((await c.post("/api/auth/password", { current: "xato", password: "Yangi12345" })).status, 401);
-  assert.equal((await c.post("/api/auth/password", { current: "Parol1234", password: "Yangi12345" })).status, 200);
+  assert.equal((await c.post("/api/auth/password", { current: "Sinov-Kalit-2468", password: "Yangi12345" })).status, 200);
   // 5 ta xato — 15 daqiqa blok (to‘g‘ri parol ham o‘tmaydi)
   const x = client();
   for (let i = 0; i < 5; i++) await x.post("/api/auth/login", { email: "ali@test.uz", password: "Notog11ri" });
@@ -134,7 +134,7 @@ test("Yurist profili: tahrirlash, rasm, qayta moderatsiya; Pro vositalari, kabin
   const lw = client(), cz = client(), admin = client();
   await reg(lw, { name: "Nodira Advokat", email: "nodira@test.uz", role: "lawyer" });
   await reg(cz, { name: "Fuqaro", email: "fuqaro2@test.uz" });
-  await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Parol1234" });
+  await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Sinov-Kalit-2468" });
   // Profil sahifasi va saqlash
   assert.match(await (await lw.get("/hisob/profil")).text(), /data-api="\/api\/lawyer\/profile"/);
   const pf = { name: "Nodira Advokat", kind: "advokat", phone: "+998 91 222 33 44", email: "nodira@test.uz", telegram: "@nodira_law", website: "https://nodira.example.com",
@@ -249,7 +249,7 @@ test("Kirish huquqlari: har bir rol × har bir sahifa va API (200 / 303 / 401 / 
 test("Yo‘nalish: profilsiz rasm va soha, /api/practice, admin bazasi — darhol ko‘rinadi", opts, async () => {
   const lw = client(), admin = client();
   await reg(lw, { name: "Yangi Yurist", email: "yangi@test.uz", role: "lawyer" });
-  await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Parol1234" });
+  await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Sinov-Kalit-2468" });
   const prof = () => db.one("select * from lawyer_profiles where user_id = (select id from users where email = 'yangi@test.uz')");
   // Profil to‘ldirilmagan: rasm va yo‘nalish baribir saqlanadi, moderatsiya navbatiga tushmaydi
   const png = Buffer.concat([Buffer.from("89504E470D0A1A0A", "hex"), Buffer.alloc(300)]).toString("base64");
@@ -291,7 +291,7 @@ test("Ish paketi: fuqaro reja va arizani tanlagan yuristga yuboradi; faqat ikki 
   assert.equal((await reg(lawyer, { name: "Dilnoza Ishonch", email: "dilnoza@test.uz", role: "lawyer" })).status, 201);
   assert.equal((await reg(citizen, { name: "Aziz Fuqaro", email: "aziz@test.uz" })).status, 201);
   assert.equal((await reg(other, { name: "Begona Odam", email: "begona@test.uz" })).status, 201);
-  assert.equal((await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Parol1234" })).status, 200);
+  assert.equal((await admin.post("/api/auth/login", { email: "admin@test.uz", password: "Sinov-Kalit-2468" })).status, 200);
   assert.equal((await lawyer.post("/api/lawyer/profile", { name: "Dilnoza Ishonch", phone: "+998 90 111 22 33", kind: "advokat", areas: ["mehnat"], region: "Samarqand viloyati", formats: ["online"], price: "300000", license: "A-777" })).status, 200);
   const prof = await db.one("select id from lawyer_profiles where name = 'Dilnoza Ishonch'");
   assert.equal((await admin.post(`/api/admin/lawyer/${prof.id}/approve`)).status, 200);

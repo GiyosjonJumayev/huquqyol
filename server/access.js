@@ -1,3 +1,4 @@
+import { msg, resolveLang } from "./i18n.js";
 // Kirish huquqlari — YAGONA MANBA. Har bir sahifa va /api yo‘li uchun qaysi rollar ocha oladi.
 // Server har bir so‘rovda shu jadval bo‘yicha tekshiradi (accessMiddleware); brauzer faqat havolalarni yashiradi (navFor).
 // Yangi yo‘l qo‘shilsa — shu yerga yozilishi shart: test barcha Express yo‘llari jadvalda borligini tekshiradi.
@@ -32,6 +33,7 @@ export const PAGES = [
   { path: "/jamoa",            roles: ["citizen", "lawyer", "org"] },
   { path: "/jamoa/taklif",     roles: ["citizen", "lawyer", "org"] },
   { path: "/kirish",           roles: ALL },          // kirgan foydalanuvchi o‘z bosh sahifasiga yo‘naltiriladi
+  { path: "/kirish/havola",    roles: ALL },          // e-pochtadagi parolsiz kirish havolasi (kirish — tugma bosilganda, POST)
   { path: "/royxat",           roles: ALL },
   { path: "/mavzu",            roles: ALL },          // yorug‘/qorong‘i mavzu (JavaScript’siz)
   { path: "/hisob",            roles: ["citizen", "lawyer", "org", "moderator"] },   // hujjatlar, kelishuvlar, obunalar; tashkilot hisobi
@@ -41,6 +43,10 @@ export const PAGES = [
   { path: "/hisob/profil",     roles: ["lawyer"] },
   { path: "/hisob/statistika", roles: ["lawyer"], need: "pro" },
   { path: "/kabinet",          roles: ["lawyer", "org"], need: "pro" },
+  // Kompaniya ish joyi: ko‘rish va eksport obunasiz ham (ma’lumot egasiniki), yozish — obuna bilan (API need:"pro")
+  { path: "/kompaniya",        roles: ["org"] },
+  { path: "/kompaniya/eksport/:kind", roles: ["org"] },                               // CSV (Excel)
+  { path: "/kompaniya/kalendar", roles: ["org"] },
   { path: "/admin",            roles: ["admin", "moderator"] }                      // moderator — faqat ADMIN_SECTIONS.moderator
 ];
 
@@ -49,7 +55,7 @@ export const API = [
   // Fuqaro oqimi va ochiq ma’lumot — hamma uchun (hisobsiz ham)
   ...["/api/health", "/api/meta", "/api/stats", "/api/stats.csv", "/api/courts", "/api/me"].map(path => ({ method: "GET", path, roles: ALL })),
   ...["/api/analyze", "/api/plan", "/api/document/preview", "/api/document/:format", "/api/custom/:format", "/api/photo",
-      "/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/forgot", "/api/auth/reset", "/api/auth/confirm"].map(path => ({ method: "POST", path, roles: ALL })),
+      "/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/forgot", "/api/auth/reset", "/api/auth/confirm", "/api/auth/link", "/api/auth/link/use"].map(path => ({ method: "POST", path, roles: ALL })),
   { method: "GET", path: "/api/ready", roles: ALL },
   // Provayder serverlari chaqiradi: imzo / Basic kalit handler ichida tekshiriladi (server/payGateways.js)
   ...["/api/pay/payme", "/api/pay/click/prepare", "/api/pay/click/complete"].map(path => ({ method: "POST", path, roles: ALL })),
@@ -71,6 +77,8 @@ export const API = [
   { method: "GET",  path: "/api/practice",               roles: ["lawyer", "org"], need: "pro" },
   { method: "GET",  path: "/api/cabinet",                roles: ["lawyer", "org"], need: "pro" },
   { method: "POST", path: "/api/cabinet",                roles: ["lawyer", "org"], need: "pro" },
+  ...["/api/company/records", "/api/company/records/:id", "/api/company/records/:id/:act", "/api/company/requisites", "/api/company/doc/:fmt"]
+      .map(path => ({ method: "POST", path, roles: ["org"], need: "pro" })),                       // egasi / tashkilot — handler ichida
   { method: "POST", path: "/api/admin/:kind/:id/:act",   roles: ["admin", "moderator"] }        // moderator — faqat ADMIN_ACTS.moderator
 ];
 
@@ -85,7 +93,7 @@ export const ADMIN_ACTS = {
 };
 
 // Har bir rolning «uyi»: kirgandan keyin va 403 sahifasidagi havola
-export const HOME = { guest: "/", citizen: "/hisob", lawyer: "/hisob", org: "/hisob", moderator: "/admin", admin: "/admin" };
+export const HOME = { guest: "/", citizen: "/hisob", lawyer: "/hisob", org: "/kompaniya", moderator: "/admin", admin: "/admin" };
 
 export const roleOf = user => user && ROLES.includes(user.role) && user.role !== "guest" ? user.role : "guest";
 
@@ -141,7 +149,7 @@ export function accessMiddleware({ proStatus, forbidden }){
       const api = rule.path.startsWith("/api/");
       if (api){
         const key = d.reason === "2fa" ? "need2fa" : { 401: "auth", 402: "needPro", 403: "forbidden" }[d.status];
-        return res.status(d.status).json({ error: key, key });
+        return res.status(d.status).json({ error: msg(req.lang || resolveLang(req), key), key });   // foydalanuvchiga — tushunarli matn; key — dastur uchun
       }
       if (d.status === 303) return res.redirect(303, d.location);
       return forbidden(req, res, d.reason);
@@ -150,5 +158,6 @@ export function accessMiddleware({ proStatus, forbidden }){
 }
 
 // Navbar va hisob menyusi uchun: rol ocha oladigan sahifalar (brauzer faqat yashiradi, tekshiruv serverda)
-const NAV_PATHS = ["/", "/yuristlar", "/tariflar", "/kabinet", "/hisob", "/hisob/profil", "/yurist-bolish", "/admin"];
-export const navFor = role => NAV_PATHS.filter(p => PAGES.find(x => x.path === p).roles.includes(role));
+const NAV_PATHS = ["/", "/yuristlar", "/tariflar", "/kompaniya", "/kabinet", "/hisob", "/hisob/profil", "/yurist-bolish", "/admin"];
+const NAV_HIDE = { org: ["/kabinet"] };                // kompaniya uchun asosiy ish joyi — /kompaniya (kabinet manzil orqali ochiq qoladi)
+export const navFor = role => NAV_PATHS.filter(p => PAGES.find(x => x.path === p).roles.includes(role) && !NAV_HIDE[role]?.includes(p));

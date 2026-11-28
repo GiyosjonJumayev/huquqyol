@@ -33,7 +33,7 @@ test("Katalog filtri: soha, hudud, shakl; Pro profillar yuqorida", () => {
   const all = filterLawyers({});
   const firstFree = all.findIndex(l => l.plan === "free");
   assert.ok(all.slice(firstFree).every(l => l.plan === "free"));
-  assert.equal(PLANS.length, 4);
+  assert.equal(PLANS.length, 5);                     // fuqaro, Yurist Pro, Firma, Kompaniya, Tashkilot
 });
 
 test("Sahifalar uch tilda: tariflar, katalog, profil; inline skript va style yo‘q", async () => {
@@ -43,7 +43,7 @@ test("Sahifalar uch tilda: tariflar, katalog, profil; inline skript va style yo�
       assert.equal(r.status, 200, `${lang} ${p}`);
       assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>/i.test(html), `${p}: inline skript`);
       assert.ok(!/\sstyle=/i.test(html), `${p}: style atributi`);
-      if (lang === "ru") assert.ok(!/[a-z]{4,}/i.test(html.replace(/<[^>]+>/g, " ").replace(/HuquqYo‘l|Pro|Payme|Click|example\.com|namuna\d|lex\.uz|UZ|RU|EN|my\.sud\.uz|O‘zb|Ўзб|DOCX|PDF|JSON|JavaScript|Telegram|DEMO|Mizon|murojaat\.gov\.uz|pm\.gov\.uz|yurxizmat\.uz/g, "")), `${p}: ruscha sahifada lotin matn`);
+      if (lang === "ru") assert.ok(!/[a-z]{4,}/i.test(html.replace(/<[^>]+>/g, " ").replace(/HuquqYo‘l|Pro|Payme|Click|example\.com|namuna\d|lex\.uz|UZ|RU|EN|my\.sud\.uz|O‘zb|Ўзб|DOCX|PDF|JSON|JavaScript|Telegram|Excel|DEMO|Mizon|murojaat\.gov\.uz|pm\.gov\.uz|yurxizmat\.uz/g, "")), `${p}: ruscha sahifada lotin matn`);
     }
   }
   const t = await (await get("/yuristlar")).text();

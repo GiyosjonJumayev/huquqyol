@@ -11,7 +11,7 @@ import { mailEnabled } from "./mail.js";
 
 const FONT_DIR = join(dirname(createRequire(import.meta.url).resolve("dejavu-fonts-ttf/package.json")), "ttf");
 const T = {
-  pl_pro: ["Yurist Pro", "Юрист Pro"], pl_firma: ["Firma", "Фирма"], pl_org: ["Tashkilot", "Организация"],
+  pl_pro: ["Yurist Pro", "Юрист Pro"], pl_firma: ["Firma", "Фирма"], pl_biznes: ["Kompaniya", "Компания"], pl_org: ["Tashkilot", "Организация"],
   mon1: ["1 oy", "1 месяц"], mon3: ["3 oy", "3 месяца"], mon12: ["12 oy", "12 месяцев"],
   payTitle: ["To‘lov", "Оплата"], order: ["Buyurtma № {n}", "Заказ № {n}"], total: ["To‘lanadi", "К оплате"], what: ["Xizmat", "Услуга"], period: ["Muddat", "Срок"],
   subOf: ["«{p}» obunasi", "Подписка «{p}»"], commission: ["Platforma komissiyasi", "Комиссия платформы"],
@@ -66,7 +66,7 @@ export function checkoutPage({ lang, cssHref, fs, user, accHref, req, p, tx, fis
   const summary = `<dl class="paysum">${row(t("what"), esc(what(p, t)))}${p.kind === "subscription" && Number(p.amount) ? row(t("period"), esc(mon(p.months, t))) : ""}${Number(p.amount) ? row(t("total"), `<b class="paytotal">${esc(money(p.amount, lang))}</b>`) : ""}</dl>`;
   let body;
   if (p.status === "paid") body = `<p class="paystate ok" role="status">✓ ${esc(t("paid"))}</p>${p.sub_ends ? `<p>${esc(t("activeTill", { d: date(p.sub_ends, lang) }))}</p>` : ""}
-      <p class="rowbtn"><a class="btn primary" href="/kabinet">${esc(t("toCab"))}</a>${fiscal ? `<a class="btn ghost" href="${esc(fiscal)}" target="_blank" rel="noopener noreferrer">${esc(t("receipt"))} ↗</a>` : ""}</p>`;
+      <p class="rowbtn"><a class="btn primary" href="${p.plan === "biznes" || (p.plan === "org" && user?.role === "org") ? "/kompaniya" : "/kabinet"}">${esc(t("toCab"))}</a>${fiscal ? `<a class="btn ghost" href="${esc(fiscal)}" target="_blank" rel="noopener noreferrer">${esc(t("receipt"))} ↗</a>` : ""}</p>`;
   else if (p.status !== "pending") body = `<p class="paystate">${esc(t(p.status))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("toPlans"))}</a></p>`;
   else if (!Number(p.amount)) body = `<p class="note">${esc(t("byDeal"))}</p>`;
   else body = `<h2 class="sec" id="howH">${esc(t("how"))}</h2>

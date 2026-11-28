@@ -35,7 +35,7 @@ Xizmatingizning **IKPU** va **qadoq kodi**ni [tasnif.soliq.uz](https://tasnif.so
 
 ## 5. Narxlar
 
-`PRICE_PRO`, `PRICE_FIRMA`, `COMMISSION_PCT`, `FIRMA_SEATS`, `ORG_SEATS`, `PLAN_DISCOUNT_3`, `PLAN_DISCOUNT_12` — `.env` dan, kodni o‘zgartirmasdan. Tashkilot narxi: admin → Daromad → «Narx belgilash» → mijoz o‘sha sahifada onlayn to‘laydi.
+`PRICE_PRO`, `PRICE_FIRMA`, `PRICE_BIZNES`, `BIZNES_SEATS`, `COMMISSION_PCT`, `FIRMA_SEATS`, `ORG_SEATS`, `PLAN_DISCOUNT_3`, `PLAN_DISCOUNT_12` — `.env` dan, kodni o‘zgartirmasdan. Tashkilot narxi: admin → Daromad → «Narx belgilash» → mijoz o‘sha sahifada onlayn to‘laydi.
 
 ## Qanday himoyalangan
 

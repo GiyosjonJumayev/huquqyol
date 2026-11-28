@@ -11,13 +11,16 @@ import { buildPlan, CB_RATE } from "./plan.js";
 import { documentModel, customModel, toDocx, toPdf } from "./documents.js";
 import { plansPage, lawyersPage, lawyerPage, cabinetPage, privacyPage, vLawyerApply, saveApplication, vCustom } from "./business.js";
 import { initDb, migrate, dbEnabled } from "./db.js";
-import { attachUser, register, login, logout, changePassword } from "./auth.js";
+import { attachUser, register, login, logout, changePassword, requestLink, useLink } from "./auth.js";
+import { clean } from "./validate.js";
 import { accessMiddleware, HOME, navFor, roleOf } from "./access.js";
 import { approvedLawyers, recordView, applyToDb, requestConsultation, actConsultation, consultationsFor, adminAct, adminStats, photoQueue, platformStats, caseFor } from "./market.js";
 import { casePage } from "./casePage.js";
 import { audit } from "./billing.js";
 import { regionOfForm, REGIONS } from "./regions.js";
-import { loginPage, registerPage, accountPage, adminPage, applyPage, forbiddenPage } from "./accountPages.js";
+import { loginPage, registerPage, linkPage, accountPage, adminPage, applyPage, forbiddenPage } from "./accountPages.js";
+import { companyCtx, dashboard, listRecords, getRecord, createRecord, updateRecord, actRecord, saveRequisites, fillTemplate, letterhead, toCsv, toIcs, allActive, KINDS, todayISO } from "./company.js";
+import { companyPage, sectionOf } from "./companyPages.js";
 import { proStatus, myProfile, saveProfile, saveAreas, savePhoto, sendPhoto, getCabinet, putCabinet, lawyerStats } from "./lawyer.js";
 import { getPractice, practiceCounts, customActs } from "./practice.js";
 import { subscribe, mySubscriptions, myPayments, getPayment, paymentStatus, cancelOrder, bankTransfer } from "./billing.js";
@@ -26,7 +29,7 @@ import { resendVerify, confirmEmail, forgot, resetPassword, totpStart, totpEnabl
 import { invite, cancelInvite, acceptInvite, removeMember, teamInfo, inviteView, getTeamCabinet, putTeamCabinet } from "./team.js";
 import { checkoutPage, paymentsPage, invoicePdf, securityPage, forgotPage, resetPage, confirmPage, teamPage, invitePage, offerPage } from "./payPages.js";
 import { startJobs, stopJobs } from "./jobs.js";
-import { one, q } from "./db.js";
+import { one, q, tx } from "./db.js";
 import { lawyerPanel, profileEditPage, lawyerStatsPage } from "./lawyerPages.js";
 
 // PostgreSQL (DATABASE_URL bo‘lsa): hisoblar, obunalar, kelishuvlar. Migratsiyalar start() da qo‘llanadi.
@@ -193,6 +196,8 @@ app.post("/api/auth/register", needDb, authLimit, wrap(register));
 app.post("/api/auth/login", needDb, authLimit, wrap(login));
 app.post("/api/auth/logout", wrap(logout));
 app.post("/api/auth/password", needDb, authLimit, wrap(changePassword));
+app.post("/api/auth/link", needDb, rateLimit({ max: 5, windowMs: 10 * 60_000, name:"link" }), wrap(requestLink));
+app.post("/api/auth/link/use", needDb, authLimit, wrap(useLink));
 app.post("/api/auth/forgot", needDb, rateLimit({ max: 5, windowMs: 10 * 60_000, name:"forgot" }), wrap(forgot));
 app.post("/api/auth/reset", needDb, authLimit, wrap(resetPassword));
 app.post("/api/auth/confirm", needDb, authLimit, wrap(confirmEmail));
@@ -216,6 +221,31 @@ app.post("/api/consultations", needDb, rateLimit({ max: 10, name:"cons" }), wrap
 app.post("/api/consultations/:id/:act", needDb, rateLimit({ max: 60, name:"consact" }), wrap(actConsultation));
 // Admin amallari
 app.post("/api/admin/:kind/:id/:act", needDb, wrap(adminAct));
+// Kompaniya ish joyi (yozish — obuna bilan: server/access.js need:"pro")
+const cLimit = rateLimit({ max: 120, name:"company" });
+app.post("/api/company/records", needDb, cLimit, wrap(createRecord));
+app.post("/api/company/records/:id", needDb, cLimit, wrap(updateRecord));
+app.post("/api/company/records/:id/:act", needDb, cLimit, wrap(actRecord));
+app.post("/api/company/requisites", needDb, cLimit, wrap(saveRequisites));
+app.post("/api/company/doc/:fmt", needDb, rateLimit({ max: 30, name:"cdoc" }), wrap(async (req, res) => {
+  const fmt = req.params.fmt;
+  if (fmt !== "docx" && fmt !== "pdf") return res.status(404).json({ error: msg(req.lang, "format") });
+  const ctx = await companyCtx(req.user);
+  if (!ctx) return res.status(402).json({ error: msg(req.lang, "needTeam") });
+  const dl = parseLang(req.body?.docLang) || "uz", f = fillTemplate(clean(req.body?.tpl, 40), req.body?.values, ctx.org, base(dl));
+  let number = "";
+  // Chiquvchi xat: jurnalga yoziladi va raqam hujjatning o‘ziga qo‘yiladi
+  if (f.letter && req.body?.logOut === true){
+    const out = await tx(async run => { const { insertLetter } = await import("./company.js"); return insertLetter(run, ctx.org.id, req.user.id, { title: f.name, party: f.party || f.name }); });
+    number = out.number;
+    await audit(q, { userId: req.user.id, action: "company.create", target: `record:${out.id}`, data: { kind: "letter", tpl: true }, ip: req.ip });
+  }
+  const model = customModel({ title: f.title, text: (number ? `№ ${number}\n\n` : "") + f.text, to: f.to, sign: false, letterhead: letterhead(ctx.org), lang: base(dl) });
+  const out = dl === "cyr" ? cyrillicModel(model) : model, buf = fmt === "docx" ? await toDocx(out) : await toPdf(out);
+  res.set({ "Content-Type": fmt === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf",
+    "Content-Disposition": `attachment; filename="${safeName(`${f.name}${number ? "-" + number : ""}.${fmt}`)}"`, "Cache-Control": "private, no-store",
+    ...(number ? { "X-Record-Number": encodeURIComponent(number) } : {}) }).send(buf);
+}));
 // Yurist profili va Pro kabineti
 app.post("/api/lawyer/profile", needDb, rateLimit({ max: 30, name:"lprof" }), wrap(saveProfile));
 app.post("/api/lawyer/areas", needDb, rateLimit({ max: 60, name:"lareas" }), wrap(saveAreas));
@@ -351,6 +381,39 @@ app.get("/mavzu", (req, res) => {
   const back = typeof req.query.back === "string" && /^\/[a-z0-9/_?=&%.-]*$/i.test(req.query.back) && !req.query.back.startsWith("//") ? req.query.back : "/";
   res.redirect(303, back);
 });
+// Kompaniya ish joyi: ko‘rish obunasiz ham ochiq (yozish — API’da obuna bilan)
+app.get("/kompaniya", (req, res, next) => dbEnabled() ? next() : res.status(503).type("text").send("DB"), bizPage(async a => {
+  const ctx = await companyCtx(a.user);
+  if (!ctx) return null;
+  const b = sectionOf(a.query.b), K = { shartnomalar: "contract", muddatlar: "deadline", xatlar: "letter", kutubxona: "doc" }[b];
+  const dash = await dashboard(ctx.org.id);
+  const nav = { shartnomalar: { n: dash.by.contract.active, alert: dash.by.contract.overdue + dash.by.contract.soon }, muddatlar: { n: dash.by.deadline.active, alert: dash.by.deadline.overdue + dash.by.deadline.soon },
+    xatlar: { n: dash.by.letter.active, alert: dash.by.letter.overdue + dash.by.letter.soon }, kutubxona: { n: dash.by.doc.active, alert: dash.by.doc.overdue + dash.by.doc.soon } };
+  const data = { dash, nav };
+  if (K){
+    data.rows = await listRecords(ctx.org.id, K, { holat: a.query.holat, qidir: a.query.q, muddat: a.query.muddat });
+    if (a.query.id){ const r = await getRecord(ctx.org.id, a.query.id); data.record = r?.kind === K ? r : null; }
+  }
+  if (b === "qonunlar") data.libUrls = (await listRecords(ctx.org.id, "doc", { holat: "all" })).map(r => r.url).filter(Boolean);
+  return companyPage({ ...a, ctx, b, data });
+}));
+app.get("/kompaniya/eksport/:kind", (req, res, next) => (async () => {
+  const kind = req.params.kind;
+  if (!dbEnabled() || !KINDS.includes(kind)) return next();
+  const ctx = await companyCtx(req.user);
+  if (!ctx) return next();
+  const rows = await listRecords(ctx.org.id, kind, { holat: "all" });
+  await audit(q, { userId: req.user.id, action: "company.export", target: `org:${ctx.org.id}`, data: { kind }, ip: req.ip });
+  res.set({ "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="HuquqYol-${kind}-${todayISO()}.csv"`, "Cache-Control": "private, no-store" })
+    .send(toCsv(kind, rows, ctx.members));
+})().catch(next));
+app.get("/kompaniya/kalendar", (req, res, next) => (async () => {
+  if (!dbEnabled()) return next();
+  const ctx = await companyCtx(req.user);
+  if (!ctx) return next();
+  res.set({ "Content-Type": "text/calendar; charset=utf-8", "Content-Disposition": `attachment; filename="HuquqYol-muddatlar.ics"`, "Cache-Control": "private, no-store" })
+    .send(toIcs(await allActive(ctx.org.id), ctx.org.name, process.env.PUBLIC_HOST || "huquqyol"));
+})().catch(next));
 app.get("/kirish", bizPage(a => a.user ? (a.res.redirect(303, HOME[roleOf(a.user)]), REDIRECTED) : loginPage(a)));
 app.get("/royxat", bizPage(a => a.user ? (a.res.redirect(303, HOME[roleOf(a.user)]), REDIRECTED) : registerPage(a)));
 // Quyidagi sahifalarga kim kira olishini guard (server/access.js) hal qiladi — bu yerda faqat chizish
@@ -372,6 +435,7 @@ app.get("/parol-unutdim", bizPage(forgotPage));
 const tokenPage = (kind, render) => bizPage(async a => { a.res.set("Referrer-Policy", "no-referrer"); return render({ ...a, token: String(a.query.t || ""), valid: dbEnabled() && !!await peekToken(kind, a.query.t) }); });
 app.get("/parol-tiklash", tokenPage("reset", resetPage));
 app.get("/tasdiqlash", tokenPage("verify", confirmPage));
+app.get("/kirish/havola", tokenPage("login", linkPage));
 app.get("/xavfsizlik", bizPage(async a => securityPage({ ...a, sessions: await sessionsOf(a.req) })));
 app.get("/malumotlarim", rateLimit({ max: 5, name:"export" }), wrap(exportData));
 app.get("/hisob/tolovlar", bizPage(async a => paymentsPage({ ...a, list: await myPayments(a.user.id) })));
@@ -444,7 +508,7 @@ app.use((err, req, res, next) => {
   if (err.type === "entity.parse.failed") return res.status(400).json({ error: msg(lang, "badJson") });
   const status = err.status && (err.status < 500 || err.key) ? err.status : 500;   // kalitli xatolar (masalan, AI yo‘q — 503) o‘z holatini saqlaydi
   if (status === 500) console.error("[server]", err.message);
-  res.status(status).json({ error: status === 500 ? msg(lang, "server") : err.key ? msg(lang, err.key, err.vars) : err.message });
+  res.status(status).json({ error: status === 500 ? msg(lang, "server") : err.key ? msg(lang, err.key, err.vars) : err.message, ...(status < 500 && typeof err.field === "string" ? { field: err.field } : {}) });
 });
 
 // Serverni ishga tushirish. Hosting (Passenger/cPanel) PORT ni o‘zi beradi; VPS’da HOST=127.0.0.1 bilan

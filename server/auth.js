@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 import { q, one, tx, dbEnabled } from "./db.js";
 import { clean, ValidationError } from "./validate.js";
 import { msg } from "./i18n.js";
+import { isCommonPassword } from "./passwords.js";
 
 const scrypt = promisify(_scrypt);
 const N = 16384, KEYLEN = 64;
@@ -31,19 +32,34 @@ const sha = s => createHash("sha256").update(s).digest("hex");
 export const adminEmails = () => new Set((process.env.ADMIN_EMAILS || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean));
 
 // ---------- Tekshiruv ----------
+// Xato qaysi maydonga tegishli — brauzer o‘sha maydonni belgilaydi va unga fokus qiladi (field)
+const fErr = (field, key, vars) => Object.assign(new ValidationError(key, vars), { field });
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i;
+/** Parol: 8–200 belgi, harf va raqam; keng tarqalgan parollar va e-pochta/ism bilan bir xil parol rad etiladi (NIST SP 800-63B). */
+export function checkPassword(v, { email = "", name = "" } = {}){
+  const pw = String(v ?? "");
+  if (pw.length < 8 || pw.length > 200 || !/\p{L}/u.test(pw) || !/\d/.test(pw)) throw fErr("password", "weakPassword");
+  if (isCommonPassword(pw)) throw fErr("password", "commonPassword");
+  const low = pw.toLowerCase(), local = String(email).split("@")[0].toLowerCase(), words = String(name).toLowerCase().split(/[\s.'‘’-]+/).filter(w => w.length >= 4);
+  if ((local.length >= 4 && low.includes(local)) || words.some(w => low.includes(w))) throw fErr("password", "pwPersonal");
+  return pw;
+}
+export const ORG_KINDS = ["korxona", "muassasa", "firma", "byuro", "boshqa"];
+export const ORG_SIZES = ["1-10", "11-50", "51-250", "250+"];
+export const LAWYER_KINDS = ["advokat", "yurist", "mediator"];
 export function vRegister(b){
-  const email = clean(b?.email, 254).toLowerCase(), name = clean(b?.name, 120), phone = clean(b?.phone, 40), pw = String(b?.password ?? "");
-  if (name.length < 2) throw new ValidationError("required", { label: "F.I.Sh." });
-  if (!EMAIL.test(email)) throw new ValidationError("email");
-  if (phone && !/^[+\d\s()-]{7,40}$/.test(phone)) throw new ValidationError("phone");
-  if (pw.length < 8 || pw.length > 200 || !/\p{L}/u.test(pw) || !/\d/.test(pw)) throw new ValidationError("weakPassword");
+  const email = clean(b?.email, 254).toLowerCase(), name = clean(b?.name, 120), phone = clean(b?.phone, 40);
   const role = ["citizen", "lawyer", "org"].includes(b?.role) ? b.role : "citizen";
-  const org = role === "org" ? { name: clean(b?.orgName, 200), kind: ["korxona", "muassasa", "firma", "byuro", "boshqa"].includes(b?.orgKind) ? b.orgKind : "korxona", inn: clean(b?.inn, 20) } : null;
-  if (org && org.name.length < 2) throw new ValidationError("required", { label: "Tashkilot nomi" });
-  if (org?.inn && !/^\d{9}$/.test(org.inn)) throw new ValidationError("inn");
-  if (b?.consent !== true) throw new ValidationError("terms");
-  return { email, name, phone, password: pw, role, org };
+  if (name.length < 2) throw fErr("name", "required", { label: ["F.I.Sh.", "ФИО"] });
+  if (!EMAIL.test(email)) throw fErr("email", "email");
+  if (phone && !/^[+\d\s()-]{7,40}$/.test(phone)) throw fErr("phone", "phone");
+  const pw = checkPassword(b?.password, { email, name });
+  const org = role === "org" ? { name: clean(b?.orgName, 200), kind: ORG_KINDS.includes(b?.orgKind) ? b.orgKind : "korxona", inn: String(b?.inn ?? "").replace(/\s/g, ""), size: ORG_SIZES.includes(b?.orgSize) ? b.orgSize : null } : null;
+  if (org && org.name.length < 2) throw fErr("orgName", "required", { label: ["Kompaniya nomi", "Название компании"] });
+  if (org?.inn && !/^\d{9}$/.test(org.inn)) throw fErr("inn", "inn");
+  const lawyer = role === "lawyer" ? { kind: LAWYER_KINDS.includes(b?.lawyerKind) ? b.lawyerKind : "yurist", license: clean(b?.license, 60), firm: clean(b?.firm, 200) } : null;
+  if (b?.consent !== true) throw fErr("consent", "terms");
+  return { email, name, phone, password: pw, role, org, lawyer };
 }
 
 // ---------- Sessiya ----------
@@ -53,11 +69,6 @@ export async function createSession(res, req, userId){
     [sha(token), userId, TTL_DAYS, req.ip || null, String(req.get("user-agent") || "").slice(0, 200)]);
   res.cookie(COOKIE, token, { httpOnly: true, sameSite: "lax", secure: req.secure, path: "/", maxAge: TTL_DAYS * 864e5 });
 }
-export const checkPassword = v => {
-  const pw = String(v ?? "");
-  if (pw.length < 8 || pw.length > 200 || !/\p{L}/u.test(pw) || !/\d/.test(pw)) throw new ValidationError("weakPassword");
-  return pw;
-};
 // Admin roli ADMIN_EMAILS bo‘yicha: production’da faqat e-pochta egaligi tasdiqlangan bo‘lsa (aks holda birovning manzili bilan
 // birinchi ro‘yxatdan o‘tgan odam admin bo‘lib qolardi). SMTP yo‘q serverda: node scripts/make-admin.mjs <e-pochta>
 const autoAdmin = (email, verified) => adminEmails().has(email) && (process.env.NODE_ENV !== "production" || !!verified);
@@ -92,19 +103,23 @@ export async function register(req, res){
     const u = (await run("insert into users(email, phone, name, password_hash, role) values ($1,$2,$3,$4,$5) returning id, role",
       [v.email, v.phone || null, v.name, hash, role])).rows[0];
     if (v.org){
-      const o = (await run("insert into organizations(name, kind, inn, created_by) values ($1,$2,$3,$4) returning id", [v.org.name, v.org.kind, v.org.inn || null, u.id])).rows[0];
+      const o = (await run("insert into organizations(name, kind, inn, size, created_by) values ($1,$2,$3,$4,$5) returning id", [v.org.name, v.org.kind, v.org.inn || null, v.org.size, u.id])).rows[0];
       await run("update users set org_id = $1, org_role = 'owner' where id = $2", [o.id, u.id]);
     }
-    // Yurist va tashkilot: 14 kunlik bepul sinov obunasi
+    // Yurist: qoralama profil (telefonsiz — moderatsiya navbatiga tushmaydi), turi va litsenziyasi bilan
+    if (v.lawyer) await run("insert into lawyer_profiles(user_id, name, phone, kind, license, firm) values ($1, $2, '', $3, $4, $5) on conflict (user_id) do nothing",
+      [u.id, v.name, v.lawyer.kind, v.lawyer.license || null, v.lawyer.firm || null]);
+    // Yurist va kompaniya: 14 kunlik bepul sinov (kompaniya — «Kompaniya» tarifi)
     if (v.role === "lawyer" || v.role === "org"){
-      const plan = v.role === "org" ? "org" : "pro";
+      const plan = v.role === "org" ? "biznes" : "pro";
       await run("insert into subscriptions(user_id, org_id, plan, status, price, ends_at) values ($1, (select org_id from users where id = $1), $2, 'trial', 0, now() + interval '14 days')", [u.id, plan]);
     }
     return u;
   }).catch(e => { throw e.code === "23505" ? new ValidationError("emailTaken") : e; });
   await createSession(res, req, user.id);
   import("./account.js").then(m => m.sendVerify(req, { id: user.id, email: v.email })).catch(e => console.error("[verify]", e.message));
-  res.status(201).json({ ok: true, role: user.role, next: HOME[user.role] || "/hisob" });
+  const first = { lawyer: "/hisob/profil?yangi=1", org: "/kompaniya?yangi=1" }[user.role];
+  res.status(201).json({ ok: true, role: user.role, next: first || HOME[user.role] || "/hisob" });
 }
 
 export async function login(req, res){
@@ -115,7 +130,7 @@ export async function login(req, res){
   if (!u || !ok){
     if (u) await q(`update users set failed_logins = failed_logins + 1,
       locked_until = case when failed_logins + 1 >= 5 then now() + interval '15 minutes' else locked_until end where id = $1`, [u.id]);
-    throw Object.assign(new ValidationError("badLogin"), { status: 401 });
+    throw Object.assign(new ValidationError("badLogin"), { status: 401, field: "password" });
   }
   // Ikkinchi bosqich: ilova kodi yoki zaxira kod. Xato kod ham urinish sifatida sanaladi (bloklash umumiy).
   if (u.totp_enabled_at){
@@ -141,11 +156,47 @@ export async function logout(req, res){
 }
 
 export async function changePassword(req, res){
-  const cur = String(req.body?.current ?? "").slice(0, 200), pw = checkPassword(req.body?.password);
+  const cur = String(req.body?.current ?? "").slice(0, 200), pw = checkPassword(req.body?.password, { email: req.user.email, name: req.user.name });
   const u = await one("select password_hash from users where id = $1", [req.user.id]);
   if (!(await verifyPassword(cur, u.password_hash))) throw Object.assign(new ValidationError("badLogin"), { status: 401 });
   await q("update users set password_hash = $2 where id = $1", [req.user.id, await hashPassword(pw)]);
   // Boshqa qurilmalardagi sessiyalar bekor qilinadi (joriysi qoladi)
   await q("delete from sessions where user_id = $1 and id <> $2", [req.user.id, sha(tokenOf(req))]);
   res.json({ ok: true });
+}
+
+// ---------- E-pochtaga kirish havolasi (parolsiz) ----------
+// Javob har doim bir xil (hisob borligi bilinmaydi). Havola 15 daqiqa, bir marta; xatdagi havola faqat sahifani ochadi —
+// kirish tugmani bosganda (POST) bo‘ladi, shuning uchun pochta skanerlari havolani «ishlatib» qo‘ya olmaydi. 2FA yoqilgan bo‘lsa — kod ham so‘raladi.
+export async function requestLink(req, res){
+  const { mailEnabled, siteUrl, sendMail } = await import("./mail.js");
+  if (!mailEnabled() || !siteUrl(req)) throw Object.assign(new ValidationError("mailOff"), { status: 503 });
+  const email = clean(req.body?.email, 254).toLowerCase();
+  if (!EMAIL.test(email)) throw fErr("email", "email");
+  res.json({ ok: true, sent: true, message: msg(req.lang, "linkSent") });
+  try {
+    const u = await one("select id, email from users where lower(email) = $1 and (locked_until is null or locked_until < now())", [email]);
+    if (!u) return;
+    const { issueToken } = await import("./account.js");
+    const t = await issueToken("login", { userId: u.id, hours: 0.25 });
+    await sendMail(u.email, "login", { lang: req.lang, link: `${siteUrl(req)}/kirish/havola?t=${t}` });
+  } catch (e){ console.error("[link]", e.message); }
+}
+export async function useLink(req, res){
+  const { peekToken, takeToken, verifySecond } = await import("./account.js");
+  const t = await peekToken("login", req.body?.token);
+  if (!t) throw new ValidationError("badLink");
+  const u = await one("select id, role, totp_secret, totp_enabled_at, totp_last from users where id = $1", [t.user_id]);
+  if (!u) throw new ValidationError("badLink");
+  if (u.totp_enabled_at){
+    const code = String(req.body?.code ?? "").trim();
+    if (!code) return res.status(401).json({ error: msg(req.lang, "needCode"), need: "code" });
+    if (!await verifySecond(q, u, code)) return res.status(401).json({ error: msg(req.lang, "badCode"), need: "code" });
+  }
+  const taken = await tx(run => takeToken(run, "login", req.body?.token));
+  if (!taken) throw new ValidationError("badLink");
+  // Havola pochtaga kelgan — demak e-pochta egaligi ham tasdiqlandi
+  await q("update users set failed_logins = 0, locked_until = null, last_login_at = now(), email_verified_at = coalesce(email_verified_at, now()) where id = $1", [u.id]);
+  await createSession(res, req, u.id);
+  res.json({ ok: true, role: u.role, next: HOME[u.role] || "/hisob" });
 }

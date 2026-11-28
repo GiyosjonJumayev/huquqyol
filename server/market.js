@@ -214,7 +214,7 @@ export async function adminStats(){
     q("select plan, status, count(*)::int n, coalesce(sum(price),0)::bigint sum from subscriptions group by plan, status order by plan, status"),
     q(`select s.id, s.plan, s.status, s.price, s.ends_at, s.created_at, u.name, u.email, o.name org_name, o.kind org_kind, o.inn
        from subscriptions s join users u on u.id = s.user_id left join organizations o on o.id = coalesce(s.org_id, u.org_id)
-       where s.plan in ('firma','org') or o.id is not null order by s.created_at desc limit 100`),
+       where s.plan in ('firma','biznes','org') or o.id is not null order by s.created_at desc limit 100`),
     q(`select to_char(date_trunc('month', paid_at), 'YYYY-MM') m, kind, sum(amount)::bigint sum, count(*)::int n from payments
        where status = 'paid' and paid_at > now() - interval '12 months' group by 1, 2 order by 1`),
     q("select coalesce(sum(price),0)::bigint mrr, count(*)::int n from subscriptions where status = 'active' and (ends_at is null or ends_at > now())"),

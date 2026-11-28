@@ -105,7 +105,7 @@ export function acctHTML(user, t, { full = false, nav = GUEST_NAV, path = "" } =
  *  Kirgan foydalanuvchida (data-auth) 1280px gacha hamma narsa ☰ menyuga yig‘iladi — hech narsa ustma-ust tushmaydi. */
 export function siteNav({ lang = "uz", t, mode = "page", path = "/", user = null, langHref = l => `?lang=${l}`, a11y = false, nav = GUEST_NAV }){
   const cur = p => (path.split("?")[0] === p ? ` aria-current="page"` : "");
-  const links = [["/yuristlar", "lawyers", "navLawyers"], ["/tariflar", "plans", "navPlans"], ["/kabinet", "cabinet", "navCabinet"]];
+  const links = [["/yuristlar", "lawyers", "navLawyers"], ["/tariflar", "plans", "navPlans"], ["/kompaniya", "cabinet", "navCompany"], ["/kabinet", "cabinet", "navCabinet"]];
   const applyLink = mode === "app"
     ? `<button type="button" class="navlink" data-go="1">${ni("apply")}<span>${esc(t("navApply"))}</span></button>`
     : `<a class="navlink" href="/"${cur("/")}>${ni("apply")}<span>${esc(t("navApply"))}</span></a>`;

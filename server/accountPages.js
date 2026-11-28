@@ -7,6 +7,7 @@ import { toCyrillic } from "../public/translit.js";
 import { kbFor, COURTS, PRACTICE } from "./kb.js";
 import { actTypes } from "./practice.js";
 import { PRICES, providers } from "./billing.js";
+import { mailEnabled } from "./mail.js";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const T = {
@@ -27,7 +28,7 @@ const T = {
   subs: ["Obuna", "Подписка"], noSubs: ["Hozircha obunangiz yo‘q.", "Подписки пока нет."], subscribe: ["Tariflar va obuna", "Тарифы и подписка"],
   until: ["{d} gacha", "до {d}"], price: ["Narx", "Цена"],
   st_trial: ["Sinov", "Пробный"], st_pending: ["To‘lov kutilmoqda", "Ожидает оплаты"], st_active: ["Faol", "Активна"], st_cancelled: ["Bekor qilingan", "Отменена"], st_expired: ["Muddati tugagan", "Истекла"],
-  pl_pro: ["Yurist Pro", "Юрист Pro"], pl_firma: ["Firma", "Фирма"], pl_org: ["Tashkilot", "Организация"],
+  pl_pro: ["Yurist Pro", "Юрист Pro"], pl_firma: ["Firma", "Фирма"], pl_biznes: ["Kompaniya", "Компания"], pl_org: ["Tashkilot", "Организация"],
   payNote: ["To‘lov tizimi ulanmaguncha hisob-faktura bo‘yicha to‘lanadi; to‘lov tasdiqlangach obuna 30 kunga faollashadi.", "Пока платёжная система не подключена, оплата по счёту; после подтверждения подписка активна 30 дней."],
   myCons: ["Mening so‘rovlarim va kelishuvlarim", "Мои запросы и договорённости"],
   caseOpen: ["Reja va ariza (ish)", "План и заявление (дело)"], caseGone: ["Ish ma’lumotlari o‘chirilgan.", "Данные дела удалены."], noCons: ["Hali so‘rov yo‘q. Katalogdan yurist tanlang.", "Запросов пока нет. Выберите юриста в каталоге."],
@@ -107,41 +108,124 @@ const LOGOUT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 export const logoutButton = t => `<button class="btn danger logoutbtn" type="button" data-logout>${LOGOUT_ICON}<span>${esc(t("logout"))}</span></button>`;
 const safeNext = n => typeof n === "string" && /^\/[a-z0-9/_-]*(\?[a-z0-9=&_%-]*)?$/i.test(n) && !n.startsWith("//") ? n : "";
 
+// ---------- Kirish va ro‘yxatdan o‘tish ----------
+// Standartlar: WCAG 2.2 (3.3.7 takror kiritmaslik, 3.3.8 kirishda kognitiv test yo‘q — parolni joylash va menejer ishlaydi), NIST SP 800-63B
+// (uzun parol ruxsat, keng tarqalgan parollar rad, majburiy almashtirish yo‘q), to‘g‘ri autocomplete, maydon bo‘yicha xato va fokus.
+const A = {
+  welcomeBack: ["Qaytganingizdan xursandmiz", "Рады видеть вас снова"],
+  sideLogin: ["Bitta hisob — o‘z rolingiz uchun ish joyi.", "Один аккаунт — рабочее место под вашу роль."],
+  perkCit: ["Fuqaro: arizalar, yuristga so‘rovlar va kelishuvlar", "Гражданин: заявления, запросы юристам и договорённости"],
+  perkLaw: ["Yurist va advokat: mijozlar, ishlar, muddatlar, katalogdagi profil", "Юрист и адвокат: клиенты, дела, сроки, профиль в каталоге"],
+  perkOrg: ["Kompaniya: shartnomalar, muddatlar, xatlar va tayyor hujjatlar", "Компания: договоры, сроки, письма и готовые документы"],
+  secure: ["Parollar shifrlangan holda saqlanadi (scrypt). Ikki bosqichli kirish va qurilmalarni boshqarish — «Xavfsizlik» bo‘limida.", "Пароли хранятся в зашифрованном виде (scrypt). Двухэтапный вход и управление устройствами — в разделе «Безопасность»."],
+  show: ["Ko‘rsatish", "Показать"], hide: ["Yashirish", "Скрыть"], showPw: ["Parolni ko‘rsatish", "Показать пароль"],
+  caps: ["Caps Lock yoqilgan.", "Включён Caps Lock."], or: ["yoki", "или"],
+  linkH: ["Parolsiz kirish", "Вход без пароля"], linkLead: ["E-pochtangizga bir martalik kirish havolasini yuboramiz (15 daqiqa amal qiladi).", "Отправим на почту одноразовую ссылку для входа (действует 15 минут)."],
+  linkBtn: ["Havolani yuborish", "Отправить ссылку"], linkSentOk: ["Agar bu e-pochta bilan hisob bo‘lsa, havola yuborildi. Pochtangizni (va «Spam» papkasini) tekshiring.", "Если аккаунт с этой почтой есть, ссылка отправлена. Проверьте почту (и папку «Спам»)."],
+  emailHint: ["Masalan: ism@mail.uz", "Например: name@mail.uz"],
+  regH: ["Hisob yaratish", "Создать аккаунт"], regLead2: ["2 daqiqa. Fuqarolar uchun reja va ariza hisobsiz ham bepul.", "2 минуты. Гражданам план и заявление доступны и без аккаунта."],
+  rolePick: ["Kim sifatida foydalanasiz?", "Как вы будете пользоваться?"],
+  rcCitizenD: ["Ariza tayyorlash bepul. Hisob — yuristga ish yuborish va kelishuvlar uchun.", "Заявления — бесплатно. Аккаунт — чтобы отправлять дело юристу и вести договорённости."],
+  rcLawyerD: ["Mijozlar va ishlar kartotekasi, muddatlar, blanka, katalogda profil.", "Картотека клиентов и дел, сроки, бланк, профиль в каталоге."],
+  rcOrgD: ["Yuristi yo‘q korxona uchun: shartnomalar, muddatlar, xatlar, tayyor hujjatlar.", "Для компании без юриста: договоры, сроки, письма, готовые документы."],
+  rCompany: ["Kompaniya yoki tashkilot", "Компания или организация"], free: ["Bepul", "Бесплатно"], trial14: ["14 kun bepul", "14 дней бесплатно"],
+  secOrg: ["Kompaniya", "Компания"], secLawyer: ["Faoliyatingiz", "Ваша практика"], secYou: ["Siz haqingizda", "О вас"], secLogin: ["Kirish ma’lumotlari", "Данные для входа"],
+  orgSize: ["Xodimlar soni", "Количество сотрудников"], notSet: ["— tanlang —", "— выберите —"],
+  lawKind: ["Siz kimsiz", "Кто вы"], lawLicense: ["Litsenziya yoki guvohnoma raqami (ixtiyoriy)", "Номер лицензии или удостоверения (необязательно)"],
+  lawLicenseH: ["Katalogga chiqish uchun moderator tekshiradi. Hozir bo‘sh qoldirsangiz, keyin profilda kiritasiz.", "Для каталога модератор проверит его. Можно оставить пустым и указать позже в профиле."],
+  lawFirm: ["Byuro yoki firma (ixtiyoriy)", "Бюро или фирма (необязательно)"],
+  nameYou: ["Ismingiz va familiyangiz", "Имя и фамилия"], nameOrgH: ["Hisob egasi — kompaniya nomidan ishlaydigan shaxs.", "Владелец аккаунта — человек, работающий от имени компании."],
+  pwNew: ["Parol o‘ylab toping", "Придумайте пароль"], pwRules: ["Parol talablari", "Требования к паролю"],
+  ruleLen: ["kamida 8 belgi (12+ — yaxshiroq)", "не менее 8 символов (12+ — лучше)"], ruleLetter: ["harf", "буква"], ruleDigit: ["raqam", "цифра"],
+  pwTip: ["Maslahat: 3–4 so‘zli ibora eslab qolishga oson va buzish qiyin, masalan «choynak-yashil-bahor-7».", "Совет: фраза из 3–4 слов легко запоминается и трудно подбирается, например «чайник-зелёный-весна-7»."],
+  strength: ["Parol kuchi", "Надёжность пароля"], st0: ["juda zaif", "очень слабый"], st1: ["zaif", "слабый"], st2: ["o‘rtacha", "средний"], st3: ["yaxshi", "хороший"], st4: ["kuchli", "сильный"],
+  consentA: ["Men", "Я принимаю"], offer: ["foydalanish shartlari (oferta)", "условия использования (оферту)"], and: ["va", "и"], privacyL: ["maxfiylik siyosati", "политику конфиденциальности"], consentB: ["bilan tanishdim va roziman.", "и согласен(-на) с ними."],
+  createBtn: ["Hisob yaratish", "Создать аккаунт"], trialCit: ["Fuqaro hisobi doim bepul.", "Аккаунт гражданина всегда бесплатный."],
+  trialPro: ["14 kunlik bepul sinov avtomatik yoqiladi — karta kerak emas, avtomatik yechib olish yo‘q.", "Бесплатный период 14 дней включается автоматически — без карты и автосписаний."],
+  linkPageH: ["Hisobga kirish", "Вход в аккаунт"], linkPageLead: ["Kirish uchun tugmani bosing. Havola bir marta ishlaydi.", "Нажмите кнопку, чтобы войти. Ссылка срабатывает один раз."],
+  linkBad: ["Havola eskirgan yoki allaqachon ishlatilgan. Yangisini so‘rang yoki parol bilan kiring.", "Ссылка устарела или уже использована. Запросите новую или войдите с паролем."],
+  enter: ["Kirish", "Войти"]
+};
+const aT = lang => (k, v = {}) => { const s = (A[k] || T[k] || [k, k])[lang === "ru" ? 1 : 0].replace(/\{(\w+)\}/g, (_, x) => v[x] ?? ""); return lang === "cyr" ? toCyrillic(s) : s; };
+const EYE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const pwField = (t, id, label, ac, hint = "", extra = "") => `<div class="field need"><label for="${id}">${esc(label)}</label>
+  <div class="pwwrap"><input id="${id}" name="password" type="password" required maxlength="200" autocomplete="${ac}" autocapitalize="none" spellcheck="false"${hint ? ` aria-describedby="${id}_h ${id}_caps"` : ` aria-describedby="${id}_caps"`}${extra}>
+  <button class="pwtoggle" type="button" data-pw-toggle="${id}" aria-controls="${id}" aria-pressed="false" aria-label="${esc(t("showPw"))}" data-show="${esc(t("show"))}" data-hide="${esc(t("hide"))}">${EYE}<span>${esc(t("show"))}</span></button></div>
+  <span class="hint warn" id="${id}_caps" data-caps hidden>⇪ ${esc(t("caps"))}</span>${hint ? `<span class="hint" id="${id}_h">${esc(hint)}</span>` : ""}</div>`;
+const emailField = (t, id, ac, val = "") => `<div class="field need"><label for="${id}">${esc(t("email"))}</label>
+  <input id="${id}" name="email" type="email" required maxlength="254" autocomplete="${ac}" inputmode="email" autocapitalize="none" spellcheck="false" value="${esc(val)}" aria-describedby="${id}_s" data-email-check>
+  <span class="hint" id="${id}_s" data-email-sugg aria-live="polite"></span></div>`;
+const side = (t, mode) => `<aside class="authside" aria-labelledby="as_h"><p class="eyebrow">HuquqYo‘l</p>
+  <h2 id="as_h">${esc(t(mode === "login" ? "welcomeBack" : "regH"))}</h2><p>${esc(t(mode === "login" ? "sideLogin" : "regLead2"))}</p>
+  <ul class="authperks"><li data-perk="citizen">${esc(t("perkCit"))}</li><li data-perk="lawyer">${esc(t("perkLaw"))}</li><li data-perk="org">${esc(t("perkOrg"))}</li></ul>
+  <p class="small authsec">🔒 ${esc(t("secure"))}</p></aside>`;
+
 export function loginPage({ lang, cssHref, fs, user, accHref, query, db }){
-  const t = L(lang), next = safeNext(query.next);
+  const t = aT(lang), next = safeNext(query.next), qs = next ? `?next=${encodeURIComponent(next)}` : "";
+  const mail = mailEnabled();
   return page({ lang, cssHref, fs, user, accHref, path: "/kirish", title: t("login"), desc: t("loginLead"), body: `
-    <div class="authbox"><h1>${esc(t("login"))}</h1><p class="lead">${esc(t("loginLead"))}</p>
-    ${!db ? `<p class="note warn">${esc(t("dbOff"))}</p>` : `<form class="card kform" data-api="/api/auth/login"${next ? ` data-next="${esc(next)}"` : ""}>
-      ${field("l_email", t("email"), `<input id="l_email" name="email" type="email" required autocomplete="username" maxlength="254">`)}
-      ${field("l_pw", t("password"), `<input id="l_pw" name="password" type="password" required autocomplete="current-password" maxlength="200">`)}
-      <div data-code hidden>${field("l_code", t("code2"), `<input id="l_code" name="code" inputmode="text" autocomplete="one-time-code" maxlength="20">`)}</div>
-      <button class="btn primary" type="submit">${esc(t("login"))}</button>${err}</form>
-    <p><a href="/parol-unutdim">${esc(t("forgot"))}</a></p>
-    <p>${esc(t("noAcc"))} <a href="/royxat${next ? `?next=${encodeURIComponent(next)}` : ""}">${esc(t("register"))}</a></p>`}</div>` });
+    <div class="authwrap">${side(t, "login")}
+    <section class="card authcard" aria-labelledby="lg_h"><h1 id="lg_h">${esc(t("login"))}</h1><p class="lead">${esc(t("loginLead"))}</p>
+    ${!db ? `<p class="note warn">${esc(t("dbOff"))}</p>` : `<form class="kform authform" data-api="/api/auth/login"${next ? ` data-next="${esc(next)}"` : ""} novalidate>
+      ${emailField(t, "l_email", "username")}
+      ${pwField(t, "l_pw", t("password"), "current-password")}
+      <p class="small authforgot"><a href="/parol-unutdim">${esc(t("forgot"))}</a></p>
+      <div data-code hidden>${field("l_code", t("code2"), `<input id="l_code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="20" autocapitalize="none">`)}</div>
+      <button class="btn primary wide" type="submit">${esc(t("login"))}</button>${err}</form>
+    ${mail ? `<div class="orline" role="separator"><span>${esc(t("or"))}</span></div>
+    <details class="linkbox"><summary>✉ ${esc(t("linkH"))}</summary><form class="kform" data-api="/api/auth/link" data-ok="${esc(t("linkSentOk"))}" novalidate>
+      <p class="small muted">${esc(t("linkLead"))}</p>${emailField(t, "k_email", "email")}
+      <button class="btn ghost" type="submit">${esc(t("linkBtn"))}</button><p class="ok" data-ok-msg role="status" hidden></p>${err}</form></details>` : ""}
+    <p class="authalt">${esc(t("noAcc"))} <a href="/royxat${qs}">${esc(t("register"))}</a></p>`}</section></div>` });
 }
 
 export function registerPage({ lang, cssHref, fs, user, accHref, query, db }){
-  const t = L(lang), tar = query.tarif, role0 = tar === "org" ? "org" : tar ? "lawyer" : (["lawyer", "org"].includes(query.rol) ? query.rol : "citizen");
-  const next = safeNext(query.next) || (tar ? "/tariflar" : "");
+  const t = aT(lang), tar = query.tarif;
+  const role0 = ["org", "biznes"].includes(tar) ? "org" : tar ? "lawyer" : (["lawyer", "org"].includes(query.rol) ? query.rol : "citizen");
+  const next = safeNext(query.next) || (tar && tar !== "biznes" ? "/tariflar" : "");
   const kinds = [["korxona", "kKorxona"], ["muassasa", "kMuassasa"], ["firma", "kFirma"], ["byuro", "kByuro"], ["boshqa", "kBoshqa"]];
+  const shown = r => r.split(" ").includes(role0) ? "" : " hidden";
+  const card = (v, title, desc, badge) => `<label class="rolecard"><input type="radio" name="role" value="${v}"${v === role0 ? " checked" : ""} data-role-switch>
+    <span class="rc"><b>${esc(title)}</b><span class="small">${esc(desc)}</span><span class="chip${v === "citizen" ? "" : " ok"}">${esc(badge)}</span></span></label>`;
   return page({ lang, cssHref, fs, user, accHref, path: "/royxat", title: t("register"), desc: t("regLead"), body: `
-    <div class="authbox"><h1>${esc(t("register"))}</h1><p class="lead">${esc(t("regLead"))}</p>
-    ${!db ? `<p class="note warn">${esc(t("dbOff"))}</p>` : `<form class="card kform" data-api="/api/auth/register"${next ? ` data-next="${esc(next)}"` : ""}>
-      <fieldset><legend>${esc(t("roleQ"))}</legend><div class="checks">${[["citizen", "rCitizen"], ["lawyer", "rLawyer"], ["org", "rOrg"]].map(([v, k]) =>
-        `<label class="check"><input type="radio" name="role" value="${v}"${v === role0 ? " checked" : ""} data-toggle="org" data-show="${v === "org"}"> ${esc(t(k))}</label>`).join("")}</div></fieldset>
-      ${field("r_name", t("name"), `<input id="r_name" name="name" required minlength="2" maxlength="120" autocomplete="name">`)}
-      ${field("r_email", t("email"), `<input id="r_email" name="email" type="email" required maxlength="254" autocomplete="email">`)}
-      ${field("r_phone", t("phone"), `<input id="r_phone" name="phone" type="tel" maxlength="40" autocomplete="tel">`)}
-      ${field("r_pw", t("password"), `<input id="r_pw" name="password" type="password" required minlength="8" maxlength="200" autocomplete="new-password">`, t("pwHint"))}
-      <div class="grid2" data-group="org"${role0 === "org" ? "" : " hidden"}>
-        ${field("r_org", t("orgName"), `<input id="r_org" name="orgName" maxlength="200" autocomplete="organization">`)}
+    <div class="authwrap reg" data-role="${role0}">${side(t, "register")}
+    <section class="card authcard" aria-labelledby="rg_h"><h1 id="rg_h">${esc(t("register"))}</h1>
+    ${!db ? `<p class="note warn">${esc(t("dbOff"))}</p>` : `<form class="kform authform" data-api="/api/auth/register"${next ? ` data-next="${esc(next)}"` : ""} novalidate>
+      <fieldset class="rolefs"><legend>${esc(t("rolePick"))}</legend><div class="rolecards">
+        ${card("citizen", t("rCitizen"), t("rcCitizenD"), t("free"))}${card("lawyer", t("rLawyer"), t("rcLawyerD"), t("trial14"))}${card("org", t("rCompany"), t("rcOrgD"), t("trial14"))}</div></fieldset>
+      <fieldset class="authsec2" data-for="org"${shown("org")}><legend>${esc(t("secOrg"))}</legend>
+        ${field("r_org", t("orgName"), `<input id="r_org" name="orgName" maxlength="200" autocomplete="organization" required>`, "", )}
+        <div class="grid2">${field("r_inn", t("inn"), `<input id="r_inn" name="inn" inputmode="numeric" maxlength="9" pattern="\\d{9}" autocomplete="off">`)}
         ${field("r_kind", t("orgKind"), `<select id="r_kind" name="orgKind">${kinds.map(([v, k]) => `<option value="${v}">${esc(t(k))}</option>`).join("")}</select>`)}
-        ${field("r_inn", t("inn"), `<input id="r_inn" name="inn" inputmode="numeric" maxlength="9" pattern="\\d{9}">`)}
-      </div>
-      <label class="check"><input type="checkbox" name="consent" required> ${esc(t("terms"))}</label>
-      <p class="small muted">${esc(t("trialNote"))}</p>
-      <button class="btn primary" type="submit">${esc(t("register"))}</button>${err}</form>
-    <p>${esc(t("haveAcc"))} <a href="/kirish${next ? `?next=${encodeURIComponent(next)}` : ""}">${esc(t("login"))}</a></p>`}</div>` });
+        ${field("r_size", t("orgSize"), `<select id="r_size" name="orgSize"><option value="">${esc(t("notSet"))}</option>${["1-10", "11-50", "51-250", "250+"].map(s => `<option value="${s}">${s}</option>`).join("")}</select>`)}</div></fieldset>
+      <fieldset class="authsec2" data-for="lawyer"${shown("lawyer")}><legend>${esc(t("secLawyer"))}</legend>
+        <div class="grid2">${field("r_lk", t("lawKind"), `<select id="r_lk" name="lawyerKind">${["advokat", "yurist", "mediator"].map(k => `<option value="${k}"${k === "yurist" ? " selected" : ""}>${esc(t("k_" + k))}</option>`).join("")}</select>`)}
+        ${field("r_firm", t("lawFirm"), `<input id="r_firm" name="firm" maxlength="200" autocomplete="organization">`)}</div>
+        ${field("r_lic", t("lawLicense"), `<input id="r_lic" name="license" maxlength="60" autocomplete="off">`, t("lawLicenseH"))}</fieldset>
+      <fieldset class="authsec2"><legend>${esc(t("secYou"))}</legend>
+        <div class="grid2">${field("r_name", t("nameYou"), `<input id="r_name" name="name" required minlength="2" maxlength="120" autocomplete="name">`)}
+        ${field("r_phone", t("phone"), `<input id="r_phone" name="phone" type="tel" maxlength="40" autocomplete="tel" inputmode="tel" placeholder="+998 90 123 45 67">`)}</div>
+        <p class="small muted" data-for="org"${shown("org")}>${esc(t("nameOrgH"))}</p></fieldset>
+      <fieldset class="authsec2"><legend>${esc(t("secLogin"))}</legend>
+        ${emailField(t, "r_email", "email")}
+        ${pwField(t, "r_pw", t("pwNew"), "new-password", t("pwTip"), ` minlength="8" data-strength`)}
+        <div class="pwmeter" data-meter aria-live="polite"><span class="bar" aria-hidden="true"><i></i></span><span class="small"><span>${esc(t("strength"))}:</span> <b data-meter-label>—</b></span></div>
+        <ul class="pwrules small" aria-label="${esc(t("pwRules"))}"><li data-rule="len">${esc(t("ruleLen"))}</li><li data-rule="letter">${esc(t("ruleLetter"))}</li><li data-rule="digit">${esc(t("ruleDigit"))}</li></ul>
+        <template data-strength-labels>${[0, 1, 2, 3, 4].map(i => `<span>${esc(t("st" + i))}</span>`).join("")}</template></fieldset>
+      <label class="check consent"><input type="checkbox" name="consent" required> <span>${esc(t("consentA"))} <a href="/oferta" target="_blank" rel="noopener">${esc(t("offer"))}</a> ${esc(t("and"))} <a href="/maxfiylik" target="_blank" rel="noopener">${esc(t("privacyL"))}</a> ${esc(t("consentB"))}</span></label>
+      <p class="small muted" data-for="citizen"${shown("citizen")}>${esc(t("trialCit"))}</p><p class="small muted" data-for="lawyer org"${shown("lawyer org")}>${esc(t("trialPro"))}</p>
+      <button class="btn primary wide" type="submit">${esc(t("createBtn"))}</button>${err}</form>
+    <p class="authalt">${esc(t("haveAcc"))} <a href="/kirish${next ? `?next=${encodeURIComponent(next)}` : ""}">${esc(t("login"))}</a></p>`}</section></div>` });
+}
+
+export function linkPage({ lang, cssHref, fs, user, accHref, token, valid }){
+  const t = aT(lang);
+  return page({ lang, cssHref, fs, user, accHref, path: "/kirish/havola", title: t("linkPageH"), desc: "", body: `
+    <div class="authwrap single"><section class="card authcard"><h1>${esc(t("linkPageH"))}</h1>
+    ${valid ? `<p class="lead">${esc(t("linkPageLead"))}</p><form class="kform authform" data-api="/api/auth/link/use" novalidate><input type="hidden" name="token" value="${esc(token)}">
+      <div data-code hidden>${field("lk_code", t("code2"), `<input id="lk_code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="20">`)}</div>
+      <button class="btn primary wide" type="submit">${esc(t("enter"))}</button>${err}</form>`
+    : `<p class="note warn">${esc(t("linkBad"))}</p><p><a class="btn primary" href="/kirish">${esc(t("login"))}</a></p>`}</section></div>` });
 }
 
 const consRow = (c, lang, side) => {
@@ -177,7 +261,7 @@ export function accountPage({ lang, cssHref, fs, user, accHref, subs, cons, pane
     <p class="muted">${esc(user.email)}${user.org_name ? ` · ${esc(t("org"))}: ${esc(user.org_name)}` : ""}</p>
     ${panel}
     ${user.role === "citizen" ? applyBox(application, lang) : ""}
-    ${["lawyer", "org"].includes(user.role) ? `<h2 class="sec">${esc(t("subs"))}</h2>${subRows}<p class="small muted">${esc(t("payNote"))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("subscribe"))}</a> <a class="btn ghost" href="/kabinet">${esc(t("toCabinet"))}</a></p>` : ""}
+    ${["lawyer", "org"].includes(user.role) ? `<h2 class="sec">${esc(t("subs"))}</h2>${subRows}<p class="small muted">${esc(t("payNote"))}</p><p><a class="btn ghost" href="/tariflar">${esc(t("subscribe"))}</a> <a class="btn ghost" href="${user.role === "org" ? "/kompaniya" : "/kabinet"}">${esc(t("toCabinet"))}</a></p>` : ""}
     ${user.role === "lawyer" ? `<h2 class="sec">${esc(t("inCons"))}</h2>${cons.asLawyer.length ? `<ul class="klist">${cons.asLawyer.map(c => consRow(c, lang, "lawyer")).join("")}</ul>` : `<p class="empty">${esc(t("noIn"))}</p>`}` : ""}
     <h2 class="sec">${esc(t("myCons"))}</h2>${cons.asCitizen.length ? `<ul class="klist">${cons.asCitizen.map(c => consRow(c, lang, "citizen")).join("")}</ul>` : `<p class="empty">${esc(t("noCons"))} <a href="/yuristlar">${esc(btr(lang)("navLawyers"))}</a></p>`}
     <p class="rowbtn acclinks2">${user.role === "moderator" ? "" : `<a class="btn ghost" href="/hisob/tolovlar">${esc(t("lnkPays"))}</a>`}${["lawyer", "org"].includes(user.role) ? `<a class="btn ghost" href="/jamoa">${esc(t("lnkTeam"))}</a>` : ""}<a class="btn ghost" href="/xavfsizlik">${esc(t("lnkSec"))}</a></p>` });

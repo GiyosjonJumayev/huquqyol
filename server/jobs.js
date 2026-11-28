@@ -4,10 +4,11 @@ import { tx, dbEnabled } from "./db.js";
 import { TX_TTL } from "./billing.js";
 import { sendMail, mailEnabled } from "./mail.js";
 import { fmtDate } from "../public/i18n.js";
+import { digestRows, groupDigest, todayISO } from "./company.js";
 
 export async function runJobs(now = Date.now()){
   if (!dbEnabled()) return null;
-  const remind = [];
+  const remind = [], digest = [];
   const out = await tx(async run => {
     if (!(await run("select pg_try_advisory_xact_lock(724502) as ok")).rows[0].ok) return null;
     const n = async (sql, p = []) => (await run(sql, p)).rowCount;
@@ -30,8 +31,20 @@ export async function runJobs(now = Date.now()){
     r.cases = await n(`update consultations set case_data = null, case_withdrawn_at = now() where case_data is not null
       and status in ('completed','declined','cancelled') and updated_at < now() - interval '90 days'`);
     await run("delete from audit_log where at < now() - interval '3 years'");
+    // Kompaniya: kunlik eslatma (ertalab 8 dan keyin, tashkilotga kuniga bir marta) — faqat sarlavha, kontragent va sana
+    r.digest = 0;
+    if (mailEnabled() && process.env.PUBLIC_HOST && new Date(now).getHours() >= 8){
+      const rows = await digestRows(run, todayISO());
+      digest.push(...groupDigest(rows));
+      const orgs = [...new Set(rows.map(x => Number(x.org_id)))];
+      if (orgs.length) r.digest = await n("update organizations set digest_on = $1::date where id = any($2::bigint[])", [todayISO(), orgs]);
+    }
     return r;
   });
+  for (const m of digest){
+    const list = m.items.slice(0, 20).map(x => `${x.due_date.split("-").reverse().join(".")} — ${x.title}${x.party ? ` (${x.party})` : ""}`).join("; ") + (m.items.length > 20 ? " …" : "");
+    await sendMail(m.to, "digest", { vars: { org: m.org, n: m.items.length, list }, link: `https://${process.env.PUBLIC_HOST}/kompaniya` });
+  }
   for (const x of remind) await sendMail(x.email, "renew", { vars: { date: fmtDate(new Date(x.ends_at), "uz") }, link: `https://${process.env.PUBLIC_HOST}/tariflar` });
   return out;
 }
