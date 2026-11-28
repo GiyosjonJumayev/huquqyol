@@ -13,7 +13,7 @@ const int = (v, min, max) => { const n = Math.round(Number(String(v ?? "").repla
 
 // ---------- Pro holati ----------
 export async function proStatus(userId){
-  const s = await one(`select plan, status, ends_at from subscriptions where (user_id = $1 or (plan in ('firma','org') and org_id = (select org_id from users where id = $1))) and plan in ('pro','firma','org')
+  const s = await one(`select plan, status, ends_at from subscriptions where (user_id = $1 or (plan in ('firma','biznes','org') and org_id = (select org_id from users where id = $1))) and plan in ('pro','firma','biznes','org')
       and status in ('active','trial') and (ends_at is null or ends_at > now())
       order by (status = 'active') desc, ends_at desc nulls first limit 1`, [userId]);
   return { paid: s?.status === "active", trial: s?.status === "trial", tools: !!s, plan: s?.plan || null, endsAt: s?.ends_at || null };

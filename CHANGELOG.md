@@ -1,5 +1,23 @@
 # O‘zgarishlar tarixi
 
+## 4.2.0 — 2026-11-28 · Yangi kirish va ro‘yxat, «Kompaniya» ish joyi
+- **Ro‘yxatdan o‘tish:** rol kartochkalari (Fuqaro · Yurist yoki advokat · Kompaniya), har bir rol uchun o‘z maydonlari
+  (kompaniya: nom, STIR, turi, xodimlar soni; advokat: turi, litsenziya, byuro — qoralama profil avtomatik yaratiladi), parolni ko‘rsatish tugmasi,
+  parol kuchi ko‘rsatkichi va talablar ro‘yxati, Caps Lock ogohlantirishi, e-pochtadagi xato domenga taklif («gmial.com» → «gmail.com»),
+  oferta va maxfiylik havolalari. Ro‘yxatdan keyin har bir rol o‘z birinchi sahifasiga o‘tadi.
+- **Parol siyosati (NIST SP 800-63B):** keng tarqalgan parollar va e-pochta/ism bilan bir xil parol rad etiladi; uzun ibora-parol tavsiya qilinadi.
+- **Kirish:** ikki ustunli sahifa, maydon bo‘yicha xato (aria-invalid, fokus), **parolsiz kirish** — e-pochtaga bir martalik havola (15 daqiqa;
+  havola sahifani ochadi, kirish tugma bilan — pochta skanerlari uni ishlatib qo‘ya olmaydi; 2FA yoqilgan bo‘lsa kod ham so‘raladi).
+  API kirish xatolari endi foydalanuvchi tilida.
+- **«Kompaniya» tarifi va ish joyi (/kompaniya)** — yuristi yo‘q korxonalar uchun: shartnomalar reestri (kontragent, STIR, summa, valyuta, muddat),
+  muddatlar (litsenziya, ishonchnoma, hisobot; har oy/chorak/yil takrorlanadi), kiruvchi/chiquvchi xatlar jurnali (avtomatik raqam K-/Ch-YIL/NNN),
+  ichki hujjatlar kutubxonasi, faoliyatga oid qonunlar (lex.uz, bazadan), rekvizitlar va blanka, 9 ta tasdiqlangan shablondan hujjat
+  (buyruq, pretenziya, xizmat shartnomasi, kelishmovchilik bayonnomasi, dalolatnoma, qaror) jonli ko‘rinish bilan — DOCX/PDF, chiquvchi xat jurnalga avtomatik.
+  Bosh panel: muddati o‘tgan / eslatma vaqti kelgan, faol shartnomalar summasi, boshlash ro‘yxati. Excel (CSV) va kalendar (.ics) eksport,
+  e-pochtaga kunlik eslatma (egasiga va mas’ulga). Obuna tugasa ham ko‘rish va eksport ochiq — ma’lumot egasiniki.
+- Xavfsizlik: tashkilotlar orasida qat’iy ajratish, har bir o‘zgarish jurnalga (matnsiz), CSV formula in’ektsiyasidan himoya, rekvizitlarni faqat egasi o‘zgartiradi.
+- Testlar: `test/company.test.js` (ro‘yxat, parolsiz kirish, kompaniya reestri, eslatma).
+
 ## 4.1.0 — 2026-11-26 · Mamlakat statistikasi va ishni yuristga yuborish
 - **Statistika (/statistika):** davr tanlovi — 7 kun, 30 kun, 3 oy, 1 yil — va har bir ko‘rsatkich oldingi shunday davr bilan solishtiriladi.
   Ko‘rsatkichlar: faol foydalanuvchilar (kun ichida noyob), ochilgan rejalar, tayyorlangan arizalar (konversiya bilan), yuristga yuborilgan ishlar,

@@ -165,7 +165,33 @@ const MIGRATIONS = [
      action text not null, target text, data jsonb, ip text);
    create index audit_log_at on audit_log(at desc);`,
   // Fuqaro tanlagan yuristga ish paketi: reja va ariza ma’lumotlari (faqat rozilik bilan; qaytarib olinadi, rad/bekor qilinganda o‘chadi)
-  `alter table consultations add column case_data jsonb, add column case_at timestamptz, add column case_withdrawn_at timestamptz;`
+  `alter table consultations add column case_data jsonb, add column case_at timestamptz, add column case_withdrawn_at timestamptz;`,
+  // Kompaniya ish joyi: «Kompaniya» tarifi, rekvizitlar, shartnomalar / muddatlar / xatlar / hujjatlar reestri (jamoa uchun umumiy)
+  `alter table subscriptions drop constraint if exists subscriptions_plan_check;
+   alter table subscriptions add constraint subscriptions_plan_check check (plan in ('pro','firma','org','biznes'));
+   alter table organizations add column req jsonb not null default '{}'::jsonb, add column size text, add column digest_on date;
+   alter table user_tokens drop constraint if exists user_tokens_kind_check;
+   alter table user_tokens add constraint user_tokens_kind_check check (kind in ('verify','reset','invite','login'));
+   create table org_records(
+     id bigserial primary key,
+     org_id bigint not null references organizations(id) on delete cascade,
+     kind text not null check (kind in ('contract','deadline','letter','doc')),
+     title text not null,
+     party text, party_inn text, number text,
+     amount numeric(18,2), currency text check (currency in ('UZS','USD','EUR','RUB')),
+     start_date date, due_date date,
+     remind_days int not null default 14 check (remind_days between 0 and 365),
+     repeat text not null default 'none' check (repeat in ('none','month','quarter','year')),
+     direction text check (direction in ('in','out')),
+     category text,
+     status text not null default 'active' check (status in ('active','done','cancelled')),
+     assignee_id bigint references users(id) on delete set null,
+     url text, note text,
+     created_by bigint references users(id) on delete set null,
+     created_at timestamptz not null default now(),
+     updated_at timestamptz not null default now(),
+     done_at timestamptz);
+   create index org_records_org on org_records(org_id, kind, status, due_date);`
 ];
 
 let pool = null;

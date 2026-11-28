@@ -31,7 +31,7 @@ function client(){
     post: (p, b = {}) => fetch(base + p, { method: "POST", headers: { "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify({ lang: "uz", ...b }) }).then(keep),
     json: async (p, b) => (await (b === undefined ? fetch(base + p, { headers: { Cookie: cookie } }) : fetch(base + p, { method: "POST", headers: { "Content-Type": "application/json", Cookie: cookie }, body: JSON.stringify(b) }))).json() };
 }
-const PW = "Parol1234";
+const PW = "Sinov-Kalit-2468";
 const reg = async (email, role = "lawyer", extra = {}) => { const c = client(); const r = await c.post("/api/auth/register", { name: "Test " + email, email, password: PW, consent: true, role, ...extra }); assert.equal(r.status, 201); return c; };
 const order = async (c, plan = "pro", months = 1) => (await c.json("/api/subscriptions", { plan, months })).id;
 const pay = id => db.one("select * from payments where id = $1", [id]);

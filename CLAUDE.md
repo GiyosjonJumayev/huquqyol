@@ -23,7 +23,7 @@ text come from code + verified templates. The app must work fully with no API ke
 npm ci
 cp .env.example .env     # Windows: copy .env.example .env ; set NODE_ENV=development, TRUST_PROXY= (empty)
 npm run dev              # http://localhost:3000 (auto-restart)
-npm test                 # node:test, must stay green (178 tests; 18 DB tests skip without TEST_DATABASE_URL). With a DB run files sequentially: node --test --test-concurrency=1 test/*.test.js
+npm test                 # node:test, must stay green (183 tests; 23 DB tests skip without TEST_DATABASE_URL). With a DB run files sequentially: node --test --test-concurrency=1 test/*.test.js
 npm run test:e2e         # 15 browser tests incl. axe and navbar overlap per role; npm i --no-save playwright && npx playwright install chromium (or CHROME_PATH=…)
 npm run bot              # Telegram bot (long polling); needs TELEGRAM_BOT_TOKEN in .env
 npm run kb               # rebuild server/kb/*.json from scripts/*.py (Windows: python scripts/build-kb.py server/kb)
@@ -66,7 +66,13 @@ become admin), `AI_PROVIDER` (anthropic|gemini; default = whichever key is set, 
   Never trust amounts from the browser; never log keys. Setup guide: `docs/PAYMENTS.md`. Prices/discounts/seats come from env.
 - Account security: `server/account.js`, `server/totp.js` (2FA), `server/mail.js` (SMTP; off without `SMTP_URL`), page `/xavfsizlik`. Teams: `server/team.js` (`/jamoa`, shared cabinet with versions). Hourly jobs: `server/jobs.js`.
 - Production: `deploy/compose.yml` (Caddy, PostgreSQL, backups), `npm run check`, `npm run admin`. Demo lawyers are hidden when NODE_ENV=production unless `SHOW_DEMO=1`.
-- Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Tashkilot). Checkout `/tolov/:id`; admin can also confirm bank transfers.
+- Plans: `/tariflar` (Fuqaro free, Yurist Pro, Firma, Kompaniya, Tashkilot). Checkout `/tolov/:id`; admin can also confirm bank transfers.
+- Auth pages (`server/accountPages.js` loginPage/registerPage/linkPage): role cards, per-role fields, password show/strength, field-level errors
+  (server returns `field`), passwordless e-mail link (`/api/auth/link`, `/kirish/havola`, token kind `login`, 15 min, POST to use). Password policy in
+  `server/auth.js` checkPassword (+ `server/passwords.js` common list). Test password: `Sinov-Kalit-2468`.
+- Company workspace (role org, plan `biznes` «Kompaniya» / `org`): `server/company.js` (org_records: contract / deadline / letter / doc, requisites in
+  `organizations.req`, templates = practice.json ids in COMPANY_TPL, CSV/ICS export, daily digest in `server/jobs.js`) + `server/companyPages.js`
+  (`/kompaniya?b=…`). Read and export stay open without a subscription; writes need `need:"pro"`. Dates are entered by users — never invent legal deadlines.
 - Courts by district: `server/kb/courts.json` (+ `public/courts.js`, `GET /api/courts`).
 - Statistics: `server/stats.js` (counts only; per-day: active users, domains, scenarios, region from the form's district via `server/regions.js`, photo reads, cases sent to lawyers) → `report({ period })` for 7/30/90/365 days vs the previous period. Page `server/statsPage.js` (`/statistika?davr=`), `GET /api/stats?davr=`, `GET /api/stats.csv`. Never store text, IP, or addresses.
 - Case handoff: citizen sends plan + application data to a chosen lawyer (`POST /api/consultations` with `shareCase:true, case:{…}` built in `public/account.js` from localStorage). Stored in `consultations.case_data` (validated per field), visible only to the two parties at `/hisob/ish/:id` (`server/casePage.js`, DOCX/PDF at `/hisob/ish/:id/:fmt`). Withdraw: `/api/consultations/:id/withdraw`; wiped on decline/cancel and 90 days after closing (`server/jobs.js`).

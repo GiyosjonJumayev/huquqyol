@@ -92,15 +92,17 @@ document.addEventListener("submit", async e => {
   // Yuristga so‘rov: fuqaro belgilagan bo‘lsa, shu brauzerdagi reja va ariza ma’lumotlari qo‘shiladi
   if ("case" in f.dataset && body.shareCase === true){ const s = savedCase(); if (s) body.case = caseBody(s); else body.shareCase = false; }
   const btn = f.querySelector('[type="submit"]');
+  clearMarks(f);
   showErr(f, ""); const okEl = f.querySelector("[data-ok-msg]"); if (okEl) okEl.hidden = true;
   if (btn) btn.disabled = true;
   try {
     const d = await send(f.dataset.api, body);
     if (f.dataset.result) showResult(document.getElementById(f.dataset.result), d, f);
-    else if (f.dataset.ok){ if (okEl){ okEl.textContent = f.dataset.ok + (d.recheck ? ` ${MOD[lang] || MOD.uz}` : ""); okEl.hidden = false; } if (!("reload" in f.dataset)) f.reset(); }
+    else if (f.dataset.ok){ if (okEl){ okEl.textContent = f.dataset.ok + (d.recheck ? ` ${MOD[lang] || MOD.uz}` : ""); okEl.hidden = false; okEl.focus?.(); } if (!("reload" in f.dataset)) f.reset(); }
     else go(f.dataset.next || d.next);
   } catch (x){
     showErr(f, x.message);
+    markField(f, x.data?.field, x.message);
     if (x.data?.need === "code"){ const c = f.querySelector("[data-code]"); if (c){ c.hidden = false; const i = c.querySelector("input"); i.required = true; i.value = ""; i.focus(); } }
   }
   finally { if (btn) btn.disabled = false; }
@@ -133,7 +135,7 @@ document.addEventListener("click", async e => {
   if ("confirm" in b.dataset && b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = SURE[lang] || SURE.uz; setTimeout(() => { b.dataset.armed = ""; }, 5000); return; }
   let body = {}; try { body = b.dataset.body ? JSON.parse(b.dataset.body) : {}; } catch {}
   b.disabled = true;
-  try { const d = await send(b.dataset.post, body); go(d.next); }
+  try { const d = await send(b.dataset.post, body); go(b.dataset.next || d.next); }
   catch (x){ showErr(b.closest("li, article, form, div") || document.body, x.message); b.disabled = false; }
 });
 
@@ -177,3 +179,131 @@ for (const f of document.querySelectorAll("form[data-case]")){
   const sync = () => { if (msg){ msg.required = !cb.checked; msg.minLength = cb.checked ? 0 : 10; } };
   cb.addEventListener("change", sync); sync();
 }
+
+
+// ---------- Maydon bo‘yicha xato (server «field» qaytaradi): maydon belgilanadi, xato matni ostida, fokus unga ----------
+function markField(f, name, text){
+  if (!name) return;
+  const el = f.elements[name] instanceof RadioNodeList ? f.elements[name][0] : f.elements[name];
+  if (!el || !el.closest) return;
+  const box = el.closest(".field") || el.closest("label") || el.parentElement;
+  el.setAttribute("aria-invalid", "true");
+  let m = box.querySelector(".ferr");
+  if (!m){ m = document.createElement("span"); m.className = "err ferr"; m.id = `${el.id || name}_err`; box.append(m); }
+  m.textContent = text;
+  el.setAttribute("aria-describedby", [...new Set([...(el.getAttribute("aria-describedby") || "").split(" ").filter(Boolean), m.id])].join(" "));
+  el.focus();
+}
+function clearMarks(f){
+  for (const el of f.querySelectorAll('[aria-invalid="true"]')) el.removeAttribute("aria-invalid");
+  for (const m of f.querySelectorAll(".ferr")) m.remove();
+}
+document.addEventListener("input", e => { const el = e.target; if (el.getAttribute?.("aria-invalid") === "true"){ el.removeAttribute("aria-invalid"); el.closest(".field")?.querySelector(".ferr")?.remove(); } });
+
+// ---------- Parol: ko‘rsatish / yashirish, Caps Lock, kuchi ----------
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-pw-toggle]"); if (!b) return;
+  const i = document.getElementById(b.dataset.pwToggle); if (!i) return;
+  const show = i.type === "password";
+  i.type = show ? "text" : "password";
+  b.setAttribute("aria-pressed", String(show));
+  b.querySelector("span").textContent = show ? b.dataset.hide : b.dataset.show;
+  i.focus();
+});
+const capsCheck = e => {
+  if (!(e.target instanceof HTMLInputElement) || !e.target.closest(".pwwrap") || typeof e.getModifierState !== "function") return;
+  const n = document.getElementById(`${e.target.id}_caps`); if (n) n.hidden = !e.getModifierState("CapsLock");
+};
+document.addEventListener("keydown", capsCheck); document.addEventListener("keyup", capsCheck);
+// Taxminiy kuch: uzunlik muhimroq (NIST), turli belgilar — qo‘shimcha; oddiy naqshlar — pastroq
+function pwScore(pw){
+  if (!pw) return -1;
+  let s = pw.length >= 16 ? 3 : pw.length >= 12 ? 2 : pw.length >= 8 ? 1 : 0;
+  const kinds = [/\p{Ll}/u, /\p{Lu}/u, /\d/, /[^\p{L}\d]/u].filter(r => r.test(pw)).length;
+  if (kinds >= 3) s++;
+  if (/^(.)\1+$/.test(pw) || /^(?:0123|1234|qwer|asdf|parol|pass)/i.test(pw) || /(.)\1{3,}/.test(pw)) s = Math.min(s, 1);
+  if (!/\p{L}/u.test(pw) || !/\d/.test(pw)) s = Math.min(s, 1);
+  return Math.max(0, Math.min(4, s));
+}
+for (const i of document.querySelectorAll("input[data-strength]")){
+  const f = i.form, meter = f.querySelector("[data-meter]"), label = f.querySelector("[data-meter-label]"), names = [...(f.querySelector("template[data-strength-labels]")?.content.children || [])].map(x => x.textContent);
+  const rules = { len: v => v.length >= 8, letter: v => /\p{L}/u.test(v), digit: v => /\d/.test(v) };
+  const upd = () => {
+    const v = i.value, sc = pwScore(v);
+    meter.dataset.score = String(sc);
+    label.textContent = sc < 0 ? "—" : names[sc] || "";
+    for (const li of f.querySelectorAll("[data-rule]")) li.classList.toggle("ok", rules[li.dataset.rule](v));
+  };
+  i.addEventListener("input", upd); upd();
+}
+
+// ---------- E-pochta: tez-tez uchraydigan xato domenlar uchun taklif ----------
+const DOMAINS = ["gmail.com", "mail.ru", "yandex.ru", "yandex.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "inbox.ru", "list.ru", "bk.ru", "mail.uz", "umail.uz", "inbox.uz"];
+const SUGG = { uz:"Balki {e} demoqchisiz?", cyr:"Балки {e} демоқчисиз?", ru:"Возможно, вы имели в виду {e}?" };
+function lev(a, b){
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+for (const i of document.querySelectorAll("input[data-email-check]")){
+  const out = document.getElementById(`${i.id}_s`);
+  i.addEventListener("blur", () => {
+    out.replaceChildren();
+    const m = /^([^@\s]+)@([^@\s]+)$/.exec(i.value.trim().toLowerCase()); if (!m || DOMAINS.includes(m[2])) return;
+    const best = DOMAINS.map(d => [d, lev(m[2], d)]).sort((a, b) => a[1] - b[1])[0];
+    if (!best || best[1] > 2) return;
+    const fixed = `${m[1]}@${best[0]}`, [pre, post] = (SUGG[lang] || SUGG.uz).split("{e}");
+    const b = Object.assign(document.createElement("button"), { type: "button", className: "linkbtn", textContent: fixed });
+    b.addEventListener("click", () => { i.value = fixed; out.replaceChildren(); i.focus(); });
+    out.append(pre, b, post);
+  });
+}
+
+// ---------- Ro‘yxat: rol tanlanganda tegishli bo‘limlar ----------
+for (const r of document.querySelectorAll("input[data-role-switch]")){
+  r.addEventListener("change", () => {
+    if (!r.checked) return;
+    const wrap = r.closest(".authwrap"); if (wrap) wrap.dataset.role = r.value;
+    for (const el of r.form.querySelectorAll("[data-for]")) el.hidden = !el.dataset.for.split(" ").includes(r.value);
+  });
+}
+
+// ---------- Kompaniya: shablondan hujjat — jonli ko‘rinish va yuklab olish (DOCX / PDF) ----------
+const tplData = document.getElementById("tpl-data"), tplPrev = document.getElementById("tplPreview");
+if (tplData && tplPrev){
+  const D = JSON.parse(tplData.textContent), form = document.querySelector("form[data-download]");
+  const vals = () => Object.fromEntries([...form.querySelectorAll("[data-tpl-k]")].map(x => [x.dataset.tplK, x.value.trim()]));
+  const fill = (s, v) => s.replace(/\{\{(\w+)\}\}/g, (_, k) => v[k] || "________");
+  const draw = () => {
+    const v = vals(), el = (tag, cls, txt) => Object.assign(document.createElement(tag), { className: cls || "", textContent: txt || "" });
+    const nodes = [];
+    if (D.lh?.length){ const h = el("div", "lhead"); D.lh.forEach((l, i) => { const p = el("p"); if (i) p.textContent = l; else p.append(el("b", "", l)); h.append(p); }); nodes.push(h); }
+    if (D.to?.length){ const a = el("div", "addr"); for (const l of D.to) a.append(el("p", "", fill(l, v))); nodes.push(a); }
+    if (D.title) nodes.push(el("p", "dtitle", D.title));
+    for (const para of fill(D.text, v).split(/\n{2,}/)) nodes.push(el("p", "", para));
+    tplPrev.replaceChildren(...nodes);
+  };
+  form.addEventListener("input", draw); draw();
+}
+document.addEventListener("submit", async e => {
+  const f = e.target.closest("form[data-download]"); if (!f) return;
+  e.preventDefault();
+  const fmt = e.submitter?.dataset.fmt === "pdf" ? "pdf" : "docx";
+  const values = {}; for (const x of f.querySelectorAll("[data-tpl-k]")) values[x.dataset.tplK] = x.value;
+  const body = { tpl: f.elements.tpl.value, values, docLang: f.elements.docLang?.value || lang, logOut: !!f.elements.logOut?.checked, lang };
+  const ok = f.querySelector("[data-ok-msg]"); showErr(f, ""); if (ok) ok.hidden = true;
+  const btns = f.querySelectorAll('[type="submit"]'); btns.forEach(b => { b.disabled = true; });
+  try {
+    let r;
+    try { r = await fetch(f.dataset.download + fmt, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), credentials: "same-origin" }); }
+    catch { throw new Error(NET[lang] || NET.uz); }
+    if (!r.ok){ let d = {}; try { d = await r.json(); } catch {} throw new Error(d.error || ERR[lang] || ERR.uz); }
+    const blob = await r.blob(), name = /filename="([^"]+)"/.exec(r.headers.get("Content-Disposition") || "")?.[1] || `hujjat.${fmt}`;
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: name });
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    const no = r.headers.get("X-Record-Number");
+    if (ok){ ok.textContent = `✓ ${name}${no ? ` · № ${decodeURIComponent(no)}` : ""}`; ok.hidden = false; }
+  } catch (x){ showErr(f, x.message); }
+  finally { btns.forEach(b => { b.disabled = false; }); }
+});

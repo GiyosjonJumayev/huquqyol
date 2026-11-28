@@ -82,6 +82,9 @@ const T = {
   pFree: ["Fuqaro", "Гражданин"], pFreeFor: ["Huquqi buzilgan har bir fuqaro uchun", "Для каждого гражданина"],
   pPro: ["Yurist Pro", "Юрист Pro"], pProFor: ["Yakka yurist va advokatlar uchun", "Для частных юристов и адвокатов"],
   pFirm: ["Firma", "Фирма"], pFirmFor: ["Advokatlik byurosi va yuridik firmalar uchun", "Для адвокатских бюро и юридических фирм"],
+  pBiz: ["Kompaniya", "Компания"], pBizFor: ["Yuristi yo‘q korxona va tadbirkorlar uchun: shartnomalar, muddatlar, xatlar va hujjatlar bir joyda", "Для предприятий и предпринимателей без юриста: договоры, сроки, письма и документы в одном месте"],
+  plBizWhy: ["Bitta o‘tkazib yuborilgan shartnoma muddati, javobsiz qolgan xat yoki eskirgan ishonchnoma oylik to‘lovdan qimmatga tushadi. Kompaniya bo‘limi ularni oldindan eslatadi.", "Один пропущенный срок договора, письмо без ответа или просроченная доверенность обходятся дороже месячной оплаты. Раздел «Компания» напоминает о них заранее."],
+  plBizTry: ["14 kun bepul — kartasiz", "14 дней бесплатно — без карты"],
   pOrg: ["Tashkilot", "Организация"], pOrgFor: ["Korxona, muassasa va tashkilot yuristlari uchun", "Для юристов предприятий, учреждений и организаций"],
   plAll: ["{p} imkoniyatlari, shuningdek:", "Всё из «{p}», а также:"],
   cmpTitle: ["Imkoniyatlarni solishtirish", "Сравнение возможностей"], cmpFeature: ["Imkoniyat", "Возможность"],
@@ -103,11 +106,19 @@ const FEAT = {
     ["Faoliyatga oid qonunlar ro‘yxati (lex.uz havolalari)", "Список законов по деятельности (ссылки на lex.uz)"], ["Ichki shablonlar: shartnoma, buyruq, xat — tashkilot blankasida", "Внутренние шаблоны: договор, приказ, письмо — на бланке организации"],
     ["Bir nechta yurist uchun umumiy kutubxona", "Общая библиотека для нескольких юристов"]]
 };
+FEAT.biznes = [["Shartnomalar reestri: kontragent, summa, muddat; tugashidan oldin eslatma", "Реестр договоров: контрагент, сумма, срок; напоминание до окончания"],
+  ["Muddatlar kalendari: litsenziya, ishonchnoma, hisobot — takrorlanadigan eslatmalar (.ics)", "Календарь сроков: лицензии, доверенности, отчёты — повторяющиеся напоминания (.ics)"],
+  ["Kiruvchi va chiquvchi xatlar jurnali: avtomatik raqam va javob muddati", "Журнал входящих и исходящих писем: автономер и срок ответа"],
+  ["Kompaniya blankasida tayyor hujjatlar: buyruq, pretenziya, shartnoma, dalolatnoma, qaror", "Готовые документы на бланке компании: приказ, претензия, договор, акт, решение"],
+  ["Ichki hujjatlar kutubxonasi va faoliyatga oid qonunlar (lex.uz)", "Библиотека внутренних документов и законы по деятельности (lex.uz)"],
+  ["Jamoa: {bseats} tagacha xodim, mas’ul belgilash, e-pochtaga kunlik eslatma", "Команда: до {bseats} сотрудников, ответственные, ежедневное напоминание на почту"],
+  ["Excel (CSV) eksport — ma’lumot doim sizniki; obuna tugasa ham ko‘rish va yuklab olish ochiq", "Экспорт в Excel (CSV) — данные всегда ваши; после окончания подписки просмотр и выгрузка остаются"]];
 const SOON = new Set();                                 // hali ishlab chiqilmagan imkoniyatlar («tez orada»): hozircha yo‘q
 export const PLANS = [
   { id:"free", name:"pFree", for:"pFreeFor", price:0, cta:["plStart", "/"] },
   { id:"pro", name:"pPro", for:"pProFor", price:PRICES.pro, cta:["plTry", "/kabinet?tarif=pro"], best:true },
   { id:"firma", name:"pFirm", for:"pFirmFor", price:PRICES.firma, cta:["plTry", "/kabinet?tarif=firma"], base:"pro" },
+  { id:"biznes", name:"pBiz", for:"pBizFor", price:PRICES.biznes, cta:["plBizTry", "/kompaniya"] },
   { id:"org", name:"pOrg", for:"pOrgFor", price:null, cta:["plContact", "/kabinet?tarif=org"], base:"pro" }
 ];
 
@@ -153,24 +164,25 @@ ${a11yDialogHTML(mt)}${accHref ? `<script type="module" src="${accHref}"></scrip
 // ---------- Tariflar ----------
 export function plansPage({ lang, cssHref, fs, user, accHref, subs = [] }){
   const t = tr(lang), docs = kbFor("uz").SCENARIOS.reduce((n, s) => n + s.docs.length, 0);
-  const feat = (id, i, f) => `<li${SOON.has(`${id}:${i}`) ? ` class="soon"` : ""}>${esc(pick(f, lang).replace("{docs}", docs).replace("{seats}", SEATS.firma))}${SOON.has(`${id}:${i}`) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</li>`;
+  const feat = (id, i, f) => `<li${SOON.has(`${id}:${i}`) ? ` class="soon"` : ""}>${esc(pick(f, lang).replace("{docs}", docs).replace("{seats}", SEATS.firma).replace("{bseats}", SEATS.biznes))}${SOON.has(`${id}:${i}`) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</li>`;
   const cards = PLANS.map(p => {
     const list = (p.id === "firma" ? FEAT.firma : p.id === "org" ? FEAT.org : FEAT[p.id]).map((f, i) => feat(p.id === "org" ? "org" : p.id, i, f)).join("");
+    const why = p.id === "biznes" ? `<p class="small why">${esc(t("plBizWhy"))}</p>` : "";
     const price = p.price === 0 ? t("free") : p.price ? `${money(p.price, lang)} <span class="per">/ ${esc(t("perMonth"))}</span>` : esc(t("byDeal"));
     return `<article class="plan${p.best ? " best" : ""}" aria-labelledby="pl_${p.id}">
       <h2 id="pl_${p.id}">${esc(t(p.name))}</h2><p class="for">${esc(t(p.for))}</p><p class="price">${price}</p>
       ${p.base ? `<p class="small muted">${esc(t("plAll", { p: t("pPro") }))}</p>` : ""}
-      <ul class="feat">${list}</ul>
+      <ul class="feat">${list}</ul>${why}
       ${p.id === "free" ? `<a class="btn ghost" href="/">${esc(t("plStart"))}</a>`
         : user ? (["citizen", "lawyer", "org"].includes(user.role) ? orderForm({ lang, plan: p.id, best: p.best, active: subs.some(s => s.plan === p.id && s.status === "active") }) : "")
         : `<a class="btn ${p.best ? "primary" : "ghost"}" href="/royxat?tarif=${p.id}">${esc(t("plSubscribe"))}</a>`}
-      ${p.id !== "free" && (!user || ["lawyer", "org"].includes(user.role)) ? `<a class="small" href="${user ? p.cta[1] : `/royxat?tarif=${p.id}`}">${esc(t("plTry"))}</a>` : ""}</article>`;
+      ${p.id !== "free" && (!user || ["lawyer", "org"].includes(user.role)) ? `<a class="small" href="${user ? p.cta[1] : `/royxat?tarif=${p.id}`}">${esc(t(p.id === "biznes" ? "plBizTry" : "plTry"))}</a>` : ""}</article>`;
   }).join("");
   // Solishtirish jadvali
-  const rows = [...FEAT.free.map((f, i) => [f, ["free", "pro", "firma", "org"], `free:${i}`]), ...FEAT.pro.map((f, i) => [f, ["pro", "firma", "org"], `pro:${i}`]),
-    ...FEAT.firma.map((f, i) => [f, ["firma"], `firma:${i}`]), ...FEAT.org.map((f, i) => [f, ["org"], `org:${i}`])];
+  const rows = [...FEAT.free.map((f, i) => [f, ["free", "pro", "firma", "biznes", "org"], `free:${i}`]), ...FEAT.pro.map((f, i) => [f, ["pro", "firma", "org"], `pro:${i}`]),
+    ...FEAT.firma.map((f, i) => [f, ["firma"], `firma:${i}`]), ...FEAT.biznes.map((f, i) => [f, ["biznes", "org"], `biznes:${i}`]), ...FEAT.org.map((f, i) => [f, ["org"], `org:${i}`])];
   const table = `<div class="tscroll" tabindex="0"><table class="cmp"><thead><tr><th scope="col">${esc(t("cmpFeature"))}</th>${PLANS.map(p => `<th scope="col">${esc(t(p.name))}</th>`).join("")}</tr></thead><tbody>
-    ${rows.map(([f, has, key]) => `<tr><th scope="row">${esc(pick(f, lang).replace("{docs}", docs).replace("{seats}", SEATS.firma))}${SOON.has(key) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</th>${PLANS.map(p => `<td>${has.includes(p.id) ? `<span class="yes" aria-label="+">✓</span>` : `<span class="no" aria-label="—">—</span>`}</td>`).join("")}</tr>`).join("")}
+    ${rows.map(([f, has, key]) => `<tr><th scope="row">${esc(pick(f, lang).replace("{docs}", docs).replace("{seats}", SEATS.firma).replace("{bseats}", SEATS.biznes))}${SOON.has(key) ? ` <span class="tag">${esc(t("soon"))}</span>` : ""}</th>${PLANS.map(p => `<td>${has.includes(p.id) ? `<span class="yes" aria-label="+">✓</span>` : `<span class="no" aria-label="—">—</span>`}</td>`).join("")}</tr>`).join("")}
   </tbody></table></div>`;
   return page({ lang, cssHref, fs, user, accHref, path:"/tariflar", title:t("plTitle"), desc:t("plLead"), body:`
     <h1>${esc(t("plTitle"))}</h1><p class="lead">${esc(t("plLead"))}</p>
@@ -376,7 +388,7 @@ const PV = {
   h5: ["Cookie", "Cookie"],
   p5: ["hy_lang — til, hy_fs — shrift o‘lchami, hy_theme — mavzu, hy_photo — rasm paneli yopilgani. Hisobga kirsangiz — kirish uchun sessiya cookie (HttpOnly).", "hy_lang — язык, hy_fs — размер шрифта, hy_theme — тема, hy_photo — закрыта ли панель фото. Если вы вошли в аккаунт — cookie сессии (HttpOnly, только для входа)."],
   h6: ["Hisob", "Аккаунт"],
-  p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi. «Reja va arizamni yuborish»ni belgilasangiz, ariza maydonlari, sana va dalillar ro‘yxati bazada saqlanadi va faqat siz hamda o‘sha yurist ko‘radi; siz ularni istalgan vaqtda qaytarib olasiz, so‘rov rad etilsa yoki bekor qilinsa darhol, yopilgan ishlarda 90 kundan keyin o‘chiriladi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист. Если отметить «отправить план и заявление», поля заявления, дата и список доказательств хранятся в базе и видны только вам и этому юристу; их можно отозвать в любой момент, при отклонении или отмене запроса они удаляются сразу, по закрытым делам — через 90 дней."],
+  p6: ["Ro‘yxatdan o‘tsangiz, e-pochta, ism, telefon (ixtiyoriy) va rol bazada saqlanadi; parol faqat xesh ko‘rinishida. Yuristga so‘rov yuborsangiz, xabaringizni o‘sha yurist ko‘radi. «Reja va arizamni yuborish»ni belgilasangiz, ariza maydonlari, sana va dalillar ro‘yxati bazada saqlanadi va faqat siz hamda o‘sha yurist ko‘radi; siz ularni istalgan vaqtda qaytarib olasiz, so‘rov rad etilsa yoki bekor qilinsa darhol, yopilgan ishlarda 90 kundan keyin o‘chiriladi. Kompaniya hisobida shartnomalar, muddatlar, xatlar va rekvizitlar bazada saqlanadi va faqat shu kompaniya jamoasiga ko‘rinadi; ularni istalgan vaqtda Excel’ga yuklab olish yoki o‘chirish mumkin, hisob o‘chirilsa — kompaniya yozuvlari ham o‘chadi.", "При регистрации в базе хранятся эл. почта, имя, телефон (необязательно) и роль; пароль — только в виде хеша. Если вы отправите запрос юристу, ваше сообщение увидит этот юрист. Если отметить «отправить план и заявление», поля заявления, дата и список доказательств хранятся в базе и видны только вам и этому юристу; их можно отозвать в любой момент, при отклонении или отмене запроса они удаляются сразу, по закрытым делам — через 90 дней. В аккаунте компании договоры, сроки, письма и реквизиты хранятся в базе и видны только команде этой компании; их можно в любой момент выгрузить в Excel или удалить, при удалении аккаунта записи компании тоже удаляются."],
   h8: ["To‘lov", "Оплата"],
   p8: ["To‘lov Payme yoki Click sahifasida amalga oshiriladi; karta ma’lumotlari bizga kelmaydi. Biz buyurtma raqami, summa, sana va holatni saqlaymiz; hisob o‘chirilsa, bu yozuvlar shaxssiz qoladi. Yurist va jamoa kabinetidagi ma’lumotlar bazada saqlanadi va faqat egasi (jamoada — a’zolar) ko‘radi. Xavfsizlik uchun kirishlar (IP, brauzer) va muhim amallar jurnali yuritiladi.", "Оплата проходит на странице Payme или Click; данные карты к нам не попадают. Мы храним номер заказа, сумму, дату и статус; при удалении аккаунта записи обезличиваются. Данные кабинета юриста и команды хранятся в базе и видны только владельцу (в команде — участникам). Для безопасности ведётся журнал входов (IP, браузер) и важных действий."],
   h7: ["Telegram bot", "Telegram-бот"],

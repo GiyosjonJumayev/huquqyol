@@ -436,7 +436,7 @@ test("PDF: matnli PDF (OCR’siz) va skanerlangan PDF (OCR) — tur, holat, mudd
 });
 
 test("«Aa Qulaylik» modal oynasi har bir sahifada: Esc, fon, ×, fokus qaytadi, sahifa surilmaydi; footer va DEMO belgisi", { skip }, async () => {
-  for (const path of ["", "tariflar", "yuristlar/namuna-1", "kirish", "statistika", "maxfiylik"]){
+  for (const path of ["", "tariflar", "yuristlar/namuna-1", "kirish", "royxat?rol=org", "statistika", "maxfiylik"]){
     const p = await page();
     await p.goto(base + path);
     const top = await p.evaluate(() => document.querySelector("main").getBoundingClientRect().top);
@@ -488,7 +488,8 @@ test("Navbar har bir rol uchun: 1024 / 1280 / 1440 da hech narsa ustma-ust emas;
       for (let j = i + 1; j < R.length; j++) if (R[i].left < R[j].right - .5 && R[j].left < R[i].right - .5 && R[i].top < R[j].bottom - .5 && R[j].top < R[i].bottom - .5) bad.push("overlap");
     }
     if (document.documentElement.scrollWidth > innerWidth) bad.push("hscroll");
-    return { bad, kabinet: [...document.querySelectorAll('[data-nav="/kabinet"]')].some(a => !a.hidden) };
+    const shown = h => [...document.querySelectorAll(`[data-nav="${h}"]`)].some(a => !a.hidden);
+    return { bad, kabinet: shown("/kabinet"), kompaniya: shown("/kompaniya") };
   });
   for (const [role, r] of Object.entries(USERS)){
     const user = r && { id: 1, name: "Dilnoza Abdullayeva", role: r };
@@ -502,7 +503,8 @@ test("Navbar har bir rol uchun: 1024 / 1280 / 1440 da hech narsa ustma-ust emas;
         await p.waitForLoadState("networkidle");
         const s = await check(p);
         assert.deepEqual(s.bad, [], `${role} ${lang} ${width} (server)`);
-        assert.equal(s.kabinet, ["lawyer", "org"].includes(role), `${role}: Kabinet havolasi`);
+        assert.equal(s.kabinet, role === "lawyer", `${role}: Kabinet havolasi`);
+        assert.equal(s.kompaniya, role === "org", `${role}: Kompaniya havolasi`);
         // Bosh sahifa (navbar /api/me dan yangilanadi)
         await p.route(base + "api/me", x => x.fulfill({ contentType: "application/json", body: JSON.stringify({ user, nav: navFor(role) }) }));
         await p.context().addCookies([{ name: "hy_lang", value: lang, url: base }]);

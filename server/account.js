@@ -16,7 +16,7 @@ const TOKEN = /^[A-Za-z0-9_-]{30,80}$/;
 export async function issueToken(kind, { userId = null, hours, data = null }){
   const t = randomBytes(32).toString("base64url");
   if (userId && kind !== "invite") await q("delete from user_tokens where user_id = $1 and kind = $2", [userId, kind]);
-  await q("insert into user_tokens(id, kind, user_id, data, expires_at) values ($1, $2, $3, $4, now() + make_interval(hours => $5))", [sha(t), kind, userId, data ? JSON.stringify(data) : null, hours]);
+  await q("insert into user_tokens(id, kind, user_id, data, expires_at) values ($1, $2, $3, $4, now() + make_interval(mins => $5))", [sha(t), kind, userId, data ? JSON.stringify(data) : null, Math.round(hours * 60)]);
   return t;
 }
 export const peekToken = (kind, t) => TOKEN.test(String(t || "")) ? one("select * from user_tokens where id = $1 and kind = $2 and expires_at > now()", [sha(t), kind]) : null;
@@ -142,7 +142,9 @@ export async function deleteAccount(req, res){
   if (req.user.role === "admin") throw err("ownRole");
   await tx(async run => {
     // Moliyaviy yozuvlar buxgalteriya uchun shaxssiz qoladi (payments.user_id → null); qolgan hammasi o‘chadi
-    if (req.user.org_role === "owner"){ await run("update users set org_id = null, org_role = null where org_id = $1 and id <> $2", [req.user.org_id, req.user.id]); await run("delete from org_cabinet where org_id = $1", [req.user.org_id]); }
+    if (req.user.org_role === "owner"){ await run("update users set org_id = null, org_role = null where org_id = $1 and id <> $2", [req.user.org_id, req.user.id]); await run("delete from org_cabinet where org_id = $1", [req.user.org_id]);
+      // Kompaniya yozuvlari va rekvizitlar ham o‘chadi (maxfiylik siyosatidagi va’da); tashkilot qatori to‘lovlar tarixi uchun nomsiz qoladi
+      await run("delete from org_records where org_id = $1", [req.user.org_id]); await run("update organizations set req = '{}'::jsonb where id = $1", [req.user.org_id]); }
     await run("delete from lawyer_profiles where user_id = $1", [req.user.id]);
     await run("delete from users where id = $1", [req.user.id]);
     await audit(run, { action: "account.deleted", target: `user:${req.user.id}` });

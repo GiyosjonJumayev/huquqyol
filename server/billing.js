@@ -8,8 +8,10 @@ import { clean, ValidationError } from "./validate.js";
 
 const err = (key, status = 400, vars) => Object.assign(new ValidationError(key, vars), { status });
 const price = (name, def) => { const n = Number(process.env[name]); return Number.isFinite(n) && n > 0 ? Math.round(n) : def; };
-export const PRICES = { pro: price("PRICE_PRO", 149000), firma: price("PRICE_FIRMA", 490000), org: 0 };
-export const SEATS = { pro: 1, firma: price("FIRMA_SEATS", 5), org: price("ORG_SEATS", 20) };
+// biznes — «Kompaniya»: yuristi bo‘lmagan korxonalar uchun hujjat va muddatlar reestri (server/company.js)
+export const PRICES = { pro: price("PRICE_PRO", 149000), firma: price("PRICE_FIRMA", 490000), biznes: price("PRICE_BIZNES", 249000), org: 0 };
+export const SEATS = { pro: 1, firma: price("FIRMA_SEATS", 5), biznes: price("BIZNES_SEATS", 10), org: price("ORG_SEATS", 20) };
+export const TEAM_PLANS = ["firma", "biznes", "org"];
 export const PERIODS = [1, 3, 12];
 const pctOf = m => { const n = Number(process.env[`PLAN_DISCOUNT_${m}`]); return Number.isFinite(n) && n > 0 && n < 90 ? n : 0; };
 /** Davr narxi, so‘m: oylik × oylar − chegirma (PLAN_DISCOUNT_3 / PLAN_DISCOUNT_12, standart 0). */
@@ -67,7 +69,7 @@ export async function settle(run, p, method){
       orgId = u.org_id;
       if (!orgId){
         const prof = (await run("select firm from lawyer_profiles where user_id = $1", [u.id])).rows[0];
-        orgId = (await run("insert into organizations(name, kind, created_by) values ($1, $2, $3) returning id", [prof?.firm || u.name, s.plan === "firma" ? "firma" : "boshqa", u.id])).rows[0].id;
+        orgId = (await run("insert into organizations(name, kind, created_by) values ($1, $2, $3) returning id", [prof?.firm || u.name, s.plan === "firma" ? "firma" : s.plan === "biznes" ? "korxona" : "boshqa", u.id])).rows[0].id;
         await run("update users set org_id = $1, org_role = 'owner' where id = $2", [orgId, u.id]);
       }
     }
@@ -77,7 +79,7 @@ export async function settle(run, p, method){
         reminded_at = null where id = $1`, [s.id, orgId, Math.round(Number(p.amount) / p.months), p.months]);
     await run("update subscriptions set status = 'expired', ends_at = least(ends_at, now()) where user_id = $1 and status = 'trial' and plan = $2", [s.user_id, s.plan]);
     // Fuqaro faqat to‘lagandan keyin yurist / tashkilot hisobiga o‘tadi
-    await run("update users set role = $2 where id = $1 and role = 'citizen'", [s.user_id, s.plan === "org" ? "org" : "lawyer"]);
+    await run("update users set role = $2 where id = $1 and role = 'citizen'", [s.user_id, ["org", "biznes"].includes(s.plan) ? "org" : "lawyer"]);
   }
   await audit(run, { userId: p.user_id, action: "payment.paid", target: `payment:${p.id}`, data: { amount: Number(p.amount), method } });
   return true;
@@ -99,7 +101,7 @@ export const audit = (run, { userId = null, action, target = null, data = null, 
 
 // ---------- Obunaga buyurtma ----------
 export async function subscribe(req, res){
-  const plan = ["pro", "firma", "org"].includes(req.body?.plan) ? req.body.plan : null;
+  const plan = ["pro", "firma", "biznes", "org"].includes(req.body?.plan) ? req.body.plan : null;
   const months = req.body?.months == null ? 1 : Number(req.body.months);
   if (!plan || !PERIODS.includes(months)) throw err("option", 400, { label: "Tarif" });
   if (plan !== "pro" && req.user.org_role === "member") throw err("orgMember", 403);                 // jamoa a’zosi uchun tarifni egasi to‘laydi
